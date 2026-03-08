@@ -4,8 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { tiposServico } from "@/data/agendaData";
-import { getClientes, getVeiculos, getMotoristas, getFornecedores, saveAgendaItem } from "@/data/cadastroStorage";
+import { getClientes, getVeiculos, getMotoristas, getFornecedores, saveAgendaItem, getTiposServico } from "@/data/cadastroStorage";
 import { toast } from "sonner";
 import { Plus } from "lucide-react";
 
@@ -20,6 +19,7 @@ const NovoServicoDialog = ({ open, onOpenChange, onSaved }: NovoServicoDialogPro
   const [veiculos, setVeiculos] = useState(getVeiculos());
   const [motoristas, setMotoristas] = useState(getMotoristas());
   const [fornecedores, setFornecedores] = useState(getFornecedores());
+  const [tiposServico, setTiposServico] = useState(getTiposServico());
 
   const [form, setForm] = useState({
     data: "",
@@ -44,6 +44,7 @@ const NovoServicoDialog = ({ open, onOpenChange, onSaved }: NovoServicoDialogPro
       setVeiculos(getVeiculos());
       setMotoristas(getMotoristas());
       setFornecedores(getFornecedores());
+      setTiposServico(getTiposServico());
     }
   }, [open]);
 

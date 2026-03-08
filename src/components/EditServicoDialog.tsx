@@ -4,8 +4,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { tiposServico, AgendaItem, statusFaturamentoOptions, StatusFaturamento } from "@/data/agendaData";
-import { updateAgendaItem } from "@/data/cadastroStorage";
+import { AgendaItem, statusFaturamentoOptions, StatusFaturamento } from "@/data/agendaData";
+import { updateAgendaItem, getTiposServico } from "@/data/cadastroStorage";
 import { toast } from "sonner";
 import { Pencil } from "lucide-react";
 
@@ -17,6 +17,7 @@ interface EditServicoDialogProps {
 }
 
 const EditServicoDialog = ({ open, onOpenChange, item, onSaved }: EditServicoDialogProps) => {
+  const tiposServico = getTiposServico();
   const [form, setForm] = useState({
     data: "",
     hora: "",

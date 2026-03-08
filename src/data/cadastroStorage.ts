@@ -91,8 +91,25 @@ export const deleteFornecedor = (id: string) => {
   setItems("cadastro_fornecedores", getFornecedores().filter((i) => i.id !== id));
 };
 
+// Tipos de Serviço
+import { AgendaItem, mockData, tiposServicoDefault } from "@/data/agendaData";
+
+export const getTiposServico = (): string[] => {
+  const data = localStorage.getItem("cadastro_tipos_servico");
+  return data ? JSON.parse(data) : tiposServicoDefault;
+};
+
+export const saveTipoServico = (tipo: string) => {
+  const items = getTiposServico();
+  items.push(tipo);
+  setItems("cadastro_tipos_servico", items);
+};
+
+export const deleteTipoServico = (tipo: string) => {
+  setItems("cadastro_tipos_servico", getTiposServico().filter((t) => t !== tipo));
+};
+
 // Agenda
-import { AgendaItem, mockData } from "@/data/agendaData";
 
 export const getAgendaItems = (): AgendaItem[] => {
   const data = localStorage.getItem("agenda_items");

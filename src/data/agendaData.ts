@@ -21,7 +21,8 @@ export interface AgendaItem {
   statusFaturamento: StatusFaturamento;
 }
 
-export const tiposServico = ["Transfer In", "Transfer Out", "City Tour", "Translado", "Fretamento"];
+export const tiposServicoDefault = ["Transfer In", "Transfer Out", "City Tour", "Translado", "Fretamento"];
+export const tiposServico = tiposServicoDefault;
 export const fornecedores = ["TransLog", "VipTur", "RoadMaster", "FlexRide", "AutoElite"];
 
 export const statusFaturamentoOptions: { value: StatusFaturamento; label: string }[] = [
