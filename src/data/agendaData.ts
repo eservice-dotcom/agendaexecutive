@@ -15,6 +15,7 @@ export interface AgendaItem {
   valor: number;
   fornecedor: string;
   custo: number;
+  observacoes: string;
 }
 
 export const tiposServico = ["Transfer In", "Transfer Out", "City Tour", "Translado", "Fretamento"];
