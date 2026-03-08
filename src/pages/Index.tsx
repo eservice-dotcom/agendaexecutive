@@ -82,9 +82,6 @@ const Index = () => {
                 <ClipboardList className="h-4 w-4" /> Cadastros
               </span>
             </Link>
-            <Button variant="ghost" size="sm" onClick={signOut} className="gap-1 text-primary-foreground/80 hover:text-primary-foreground hover:bg-primary-foreground/10">
-              <LogOut className="h-4 w-4" /> Sair
-            </Button>
           </div>
         </div>
       </header>
