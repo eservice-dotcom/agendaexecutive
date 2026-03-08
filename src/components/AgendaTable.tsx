@@ -3,10 +3,13 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { AgendaItem } from "@/data/agendaData";
-import { MapPin, Phone, User, Truck, MessageCircle, Pencil } from "lucide-react";
+import { MapPin, Phone, User, Truck, MessageCircle, Pencil, Trash2 } from "lucide-react";
 import WhatsAppDialog from "./WhatsAppDialog";
 import EditServicoDialog from "./EditServicoDialog";
 import { useAuth } from "@/contexts/AuthContext";
+import { deleteAgendaItem } from "@/data/cadastroStorage";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
+import { toast } from "sonner";
 
 interface AgendaTableProps {
   items: AgendaItem[];
@@ -34,7 +37,17 @@ const formatDate = (dateStr: string) => {
 const AgendaTable = ({ items, onEdited }: AgendaTableProps) => {
   const [whatsappItem, setWhatsappItem] = useState<AgendaItem | null>(null);
   const [editItem, setEditItem] = useState<AgendaItem | null>(null);
+  const [deleteItemId, setDeleteItemId] = useState<string | null>(null);
   const { canViewFinancials } = useAuth();
+
+  const handleDelete = () => {
+    if (deleteItemId) {
+      deleteAgendaItem(deleteItemId);
+      setDeleteItemId(null);
+      toast.success("Serviço excluído com sucesso!");
+      onEdited?.();
+    }
+  };
 
   if (items.length === 0) {
     return (
@@ -147,21 +160,48 @@ const AgendaTable = ({ items, onEdited }: AgendaTableProps) => {
                 {item.observacoes || "—"}
               </TableCell>
               <TableCell className="text-center">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="h-7 w-7 p-0 text-muted-foreground hover:text-primary"
-                  onClick={() => setEditItem(item)}
-                  title="Editar serviço"
-                >
-                  <Pencil className="h-4 w-4" />
-                </Button>
+                <span className="flex items-center justify-center gap-1">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="h-7 w-7 p-0 text-muted-foreground hover:text-primary"
+                    onClick={() => setEditItem(item)}
+                    title="Editar serviço"
+                  >
+                    <Pencil className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="h-7 w-7 p-0 text-muted-foreground hover:text-destructive"
+                    onClick={() => setDeleteItemId(item.id)}
+                    title="Excluir serviço"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                </span>
               </TableCell>
             </TableRow>
           ))}
         </TableBody>
       </Table>
     </div>
+    <AlertDialog open={!!deleteItemId} onOpenChange={(v) => { if (!v) setDeleteItemId(null); }}>
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle>Excluir serviço</AlertDialogTitle>
+          <AlertDialogDescription>
+            Tem certeza que deseja excluir este serviço? Esta ação não pode ser desfeita.
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogCancel>Cancelar</AlertDialogCancel>
+          <AlertDialogAction onClick={handleDelete} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+            Excluir
+          </AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
     </>
   );
 };
