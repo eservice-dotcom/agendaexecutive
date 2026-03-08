@@ -47,6 +47,7 @@ const AgendaTable = ({ items, onEdited }: AgendaTableProps) => {
   return (
     <>
     <WhatsAppDialog open={!!whatsappItem} onOpenChange={(v) => { if (!v) setWhatsappItem(null); }} item={whatsappItem} />
+    <EditServicoDialog open={!!editItem} onOpenChange={(v) => { if (!v) setEditItem(null); }} item={editItem} onSaved={() => onEdited?.()} />
     <div className="overflow-auto rounded-lg border border-border bg-card shadow-sm">
       <Table>
         <TableHeader>
