@@ -37,7 +37,17 @@ const formatDate = (dateStr: string) => {
 const AgendaTable = ({ items, onEdited }: AgendaTableProps) => {
   const [whatsappItem, setWhatsappItem] = useState<AgendaItem | null>(null);
   const [editItem, setEditItem] = useState<AgendaItem | null>(null);
+  const [deleteItemId, setDeleteItemId] = useState<string | null>(null);
   const { canViewFinancials } = useAuth();
+
+  const handleDelete = () => {
+    if (deleteItemId) {
+      deleteAgendaItem(deleteItemId);
+      setDeleteItemId(null);
+      toast.success("Serviço excluído com sucesso!");
+      onEdited?.();
+    }
+  };
 
   if (items.length === 0) {
     return (
