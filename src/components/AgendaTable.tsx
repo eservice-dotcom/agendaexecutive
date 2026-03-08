@@ -160,15 +160,26 @@ const AgendaTable = ({ items, onEdited }: AgendaTableProps) => {
                 {item.observacoes || "—"}
               </TableCell>
               <TableCell className="text-center">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="h-7 w-7 p-0 text-muted-foreground hover:text-primary"
-                  onClick={() => setEditItem(item)}
-                  title="Editar serviço"
-                >
-                  <Pencil className="h-4 w-4" />
-                </Button>
+                <span className="flex items-center justify-center gap-1">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="h-7 w-7 p-0 text-muted-foreground hover:text-primary"
+                    onClick={() => setEditItem(item)}
+                    title="Editar serviço"
+                  >
+                    <Pencil className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="h-7 w-7 p-0 text-muted-foreground hover:text-destructive"
+                    onClick={() => setDeleteItemId(item.id)}
+                    title="Excluir serviço"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                </span>
               </TableCell>
             </TableRow>
           ))}
