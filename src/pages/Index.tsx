@@ -1,5 +1,5 @@
 import { useState, useMemo, useCallback } from "react";
-import { CalendarDays, ListChecks, Truck, Building2, Plus, LogOut } from "lucide-react";
+import { CalendarDays, ListChecks, Truck, Building2, Plus } from "lucide-react";
 import logo from "@/assets/logo-executive-service.png";
 import { Link } from "react-router-dom";
 import { ClipboardList } from "lucide-react";
