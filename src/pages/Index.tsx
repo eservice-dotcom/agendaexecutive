@@ -1,14 +1,16 @@
-import { useState, useMemo } from "react";
-import { CalendarDays, ListChecks, Truck, Building2 } from "lucide-react";
+import { useState, useMemo, useCallback } from "react";
+import { CalendarDays, ListChecks, Truck, Building2, Plus } from "lucide-react";
 import logo from "@/assets/logo-executive-service.png";
 import { Link } from "react-router-dom";
 import { ClipboardList } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Button } from "@/components/ui/button";
 import AgendaFilters from "@/components/AgendaFilters";
 import AgendaTable from "@/components/AgendaTable";
 import FaturamentoVeiculo from "@/components/FaturamentoVeiculo";
 import FaturamentoFornecedor from "@/components/FaturamentoFornecedor";
-import { mockData } from "@/data/agendaData";
+import NovoServicoDialog from "@/components/NovoServicoDialog";
+import { getAgendaItems } from "@/data/cadastroStorage";
 
 interface FiltersState {
   search: string;
