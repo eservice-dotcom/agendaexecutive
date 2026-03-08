@@ -67,7 +67,7 @@ const WhatsAppDialog = ({ open, onOpenChange, item }: WhatsAppDialogProps) => {
 
         <div className="space-y-3">
           <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Selecione uma mensagem</p>
-          <div className="grid gap-2 max-h-48 overflow-y-auto pr-1">
+          <div className="grid gap-2 max-h-64 overflow-y-auto pr-1">
             {mensagensPreCadastradas.map((msg) => (
               <button
                 key={msg.id}
