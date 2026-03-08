@@ -3,10 +3,13 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { AgendaItem } from "@/data/agendaData";
-import { MapPin, Phone, User, Truck, MessageCircle, Pencil } from "lucide-react";
+import { MapPin, Phone, User, Truck, MessageCircle, Pencil, Trash2 } from "lucide-react";
 import WhatsAppDialog from "./WhatsAppDialog";
 import EditServicoDialog from "./EditServicoDialog";
 import { useAuth } from "@/contexts/AuthContext";
+import { deleteAgendaItem } from "@/data/cadastroStorage";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
+import { toast } from "sonner";
 
 interface AgendaTableProps {
   items: AgendaItem[];
