@@ -1,8 +1,10 @@
+import { useState } from "react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { AgendaItem } from "@/data/agendaData";
 import { MapPin, Phone, User, Truck, MessageCircle } from "lucide-react";
+import WhatsAppDialog from "./WhatsAppDialog";
 
 interface AgendaTableProps {
   items: AgendaItem[];
