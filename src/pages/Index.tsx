@@ -1,6 +1,8 @@
 import { useState, useMemo } from "react";
 import { CalendarDays, ListChecks, Truck, Building2 } from "lucide-react";
 import logo from "@/assets/logo-executive-service.png";
+import { Link } from "react-router-dom";
+import { ClipboardList } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import AgendaFilters from "@/components/AgendaFilters";
 import AgendaTable from "@/components/AgendaTable";
@@ -63,8 +65,13 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-background">
       <header className="border-b border-border bg-foreground px-4 py-3 shadow-sm sm:px-6 lg:px-8">
-        <div className="mx-auto flex max-w-[1600px] items-center gap-4">
+        <div className="mx-auto flex max-w-[1600px] items-center justify-between">
           <img src={logo} alt="Executive Service - Transportes e Eventos" className="h-10" />
+          <Link to="/cadastros">
+            <span className="flex items-center gap-1 text-sm text-primary-foreground/80 hover:text-primary-foreground">
+              <ClipboardList className="h-4 w-4" /> Cadastros
+            </span>
+          </Link>
         </div>
       </header>
 
