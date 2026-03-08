@@ -1,5 +1,5 @@
 import { useState, useMemo, useCallback } from "react";
-import { CalendarDays, ListChecks, Truck, Building2, Plus } from "lucide-react";
+import { CalendarDays, ListChecks, Truck, Building2, Plus, LogOut } from "lucide-react";
 import logo from "@/assets/logo-executive-service.png";
 import { Link } from "react-router-dom";
 import { ClipboardList } from "lucide-react";
@@ -11,6 +11,7 @@ import FaturamentoVeiculo from "@/components/FaturamentoVeiculo";
 import FaturamentoFornecedor from "@/components/FaturamentoFornecedor";
 import NovoServicoDialog from "@/components/NovoServicoDialog";
 import { getAgendaItems } from "@/data/cadastroStorage";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface FiltersState {
   search: string;
@@ -31,6 +32,7 @@ const initialFilters: FiltersState = {
 };
 
 const Index = () => {
+  const { canViewFinancials, signOut, user } = useAuth();
   const [filters, setFilters] = useState<FiltersState>(initialFilters);
   const [novoDialogOpen, setNovoDialogOpen] = useState(false);
   const [agendaData, setAgendaData] = useState(getAgendaItems);
@@ -70,40 +72,54 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <header className="border-b border-border bg-foreground px-4 py-3 shadow-sm sm:px-6 lg:px-8">
+       <header className="border-b border-border bg-foreground px-4 py-3 shadow-sm sm:px-6 lg:px-8">
         <div className="mx-auto flex max-w-[1600px] items-center justify-between">
           <img src={logo} alt="Executive Service - Transportes e Eventos" className="h-10" />
-          <Link to="/cadastros">
-            <span className="flex items-center gap-1 text-sm text-primary-foreground/80 hover:text-primary-foreground">
-              <ClipboardList className="h-4 w-4" /> Cadastros
-            </span>
-          </Link>
+          <div className="flex items-center gap-4">
+            <span className="hidden text-xs text-primary-foreground/60 sm:inline">{user?.email}</span>
+            <Link to="/cadastros">
+              <span className="flex items-center gap-1 text-sm text-primary-foreground/80 hover:text-primary-foreground">
+                <ClipboardList className="h-4 w-4" /> Cadastros
+              </span>
+            </Link>
+            <Button variant="ghost" size="sm" onClick={signOut} className="gap-1 text-primary-foreground/80 hover:text-primary-foreground hover:bg-primary-foreground/10">
+              <LogOut className="h-4 w-4" /> Sair
+            </Button>
+          </div>
         </div>
       </header>
 
       <main className="mx-auto max-w-[1600px] space-y-4 px-4 py-6 sm:px-6 lg:px-8">
         <Tabs defaultValue="agenda" className="space-y-4">
-          <TabsList className="grid w-full grid-cols-3 sm:w-auto sm:inline-grid">
+          <TabsList className={`grid w-full sm:w-auto sm:inline-grid ${canViewFinancials ? 'grid-cols-3' : 'grid-cols-1'}`}>
             <TabsTrigger value="agenda" className="gap-2">
               <CalendarDays className="h-4 w-4" />
               Agenda
             </TabsTrigger>
-            <TabsTrigger value="fat-veiculo" className="gap-2">
-              <Truck className="h-4 w-4" />
-              Fat. Veículo
-            </TabsTrigger>
-            <TabsTrigger value="fat-fornecedor" className="gap-2">
-              <Building2 className="h-4 w-4" />
-              Fat. Fornecedor
-            </TabsTrigger>
+            {canViewFinancials && (
+              <>
+                <TabsTrigger value="fat-veiculo" className="gap-2">
+                  <Truck className="h-4 w-4" />
+                  Fat. Veículo
+                </TabsTrigger>
+                <TabsTrigger value="fat-fornecedor" className="gap-2">
+                  <Building2 className="h-4 w-4" />
+                  Fat. Fornecedor
+                </TabsTrigger>
+              </>
+            )}
           </TabsList>
 
           <TabsContent value="agenda" className="space-y-4">
-            <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+            <div className={`grid gap-3 ${canViewFinancials ? 'grid-cols-2 sm:grid-cols-4' : 'grid-cols-2'}`}>
               <StatCard label="Registros" value={filteredData.length.toString()} />
               <StatCard label="Total PAX" value={filteredData.reduce((s, i) => s + i.pax, 0).toString()} />
-              <StatCard label="Receita" value={new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(totalValor)} accent />
-              <StatCard label="Margem" value={new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(totalValor - totalCusto)} />
+              {canViewFinancials && (
+                <>
+                  <StatCard label="Receita" value={new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(totalValor)} accent />
+                  <StatCard label="Margem" value={new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(totalValor - totalCusto)} />
+                </>
+              )}
             </div>
             <AgendaFilters filters={filters} onFilterChange={setFilters} motoristas={motoristas} />
             <div className="flex items-center justify-between">
@@ -120,13 +136,16 @@ const Index = () => {
             <NovoServicoDialog open={novoDialogOpen} onOpenChange={setNovoDialogOpen} onSaved={reloadData} />
           </TabsContent>
 
-          <TabsContent value="fat-veiculo">
-            <FaturamentoVeiculo />
-          </TabsContent>
-
-          <TabsContent value="fat-fornecedor">
-            <FaturamentoFornecedor />
-          </TabsContent>
+          {canViewFinancials && (
+            <>
+              <TabsContent value="fat-veiculo">
+                <FaturamentoVeiculo />
+              </TabsContent>
+              <TabsContent value="fat-fornecedor">
+                <FaturamentoFornecedor />
+              </TabsContent>
+            </>
+          )}
         </Tabs>
       </main>
     </div>
