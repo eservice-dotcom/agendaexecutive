@@ -19,6 +19,7 @@ const NovoServicoDialog = ({ open, onOpenChange, onSaved }: NovoServicoDialogPro
   const [veiculos, setVeiculos] = useState(getVeiculos());
   const [motoristas, setMotoristas] = useState(getMotoristas());
   const [fornecedores, setFornecedores] = useState(getFornecedores());
+  const [tiposServico, setTiposServico] = useState(getTiposServico());
 
   const [form, setForm] = useState({
     data: "",
