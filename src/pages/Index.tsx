@@ -106,11 +106,18 @@ const Index = () => {
               <StatCard label="Margem" value={new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(totalValor - totalCusto)} />
             </div>
             <AgendaFilters filters={filters} onFilterChange={setFilters} motoristas={motoristas} />
-            <div className="flex items-center gap-2 text-sm text-muted-foreground">
-              <ListChecks className="h-4 w-4" />
-              <span>{filteredData.length} de {mockData.length} registros</span>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                <ListChecks className="h-4 w-4" />
+                <span>{filteredData.length} de {agendaData.length} registros</span>
+              </div>
+              <Button onClick={() => setNovoDialogOpen(true)} className="gap-2">
+                <Plus className="h-4 w-4" />
+                Novo Serviço
+              </Button>
             </div>
             <AgendaTable items={filteredData} />
+            <NovoServicoDialog open={novoDialogOpen} onOpenChange={setNovoDialogOpen} onSaved={reloadData} />
           </TabsContent>
 
           <TabsContent value="fat-veiculo">
