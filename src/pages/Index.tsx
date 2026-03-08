@@ -32,14 +32,18 @@ const initialFilters: FiltersState = {
 
 const Index = () => {
   const [filters, setFilters] = useState<FiltersState>(initialFilters);
+  const [novoDialogOpen, setNovoDialogOpen] = useState(false);
+  const [agendaData, setAgendaData] = useState(getAgendaItems);
+
+  const reloadData = useCallback(() => setAgendaData(getAgendaItems()), []);
 
   const motoristas = useMemo(
-    () => [...new Set(mockData.map((i) => i.motorista))],
-    []
+    () => [...new Set(agendaData.map((i) => i.motorista))].filter(Boolean) as string[],
+    [agendaData]
   );
 
   const filteredData = useMemo(() => {
-    return mockData.filter((item) => {
+    return agendaData.filter((item) => {
       const search = filters.search.toLowerCase();
       if (
         search &&
@@ -59,7 +63,7 @@ const Index = () => {
       if (filters.motorista && item.motorista !== filters.motorista) return false;
       return true;
     });
-  }, [filters]);
+  }, [filters, agendaData]);
 
   const totalValor = filteredData.reduce((s, i) => s + i.valor, 0);
   const totalCusto = filteredData.reduce((s, i) => s + i.custo, 0);
