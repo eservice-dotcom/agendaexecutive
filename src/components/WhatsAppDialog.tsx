@@ -24,7 +24,8 @@ const replacePlaceholders = (texto: string, item: AgendaItem) => {
     .replace(/{placa}/g, item.placa)
     .replace(/{motorista}/g, item.motorista)
     .replace(/{pax}/g, String(item.pax))
-    .replace(/{cot}/g, item.cot);
+    .replace(/{cot}/g, item.cot)
+    .replace(/{tipo}/g, item.tipo);
 };
 
 const WhatsAppDialog = ({ open, onOpenChange, item }: WhatsAppDialogProps) => {
