@@ -31,8 +31,9 @@ const formatDate = (dateStr: string) => {
   return `${d}/${m}/${y}`;
 };
 
-const AgendaTable = ({ items }: AgendaTableProps) => {
+const AgendaTable = ({ items, onEdited }: AgendaTableProps) => {
   const [whatsappItem, setWhatsappItem] = useState<AgendaItem | null>(null);
+  const [editItem, setEditItem] = useState<AgendaItem | null>(null);
   const { canViewFinancials } = useAuth();
 
   if (items.length === 0) {
