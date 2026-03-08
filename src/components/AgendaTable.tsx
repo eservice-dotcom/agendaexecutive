@@ -29,6 +29,8 @@ const formatDate = (dateStr: string) => {
 };
 
 const AgendaTable = ({ items }: AgendaTableProps) => {
+  const [whatsappItem, setWhatsappItem] = useState<AgendaItem | null>(null);
+
   if (items.length === 0) {
     return (
       <div className="flex h-40 items-center justify-center rounded-lg border border-border bg-card text-muted-foreground">
@@ -38,6 +40,8 @@ const AgendaTable = ({ items }: AgendaTableProps) => {
   }
 
   return (
+    <>
+    <WhatsAppDialog open={!!whatsappItem} onOpenChange={(v) => { if (!v) setWhatsappItem(null); }} item={whatsappItem} />
     <div className="overflow-auto rounded-lg border border-border bg-card shadow-sm">
       <Table>
         <TableHeader>
