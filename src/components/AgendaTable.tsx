@@ -110,6 +110,7 @@ const AgendaTable = ({ items, onEdited }: AgendaTableProps) => {
               </>
             )}
             <TableHead className="whitespace-nowrap font-semibold">Observações</TableHead>
+            <TableHead className="whitespace-nowrap font-semibold text-center">Fat.</TableHead>
             <TableHead className="whitespace-nowrap font-semibold text-center">Ações</TableHead>
           </TableRow>
         </TableHeader>
