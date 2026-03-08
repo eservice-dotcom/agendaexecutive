@@ -3,12 +3,14 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { AgendaItem } from "@/data/agendaData";
-import { MapPin, Phone, User, Truck, MessageCircle } from "lucide-react";
+import { MapPin, Phone, User, Truck, MessageCircle, Pencil } from "lucide-react";
 import WhatsAppDialog from "./WhatsAppDialog";
+import EditServicoDialog from "./EditServicoDialog";
 import { useAuth } from "@/contexts/AuthContext";
 
 interface AgendaTableProps {
   items: AgendaItem[];
+  onEdited?: () => void;
 }
 
 const tipoBadgeVariant = (tipo: string) => {
@@ -29,8 +31,9 @@ const formatDate = (dateStr: string) => {
   return `${d}/${m}/${y}`;
 };
 
-const AgendaTable = ({ items }: AgendaTableProps) => {
+const AgendaTable = ({ items, onEdited }: AgendaTableProps) => {
   const [whatsappItem, setWhatsappItem] = useState<AgendaItem | null>(null);
+  const [editItem, setEditItem] = useState<AgendaItem | null>(null);
   const { canViewFinancials } = useAuth();
 
   if (items.length === 0) {
@@ -44,6 +47,7 @@ const AgendaTable = ({ items }: AgendaTableProps) => {
   return (
     <>
     <WhatsAppDialog open={!!whatsappItem} onOpenChange={(v) => { if (!v) setWhatsappItem(null); }} item={whatsappItem} />
+    <EditServicoDialog open={!!editItem} onOpenChange={(v) => { if (!v) setEditItem(null); }} item={editItem} onSaved={() => onEdited?.()} />
     <div className="overflow-auto rounded-lg border border-border bg-card shadow-sm">
       <Table>
         <TableHeader>
@@ -68,6 +72,7 @@ const AgendaTable = ({ items }: AgendaTableProps) => {
               </>
             )}
             <TableHead className="whitespace-nowrap font-semibold">Observações</TableHead>
+            <TableHead className="whitespace-nowrap font-semibold text-center">Ações</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -140,6 +145,17 @@ const AgendaTable = ({ items }: AgendaTableProps) => {
               )}
               <TableCell className="max-w-[200px] truncate text-sm text-muted-foreground" title={item.observacoes}>
                 {item.observacoes || "—"}
+              </TableCell>
+              <TableCell className="text-center">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-7 w-7 p-0 text-muted-foreground hover:text-primary"
+                  onClick={() => setEditItem(item)}
+                  title="Editar serviço"
+                >
+                  <Pencil className="h-4 w-4" />
+                </Button>
               </TableCell>
             </TableRow>
           ))}
