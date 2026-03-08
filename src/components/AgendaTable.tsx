@@ -3,12 +3,14 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { AgendaItem } from "@/data/agendaData";
-import { MapPin, Phone, User, Truck, MessageCircle } from "lucide-react";
+import { MapPin, Phone, User, Truck, MessageCircle, Pencil } from "lucide-react";
 import WhatsAppDialog from "./WhatsAppDialog";
+import EditServicoDialog from "./EditServicoDialog";
 import { useAuth } from "@/contexts/AuthContext";
 
 interface AgendaTableProps {
   items: AgendaItem[];
+  onEdited?: () => void;
 }
 
 const tipoBadgeVariant = (tipo: string) => {
