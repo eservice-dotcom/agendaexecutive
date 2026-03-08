@@ -90,3 +90,21 @@ export const saveFornecedor = (item: Omit<Fornecedor, "id">) => {
 export const deleteFornecedor = (id: string) => {
   setItems("cadastro_fornecedores", getFornecedores().filter((i) => i.id !== id));
 };
+
+// Agenda
+import { AgendaItem, mockData } from "@/data/agendaData";
+
+export const getAgendaItems = (): AgendaItem[] => {
+  const data = localStorage.getItem("agenda_items");
+  return data ? JSON.parse(data) : mockData;
+};
+
+export const saveAgendaItem = (item: Omit<AgendaItem, "id">) => {
+  const items = getAgendaItems();
+  items.push({ ...item, id: generateId() });
+  setItems("agenda_items", items);
+};
+
+export const deleteAgendaItem = (id: string) => {
+  setItems("agenda_items", getAgendaItems().filter((i) => i.id !== id));
+};
