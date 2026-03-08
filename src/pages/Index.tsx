@@ -32,7 +32,7 @@ const initialFilters: FiltersState = {
 };
 
 const Index = () => {
-  const { canViewFinancials, signOut, user } = useAuth();
+  const canViewFinancials = true;
   const [filters, setFilters] = useState<FiltersState>(initialFilters);
   const [novoDialogOpen, setNovoDialogOpen] = useState(false);
   const [agendaData, setAgendaData] = useState(getAgendaItems);
