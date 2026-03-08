@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { AgendaItem } from "@/data/agendaData";
 import { MapPin, Phone, User, Truck, MessageCircle } from "lucide-react";
 import WhatsAppDialog from "./WhatsAppDialog";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface AgendaTableProps {
   items: AgendaItem[];
@@ -30,6 +31,7 @@ const formatDate = (dateStr: string) => {
 
 const AgendaTable = ({ items }: AgendaTableProps) => {
   const [whatsappItem, setWhatsappItem] = useState<AgendaItem | null>(null);
+  const { canViewFinancials } = useAuth();
 
   if (items.length === 0) {
     return (
@@ -58,9 +60,13 @@ const AgendaTable = ({ items }: AgendaTableProps) => {
             <TableHead className="whitespace-nowrap font-semibold">Veículo</TableHead>
             <TableHead className="whitespace-nowrap font-semibold">Motorista</TableHead>
             <TableHead className="whitespace-nowrap font-semibold">Telefone</TableHead>
-            <TableHead className="whitespace-nowrap font-semibold text-right">Valor</TableHead>
-            <TableHead className="whitespace-nowrap font-semibold">Fornecedor</TableHead>
-            <TableHead className="whitespace-nowrap font-semibold text-right">Custo</TableHead>
+            {canViewFinancials && (
+              <>
+                <TableHead className="whitespace-nowrap font-semibold text-right">Valor</TableHead>
+                <TableHead className="whitespace-nowrap font-semibold">Fornecedor</TableHead>
+                <TableHead className="whitespace-nowrap font-semibold text-right">Custo</TableHead>
+              </>
+            )}
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -120,13 +126,17 @@ const AgendaTable = ({ items }: AgendaTableProps) => {
                   </Button>
                 </span>
               </TableCell>
-              <TableCell className="whitespace-nowrap text-right font-mono text-sm font-semibold text-foreground">
-                {formatCurrency(item.valor)}
-              </TableCell>
-              <TableCell className="whitespace-nowrap text-sm">{item.fornecedor}</TableCell>
-              <TableCell className="whitespace-nowrap text-right font-mono text-sm text-muted-foreground">
-                {formatCurrency(item.custo)}
-              </TableCell>
+              {canViewFinancials && (
+                <>
+                  <TableCell className="whitespace-nowrap text-right font-mono text-sm font-semibold text-foreground">
+                    {formatCurrency(item.valor)}
+                  </TableCell>
+                  <TableCell className="whitespace-nowrap text-sm">{item.fornecedor}</TableCell>
+                  <TableCell className="whitespace-nowrap text-right font-mono text-sm text-muted-foreground">
+                    {formatCurrency(item.custo)}
+                  </TableCell>
+                </>
+              )}
             </TableRow>
           ))}
         </TableBody>
