@@ -34,6 +34,7 @@ const EditServicoDialog = ({ open, onOpenChange, item, onSaved }: EditServicoDia
     fornecedor: "",
     custo: "",
     observacoes: "",
+    statusFaturamento: "" as StatusFaturamento,
   });
 
   useEffect(() => {
