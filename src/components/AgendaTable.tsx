@@ -1,7 +1,8 @@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { AgendaItem } from "@/data/agendaData";
-import { MapPin, Phone, User, Truck } from "lucide-react";
+import { MapPin, Phone, User, Truck, MessageCircle } from "lucide-react";
 
 interface AgendaTableProps {
   items: AgendaItem[];
@@ -99,9 +100,22 @@ const AgendaTable = ({ items }: AgendaTableProps) => {
                 </span>
               </TableCell>
               <TableCell className="whitespace-nowrap text-sm">
-                <span className="flex items-center gap-1">
+                <span className="flex items-center gap-2">
                   <Phone className="h-3 w-3 text-muted-foreground" />
                   {item.telefone}
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="h-7 w-7 p-0 text-accent hover:text-accent/80"
+                    onClick={() => {
+                      const phone = item.telefone.replace(/\D/g, "");
+                      const phoneWithCountry = phone.startsWith("55") ? phone : `55${phone}`;
+                      window.open(`https://wa.me/${phoneWithCountry}`, "_blank");
+                    }}
+                    title="Enviar mensagem no WhatsApp"
+                  >
+                    <MessageCircle className="h-4 w-4" />
+                  </Button>
                 </span>
               </TableCell>
               <TableCell className="whitespace-nowrap text-right font-mono text-sm font-semibold text-foreground">
