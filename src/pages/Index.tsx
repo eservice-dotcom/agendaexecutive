@@ -20,6 +20,7 @@ interface FiltersState {
   tipo: string;
   fornecedor: string;
   motorista: string;
+  pax: string;
 }
 
 const initialFilters: FiltersState = {
