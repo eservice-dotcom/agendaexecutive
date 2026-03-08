@@ -186,6 +186,24 @@ const AgendaTable = ({ items, onEdited }: AgendaTableProps) => {
                 {item.observacoes || "—"}
               </TableCell>
               <TableCell className="text-center">
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="h-7 w-7 p-0"
+                        onClick={() => cycleStatus(item)}
+                        title={statusLabel(item.statusFaturamento || "")}
+                      >
+                        {statusIcon(item.statusFaturamento || "")}
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>{statusLabel(item.statusFaturamento || "")}</TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              </TableCell>
+              <TableCell className="text-center">
                 <span className="flex items-center justify-center gap-1">
                   <Button
                     variant="ghost"
