@@ -91,27 +91,35 @@ const Index = () => {
 
       <main className="mx-auto max-w-[1600px] space-y-4 px-4 py-6 sm:px-6 lg:px-8">
         <Tabs defaultValue="agenda" className="space-y-4">
-          <TabsList className="grid w-full grid-cols-3 sm:w-auto sm:inline-grid">
+          <TabsList className={`grid w-full sm:w-auto sm:inline-grid ${canViewFinancials ? 'grid-cols-3' : 'grid-cols-1'}`}>
             <TabsTrigger value="agenda" className="gap-2">
               <CalendarDays className="h-4 w-4" />
               Agenda
             </TabsTrigger>
-            <TabsTrigger value="fat-veiculo" className="gap-2">
-              <Truck className="h-4 w-4" />
-              Fat. Veículo
-            </TabsTrigger>
-            <TabsTrigger value="fat-fornecedor" className="gap-2">
-              <Building2 className="h-4 w-4" />
-              Fat. Fornecedor
-            </TabsTrigger>
+            {canViewFinancials && (
+              <>
+                <TabsTrigger value="fat-veiculo" className="gap-2">
+                  <Truck className="h-4 w-4" />
+                  Fat. Veículo
+                </TabsTrigger>
+                <TabsTrigger value="fat-fornecedor" className="gap-2">
+                  <Building2 className="h-4 w-4" />
+                  Fat. Fornecedor
+                </TabsTrigger>
+              </>
+            )}
           </TabsList>
 
           <TabsContent value="agenda" className="space-y-4">
-            <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+            <div className={`grid gap-3 ${canViewFinancials ? 'grid-cols-2 sm:grid-cols-4' : 'grid-cols-2'}`}>
               <StatCard label="Registros" value={filteredData.length.toString()} />
               <StatCard label="Total PAX" value={filteredData.reduce((s, i) => s + i.pax, 0).toString()} />
-              <StatCard label="Receita" value={new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(totalValor)} accent />
-              <StatCard label="Margem" value={new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(totalValor - totalCusto)} />
+              {canViewFinancials && (
+                <>
+                  <StatCard label="Receita" value={new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(totalValor)} accent />
+                  <StatCard label="Margem" value={new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(totalValor - totalCusto)} />
+                </>
+              )}
             </div>
             <AgendaFilters filters={filters} onFilterChange={setFilters} motoristas={motoristas} />
             <div className="flex items-center justify-between">
