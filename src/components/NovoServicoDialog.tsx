@@ -35,6 +35,7 @@ const NovoServicoDialog = ({ open, onOpenChange, onSaved }: NovoServicoDialogPro
     valor: "",
     fornecedorId: "",
     custo: "",
+    observacoes: "",
   });
 
   useEffect(() => {
@@ -75,13 +76,14 @@ const NovoServicoDialog = ({ open, onOpenChange, onSaved }: NovoServicoDialogPro
       valor: parseFloat(form.valor) || 0,
       fornecedor: fornecedor?.razaoSocial || "",
       custo: parseFloat(form.custo) || 0,
+      observacoes: form.observacoes,
     });
 
     toast.success("Serviço adicionado com sucesso!");
     setForm({
       data: "", hora: "", clienteId: "", pax: "", cot: "", tipo: "",
       origem: "", destino: "", veiculoId: "", motoristaId: "", valor: "",
-      fornecedorId: "", custo: "",
+      fornecedorId: "", custo: "", observacoes: "",
     });
     onOpenChange(false);
     onSaved();
@@ -189,6 +191,11 @@ const NovoServicoDialog = ({ open, onOpenChange, onSaved }: NovoServicoDialogPro
           <div className="space-y-1.5">
             <Label>Custo (R$)</Label>
             <Input type="number" min={0} step="0.01" value={form.custo} onChange={(e) => update("custo", e.target.value)} placeholder="0,00" />
+          </div>
+
+          <div className="space-y-1.5 sm:col-span-2">
+            <Label>Observações</Label>
+            <Input value={form.observacoes} onChange={(e) => update("observacoes", e.target.value)} placeholder="Observações sobre o serviço" />
           </div>
         </div>
 

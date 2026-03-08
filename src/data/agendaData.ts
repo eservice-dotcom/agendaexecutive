@@ -15,6 +15,7 @@ export interface AgendaItem {
   valor: number;
   fornecedor: string;
   custo: number;
+  observacoes: string;
 }
 
 export const tiposServico = ["Transfer In", "Transfer Out", "City Tour", "Translado", "Fretamento"];
@@ -38,6 +39,7 @@ export const mockData: AgendaItem[] = [
     valor: 350,
     fornecedor: "TransLog",
     custo: 220,
+    observacoes: "",
   },
   {
     id: "2",
@@ -56,6 +58,7 @@ export const mockData: AgendaItem[] = [
     valor: 480,
     fornecedor: "VipTur",
     custo: 300,
+    observacoes: "",
   },
   {
     id: "3",
@@ -74,6 +77,7 @@ export const mockData: AgendaItem[] = [
     valor: 900,
     fornecedor: "RoadMaster",
     custo: 600,
+    observacoes: "",
   },
   {
     id: "4",
@@ -92,6 +96,7 @@ export const mockData: AgendaItem[] = [
     valor: 280,
     fornecedor: "FlexRide",
     custo: 180,
+    observacoes: "",
   },
   {
     id: "5",
@@ -110,6 +115,7 @@ export const mockData: AgendaItem[] = [
     valor: 520,
     fornecedor: "AutoElite",
     custo: 350,
+    observacoes: "",
   },
   {
     id: "6",
@@ -128,6 +134,7 @@ export const mockData: AgendaItem[] = [
     valor: 650,
     fornecedor: "TransLog",
     custo: 420,
+    observacoes: "",
   },
   {
     id: "7",
@@ -146,6 +153,7 @@ export const mockData: AgendaItem[] = [
     valor: 2200,
     fornecedor: "RoadMaster",
     custo: 1500,
+    observacoes: "",
   },
   {
     id: "8",
@@ -164,5 +172,6 @@ export const mockData: AgendaItem[] = [
     valor: 380,
     fornecedor: "VipTur",
     custo: 240,
+    observacoes: "",
   },
 ];

@@ -67,6 +67,7 @@ const AgendaTable = ({ items }: AgendaTableProps) => {
                 <TableHead className="whitespace-nowrap font-semibold text-right">Custo</TableHead>
               </>
             )}
+            <TableHead className="whitespace-nowrap font-semibold">Observações</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -137,6 +138,9 @@ const AgendaTable = ({ items }: AgendaTableProps) => {
                   </TableCell>
                 </>
               )}
+              <TableCell className="max-w-[200px] truncate text-sm text-muted-foreground" title={item.observacoes}>
+                {item.observacoes || "—"}
+              </TableCell>
             </TableRow>
           ))}
         </TableBody>
