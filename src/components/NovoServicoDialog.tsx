@@ -83,7 +83,7 @@ const NovoServicoDialog = ({ open, onOpenChange, onSaved }: NovoServicoDialogPro
     setForm({
       data: "", hora: "", clienteId: "", pax: "", cot: "", tipo: "",
       origem: "", destino: "", veiculoId: "", motoristaId: "", valor: "",
-      fornecedorId: "", custo: "",
+      fornecedorId: "", custo: "", observacoes: "",
     });
     onOpenChange(false);
     onSaved();
