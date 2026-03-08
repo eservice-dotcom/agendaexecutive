@@ -1,3 +1,5 @@
+export type StatusFaturamento = "" | "enviado" | "faturado";
+
 export interface AgendaItem {
   id: string;
   data: string;
@@ -16,6 +18,7 @@ export interface AgendaItem {
   fornecedor: string;
   custo: number;
   observacoes: string;
+  statusFaturamento: StatusFaturamento;
 }
 
 export const tiposServico = ["Transfer In", "Transfer Out", "City Tour", "Translado", "Fretamento"];
