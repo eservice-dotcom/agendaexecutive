@@ -35,6 +35,7 @@ const NovoServicoDialog = ({ open, onOpenChange, onSaved }: NovoServicoDialogPro
     valor: "",
     fornecedorId: "",
     custo: "",
+    observacoes: "",
   });
 
   useEffect(() => {
