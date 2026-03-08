@@ -76,6 +76,7 @@ const NovoServicoDialog = ({ open, onOpenChange, onSaved }: NovoServicoDialogPro
       valor: parseFloat(form.valor) || 0,
       fornecedor: fornecedor?.razaoSocial || "",
       custo: parseFloat(form.custo) || 0,
+      observacoes: form.observacoes,
     });
 
     toast.success("Serviço adicionado com sucesso!");
