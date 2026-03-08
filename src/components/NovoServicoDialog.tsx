@@ -1,0 +1,204 @@
+import { useState, useEffect } from "react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { tiposServico } from "@/data/agendaData";
+import { getClientes, getVeiculos, getMotoristas, getFornecedores, saveAgendaItem } from "@/data/cadastroStorage";
+import { toast } from "sonner";
+import { Plus } from "lucide-react";
+
+interface NovoServicoDialogProps {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  onSaved: () => void;
+}
+
+const NovoServicoDialog = ({ open, onOpenChange, onSaved }: NovoServicoDialogProps) => {
+  const [clientes, setClientes] = useState(getClientes());
+  const [veiculos, setVeiculos] = useState(getVeiculos());
+  const [motoristas, setMotoristas] = useState(getMotoristas());
+  const [fornecedores, setFornecedores] = useState(getFornecedores());
+
+  const [form, setForm] = useState({
+    data: "",
+    hora: "",
+    clienteId: "",
+    pax: "",
+    cot: "",
+    tipo: "",
+    origem: "",
+    destino: "",
+    veiculoId: "",
+    motoristaId: "",
+    valor: "",
+    fornecedorId: "",
+    custo: "",
+  });
+
+  useEffect(() => {
+    if (open) {
+      setClientes(getClientes());
+      setVeiculos(getVeiculos());
+      setMotoristas(getMotoristas());
+      setFornecedores(getFornecedores());
+    }
+  }, [open]);
+
+  const update = (key: string, value: string) => setForm((f) => ({ ...f, [key]: value }));
+
+  const handleSave = () => {
+    if (!form.data || !form.hora || !form.clienteId || !form.tipo || !form.origem || !form.destino) {
+      toast.error("Preencha os campos obrigatórios: Data, Hora, Cliente, Tipo, Origem e Destino.");
+      return;
+    }
+
+    const cliente = clientes.find((c) => c.id === form.clienteId);
+    const veiculo = veiculos.find((v) => v.id === form.veiculoId);
+    const motorista = motoristas.find((m) => m.id === form.motoristaId);
+    const fornecedor = fornecedores.find((f) => f.id === form.fornecedorId);
+
+    saveAgendaItem({
+      data: form.data,
+      hora: form.hora,
+      cliente: cliente?.nome || "",
+      pax: parseInt(form.pax) || 0,
+      cot: form.cot,
+      tipo: form.tipo,
+      origem: form.origem,
+      destino: form.destino,
+      placa: veiculo?.placa || "",
+      veiculo: veiculo ? `${veiculo.modelo}` : "",
+      motorista: motorista?.nome || "",
+      telefone: motorista?.telefone || "",
+      valor: parseFloat(form.valor) || 0,
+      fornecedor: fornecedor?.razaoSocial || "",
+      custo: parseFloat(form.custo) || 0,
+    });
+
+    toast.success("Serviço adicionado com sucesso!");
+    setForm({
+      data: "", hora: "", clienteId: "", pax: "", cot: "", tipo: "",
+      origem: "", destino: "", veiculoId: "", motoristaId: "", valor: "",
+      fornecedorId: "", custo: "",
+    });
+    onOpenChange(false);
+    onSaved();
+  };
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-2xl">
+        <DialogHeader>
+          <DialogTitle className="flex items-center gap-2">
+            <Plus className="h-5 w-5 text-primary" />
+            Novo Serviço
+          </DialogTitle>
+        </DialogHeader>
+
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <div className="space-y-1.5">
+            <Label>Data *</Label>
+            <Input type="date" value={form.data} onChange={(e) => update("data", e.target.value)} />
+          </div>
+          <div className="space-y-1.5">
+            <Label>Hora *</Label>
+            <Input type="time" value={form.hora} onChange={(e) => update("hora", e.target.value)} />
+          </div>
+
+          <div className="space-y-1.5">
+            <Label>Cliente *</Label>
+            <Select value={form.clienteId} onValueChange={(v) => update("clienteId", v)}>
+              <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
+              <SelectContent>
+                {clientes.length === 0 && <SelectItem value="_none" disabled>Nenhum cadastrado</SelectItem>}
+                {clientes.map((c) => <SelectItem key={c.id} value={c.id}>{c.nome}</SelectItem>)}
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="space-y-1.5">
+            <Label>PAX</Label>
+            <Input type="number" min={0} value={form.pax} onChange={(e) => update("pax", e.target.value)} placeholder="0" />
+          </div>
+
+          <div className="space-y-1.5">
+            <Label>COT</Label>
+            <Input value={form.cot} onChange={(e) => update("cot", e.target.value)} placeholder="COT-000" />
+          </div>
+
+          <div className="space-y-1.5">
+            <Label>Tipo *</Label>
+            <Select value={form.tipo} onValueChange={(v) => update("tipo", v)}>
+              <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
+              <SelectContent>
+                {tiposServico.map((t) => <SelectItem key={t} value={t}>{t}</SelectItem>)}
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="space-y-1.5 sm:col-span-2">
+            <Label>Origem *</Label>
+            <Input value={form.origem} onChange={(e) => update("origem", e.target.value)} placeholder="Local de origem" />
+          </div>
+
+          <div className="space-y-1.5 sm:col-span-2">
+            <Label>Destino *</Label>
+            <Input value={form.destino} onChange={(e) => update("destino", e.target.value)} placeholder="Local de destino" />
+          </div>
+
+          <div className="space-y-1.5">
+            <Label>Veículo</Label>
+            <Select value={form.veiculoId} onValueChange={(v) => update("veiculoId", v)}>
+              <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
+              <SelectContent>
+                {veiculos.length === 0 && <SelectItem value="_none" disabled>Nenhum cadastrado</SelectItem>}
+                {veiculos.map((v) => <SelectItem key={v.id} value={v.id}>{v.placa} - {v.modelo}</SelectItem>)}
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="space-y-1.5">
+            <Label>Motorista</Label>
+            <Select value={form.motoristaId} onValueChange={(v) => update("motoristaId", v)}>
+              <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
+              <SelectContent>
+                {motoristas.length === 0 && <SelectItem value="_none" disabled>Nenhum cadastrado</SelectItem>}
+                {motoristas.map((m) => <SelectItem key={m.id} value={m.id}>{m.nome}</SelectItem>)}
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="space-y-1.5">
+            <Label>Valor (R$)</Label>
+            <Input type="number" min={0} step="0.01" value={form.valor} onChange={(e) => update("valor", e.target.value)} placeholder="0,00" />
+          </div>
+
+          <div className="space-y-1.5">
+            <Label>Fornecedor</Label>
+            <Select value={form.fornecedorId} onValueChange={(v) => update("fornecedorId", v)}>
+              <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
+              <SelectContent>
+                {fornecedores.length === 0 && <SelectItem value="_none" disabled>Nenhum cadastrado</SelectItem>}
+                {fornecedores.map((f) => <SelectItem key={f.id} value={f.id}>{f.razaoSocial}</SelectItem>)}
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="space-y-1.5">
+            <Label>Custo (R$)</Label>
+            <Input type="number" min={0} step="0.01" value={form.custo} onChange={(e) => update("custo", e.target.value)} placeholder="0,00" />
+          </div>
+        </div>
+
+        <DialogFooter className="mt-4">
+          <Button variant="outline" onClick={() => onOpenChange(false)}>Cancelar</Button>
+          <Button onClick={handleSave}>Salvar Serviço</Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+};
+
+export default NovoServicoDialog;

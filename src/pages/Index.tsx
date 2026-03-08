@@ -1,14 +1,16 @@
-import { useState, useMemo } from "react";
-import { CalendarDays, ListChecks, Truck, Building2 } from "lucide-react";
+import { useState, useMemo, useCallback } from "react";
+import { CalendarDays, ListChecks, Truck, Building2, Plus } from "lucide-react";
 import logo from "@/assets/logo-executive-service.png";
 import { Link } from "react-router-dom";
 import { ClipboardList } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Button } from "@/components/ui/button";
 import AgendaFilters from "@/components/AgendaFilters";
 import AgendaTable from "@/components/AgendaTable";
 import FaturamentoVeiculo from "@/components/FaturamentoVeiculo";
 import FaturamentoFornecedor from "@/components/FaturamentoFornecedor";
-import { mockData } from "@/data/agendaData";
+import NovoServicoDialog from "@/components/NovoServicoDialog";
+import { getAgendaItems } from "@/data/cadastroStorage";
 
 interface FiltersState {
   search: string;
@@ -30,14 +32,18 @@ const initialFilters: FiltersState = {
 
 const Index = () => {
   const [filters, setFilters] = useState<FiltersState>(initialFilters);
+  const [novoDialogOpen, setNovoDialogOpen] = useState(false);
+  const [agendaData, setAgendaData] = useState(getAgendaItems);
+
+  const reloadData = useCallback(() => setAgendaData(getAgendaItems()), []);
 
   const motoristas = useMemo(
-    () => [...new Set(mockData.map((i) => i.motorista))],
-    []
+    () => [...new Set(agendaData.map((i) => i.motorista))].filter(Boolean) as string[],
+    [agendaData]
   );
 
   const filteredData = useMemo(() => {
-    return mockData.filter((item) => {
+    return agendaData.filter((item) => {
       const search = filters.search.toLowerCase();
       if (
         search &&
@@ -57,7 +63,7 @@ const Index = () => {
       if (filters.motorista && item.motorista !== filters.motorista) return false;
       return true;
     });
-  }, [filters]);
+  }, [filters, agendaData]);
 
   const totalValor = filteredData.reduce((s, i) => s + i.valor, 0);
   const totalCusto = filteredData.reduce((s, i) => s + i.custo, 0);
@@ -100,11 +106,18 @@ const Index = () => {
               <StatCard label="Margem" value={new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(totalValor - totalCusto)} />
             </div>
             <AgendaFilters filters={filters} onFilterChange={setFilters} motoristas={motoristas} />
-            <div className="flex items-center gap-2 text-sm text-muted-foreground">
-              <ListChecks className="h-4 w-4" />
-              <span>{filteredData.length} de {mockData.length} registros</span>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                <ListChecks className="h-4 w-4" />
+                <span>{filteredData.length} de {agendaData.length} registros</span>
+              </div>
+              <Button onClick={() => setNovoDialogOpen(true)} className="gap-2">
+                <Plus className="h-4 w-4" />
+                Novo Serviço
+              </Button>
             </div>
             <AgendaTable items={filteredData} />
+            <NovoServicoDialog open={novoDialogOpen} onOpenChange={setNovoDialogOpen} onSaved={reloadData} />
           </TabsContent>
 
           <TabsContent value="fat-veiculo">
