@@ -20,6 +20,7 @@ interface FiltersState {
   tipo: string;
   fornecedor: string;
   motorista: string;
+  pax: string;
 }
 
 const initialFilters: FiltersState = {
@@ -29,6 +30,7 @@ const initialFilters: FiltersState = {
   tipo: "",
   fornecedor: "",
   motorista: "",
+  pax: "",
 };
 
 const Index = () => {
@@ -63,6 +65,7 @@ const Index = () => {
       if (filters.tipo && item.tipo !== filters.tipo) return false;
       if (filters.fornecedor && item.fornecedor !== filters.fornecedor) return false;
       if (filters.motorista && item.motorista !== filters.motorista) return false;
+      if (filters.pax && item.pax !== parseInt(filters.pax)) return false;
       return true;
     });
   }, [filters, agendaData]);
