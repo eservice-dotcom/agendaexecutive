@@ -56,6 +56,7 @@ const EditServicoDialog = ({ open, onOpenChange, item, onSaved }: EditServicoDia
         fornecedor: item.fornecedor,
         custo: item.custo.toString(),
         observacoes: item.observacoes || "",
+        statusFaturamento: item.statusFaturamento || "",
       });
     }
   }, [item, open]);
