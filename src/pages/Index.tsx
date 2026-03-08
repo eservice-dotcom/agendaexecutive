@@ -136,13 +136,16 @@ const Index = () => {
             <NovoServicoDialog open={novoDialogOpen} onOpenChange={setNovoDialogOpen} onSaved={reloadData} />
           </TabsContent>
 
-          <TabsContent value="fat-veiculo">
-            <FaturamentoVeiculo />
-          </TabsContent>
-
-          <TabsContent value="fat-fornecedor">
-            <FaturamentoFornecedor />
-          </TabsContent>
+          {canViewFinancials && (
+            <>
+              <TabsContent value="fat-veiculo">
+                <FaturamentoVeiculo />
+              </TabsContent>
+              <TabsContent value="fat-fornecedor">
+                <FaturamentoFornecedor />
+              </TabsContent>
+            </>
+          )}
         </Tabs>
       </main>
     </div>
