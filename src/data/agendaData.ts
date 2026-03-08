@@ -134,6 +134,7 @@ export const mockData: AgendaItem[] = [
     valor: 650,
     fornecedor: "TransLog",
     custo: 420,
+    observacoes: "",
   },
   {
     id: "7",
