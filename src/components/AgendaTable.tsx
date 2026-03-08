@@ -136,6 +136,7 @@ const AgendaTable = ({ items }: AgendaTableProps) => {
         </TableBody>
       </Table>
     </div>
+    </>
   );
 };
 
