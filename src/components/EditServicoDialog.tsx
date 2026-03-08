@@ -186,9 +186,21 @@ const EditServicoDialog = ({ open, onOpenChange, item, onSaved }: EditServicoDia
             <Input type="number" min={0} step="0.01" value={form.custo} onChange={(e) => update("custo", e.target.value)} placeholder="0,00" />
           </div>
 
-          <div className="space-y-1.5 sm:col-span-2">
+          <div className="space-y-1.5">
             <Label>Observações</Label>
             <Input value={form.observacoes} onChange={(e) => update("observacoes", e.target.value)} placeholder="Observações sobre o serviço" />
+          </div>
+
+          <div className="space-y-1.5">
+            <Label>Status Faturamento</Label>
+            <Select value={form.statusFaturamento || "_empty"} onValueChange={(v) => update("statusFaturamento", v === "_empty" ? "" : v)}>
+              <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
+              <SelectContent>
+                {statusFaturamentoOptions.map((o) => (
+                  <SelectItem key={o.value || "_empty"} value={o.value || "_empty"}>{o.label}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
         </div>
 
