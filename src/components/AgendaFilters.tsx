@@ -51,7 +51,7 @@ const AgendaFilters = ({ filters, onFilterChange, motoristas }: AgendaFiltersPro
           </Button>
         )}
       </div>
-      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-7">
         <div className="relative xl:col-span-2">
           <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
           <Input
@@ -81,6 +81,13 @@ const AgendaFilters = ({ filters, onFilterChange, motoristas }: AgendaFiltersPro
             placeholder="Data fim"
           />
         </div>
+        <Input
+          type="number"
+          min="0"
+          placeholder="PAX"
+          value={filters.pax}
+          onChange={(e) => updateFilter("pax", e.target.value)}
+        />
         <Select value={filters.tipo} onValueChange={(v) => updateFilter("tipo", v === "all" ? "" : v)}>
           <SelectTrigger>
             <SelectValue placeholder="Tipo" />
