@@ -50,6 +50,30 @@ const AgendaTable = ({ items, onEdited }: AgendaTableProps) => {
     }
   };
 
+  const cycleStatus = (item: AgendaItem) => {
+    const order: StatusFaturamento[] = ["", "enviado", "faturado"];
+    const current = order.indexOf(item.statusFaturamento || "");
+    const next = order[(current + 1) % order.length];
+    updateAgendaItem({ ...item, statusFaturamento: next });
+    onEdited?.();
+  };
+
+  const statusIcon = (status: StatusFaturamento) => {
+    switch (status) {
+      case "enviado": return <Send className="h-4 w-4 text-amber-500" />;
+      case "faturado": return <CheckCircle2 className="h-4 w-4 text-emerald-500" />;
+      default: return <Circle className="h-4 w-4 text-muted-foreground" />;
+    }
+  };
+
+  const statusLabel = (status: StatusFaturamento) => {
+    switch (status) {
+      case "enviado": return "Enviado";
+      case "faturado": return "Faturado";
+      default: return "Vazio";
+    }
+  };
+
   if (items.length === 0) {
     return (
       <div className="flex h-40 items-center justify-center rounded-lg border border-border bg-card text-muted-foreground">
