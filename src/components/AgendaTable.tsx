@@ -67,6 +67,7 @@ const AgendaTable = ({ items }: AgendaTableProps) => {
                 <TableHead className="whitespace-nowrap font-semibold text-right">Custo</TableHead>
               </>
             )}
+            <TableHead className="whitespace-nowrap font-semibold">Observações</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
