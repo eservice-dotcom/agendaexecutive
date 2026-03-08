@@ -2,14 +2,15 @@ import { useState } from "react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { AgendaItem } from "@/data/agendaData";
-import { MapPin, Phone, User, Truck, MessageCircle, Pencil, Trash2 } from "lucide-react";
+import { AgendaItem, StatusFaturamento } from "@/data/agendaData";
+import { MapPin, Phone, User, Truck, MessageCircle, Pencil, Trash2, Circle, Send, CheckCircle2 } from "lucide-react";
 import WhatsAppDialog from "./WhatsAppDialog";
 import EditServicoDialog from "./EditServicoDialog";
 import { useAuth } from "@/contexts/AuthContext";
-import { deleteAgendaItem } from "@/data/cadastroStorage";
+import { deleteAgendaItem, updateAgendaItem } from "@/data/cadastroStorage";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { toast } from "sonner";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 interface AgendaTableProps {
   items: AgendaItem[];
@@ -49,6 +50,30 @@ const AgendaTable = ({ items, onEdited }: AgendaTableProps) => {
     }
   };
 
+  const cycleStatus = (item: AgendaItem) => {
+    const order: StatusFaturamento[] = ["", "enviado", "faturado"];
+    const current = order.indexOf(item.statusFaturamento || "");
+    const next = order[(current + 1) % order.length];
+    updateAgendaItem({ ...item, statusFaturamento: next });
+    onEdited?.();
+  };
+
+  const statusIcon = (status: StatusFaturamento) => {
+    switch (status) {
+      case "enviado": return <Send className="h-4 w-4 text-amber-500" />;
+      case "faturado": return <CheckCircle2 className="h-4 w-4 text-emerald-500" />;
+      default: return <Circle className="h-4 w-4 text-muted-foreground" />;
+    }
+  };
+
+  const statusLabel = (status: StatusFaturamento) => {
+    switch (status) {
+      case "enviado": return "Enviado";
+      case "faturado": return "Faturado";
+      default: return "Vazio";
+    }
+  };
+
   if (items.length === 0) {
     return (
       <div className="flex h-40 items-center justify-center rounded-lg border border-border bg-card text-muted-foreground">
@@ -85,6 +110,7 @@ const AgendaTable = ({ items, onEdited }: AgendaTableProps) => {
               </>
             )}
             <TableHead className="whitespace-nowrap font-semibold">Observações</TableHead>
+            <TableHead className="whitespace-nowrap font-semibold text-center">Fat.</TableHead>
             <TableHead className="whitespace-nowrap font-semibold text-center">Ações</TableHead>
           </TableRow>
         </TableHeader>
@@ -158,6 +184,24 @@ const AgendaTable = ({ items, onEdited }: AgendaTableProps) => {
               )}
               <TableCell className="max-w-[200px] truncate text-sm text-muted-foreground" title={item.observacoes}>
                 {item.observacoes || "—"}
+              </TableCell>
+              <TableCell className="text-center">
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="h-7 w-7 p-0"
+                        onClick={() => cycleStatus(item)}
+                        title={statusLabel(item.statusFaturamento || "")}
+                      >
+                        {statusIcon(item.statusFaturamento || "")}
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>{statusLabel(item.statusFaturamento || "")}</TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
               </TableCell>
               <TableCell className="text-center">
                 <span className="flex items-center justify-center gap-1">

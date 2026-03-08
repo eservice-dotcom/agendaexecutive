@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { tiposServico, AgendaItem } from "@/data/agendaData";
+import { tiposServico, AgendaItem, statusFaturamentoOptions, StatusFaturamento } from "@/data/agendaData";
 import { updateAgendaItem } from "@/data/cadastroStorage";
 import { toast } from "sonner";
 import { Pencil } from "lucide-react";
@@ -34,6 +34,7 @@ const EditServicoDialog = ({ open, onOpenChange, item, onSaved }: EditServicoDia
     fornecedor: "",
     custo: "",
     observacoes: "",
+    statusFaturamento: "" as StatusFaturamento,
   });
 
   useEffect(() => {
@@ -55,6 +56,7 @@ const EditServicoDialog = ({ open, onOpenChange, item, onSaved }: EditServicoDia
         fornecedor: item.fornecedor,
         custo: item.custo.toString(),
         observacoes: item.observacoes || "",
+        statusFaturamento: item.statusFaturamento || "",
       });
     }
   }, [item, open]);
@@ -86,6 +88,7 @@ const EditServicoDialog = ({ open, onOpenChange, item, onSaved }: EditServicoDia
       fornecedor: form.fornecedor,
       custo: parseFloat(form.custo) || 0,
       observacoes: form.observacoes,
+      statusFaturamento: form.statusFaturamento,
     });
 
     toast.success("Serviço atualizado com sucesso!");
@@ -183,9 +186,21 @@ const EditServicoDialog = ({ open, onOpenChange, item, onSaved }: EditServicoDia
             <Input type="number" min={0} step="0.01" value={form.custo} onChange={(e) => update("custo", e.target.value)} placeholder="0,00" />
           </div>
 
-          <div className="space-y-1.5 sm:col-span-2">
+          <div className="space-y-1.5">
             <Label>Observações</Label>
             <Input value={form.observacoes} onChange={(e) => update("observacoes", e.target.value)} placeholder="Observações sobre o serviço" />
+          </div>
+
+          <div className="space-y-1.5">
+            <Label>Status Faturamento</Label>
+            <Select value={form.statusFaturamento || "_empty"} onValueChange={(v) => update("statusFaturamento", v === "_empty" ? "" : v)}>
+              <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
+              <SelectContent>
+                {statusFaturamentoOptions.map((o) => (
+                  <SelectItem key={o.value || "_empty"} value={o.value || "_empty"}>{o.label}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
         </div>
 
