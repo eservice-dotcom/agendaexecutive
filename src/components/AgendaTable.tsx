@@ -138,6 +138,9 @@ const AgendaTable = ({ items }: AgendaTableProps) => {
                   </TableCell>
                 </>
               )}
+              <TableCell className="max-w-[200px] truncate text-sm text-muted-foreground" title={item.observacoes}>
+                {item.observacoes || "—"}
+              </TableCell>
             </TableRow>
           ))}
         </TableBody>

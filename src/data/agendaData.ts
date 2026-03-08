@@ -172,5 +172,6 @@ export const mockData: AgendaItem[] = [
     valor: 380,
     fornecedor: "VipTur",
     custo: 240,
+    observacoes: "",
   },
 ];
