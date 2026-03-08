@@ -1,8 +1,10 @@
+import { useState } from "react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { AgendaItem } from "@/data/agendaData";
 import { MapPin, Phone, User, Truck, MessageCircle } from "lucide-react";
+import WhatsAppDialog from "./WhatsAppDialog";
 
 interface AgendaTableProps {
   items: AgendaItem[];
@@ -27,6 +29,8 @@ const formatDate = (dateStr: string) => {
 };
 
 const AgendaTable = ({ items }: AgendaTableProps) => {
+  const [whatsappItem, setWhatsappItem] = useState<AgendaItem | null>(null);
+
   if (items.length === 0) {
     return (
       <div className="flex h-40 items-center justify-center rounded-lg border border-border bg-card text-muted-foreground">
@@ -36,6 +40,8 @@ const AgendaTable = ({ items }: AgendaTableProps) => {
   }
 
   return (
+    <>
+    <WhatsAppDialog open={!!whatsappItem} onOpenChange={(v) => { if (!v) setWhatsappItem(null); }} item={whatsappItem} />
     <div className="overflow-auto rounded-lg border border-border bg-card shadow-sm">
       <Table>
         <TableHeader>
@@ -107,11 +113,7 @@ const AgendaTable = ({ items }: AgendaTableProps) => {
                     variant="ghost"
                     size="sm"
                     className="h-7 w-7 p-0 text-accent hover:text-accent/80"
-                    onClick={() => {
-                      const phone = item.telefone.replace(/\D/g, "");
-                      const phoneWithCountry = phone.startsWith("55") ? phone : `55${phone}`;
-                      window.open(`https://wa.me/${phoneWithCountry}`, "_blank");
-                    }}
+                    onClick={() => setWhatsappItem(item)}
                     title="Enviar mensagem no WhatsApp"
                   >
                     <MessageCircle className="h-4 w-4" />
@@ -130,6 +132,7 @@ const AgendaTable = ({ items }: AgendaTableProps) => {
         </TableBody>
       </Table>
     </div>
+    </>
   );
 };
 
