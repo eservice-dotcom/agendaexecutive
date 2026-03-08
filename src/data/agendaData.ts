@@ -153,6 +153,7 @@ export const mockData: AgendaItem[] = [
     valor: 2200,
     fornecedor: "RoadMaster",
     custo: 1500,
+    observacoes: "",
   },
   {
     id: "8",
