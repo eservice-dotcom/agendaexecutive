@@ -76,7 +76,7 @@ const Index = () => {
         <div className="mx-auto flex max-w-[1600px] items-center justify-between">
           <img src={logo} alt="Executive Service - Transportes e Eventos" className="h-10" />
           <div className="flex items-center gap-4">
-            <span className="hidden text-xs text-primary-foreground/60 sm:inline">{user?.email}</span>
+            
             <Link to="/cadastros">
               <span className="flex items-center gap-1 text-sm text-primary-foreground/80 hover:text-primary-foreground">
                 <ClipboardList className="h-4 w-4" /> Cadastros
