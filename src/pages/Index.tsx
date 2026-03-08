@@ -11,7 +11,7 @@ import FaturamentoVeiculo from "@/components/FaturamentoVeiculo";
 import FaturamentoFornecedor from "@/components/FaturamentoFornecedor";
 import NovoServicoDialog from "@/components/NovoServicoDialog";
 import { getAgendaItems } from "@/data/cadastroStorage";
-import { useAuth } from "@/contexts/AuthContext";
+
 
 interface FiltersState {
   search: string;
