@@ -113,11 +113,7 @@ const AgendaTable = ({ items }: AgendaTableProps) => {
                     variant="ghost"
                     size="sm"
                     className="h-7 w-7 p-0 text-accent hover:text-accent/80"
-                    onClick={() => {
-                      const phone = item.telefone.replace(/\D/g, "");
-                      const phoneWithCountry = phone.startsWith("55") ? phone : `55${phone}`;
-                      window.open(`https://wa.me/${phoneWithCountry}`, "_blank");
-                    }}
+                    onClick={() => setWhatsappItem(item)}
                     title="Enviar mensagem no WhatsApp"
                   >
                     <MessageCircle className="h-4 w-4" />
