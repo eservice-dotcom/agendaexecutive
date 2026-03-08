@@ -7,9 +7,10 @@ import { MapPin, Phone, User, Truck, MessageCircle, Pencil, Trash2, Circle, Send
 import WhatsAppDialog from "./WhatsAppDialog";
 import EditServicoDialog from "./EditServicoDialog";
 import { useAuth } from "@/contexts/AuthContext";
-import { deleteAgendaItem } from "@/data/cadastroStorage";
+import { deleteAgendaItem, updateAgendaItem } from "@/data/cadastroStorage";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { toast } from "sonner";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 interface AgendaTableProps {
   items: AgendaItem[];
