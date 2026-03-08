@@ -1,5 +1,5 @@
 import { useState, useMemo, useCallback } from "react";
-import { CalendarDays, ListChecks, Truck, Building2, Plus } from "lucide-react";
+import { CalendarDays, ListChecks, Truck, Building2, Plus, LogOut } from "lucide-react";
 import logo from "@/assets/logo-executive-service.png";
 import { Link } from "react-router-dom";
 import { ClipboardList } from "lucide-react";
@@ -11,6 +11,7 @@ import FaturamentoVeiculo from "@/components/FaturamentoVeiculo";
 import FaturamentoFornecedor from "@/components/FaturamentoFornecedor";
 import NovoServicoDialog from "@/components/NovoServicoDialog";
 import { getAgendaItems } from "@/data/cadastroStorage";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface FiltersState {
   search: string;
