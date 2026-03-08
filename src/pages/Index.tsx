@@ -30,6 +30,7 @@ const initialFilters: FiltersState = {
   tipo: "",
   fornecedor: "",
   motorista: "",
+  pax: "",
 };
 
 const Index = () => {
