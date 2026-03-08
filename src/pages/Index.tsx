@@ -1,5 +1,5 @@
 import { useState, useMemo, useCallback } from "react";
-import { CalendarDays, ListChecks, Truck, Building2, Plus, LogOut } from "lucide-react";
+import { CalendarDays, ListChecks, Truck, Building2, Plus } from "lucide-react";
 import logo from "@/assets/logo-executive-service.png";
 import { Link } from "react-router-dom";
 import { ClipboardList } from "lucide-react";
@@ -11,7 +11,7 @@ import FaturamentoVeiculo from "@/components/FaturamentoVeiculo";
 import FaturamentoFornecedor from "@/components/FaturamentoFornecedor";
 import NovoServicoDialog from "@/components/NovoServicoDialog";
 import { getAgendaItems } from "@/data/cadastroStorage";
-import { useAuth } from "@/contexts/AuthContext";
+
 
 interface FiltersState {
   search: string;
@@ -32,7 +32,7 @@ const initialFilters: FiltersState = {
 };
 
 const Index = () => {
-  const { canViewFinancials, signOut, user } = useAuth();
+  const canViewFinancials = true;
   const [filters, setFilters] = useState<FiltersState>(initialFilters);
   const [novoDialogOpen, setNovoDialogOpen] = useState(false);
   const [agendaData, setAgendaData] = useState(getAgendaItems);
@@ -76,15 +76,12 @@ const Index = () => {
         <div className="mx-auto flex max-w-[1600px] items-center justify-between">
           <img src={logo} alt="Executive Service - Transportes e Eventos" className="h-10" />
           <div className="flex items-center gap-4">
-            <span className="hidden text-xs text-primary-foreground/60 sm:inline">{user?.email}</span>
+            
             <Link to="/cadastros">
               <span className="flex items-center gap-1 text-sm text-primary-foreground/80 hover:text-primary-foreground">
                 <ClipboardList className="h-4 w-4" /> Cadastros
               </span>
             </Link>
-            <Button variant="ghost" size="sm" onClick={signOut} className="gap-1 text-primary-foreground/80 hover:text-primary-foreground hover:bg-primary-foreground/10">
-              <LogOut className="h-4 w-4" /> Sair
-            </Button>
           </div>
         </div>
       </header>
