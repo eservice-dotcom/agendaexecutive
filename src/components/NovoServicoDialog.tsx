@@ -44,6 +44,7 @@ const NovoServicoDialog = ({ open, onOpenChange, onSaved }: NovoServicoDialogPro
       setVeiculos(getVeiculos());
       setMotoristas(getMotoristas());
       setFornecedores(getFornecedores());
+      setTiposServico(getTiposServico());
     }
   }, [open]);
 

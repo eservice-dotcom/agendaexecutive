@@ -17,6 +17,7 @@ interface EditServicoDialogProps {
 }
 
 const EditServicoDialog = ({ open, onOpenChange, item, onSaved }: EditServicoDialogProps) => {
+  const tiposServico = getTiposServico();
   const [form, setForm] = useState({
     data: "",
     hora: "",
