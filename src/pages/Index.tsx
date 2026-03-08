@@ -132,7 +132,7 @@ const Index = () => {
                 Novo Serviço
               </Button>
             </div>
-            <AgendaTable items={filteredData} />
+            <AgendaTable items={filteredData} onEdited={reloadData} />
             <NovoServicoDialog open={novoDialogOpen} onOpenChange={setNovoDialogOpen} onSaved={reloadData} />
           </TabsContent>
 

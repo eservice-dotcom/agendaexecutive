@@ -105,6 +105,11 @@ export const saveAgendaItem = (item: Omit<AgendaItem, "id">) => {
   setItems("agenda_items", items);
 };
 
+export const updateAgendaItem = (updated: AgendaItem) => {
+  const items = getAgendaItems().map((i) => (i.id === updated.id ? updated : i));
+  setItems("agenda_items", items);
+};
+
 export const deleteAgendaItem = (id: string) => {
   setItems("agenda_items", getAgendaItems().filter((i) => i.id !== id));
 };

@@ -146,6 +146,17 @@ const AgendaTable = ({ items, onEdited }: AgendaTableProps) => {
               <TableCell className="max-w-[200px] truncate text-sm text-muted-foreground" title={item.observacoes}>
                 {item.observacoes || "—"}
               </TableCell>
+              <TableCell className="text-center">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-7 w-7 p-0 text-muted-foreground hover:text-primary"
+                  onClick={() => setEditItem(item)}
+                  title="Editar serviço"
+                >
+                  <Pencil className="h-4 w-4" />
+                </Button>
+              </TableCell>
             </TableRow>
           ))}
         </TableBody>
