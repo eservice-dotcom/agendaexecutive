@@ -33,6 +33,7 @@ const AgendaFilters = ({ filters, onFilterChange, motoristas }: AgendaFiltersPro
       tipo: "",
       fornecedor: "",
       motorista: "",
+      pax: "",
     });
   };
 
