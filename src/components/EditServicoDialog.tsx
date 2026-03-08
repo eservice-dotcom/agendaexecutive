@@ -88,6 +88,7 @@ const EditServicoDialog = ({ open, onOpenChange, item, onSaved }: EditServicoDia
       fornecedor: form.fornecedor,
       custo: parseFloat(form.custo) || 0,
       observacoes: form.observacoes,
+      statusFaturamento: form.statusFaturamento,
     });
 
     toast.success("Serviço atualizado com sucesso!");
