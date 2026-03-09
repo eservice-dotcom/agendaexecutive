@@ -111,9 +111,47 @@ export const deleteTipoServico = (tipo: string) => {
 
 // Agenda
 
+const coerceString = (v: unknown) => (typeof v === "string" ? v : v == null ? "" : String(v));
+
+const normalizePassageiros = (raw: unknown): { nome: string; voo: string }[] => {
+  if (!Array.isArray(raw)) return [];
+  return raw
+    .filter(Boolean)
+    .map((p: any) => ({ nome: coerceString(p?.nome), voo: coerceString(p?.voo) }))
+    .filter((p) => p.nome !== "" || p.voo !== "");
+};
+
+const normalizeAgendaItem = (raw: any): AgendaItem => {
+  const passageirosFromArray = normalizePassageiros(raw?.passageiros);
+  const legacyNome = coerceString(raw?.nomePassageiro ?? raw?.passageiro ?? "");
+  const legacyVoo = coerceString(raw?.numeroVoo ?? raw?.voo ?? "");
+
+  const passageiros =
+    passageirosFromArray.length > 0
+      ? passageirosFromArray
+      : legacyNome || legacyVoo
+        ? [{ nome: legacyNome, voo: legacyVoo }]
+        : [];
+
+  return {
+    ...raw,
+    passageiros,
+    statusFaturamento: coerceString(raw?.statusFaturamento) as any,
+  } as AgendaItem;
+};
+
 export const getAgendaItems = (): AgendaItem[] => {
   const data = localStorage.getItem("agenda_items");
-  return data ? JSON.parse(data) : mockData;
+  const parsed = data ? (JSON.parse(data) as any[]) : null;
+  if (!Array.isArray(parsed)) return mockData;
+
+  const normalized = parsed.map(normalizeAgendaItem);
+
+  // Migração automática de dados antigos para não quebrar após updates
+  const needsWriteBack = parsed.some((r: any) => !Array.isArray(r?.passageiros) || r?.nomePassageiro != null || r?.numeroVoo != null);
+  if (needsWriteBack) setItems("agenda_items", normalized);
+
+  return normalized;
 };
 
 export const saveAgendaItem = (item: Omit<AgendaItem, "id">) => {
