@@ -52,7 +52,17 @@ const Index = () => {
   }, [reloadData]);
 
   const motoristas = useMemo(
-    () => [...new Set(agendaData.map((i) => i.motorista))].filter(Boolean) as string[],
+    () => [...new Set(agendaData.map((i) => i.motorista))].filter(Boolean).sort() as string[],
+    [agendaData]
+  );
+
+  const tipos = useMemo(
+    () => [...new Set(agendaData.map((i) => i.tipo))].filter(Boolean).sort() as string[],
+    [agendaData]
+  );
+
+  const fornecedoresList = useMemo(
+    () => [...new Set(agendaData.map((i) => i.fornecedor))].filter(Boolean).sort() as string[],
     [agendaData]
   );
 
