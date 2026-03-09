@@ -3,6 +3,9 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Building2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 
+const formatCurrency = (value: number) =>
+  new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(value);
+
 const FaturamentoFornecedor = () => {
   const [items, setItems] = useState<any[]>([]);
 
