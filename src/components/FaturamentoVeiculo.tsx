@@ -10,6 +10,7 @@ const formatCurrency = (value: number) =>
 
 const FaturamentoVeiculo = () => {
   const [items, setItems] = useState<any[]>([]);
+  const [printWithFinancials, setPrintWithFinancials] = useState(true);
 
   useEffect(() => {
     supabase.from("agenda_items").select("*").then(({ data }) => {
@@ -43,8 +44,12 @@ const FaturamentoVeiculo = () => {
           <StatCard label="Margem Total" value={formatCurrency(totalReceita - totalCusto)} />
         </div>
       </div>
-      <div className="flex justify-end">
-        <Button variant="outline" size="sm" onClick={() => printFatVeiculo(items)} className="gap-2">
+      <div className="flex items-center justify-end gap-3">
+        <label className="flex items-center gap-1.5 text-xs text-muted-foreground cursor-pointer select-none">
+          <input type="checkbox" checked={printWithFinancials} onChange={e => setPrintWithFinancials(e.target.checked)} className="rounded" />
+          Incluir financeiro
+        </label>
+        <Button variant="outline" size="sm" onClick={() => printFatVeiculo(items, printWithFinancials)} className="gap-2">
           <Printer className="h-4 w-4" />
           Imprimir
         </Button>
