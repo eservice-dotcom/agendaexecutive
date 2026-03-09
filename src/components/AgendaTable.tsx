@@ -3,7 +3,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { AgendaItem, StatusFaturamento } from "@/data/agendaData";
-import { MapPin, Phone, User, Truck, MessageCircle, Pencil, Trash2, Circle, Send, CheckCircle2 } from "lucide-react";
+import { MapPin, Phone, User, Truck, MessageCircle, Pencil, Trash2, Circle, Send, CheckCircle2, Users } from "lucide-react";
 import WhatsAppDialog from "./WhatsAppDialog";
 import EditServicoDialog from "./EditServicoDialog";
 import { useAuth } from "@/contexts/AuthContext";
@@ -127,8 +127,39 @@ const AgendaTable = ({ items, onEdited }: AgendaTableProps) => {
                   {item.pax}
                 </span>
               </TableCell>
-              <TableCell className="whitespace-nowrap text-sm">{item.nomePassageiro}</TableCell>
-              <TableCell className="whitespace-nowrap font-mono text-xs text-muted-foreground">{item.numeroVoo}</TableCell>
+              <TableCell className="max-w-[180px]">
+                {item.passageiros.length > 0 ? (
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <div className="flex items-center gap-1 cursor-help">
+                          <User className="h-3 w-3 text-muted-foreground shrink-0" />
+                          <span className="truncate text-sm">{item.passageiros[0].nome}</span>
+                          {item.passageiros.length > 1 && (
+                            <Badge variant="secondary" className="ml-1 h-5 px-1.5 text-xs">
+                              +{item.passageiros.length - 1}
+                            </Badge>
+                          )}
+                        </div>
+                      </TooltipTrigger>
+                      <TooltipContent side="bottom" className="max-w-xs">
+                        <div className="space-y-1">
+                          {item.passageiros.map((p, idx) => (
+                            <div key={idx} className="text-sm">
+                              <strong>{p.nome}</strong> - {p.voo}
+                            </div>
+                          ))}
+                        </div>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+                ) : (
+                  <span className="text-muted-foreground text-sm">—</span>
+                )}
+              </TableCell>
+              <TableCell className="whitespace-nowrap font-mono text-xs text-muted-foreground">
+                {item.passageiros.length > 0 ? item.passageiros[0].voo : "—"}
+              </TableCell>
               <TableCell className="whitespace-nowrap font-mono text-xs text-muted-foreground">{item.cot}</TableCell>
               <TableCell>
                 <Badge variant={tipoBadgeVariant(item.tipo) as any} className="whitespace-nowrap text-xs">

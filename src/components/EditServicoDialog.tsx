@@ -4,10 +4,11 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { AgendaItem, statusFaturamentoOptions, StatusFaturamento } from "@/data/agendaData";
+import { AgendaItem, statusFaturamentoOptions, StatusFaturamento, Passageiro } from "@/data/agendaData";
 import { updateAgendaItem, getTiposServico } from "@/data/cadastroStorage";
 import { toast } from "sonner";
 import { Pencil } from "lucide-react";
+import PassageirosInput from "./PassageirosInput";
 
 interface EditServicoDialogProps {
   open: boolean;
@@ -23,8 +24,6 @@ const EditServicoDialog = ({ open, onOpenChange, item, onSaved }: EditServicoDia
     hora: "",
     cliente: "",
     pax: "",
-    nomePassageiro: "",
-    numeroVoo: "",
     cot: "",
     tipo: "",
     origem: "",
@@ -39,6 +38,8 @@ const EditServicoDialog = ({ open, onOpenChange, item, onSaved }: EditServicoDia
     observacoes: "",
     statusFaturamento: "" as StatusFaturamento,
   });
+  
+  const [passageiros, setPassageiros] = useState<Passageiro[]>([]);
 
   useEffect(() => {
     if (item && open) {
@@ -47,8 +48,6 @@ const EditServicoDialog = ({ open, onOpenChange, item, onSaved }: EditServicoDia
         hora: item.hora,
         cliente: item.cliente,
         pax: item.pax.toString(),
-        nomePassageiro: item.nomePassageiro || "",
-        numeroVoo: item.numeroVoo || "",
         cot: item.cot,
         tipo: item.tipo,
         origem: item.origem,
@@ -63,6 +62,7 @@ const EditServicoDialog = ({ open, onOpenChange, item, onSaved }: EditServicoDia
         observacoes: item.observacoes || "",
         statusFaturamento: item.statusFaturamento || "",
       });
+      setPassageiros(item.passageiros || []);
     }
   }, [item, open]);
 
@@ -81,8 +81,7 @@ const EditServicoDialog = ({ open, onOpenChange, item, onSaved }: EditServicoDia
       hora: form.hora,
       cliente: form.cliente,
       pax: parseInt(form.pax) || 0,
-      nomePassageiro: form.nomePassageiro,
-      numeroVoo: form.numeroVoo,
+      passageiros: passageiros,
       cot: form.cot,
       tipo: form.tipo,
       origem: form.origem,
@@ -134,18 +133,12 @@ const EditServicoDialog = ({ open, onOpenChange, item, onSaved }: EditServicoDia
           </div>
 
           <div className="space-y-1.5">
-            <Label>Nome do Passageiro</Label>
-            <Input value={form.nomePassageiro} onChange={(e) => update("nomePassageiro", e.target.value)} placeholder="Nome completo" />
-          </div>
-
-          <div className="space-y-1.5">
-            <Label>Número do Voo</Label>
-            <Input value={form.numeroVoo} onChange={(e) => update("numeroVoo", e.target.value)} placeholder="G31234" />
-          </div>
-
-          <div className="space-y-1.5">
             <Label>COT</Label>
             <Input value={form.cot} onChange={(e) => update("cot", e.target.value)} placeholder="COT-000" />
+          </div>
+
+          <div className="space-y-1.5 sm:col-span-2">
+            <PassageirosInput passageiros={passageiros} onChange={setPassageiros} />
           </div>
 
           <div className="space-y-1.5">
