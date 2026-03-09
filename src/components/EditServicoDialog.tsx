@@ -104,6 +104,7 @@ const EditServicoDialog = ({ open, onOpenChange, item, onSaved }: EditServicoDia
         fornecedor: form.fornecedor,
         custo: parseFloat(form.custo) || 0,
         observacoes: form.observacoes,
+        receptivo: form.receptivo,
         statusFaturamento: form.statusFaturamento,
       });
 
