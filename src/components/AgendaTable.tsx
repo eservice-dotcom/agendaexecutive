@@ -220,7 +220,27 @@ const AgendaTable = ({ items, onEdited }: AgendaTableProps) => {
                   <TableCell className="whitespace-nowrap text-right font-mono text-sm font-semibold text-foreground">
                     {formatCurrency(item.valor)}
                   </TableCell>
-                  <TableCell className="whitespace-nowrap text-sm">{item.fornecedor}</TableCell>
+                  <TableCell className="whitespace-nowrap text-sm">
+                    <span className="flex items-center gap-1">
+                      {item.fornecedor}
+                      {item.fornecedor && (
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="h-7 w-7 p-0 text-accent hover:text-accent/80"
+                          onClick={() => {
+                            const fornecedorItems = items.filter(
+                              (i) => i.fornecedor === item.fornecedor && i.data === item.data
+                            );
+                            setFornecedorWhatsapp({ nome: item.fornecedor, items: fornecedorItems });
+                          }}
+                          title="Enviar serviços do dia ao fornecedor via WhatsApp"
+                        >
+                          <MessageCircle className="h-4 w-4" />
+                        </Button>
+                      )}
+                    </span>
+                  </TableCell>
                   <TableCell className="whitespace-nowrap text-right font-mono text-sm text-muted-foreground">
                     {formatCurrency(item.custo)}
                   </TableCell>
