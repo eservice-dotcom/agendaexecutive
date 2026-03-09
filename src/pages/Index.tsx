@@ -12,7 +12,7 @@ import FaturamentoFornecedor from "@/components/FaturamentoFornecedor";
 import DashboardOcupacao from "@/components/DashboardOcupacao";
 import NovoServicoDialog from "@/components/NovoServicoDialog";
 import { getAgendaItems } from "@/data/cadastroStorage";
-import { printElement } from "@/lib/printUtils";
+import { printAgenda } from "@/lib/printUtils";
 
 
 interface FiltersState {
