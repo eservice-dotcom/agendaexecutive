@@ -222,6 +222,11 @@ const NovoServicoDialog = ({ open, onOpenChange, onSaved }: NovoServicoDialogPro
             <Input type="number" min={0} step="0.01" value={form.custo} onChange={(e) => update("custo", e.target.value)} placeholder="0,00" />
           </div>
 
+          <div className="space-y-1.5">
+            <Label>Receptivo</Label>
+            <Input value={form.receptivo} onChange={(e) => update("receptivo", e.target.value)} placeholder="Nome do receptivo" />
+          </div>
+
           <div className="space-y-1.5 sm:col-span-2">
             <Label>Observações</Label>
             <Input value={form.observacoes} onChange={(e) => update("observacoes", e.target.value)} placeholder="Observações sobre o serviço" />

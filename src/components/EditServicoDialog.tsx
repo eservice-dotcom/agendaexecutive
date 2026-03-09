@@ -212,6 +212,11 @@ const EditServicoDialog = ({ open, onOpenChange, item, onSaved }: EditServicoDia
           </div>
 
           <div className="space-y-1.5">
+            <Label>Receptivo</Label>
+            <Input value={form.receptivo} onChange={(e) => update("receptivo", e.target.value)} placeholder="Nome do receptivo" />
+          </div>
+
+          <div className="space-y-1.5">
             <Label>Observações</Label>
             <Input value={form.observacoes} onChange={(e) => update("observacoes", e.target.value)} placeholder="Observações sobre o serviço" />
           </div>

@@ -314,6 +314,7 @@ export const updateAgendaItem = async (updated: AgendaItem) => {
       fornecedor: updated.fornecedor,
       custo: updated.custo,
       observacoes: updated.observacoes,
+      receptivo: updated.receptivo || "",
       status_faturamento: updated.statusFaturamento,
     })
     .eq("id", updated.id);

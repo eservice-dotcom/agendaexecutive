@@ -24,6 +24,7 @@ export interface AgendaItem {
   fornecedor: string;
   custo: number;
   observacoes: string;
+  receptivo: string;
   statusFaturamento: StatusFaturamento;
 }
 

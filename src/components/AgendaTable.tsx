@@ -218,6 +218,7 @@ const AgendaTable = ({ items, onEdited }: AgendaTableProps) => {
                   </TableCell>
                 </>
               )}
+              <TableCell className="whitespace-nowrap text-sm">{item.receptivo || "—"}</TableCell>
               <TableCell className="max-w-[200px] truncate text-sm text-muted-foreground" title={item.observacoes}>
                 {item.observacoes || "—"}
               </TableCell>
