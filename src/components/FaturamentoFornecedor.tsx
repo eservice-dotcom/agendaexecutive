@@ -1,24 +1,29 @@
-import { useMemo } from "react";
+import { useMemo, useEffect, useState } from "react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { mockData } from "@/data/agendaData";
 import { Building2 } from "lucide-react";
-
-const formatCurrency = (value: number) =>
-  new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(value);
+import { supabase } from "@/integrations/supabase/client";
 
 const FaturamentoFornecedor = () => {
+  const [items, setItems] = useState<any[]>([]);
+
+  useEffect(() => {
+    supabase.from("agenda_items").select("*").then(({ data }) => {
+      if (data) setItems(data);
+    });
+  }, []);
+
   const dados = useMemo(() => {
     const map = new Map<string, { fornecedor: string; viagens: number; receita: number; custo: number; pax: number }>();
-    mockData.forEach((item) => {
+    items.forEach((item) => {
       const existing = map.get(item.fornecedor) || { fornecedor: item.fornecedor, viagens: 0, receita: 0, custo: 0, pax: 0 };
       existing.viagens += 1;
-      existing.receita += item.valor;
-      existing.custo += item.custo;
-      existing.pax += item.pax;
+      existing.receita += Number(item.valor);
+      existing.custo += Number(item.custo);
+      existing.pax += Number(item.pax);
       map.set(item.fornecedor, existing);
     });
     return Array.from(map.values()).sort((a, b) => b.custo - a.custo);
-  }, []);
+  }, [items]);
 
   const totalReceita = dados.reduce((s, d) => s + d.receita, 0);
   const totalCusto = dados.reduce((s, d) => s + d.custo, 0);
