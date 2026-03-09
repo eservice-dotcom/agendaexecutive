@@ -159,8 +159,8 @@ const AgendaTable = ({ items, onEdited }: AgendaTableProps) => {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {items.map((item) => (
-            <TableRow key={item.id} className={`transition-colors hover:bg-primary/10 ${tipoRowColor(item.tipo)}`}>
+          {items.map((item, idx) => (
+            <TableRow key={item.id} className={`transition-colors hover:bg-primary/10 ${tipoRowColor(item.tipo)} ${idx % 2 === 1 ? 'opacity-80' : ''}`}>
               <TableCell className={`whitespace-nowrap font-mono text-sm sticky left-0 z-10 ${tipoRowColor(item.tipo)}`}>{formatDate(item.data)}</TableCell>
               <TableCell className={`whitespace-nowrap font-mono text-sm font-medium sticky left-[85px] z-10 ${tipoRowColor(item.tipo)}`}>{item.hora}</TableCell>
               <TableCell className="whitespace-nowrap font-medium">{item.cliente}</TableCell>
