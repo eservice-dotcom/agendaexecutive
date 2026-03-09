@@ -10,6 +10,7 @@ const formatCurrency = (value: number) =>
 
 const FaturamentoFornecedor = () => {
   const [items, setItems] = useState<any[]>([]);
+  const [printWithFinancials, setPrintWithFinancials] = useState(true);
 
   useEffect(() => {
     supabase.from("agenda_items").select("*").then(({ data }) => {
