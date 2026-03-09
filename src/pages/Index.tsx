@@ -67,10 +67,11 @@ const Index = () => {
       if (filters.motorista && item.motorista !== filters.motorista) return false;
       if (filters.pax) {
         const paxSearch = filters.pax.toLowerCase();
-        if (!item.nomePassageiro.toLowerCase().includes(paxSearch) && 
-            !item.numeroVoo.toLowerCase().includes(paxSearch)) {
-          return false;
-        }
+        const hasMatch = item.passageiros.some(p => 
+          p.nome.toLowerCase().includes(paxSearch) || 
+          p.voo.toLowerCase().includes(paxSearch)
+        );
+        if (!hasMatch) return false;
       }
       return true;
     });
