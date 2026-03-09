@@ -37,6 +37,7 @@ const EditServicoDialog = ({ open, onOpenChange, item, onSaved }: EditServicoDia
     fornecedor: "",
     custo: "",
     observacoes: "",
+    receptivo: "",
     statusFaturamento: "" as StatusFaturamento,
   });
   
@@ -67,6 +68,7 @@ const EditServicoDialog = ({ open, onOpenChange, item, onSaved }: EditServicoDia
         fornecedor: item.fornecedor,
         custo: item.custo.toString(),
         observacoes: item.observacoes || "",
+        receptivo: item.receptivo || "",
         statusFaturamento: item.statusFaturamento || "",
       });
       setPassageiros(item.passageiros || []);
@@ -102,6 +104,7 @@ const EditServicoDialog = ({ open, onOpenChange, item, onSaved }: EditServicoDia
         fornecedor: form.fornecedor,
         custo: parseFloat(form.custo) || 0,
         observacoes: form.observacoes,
+        receptivo: form.receptivo,
         statusFaturamento: form.statusFaturamento,
       });
 
@@ -206,6 +209,11 @@ const EditServicoDialog = ({ open, onOpenChange, item, onSaved }: EditServicoDia
           <div className="space-y-1.5">
             <Label>Custo (R$)</Label>
             <Input type="number" min={0} step="0.01" value={form.custo} onChange={(e) => update("custo", e.target.value)} placeholder="0,00" />
+          </div>
+
+          <div className="space-y-1.5">
+            <Label>Receptivo</Label>
+            <Input value={form.receptivo} onChange={(e) => update("receptivo", e.target.value)} placeholder="Nome do receptivo" />
           </div>
 
           <div className="space-y-1.5">

@@ -259,6 +259,7 @@ export const getAgendaItems = async (): Promise<AgendaItem[]> => {
     fornecedor: item.fornecedor,
     custo: Number(item.custo),
     observacoes: item.observacoes || "",
+    receptivo: item.receptivo || "",
     statusFaturamento: (item.status_faturamento || "") as any,
   }));
 };
@@ -286,6 +287,7 @@ export const saveAgendaItem = async (item: Omit<AgendaItem, "id">) => {
     fornecedor: item.fornecedor,
     custo: item.custo,
     observacoes: item.observacoes,
+    receptivo: item.receptivo || "",
     status_faturamento: item.statusFaturamento,
   });
   
@@ -313,6 +315,7 @@ export const updateAgendaItem = async (updated: AgendaItem) => {
       fornecedor: updated.fornecedor,
       custo: updated.custo,
       observacoes: updated.observacoes,
+      receptivo: updated.receptivo || "",
       status_faturamento: updated.statusFaturamento,
     })
     .eq("id", updated.id);

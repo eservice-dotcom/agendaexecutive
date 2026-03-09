@@ -12,6 +12,7 @@ interface FiltersState {
   fornecedor: string;
   motorista: string;
   pax: string;
+  receptivo: string;
 }
 
 interface AgendaFiltersProps {
@@ -34,6 +35,7 @@ const AgendaFilters = ({ filters, onFilterChange, motoristas }: AgendaFiltersPro
       fornecedor: "",
       motorista: "",
       pax: "",
+      receptivo: "",
     });
   };
 
@@ -85,6 +87,11 @@ const AgendaFilters = ({ filters, onFilterChange, motoristas }: AgendaFiltersPro
           placeholder="Passageiro ou Voo"
           value={filters.pax}
           onChange={(e) => updateFilter("pax", e.target.value)}
+        />
+        <Input
+          placeholder="Receptivo"
+          value={filters.receptivo}
+          onChange={(e) => updateFilter("receptivo", e.target.value)}
         />
         <Select value={filters.tipo} onValueChange={(v) => updateFilter("tipo", v === "all" ? "" : v)}>
           <SelectTrigger>

@@ -31,6 +31,7 @@ export type Database = {
           passageiros: Json
           pax: number
           placa: string
+          receptivo: string
           status_faturamento: string | null
           telefone: string
           tipo: string
@@ -55,6 +56,7 @@ export type Database = {
           passageiros?: Json
           pax: number
           placa: string
+          receptivo?: string
           status_faturamento?: string | null
           telefone: string
           tipo: string
@@ -79,6 +81,7 @@ export type Database = {
           passageiros?: Json
           pax?: number
           placa?: string
+          receptivo?: string
           status_faturamento?: string | null
           telefone?: string
           tipo?: string
