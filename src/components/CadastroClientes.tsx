@@ -45,20 +45,6 @@ const CadastroClientes = () => {
     }
   };
 
-  const handleSave = () => {
-    if (!form.nome.trim()) { toast.error("Nome é obrigatório"); return; }
-    saveCliente(form);
-    setForm({ nome: "", cnpjCpf: "", email: "", telefone: "", endereco: "" });
-    setOpen(false);
-    refresh();
-    toast.success("Cliente cadastrado!");
-  };
-
-  const handleDelete = (id: string) => {
-    deleteCliente(id);
-    refresh();
-    toast.success("Cliente removido");
-  };
 
   return (
     <div className="space-y-4">
