@@ -2,7 +2,6 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { Calendar, Filter, RotateCcw, Search } from "lucide-react";
-import { tiposServico, fornecedores } from "@/data/agendaData";
 
 interface FiltersState {
   search: string;
@@ -19,9 +18,11 @@ interface AgendaFiltersProps {
   filters: FiltersState;
   onFilterChange: (filters: FiltersState) => void;
   motoristas: string[];
+  tipos: string[];
+  fornecedores: string[];
 }
 
-const AgendaFilters = ({ filters, onFilterChange, motoristas }: AgendaFiltersProps) => {
+const AgendaFilters = ({ filters, onFilterChange, motoristas, tipos, fornecedores }: AgendaFiltersProps) => {
   const updateFilter = (key: keyof FiltersState, value: string) => {
     onFilterChange({ ...filters, [key]: value });
   };
@@ -53,7 +54,7 @@ const AgendaFilters = ({ filters, onFilterChange, motoristas }: AgendaFiltersPro
           </Button>
         )}
       </div>
-      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-7">
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-8">
         <div className="relative xl:col-span-2">
           <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
           <Input
@@ -93,18 +94,18 @@ const AgendaFilters = ({ filters, onFilterChange, motoristas }: AgendaFiltersPro
           value={filters.receptivo}
           onChange={(e) => updateFilter("receptivo", e.target.value)}
         />
-        <Select value={filters.tipo} onValueChange={(v) => updateFilter("tipo", v === "all" ? "" : v)}>
+        <Select value={filters.tipo || "all"} onValueChange={(v) => updateFilter("tipo", v === "all" ? "" : v)}>
           <SelectTrigger>
             <SelectValue placeholder="Tipo" />
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">Todos os tipos</SelectItem>
-            {tiposServico.map((t) => (
+            {tipos.map((t) => (
               <SelectItem key={t} value={t}>{t}</SelectItem>
             ))}
           </SelectContent>
         </Select>
-        <Select value={filters.fornecedor} onValueChange={(v) => updateFilter("fornecedor", v === "all" ? "" : v)}>
+        <Select value={filters.fornecedor || "all"} onValueChange={(v) => updateFilter("fornecedor", v === "all" ? "" : v)}>
           <SelectTrigger>
             <SelectValue placeholder="Fornecedor" />
           </SelectTrigger>
@@ -112,6 +113,17 @@ const AgendaFilters = ({ filters, onFilterChange, motoristas }: AgendaFiltersPro
             <SelectItem value="all">Todos</SelectItem>
             {fornecedores.map((f) => (
               <SelectItem key={f} value={f}>{f}</SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+        <Select value={filters.motorista || "all"} onValueChange={(v) => updateFilter("motorista", v === "all" ? "" : v)}>
+          <SelectTrigger>
+            <SelectValue placeholder="Motorista" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">Todos</SelectItem>
+            {motoristas.map((m) => (
+              <SelectItem key={m} value={m}>{m}</SelectItem>
             ))}
           </SelectContent>
         </Select>
