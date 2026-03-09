@@ -68,6 +68,7 @@ const EditServicoDialog = ({ open, onOpenChange, item, onSaved }: EditServicoDia
         fornecedor: item.fornecedor,
         custo: item.custo.toString(),
         observacoes: item.observacoes || "",
+        receptivo: item.receptivo || "",
         statusFaturamento: item.statusFaturamento || "",
       });
       setPassageiros(item.passageiros || []);
