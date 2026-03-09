@@ -12,6 +12,7 @@ interface FiltersState {
   fornecedor: string;
   motorista: string;
   pax: string;
+  receptivo: string;
 }
 
 interface AgendaFiltersProps {
