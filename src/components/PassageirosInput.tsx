@@ -51,7 +51,7 @@ const PassageirosInput = ({ passageiros, onChange }: PassageirosInputProps) => {
           </p>
         ) : (
           passageiros.map((passageiro, index) => (
-            <div key={index} className="grid grid-cols-[1fr_1fr_auto] gap-2 items-end">
+            <div key={index} className="grid grid-cols-[1fr_1fr_1fr_auto] gap-2 items-end">
               <div className="space-y-1">
                 {index === 0 && <Label className="text-xs">Nome</Label>}
                 <Input
@@ -67,6 +67,15 @@ const PassageirosInput = ({ passageiros, onChange }: PassageirosInputProps) => {
                   placeholder="Nº do voo"
                   value={passageiro.voo}
                   onChange={(e) => updatePassageiro(index, "voo", e.target.value)}
+                  className="h-9"
+                />
+              </div>
+              <div className="space-y-1">
+                {index === 0 && <Label className="text-xs">Telefone</Label>}
+                <Input
+                  placeholder="Telefone"
+                  value={passageiro.telefone || ""}
+                  onChange={(e) => updatePassageiro(index, "telefone", e.target.value)}
                   className="h-9"
                 />
               </div>

@@ -3,6 +3,7 @@ export type StatusFaturamento = "" | "enviado" | "faturado";
 export interface Passageiro {
   nome: string;
   voo: string;
+  telefone?: string;
 }
 
 export interface AgendaItem {

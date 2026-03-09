@@ -187,7 +187,7 @@ const AgendaTable = ({ items, onEdited }: AgendaTableProps) => {
                         <div className="space-y-1">
                           {item.passageiros.map((p, idx) => (
                             <div key={idx} className="text-sm">
-                              <strong>{p.nome}</strong> - {p.voo}
+                              <strong>{p.nome}</strong> - {p.voo}{p.telefone ? ` | ${p.telefone}` : ""}
                             </div>
                           ))}
                         </div>
