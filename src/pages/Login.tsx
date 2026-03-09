@@ -54,14 +54,14 @@ const Login = () => {
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-1.5">
-            <Label htmlFor="email">E-mail</Label>
+            <Label htmlFor="username">Nome de usuário</Label>
             <Input
-              id="email"
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              id="username"
+              type="text"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
               required
-              placeholder="seu@email.com"
+              placeholder="Digite seu nome (sem espaços extras)"
             />
           </div>
           <div className="space-y-1.5">
