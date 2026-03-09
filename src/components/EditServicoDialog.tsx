@@ -37,6 +37,7 @@ const EditServicoDialog = ({ open, onOpenChange, item, onSaved }: EditServicoDia
     fornecedor: "",
     custo: "",
     observacoes: "",
+    receptivo: "",
     statusFaturamento: "" as StatusFaturamento,
   });
   
