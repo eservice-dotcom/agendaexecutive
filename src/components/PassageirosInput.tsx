@@ -12,7 +12,7 @@ interface PassageirosInputProps {
 
 const PassageirosInput = ({ passageiros, onChange }: PassageirosInputProps) => {
   const addPassageiro = () => {
-    onChange([...passageiros, { nome: "", voo: "" }]);
+    onChange([...passageiros, { nome: "", voo: "", telefone: "" }]);
   };
 
   const removePassageiro = (index: number) => {
