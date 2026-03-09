@@ -28,6 +28,22 @@ const tipoBadgeVariant = (tipo: string) => {
   }
 };
 
+const tipoRowColor = (tipo: string): string => {
+  const colors: Record<string, string> = {
+    "Transfer In": "bg-blue-50 dark:bg-blue-950/30",
+    "Transfer Out": "bg-emerald-50 dark:bg-emerald-950/30",
+    "City Tour": "bg-amber-50 dark:bg-amber-950/30",
+    "Translado": "bg-purple-50 dark:bg-purple-950/30",
+    "Fretamento": "bg-rose-50 dark:bg-rose-950/30",
+    "Coordenação": "bg-cyan-50 dark:bg-cyan-950/30",
+    "Diária de 5h": "bg-orange-50 dark:bg-orange-950/30",
+    "Diária de 10h": "bg-teal-50 dark:bg-teal-950/30",
+    "Viagem": "bg-indigo-50 dark:bg-indigo-950/30",
+    "Comissaria": "bg-pink-50 dark:bg-pink-950/30",
+  };
+  return colors[tipo] || "";
+};
+
 const formatCurrency = (value: number) =>
   new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(value);
 
@@ -143,7 +159,7 @@ const AgendaTable = ({ items, onEdited }: AgendaTableProps) => {
         </TableHeader>
         <TableBody>
           {items.map((item) => (
-            <TableRow key={item.id} className="transition-colors hover:bg-primary/5">
+            <TableRow key={item.id} className={`transition-colors hover:bg-primary/10 ${tipoRowColor(item.tipo)}`}>
               <TableCell className="whitespace-nowrap font-mono text-sm">{formatDate(item.data)}</TableCell>
               <TableCell className="whitespace-nowrap font-mono text-sm font-medium">{item.hora}</TableCell>
               <TableCell className="whitespace-nowrap font-medium">{item.cliente}</TableCell>
