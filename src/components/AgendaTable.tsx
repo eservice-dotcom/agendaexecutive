@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { AgendaItem, StatusFaturamento } from "@/data/agendaData";
 import { MapPin, Phone, User, Truck, MessageCircle, Pencil, Trash2, Circle, Send, CheckCircle2, Users } from "lucide-react";
 import WhatsAppDialog from "./WhatsAppDialog";
+import WhatsAppFornecedorDialog from "./WhatsAppFornecedorDialog";
 import EditServicoDialog from "./EditServicoDialog";
 import { useAuth } from "@/contexts/AuthContext";
 import { deleteAgendaItem, updateAgendaItem } from "@/data/cadastroStorage";
@@ -39,6 +40,7 @@ const AgendaTable = ({ items, onEdited }: AgendaTableProps) => {
   const [whatsappItem, setWhatsappItem] = useState<AgendaItem | null>(null);
   const [editItem, setEditItem] = useState<AgendaItem | null>(null);
   const [deleteItemId, setDeleteItemId] = useState<string | null>(null);
+  const [fornecedorWhatsapp, setFornecedorWhatsapp] = useState<{ nome: string; items: AgendaItem[] } | null>(null);
   const { canViewFinancials } = useAuth();
 
   const handleDelete = () => {
@@ -85,6 +87,12 @@ const AgendaTable = ({ items, onEdited }: AgendaTableProps) => {
   return (
     <>
     <WhatsAppDialog open={!!whatsappItem} onOpenChange={(v) => { if (!v) setWhatsappItem(null); }} item={whatsappItem} allItems={items} />
+    <WhatsAppFornecedorDialog
+      open={!!fornecedorWhatsapp}
+      onOpenChange={(v) => { if (!v) setFornecedorWhatsapp(null); }}
+      fornecedorNome={fornecedorWhatsapp?.nome || ""}
+      items={fornecedorWhatsapp?.items || []}
+    />
     <EditServicoDialog open={!!editItem} onOpenChange={(v) => { if (!v) setEditItem(null); }} item={editItem} onSaved={() => onEdited?.()} />
     <div className="overflow-auto rounded-lg border border-border bg-card shadow-sm">
       <Table>
@@ -212,7 +220,27 @@ const AgendaTable = ({ items, onEdited }: AgendaTableProps) => {
                   <TableCell className="whitespace-nowrap text-right font-mono text-sm font-semibold text-foreground">
                     {formatCurrency(item.valor)}
                   </TableCell>
-                  <TableCell className="whitespace-nowrap text-sm">{item.fornecedor}</TableCell>
+                  <TableCell className="whitespace-nowrap text-sm">
+                    <span className="flex items-center gap-1">
+                      {item.fornecedor}
+                      {item.fornecedor && (
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="h-7 w-7 p-0 text-accent hover:text-accent/80"
+                          onClick={() => {
+                            const fornecedorItems = items.filter(
+                              (i) => i.fornecedor === item.fornecedor && i.data === item.data
+                            );
+                            setFornecedorWhatsapp({ nome: item.fornecedor, items: fornecedorItems });
+                          }}
+                          title="Enviar serviços do dia ao fornecedor via WhatsApp"
+                        >
+                          <MessageCircle className="h-4 w-4" />
+                        </Button>
+                      )}
+                    </span>
+                  </TableCell>
                   <TableCell className="whitespace-nowrap text-right font-mono text-sm text-muted-foreground">
                     {formatCurrency(item.custo)}
                   </TableCell>
