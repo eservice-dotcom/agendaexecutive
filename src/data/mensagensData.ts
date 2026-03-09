@@ -88,3 +88,24 @@ export const mensagensPadrao: MensagemTemplate[] = [
     texto: "Olá {motorista}! Seguem os dados do serviço: Data: {data} | Hora: {hora} | PAX: {pax} | Passageiros: {passageiros} | Voo: {voos} | Origem: {origem} | Destino: {destino}. Qualquer dúvida, entre em contato.",
   },
 ];
+
+export const getMensagens = (): MensagemTemplate[] => {
+  try {
+    const stored = localStorage.getItem(STORAGE_KEY);
+    if (stored) {
+      const parsed = JSON.parse(stored) as MensagemTemplate[];
+      // Merge: keep stored edits but add any new defaults not yet in storage
+      const storedIds = new Set(parsed.map((m) => m.id));
+      const missing = mensagensPadrao.filter((m) => !storedIds.has(m.id));
+      return [...parsed, ...missing];
+    }
+  } catch { /* ignore */ }
+  return [...mensagensPadrao];
+};
+
+export const salvarMensagens = (mensagens: MensagemTemplate[]) => {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(mensagens));
+};
+
+// Backward-compatible alias
+export const mensagensPreCadastradas = getMensagens();

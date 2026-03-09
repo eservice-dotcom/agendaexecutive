@@ -1,7 +1,7 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { mensagensPreCadastradas } from "@/data/mensagensData";
+import { getMensagens } from "@/data/mensagensData";
 import { AgendaItem } from "@/data/agendaData";
 import { useState } from "react";
 import { MessageCircle, Send, FileText } from "lucide-react";

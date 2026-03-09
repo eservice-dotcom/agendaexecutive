@@ -69,6 +69,7 @@ const Cadastros = () => {
           <TabsContent value="motoristas"><CadastroMotoristas /></TabsContent>
           <TabsContent value="fornecedores"><CadastroFornecedores /></TabsContent>
           <TabsContent value="tipos"><CadastroTiposServico /></TabsContent>
+          <TabsContent value="mensagens"><CadastroMensagens /></TabsContent>
           <TabsContent value="usuarios"><CadastroUsuarios /></TabsContent>
         </Tabs>
       </main>
