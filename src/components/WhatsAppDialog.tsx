@@ -14,6 +14,9 @@ interface WhatsAppDialogProps {
 
 const replacePlaceholders = (texto: string, item: AgendaItem) => {
   const [y, m, d] = item.data.split("-");
+  const voos = item.passageiros.length > 0
+    ? [...new Set(item.passageiros.map(p => p.voo).filter(Boolean))].join(", ")
+    : "—";
   return texto
     .replace(/{data}/g, `${d}/${m}/${y}`)
     .replace(/{hora}/g, item.hora)
@@ -25,7 +28,8 @@ const replacePlaceholders = (texto: string, item: AgendaItem) => {
     .replace(/{motorista}/g, item.motorista)
     .replace(/{pax}/g, String(item.pax))
     .replace(/{cot}/g, item.cot)
-    .replace(/{tipo}/g, item.tipo);
+    .replace(/{tipo}/g, item.tipo)
+    .replace(/{voos}/g, voos);
 };
 
 const WhatsAppDialog = ({ open, onOpenChange, item }: WhatsAppDialogProps) => {
