@@ -130,8 +130,8 @@ const AgendaTable = ({ items, onEdited }: AgendaTableProps) => {
       <Table>
         <TableHeader>
           <TableRow className="bg-muted/50 hover:bg-muted/50">
-            <TableHead className="whitespace-nowrap font-semibold">Data</TableHead>
-            <TableHead className="whitespace-nowrap font-semibold">Hora</TableHead>
+            <TableHead className="whitespace-nowrap font-semibold sticky left-0 z-20 bg-muted/95 backdrop-blur-sm">Data</TableHead>
+            <TableHead className="whitespace-nowrap font-semibold sticky left-[85px] z-20 bg-muted/95 backdrop-blur-sm">Hora</TableHead>
             <TableHead className="whitespace-nowrap font-semibold">Cliente</TableHead>
             <TableHead className="whitespace-nowrap font-semibold text-center">PAX</TableHead>
             <TableHead className="whitespace-nowrap font-semibold">Passageiro</TableHead>
@@ -160,8 +160,8 @@ const AgendaTable = ({ items, onEdited }: AgendaTableProps) => {
         <TableBody>
           {items.map((item) => (
             <TableRow key={item.id} className={`transition-colors hover:bg-primary/10 ${tipoRowColor(item.tipo)}`}>
-              <TableCell className="whitespace-nowrap font-mono text-sm">{formatDate(item.data)}</TableCell>
-              <TableCell className="whitespace-nowrap font-mono text-sm font-medium">{item.hora}</TableCell>
+              <TableCell className={`whitespace-nowrap font-mono text-sm sticky left-0 z-10 ${tipoRowColor(item.tipo)}`}>{formatDate(item.data)}</TableCell>
+              <TableCell className={`whitespace-nowrap font-mono text-sm font-medium sticky left-[85px] z-10 ${tipoRowColor(item.tipo)}`}>{item.hora}</TableCell>
               <TableCell className="whitespace-nowrap font-medium">{item.cliente}</TableCell>
               <TableCell className="text-center">
                 <span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-primary/10 text-xs font-bold text-primary">
