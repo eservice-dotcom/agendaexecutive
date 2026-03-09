@@ -130,8 +130,8 @@ const AgendaTable = ({ items, onEdited }: AgendaTableProps) => {
       <Table>
         <TableHeader>
           <TableRow className="bg-muted/50 hover:bg-muted/50">
-            <TableHead className="whitespace-nowrap font-semibold">Data</TableHead>
-            <TableHead className="whitespace-nowrap font-semibold">Hora</TableHead>
+            <TableHead className="whitespace-nowrap font-semibold sticky left-0 z-20 bg-muted/95 backdrop-blur-sm">Data</TableHead>
+            <TableHead className="whitespace-nowrap font-semibold sticky left-[85px] z-20 bg-muted/95 backdrop-blur-sm">Hora</TableHead>
             <TableHead className="whitespace-nowrap font-semibold">Cliente</TableHead>
             <TableHead className="whitespace-nowrap font-semibold text-center">PAX</TableHead>
             <TableHead className="whitespace-nowrap font-semibold">Passageiro</TableHead>
