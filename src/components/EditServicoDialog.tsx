@@ -48,8 +48,6 @@ const EditServicoDialog = ({ open, onOpenChange, item, onSaved }: EditServicoDia
         hora: item.hora,
         cliente: item.cliente,
         pax: item.pax.toString(),
-        nomePassageiro: item.nomePassageiro || "",
-        numeroVoo: item.numeroVoo || "",
         cot: item.cot,
         tipo: item.tipo,
         origem: item.origem,
@@ -64,6 +62,7 @@ const EditServicoDialog = ({ open, onOpenChange, item, onSaved }: EditServicoDia
         observacoes: item.observacoes || "",
         statusFaturamento: item.statusFaturamento || "",
       });
+      setPassageiros(item.passageiros || []);
     }
   }, [item, open]);
 
