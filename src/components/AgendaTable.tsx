@@ -3,12 +3,12 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { AgendaItem, StatusFaturamento } from "@/data/agendaData";
-import { MapPin, Phone, User, Truck, MessageCircle, Pencil, Trash2, Circle, Send, CheckCircle2, Users } from "lucide-react";
+import { MapPin, Phone, User, Truck, MessageCircle, Pencil, Trash2, Circle, Send, CheckCircle2, Users, Copy } from "lucide-react";
 import WhatsAppDialog from "./WhatsAppDialog";
 import WhatsAppFornecedorDialog from "./WhatsAppFornecedorDialog";
 import EditServicoDialog from "./EditServicoDialog";
 import { useAuth } from "@/contexts/AuthContext";
-import { deleteAgendaItem, updateAgendaItem } from "@/data/cadastroStorage";
+import { deleteAgendaItem, updateAgendaItem, saveAgendaItem } from "@/data/cadastroStorage";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { toast } from "sonner";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
@@ -49,6 +49,22 @@ const AgendaTable = ({ items, onEdited }: AgendaTableProps) => {
       setDeleteItemId(null);
       toast.success("Serviço excluído com sucesso!");
       onEdited?.();
+    }
+  };
+
+  const handleClone = async (item: AgendaItem) => {
+    try {
+      const { id, ...rest } = item;
+      await saveAgendaItem({ ...rest, cot: rest.cot ? `${rest.cot}-COPIA` : "" });
+      toast.success("Serviço clonado! Abrindo para edição...");
+      await onEdited?.();
+      // Reload to get the new item, then open edit
+      const { getAgendaItems } = await import("@/data/cadastroStorage");
+      const allItems = await getAgendaItems();
+      const cloned = allItems.find(i => i.cot === `${rest.cot}-COPIA` && i.data === rest.data && i.hora === rest.hora);
+      if (cloned) setEditItem(cloned);
+    } catch {
+      toast.error("Erro ao clonar serviço");
     }
   };
 
@@ -278,6 +294,15 @@ const AgendaTable = ({ items, onEdited }: AgendaTableProps) => {
                     title="Editar serviço"
                   >
                     <Pencil className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="h-7 w-7 p-0 text-muted-foreground hover:text-accent"
+                    onClick={() => handleClone(item)}
+                    title="Clonar serviço"
+                  >
+                    <Copy className="h-4 w-4" />
                   </Button>
                   <Button
                     variant="ghost"
