@@ -284,6 +284,7 @@ export type Database = {
     }
     Functions: {
       can_view_financials: { Args: { _user_id: string }; Returns: boolean }
+      delete_user: { Args: { _user_id: string }; Returns: undefined }
       get_all_users: {
         Args: never
         Returns: {
