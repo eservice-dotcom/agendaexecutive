@@ -28,8 +28,6 @@ const NovoServicoDialog = ({ open, onOpenChange, onSaved }: NovoServicoDialogPro
     hora: "",
     clienteId: "",
     pax: "",
-    nomePassageiro: "",
-    numeroVoo: "",
     cot: "",
     tipo: "",
     origem: "",
@@ -41,6 +39,8 @@ const NovoServicoDialog = ({ open, onOpenChange, onSaved }: NovoServicoDialogPro
     custo: "",
     observacoes: "",
   });
+  
+  const [passageiros, setPassageiros] = useState<Passageiro[]>([]);
 
   useEffect(() => {
     if (open) {
