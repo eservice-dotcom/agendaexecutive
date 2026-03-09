@@ -26,6 +26,8 @@ const NovoServicoDialog = ({ open, onOpenChange, onSaved }: NovoServicoDialogPro
     hora: "",
     clienteId: "",
     pax: "",
+    nomePassageiro: "",
+    numeroVoo: "",
     cot: "",
     tipo: "",
     origem: "",
@@ -66,6 +68,8 @@ const NovoServicoDialog = ({ open, onOpenChange, onSaved }: NovoServicoDialogPro
       hora: form.hora,
       cliente: cliente?.nome || "",
       pax: parseInt(form.pax) || 0,
+      nomePassageiro: form.nomePassageiro,
+      numeroVoo: form.numeroVoo,
       cot: form.cot,
       tipo: form.tipo,
       origem: form.origem,
@@ -83,7 +87,7 @@ const NovoServicoDialog = ({ open, onOpenChange, onSaved }: NovoServicoDialogPro
 
     toast.success("Serviço adicionado com sucesso!");
     setForm({
-      data: "", hora: "", clienteId: "", pax: "", cot: "", tipo: "",
+      data: "", hora: "", clienteId: "", pax: "", nomePassageiro: "", numeroVoo: "", cot: "", tipo: "",
       origem: "", destino: "", veiculoId: "", motoristaId: "", valor: "",
       fornecedorId: "", custo: "", observacoes: "",
     });
@@ -125,6 +129,16 @@ const NovoServicoDialog = ({ open, onOpenChange, onSaved }: NovoServicoDialogPro
           <div className="space-y-1.5">
             <Label>PAX</Label>
             <Input type="number" min={0} value={form.pax} onChange={(e) => update("pax", e.target.value)} placeholder="0" />
+          </div>
+
+          <div className="space-y-1.5">
+            <Label>Nome do Passageiro</Label>
+            <Input value={form.nomePassageiro} onChange={(e) => update("nomePassageiro", e.target.value)} placeholder="Nome completo" />
+          </div>
+
+          <div className="space-y-1.5">
+            <Label>Número do Voo</Label>
+            <Input value={form.numeroVoo} onChange={(e) => update("numeroVoo", e.target.value)} placeholder="G31234" />
           </div>
 
           <div className="space-y-1.5">

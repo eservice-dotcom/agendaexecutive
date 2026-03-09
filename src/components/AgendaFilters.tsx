@@ -82,9 +82,7 @@ const AgendaFilters = ({ filters, onFilterChange, motoristas }: AgendaFiltersPro
           />
         </div>
         <Input
-          type="number"
-          min="0"
-          placeholder="PAX"
+          placeholder="Passageiro ou Voo"
           value={filters.pax}
           onChange={(e) => updateFilter("pax", e.target.value)}
         />
