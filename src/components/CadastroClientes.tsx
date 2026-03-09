@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -9,11 +9,41 @@ import { Cliente, getClientes, saveCliente, deleteCliente } from "@/data/cadastr
 import { toast } from "sonner";
 
 const CadastroClientes = () => {
-  const [items, setItems] = useState<Cliente[]>(getClientes());
+  const [items, setItems] = useState<Cliente[]>([]);
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState({ nome: "", cnpjCpf: "", email: "", telefone: "", endereco: "" });
 
-  const refresh = () => setItems(getClientes());
+  const refresh = async () => {
+    const data = await getClientes();
+    setItems(data);
+  };
+
+  useEffect(() => {
+    refresh();
+  }, []);
+
+  const handleSave = async () => {
+    if (!form.nome.trim()) { toast.error("Nome é obrigatório"); return; }
+    try {
+      await saveCliente(form);
+      setForm({ nome: "", cnpjCpf: "", email: "", telefone: "", endereco: "" });
+      setOpen(false);
+      await refresh();
+      toast.success("Cliente cadastrado!");
+    } catch (error) {
+      toast.error("Erro ao salvar cliente");
+    }
+  };
+
+  const handleDelete = async (id: string) => {
+    try {
+      await deleteCliente(id);
+      await refresh();
+      toast.success("Cliente removido");
+    } catch (error) {
+      toast.error("Erro ao remover cliente");
+    }
+  };
 
   const handleSave = () => {
     if (!form.nome.trim()) { toast.error("Nome é obrigatório"); return; }
