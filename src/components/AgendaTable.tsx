@@ -159,7 +159,7 @@ const AgendaTable = ({ items, onEdited }: AgendaTableProps) => {
         </TableHeader>
         <TableBody>
           {items.map((item) => (
-            <TableRow key={item.id} className="transition-colors hover:bg-primary/5">
+            <TableRow key={item.id} className={`transition-colors hover:bg-primary/10 ${tipoRowColor(item.tipo)}`}>
               <TableCell className="whitespace-nowrap font-mono text-sm">{formatDate(item.data)}</TableCell>
               <TableCell className="whitespace-nowrap font-mono text-sm font-medium">{item.hora}</TableCell>
               <TableCell className="whitespace-nowrap font-medium">{item.cliente}</TableCell>
