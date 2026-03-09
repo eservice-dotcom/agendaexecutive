@@ -23,6 +23,8 @@ const EditServicoDialog = ({ open, onOpenChange, item, onSaved }: EditServicoDia
     hora: "",
     cliente: "",
     pax: "",
+    nomePassageiro: "",
+    numeroVoo: "",
     cot: "",
     tipo: "",
     origem: "",
