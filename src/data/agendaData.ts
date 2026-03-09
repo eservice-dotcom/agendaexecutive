@@ -1,13 +1,17 @@
 export type StatusFaturamento = "" | "enviado" | "faturado";
 
+export interface Passageiro {
+  nome: string;
+  voo: string;
+}
+
 export interface AgendaItem {
   id: string;
   data: string;
   hora: string;
   cliente: string;
   pax: number;
-  nomePassageiro: string;
-  numeroVoo: string;
+  passageiros: Passageiro[];
   cot: string;
   tipo: string;
   origem: string;
