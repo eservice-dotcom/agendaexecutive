@@ -4,10 +4,11 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { AgendaItem, statusFaturamentoOptions, StatusFaturamento } from "@/data/agendaData";
+import { AgendaItem, statusFaturamentoOptions, StatusFaturamento, Passageiro } from "@/data/agendaData";
 import { updateAgendaItem, getTiposServico } from "@/data/cadastroStorage";
 import { toast } from "sonner";
 import { Pencil } from "lucide-react";
+import PassageirosInput from "./PassageirosInput";
 
 interface EditServicoDialogProps {
   open: boolean;
