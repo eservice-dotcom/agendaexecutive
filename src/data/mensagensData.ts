@@ -4,7 +4,9 @@ export interface MensagemTemplate {
   texto: string;
 }
 
-export const mensagensPreCadastradas: MensagemTemplate[] = [
+const STORAGE_KEY = "mensagens_templates";
+
+export const mensagensPadrao: MensagemTemplate[] = [
   {
     id: "1",
     titulo: "Confirmação de serviço",
