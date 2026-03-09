@@ -1,10 +1,11 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Users, Truck, User, Building2, ListChecks } from "lucide-react";
+import { Users, Truck, User, Building2, ListChecks, UserCog } from "lucide-react";
 import CadastroClientes from "@/components/CadastroClientes";
 import CadastroVeiculos from "@/components/CadastroVeiculos";
 import CadastroMotoristas from "@/components/CadastroMotoristas";
 import CadastroFornecedores from "@/components/CadastroFornecedores";
 import CadastroTiposServico from "@/components/CadastroTiposServico";
+import CadastroUsuarios from "@/components/CadastroUsuarios";
 import logo from "@/assets/logo-executive-service.png";
 import { Link } from "react-router-dom";
 import { CalendarDays } from "lucide-react";
