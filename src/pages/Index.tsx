@@ -1,5 +1,5 @@
 import { useState, useMemo, useCallback, useEffect } from "react";
-import { CalendarDays, ListChecks, Truck, Building2, Plus } from "lucide-react";
+import { CalendarDays, ListChecks, Truck, Building2, Plus, BarChart3 } from "lucide-react";
 import logo from "@/assets/logo-executive-service.png";
 import { Link } from "react-router-dom";
 import { ClipboardList } from "lucide-react";
@@ -9,6 +9,7 @@ import AgendaFilters from "@/components/AgendaFilters";
 import AgendaTable from "@/components/AgendaTable";
 import FaturamentoVeiculo from "@/components/FaturamentoVeiculo";
 import FaturamentoFornecedor from "@/components/FaturamentoFornecedor";
+import DashboardOcupacao from "@/components/DashboardOcupacao";
 import NovoServicoDialog from "@/components/NovoServicoDialog";
 import { getAgendaItems } from "@/data/cadastroStorage";
 
@@ -114,7 +115,7 @@ const Index = () => {
 
       <main className="mx-auto max-w-[1600px] space-y-4 px-4 py-6 sm:px-6 lg:px-8">
         <Tabs defaultValue="agenda" className="space-y-4">
-          <TabsList className={`grid w-full sm:w-auto sm:inline-grid ${canViewFinancials ? 'grid-cols-3' : 'grid-cols-1'}`}>
+          <TabsList className={`grid w-full sm:w-auto sm:inline-grid ${canViewFinancials ? 'grid-cols-4' : 'grid-cols-1'}`}>
             <TabsTrigger value="agenda" className="gap-2">
               <CalendarDays className="h-4 w-4" />
               Agenda
@@ -128,6 +129,10 @@ const Index = () => {
                 <TabsTrigger value="fat-fornecedor" className="gap-2">
                   <Building2 className="h-4 w-4" />
                   Fat. Fornecedor
+                </TabsTrigger>
+                <TabsTrigger value="ocupacao" className="gap-2">
+                  <BarChart3 className="h-4 w-4" />
+                  Ocupação
                 </TabsTrigger>
               </>
             )}
@@ -166,6 +171,9 @@ const Index = () => {
               </TabsContent>
               <TabsContent value="fat-fornecedor">
                 <FaturamentoFornecedor />
+              </TabsContent>
+              <TabsContent value="ocupacao">
+                <DashboardOcupacao />
               </TabsContent>
             </>
           )}
