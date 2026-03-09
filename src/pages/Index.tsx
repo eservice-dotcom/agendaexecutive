@@ -179,6 +179,7 @@ const Index = () => {
             </div>
             <div id="print-agenda">
             <AgendaTable items={filteredData} onEdited={reloadData} />
+            </div>
             <NovoServicoDialog open={novoDialogOpen} onOpenChange={setNovoDialogOpen} onSaved={reloadData} />
           </TabsContent>
 
