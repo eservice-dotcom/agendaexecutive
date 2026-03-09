@@ -42,6 +42,7 @@ const Index = () => {
   const [filters, setFilters] = useState<FiltersState>(initialFilters);
   const [novoDialogOpen, setNovoDialogOpen] = useState(false);
   const [agendaData, setAgendaData] = useState<any[]>([]);
+  const [printWithFinancials, setPrintWithFinancials] = useState(true);
 
   const reloadData = useCallback(async () => {
     const data = await getAgendaItems();
