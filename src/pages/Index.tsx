@@ -159,7 +159,7 @@ const Index = () => {
                 </>
               )}
             </div>
-            <AgendaFilters filters={filters} onFilterChange={setFilters} motoristas={motoristas} />
+            <AgendaFilters filters={filters} onFilterChange={setFilters} motoristas={motoristas} tipos={tipos} fornecedores={fornecedoresList} />
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2 text-sm text-muted-foreground">
                 <ListChecks className="h-4 w-4" />
