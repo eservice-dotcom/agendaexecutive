@@ -196,14 +196,10 @@ export const getTiposServico = async (): Promise<string[]> => {
   
   if (error) {
     console.error("Erro ao buscar tipos de serviço:", error);
-    return tiposServicoDefault;
+    return [];
   }
   
-  if (!data || data.length === 0) {
-    return tiposServicoDefault;
-  }
-  
-  return data.map((item) => item.tipo);
+  return data && data.length > 0 ? data.map((item) => item.tipo) : [];
 };
 
 export const saveTipoServico = async (tipo: string) => {
@@ -237,11 +233,11 @@ export const getAgendaItems = async (): Promise<AgendaItem[]> => {
   
   if (error) {
     console.error("Erro ao buscar itens da agenda:", error);
-    return mockData;
+    return [];
   }
   
   if (!data || data.length === 0) {
-    return mockData;
+    return [];
   }
   
   return data.map((item) => ({
