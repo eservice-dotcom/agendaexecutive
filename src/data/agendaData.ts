@@ -6,6 +6,8 @@ export interface AgendaItem {
   hora: string;
   cliente: string;
   pax: number;
+  nomePassageiro: string;
+  numeroVoo: string;
   cot: string;
   tipo: string;
   origem: string;
