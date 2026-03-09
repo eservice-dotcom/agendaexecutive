@@ -166,11 +166,18 @@ const Index = () => {
                 <ListChecks className="h-4 w-4" />
                 <span>{filteredData.length} de {agendaData.length} registros</span>
               </div>
-              <Button onClick={() => setNovoDialogOpen(true)} className="gap-2">
-                <Plus className="h-4 w-4" />
-                Novo Serviço
-              </Button>
+              <div className="flex items-center gap-2">
+                <Button variant="outline" size="sm" onClick={() => printElement("print-agenda", "Agenda de Serviços")} className="gap-2">
+                  <Printer className="h-4 w-4" />
+                  Imprimir
+                </Button>
+                <Button onClick={() => setNovoDialogOpen(true)} className="gap-2">
+                  <Plus className="h-4 w-4" />
+                  Novo Serviço
+                </Button>
+              </div>
             </div>
+            <div id="print-agenda">
             <AgendaTable items={filteredData} onEdited={reloadData} />
             <NovoServicoDialog open={novoDialogOpen} onOpenChange={setNovoDialogOpen} onSaved={reloadData} />
           </TabsContent>
