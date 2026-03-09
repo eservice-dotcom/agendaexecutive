@@ -1,7 +1,7 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { mensagensPreCadastradas } from "@/data/mensagensData";
+import { getMensagens } from "@/data/mensagensData";
 import { AgendaItem } from "@/data/agendaData";
 import { useState } from "react";
 import { MessageCircle, Send, FileText } from "lucide-react";
@@ -39,11 +39,12 @@ const replacePlaceholders = (texto: string, item: AgendaItem) => {
 const WhatsAppDialog = ({ open, onOpenChange, item }: WhatsAppDialogProps) => {
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [mensagemFinal, setMensagemFinal] = useState("");
+  const mensagens = getMensagens();
 
   if (!item) return null;
 
   const handleSelectTemplate = (id: string) => {
-    const template = mensagensPreCadastradas.find((m) => m.id === id);
+    const template = mensagens.find((m) => m.id === id);
     if (template) {
       setSelectedId(id);
       setMensagemFinal(replacePlaceholders(template.texto, item));
@@ -76,7 +77,7 @@ const WhatsAppDialog = ({ open, onOpenChange, item }: WhatsAppDialogProps) => {
         <div className="space-y-3">
           <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Selecione uma mensagem</p>
           <div className="grid gap-2 max-h-64 overflow-y-auto pr-1">
-            {mensagensPreCadastradas.map((msg) => (
+            {mensagens.map((msg) => (
               <button
                 key={msg.id}
                 onClick={() => handleSelectTemplate(msg.id)}
