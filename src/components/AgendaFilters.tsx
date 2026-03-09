@@ -58,7 +58,7 @@ const AgendaFilters = ({ filters, onFilterChange, motoristas, tipos, fornecedore
         <div className="relative xl:col-span-2">
           <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
           <Input
-            placeholder="Buscar cliente, placa..."
+            placeholder="Buscar cliente, COT, placa..."
             value={filters.search}
             onChange={(e) => updateFilter("search", e.target.value)}
             className="pl-9"
