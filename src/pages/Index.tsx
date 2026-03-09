@@ -172,6 +172,9 @@ const Index = () => {
               <TabsContent value="fat-fornecedor">
                 <FaturamentoFornecedor />
               </TabsContent>
+              <TabsContent value="ocupacao">
+                <DashboardOcupacao />
+              </TabsContent>
             </>
           )}
         </Tabs>
