@@ -9,6 +9,7 @@ import { updateAgendaItem, getTiposServico } from "@/data/cadastroStorage";
 import { toast } from "sonner";
 import { Pencil } from "lucide-react";
 import PassageirosInput from "./PassageirosInput";
+import { TooltipProvider } from "@/components/ui/tooltip";
 
 interface EditServicoDialogProps {
   open: boolean;
