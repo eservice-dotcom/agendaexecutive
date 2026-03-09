@@ -287,6 +287,7 @@ export const saveAgendaItem = async (item: Omit<AgendaItem, "id">) => {
     fornecedor: item.fornecedor,
     custo: item.custo,
     observacoes: item.observacoes,
+    receptivo: item.receptivo || "",
     status_faturamento: item.statusFaturamento,
   });
   

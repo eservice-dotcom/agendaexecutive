@@ -88,6 +88,11 @@ const AgendaFilters = ({ filters, onFilterChange, motoristas }: AgendaFiltersPro
           value={filters.pax}
           onChange={(e) => updateFilter("pax", e.target.value)}
         />
+        <Input
+          placeholder="Receptivo"
+          value={filters.receptivo}
+          onChange={(e) => updateFilter("receptivo", e.target.value)}
+        />
         <Select value={filters.tipo} onValueChange={(v) => updateFilter("tipo", v === "all" ? "" : v)}>
           <SelectTrigger>
             <SelectValue placeholder="Tipo" />
