@@ -50,7 +50,7 @@ const FaturamentoVeiculo = () => {
         </Button>
       </div>
 
-      <div id="print-fat-veiculo" className="overflow-auto rounded-lg border border-border bg-card shadow-sm">
+      <div className="overflow-auto rounded-lg border border-border bg-card shadow-sm">
         <Table>
           <TableHeader>
             <TableRow className="bg-muted/50 hover:bg-muted/50">
