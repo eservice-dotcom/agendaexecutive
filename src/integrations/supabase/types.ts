@@ -284,6 +284,15 @@ export type Database = {
     }
     Functions: {
       can_view_financials: { Args: { _user_id: string }; Returns: boolean }
+      get_all_users: {
+        Args: never
+        Returns: {
+          created_at: string
+          email: string
+          id: string
+          last_sign_in_at: string
+        }[]
+      }
     }
     Enums: {
       [_ in never]: never
