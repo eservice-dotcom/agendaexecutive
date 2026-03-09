@@ -39,6 +39,7 @@ const replacePlaceholders = (texto: string, item: AgendaItem) => {
 const WhatsAppDialog = ({ open, onOpenChange, item }: WhatsAppDialogProps) => {
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [mensagemFinal, setMensagemFinal] = useState("");
+  const mensagens = getMensagens();
 
   if (!item) return null;
 
