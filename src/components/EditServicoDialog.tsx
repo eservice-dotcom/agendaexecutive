@@ -134,6 +134,16 @@ const EditServicoDialog = ({ open, onOpenChange, item, onSaved }: EditServicoDia
           </div>
 
           <div className="space-y-1.5">
+            <Label>Nome do Passageiro</Label>
+            <Input value={form.nomePassageiro} onChange={(e) => update("nomePassageiro", e.target.value)} placeholder="Nome completo" />
+          </div>
+
+          <div className="space-y-1.5">
+            <Label>Número do Voo</Label>
+            <Input value={form.numeroVoo} onChange={(e) => update("numeroVoo", e.target.value)} placeholder="G31234" />
+          </div>
+
+          <div className="space-y-1.5">
             <Label>COT</Label>
             <Input value={form.cot} onChange={(e) => update("cot", e.target.value)} placeholder="COT-000" />
           </div>

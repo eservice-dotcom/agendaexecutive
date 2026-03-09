@@ -127,6 +127,8 @@ const AgendaTable = ({ items, onEdited }: AgendaTableProps) => {
                   {item.pax}
                 </span>
               </TableCell>
+              <TableCell className="whitespace-nowrap text-sm">{item.nomePassageiro}</TableCell>
+              <TableCell className="whitespace-nowrap font-mono text-xs text-muted-foreground">{item.numeroVoo}</TableCell>
               <TableCell className="whitespace-nowrap font-mono text-xs text-muted-foreground">{item.cot}</TableCell>
               <TableCell>
                 <Badge variant={tipoBadgeVariant(item.tipo) as any} className="whitespace-nowrap text-xs">
