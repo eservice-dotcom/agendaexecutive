@@ -8,7 +8,7 @@ import logo from "@/assets/logo-executive-service.png";
 import { LogIn } from "lucide-react";
 
 const Login = () => {
-  const [email, setEmail] = useState("");
+  const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [isSignUp, setIsSignUp] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -17,21 +17,26 @@ const Login = () => {
     e.preventDefault();
     setLoading(true);
 
+    // Gera um email fictício para o Supabase usando o nome de usuário
+    const email = `${username.trim().toLowerCase().replace(/[^a-z0-9]/g, '')}@sistema.local`;
+
     if (isSignUp) {
       const { error } = await supabase.auth.signUp({
         email,
         password,
-        options: { emailRedirectTo: window.location.origin },
+        options: { 
+          data: { name: username.trim() } 
+        },
       });
       if (error) {
-        toast.error(error.message);
+        toast.error("Erro ao criar conta. Verifique se o nome já está em uso.");
       } else {
-        toast.success("Conta criada! Verifique seu e-mail para confirmar.");
+        toast.success("Conta criada com sucesso!");
       }
     } else {
       const { error } = await supabase.auth.signInWithPassword({ email, password });
       if (error) {
-        toast.error("E-mail ou senha inválidos.");
+        toast.error("Nome de usuário ou senha inválidos.");
       }
     }
     setLoading(false);
