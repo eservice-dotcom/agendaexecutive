@@ -3,13 +3,14 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { getMensagens } from "@/data/mensagensData";
 import { AgendaItem } from "@/data/agendaData";
-import { useState } from "react";
-import { MessageCircle, Send, FileText } from "lucide-react";
+import { useState, useMemo } from "react";
+import { MessageCircle, Send, FileText, CalendarDays } from "lucide-react";
 
 interface WhatsAppDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   item: AgendaItem | null;
+  allItems?: AgendaItem[];
 }
 
 const replacePlaceholders = (texto: string, item: AgendaItem) => {
@@ -36,19 +37,72 @@ const replacePlaceholders = (texto: string, item: AgendaItem) => {
     .replace(/{passageiros}/g, passageiros);
 };
 
-const WhatsAppDialog = ({ open, onOpenChange, item }: WhatsAppDialogProps) => {
+const buildConsolidatedMessage = (items: AgendaItem[]) => {
+  if (items.length === 0) return "";
+  const first = items[0];
+  const [y, m, d] = first.data.split("-");
+  const dataFormatada = `${d}/${m}/${y}`;
+
+  let msg = `Olá ${first.motorista}! Seguem os serviços do dia ${dataFormatada}:\n`;
+
+  items
+    .sort((a, b) => a.hora.localeCompare(b.hora))
+    .forEach((item, idx) => {
+      const passageiros = item.passageiros.length > 0
+        ? item.passageiros.map(p => p.nome).filter(Boolean).join(", ")
+        : "—";
+      const voos = item.passageiros.length > 0
+        ? [...new Set(item.passageiros.map(p => p.voo).filter(Boolean))].join(", ")
+        : "—";
+
+      msg += `\n*Serviço ${idx + 1}*\n`;
+      msg += `⏰ Hora: ${item.hora}\n`;
+      msg += `👥 PAX: ${item.pax}\n`;
+      msg += `👤 Passageiros: ${passageiros}\n`;
+      msg += `✈️ Voo: ${voos}\n`;
+      msg += `📍 Origem: ${item.origem}\n`;
+      msg += `📍 Destino: ${item.destino}\n`;
+    });
+
+  msg += `\nQualquer dúvida, entre em contato.`;
+  return msg;
+};
+
+const WhatsAppDialog = ({ open, onOpenChange, item, allItems = [] }: WhatsAppDialogProps) => {
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [mensagemFinal, setMensagemFinal] = useState("");
+  const [modoConsolidado, setModoConsolidado] = useState(false);
   const mensagens = getMensagens();
+
+  const sameDayItems = useMemo(() => {
+    if (!item) return [];
+    return allItems.filter(
+      (i) => i.motorista === item.motorista && i.data === item.data && i.id !== item.id
+    );
+  }, [item, allItems]);
+
+  const allDriverDayItems = useMemo(() => {
+    if (!item) return [];
+    return allItems
+      .filter((i) => i.motorista === item.motorista && i.data === item.data)
+      .sort((a, b) => a.hora.localeCompare(b.hora));
+  }, [item, allItems]);
 
   if (!item) return null;
 
   const handleSelectTemplate = (id: string) => {
+    setModoConsolidado(false);
     const template = mensagens.find((m) => m.id === id);
     if (template) {
       setSelectedId(id);
       setMensagemFinal(replacePlaceholders(template.texto, item));
     }
+  };
+
+  const handleConsolidado = () => {
+    setSelectedId(null);
+    setModoConsolidado(true);
+    setMensagemFinal(buildConsolidatedMessage(allDriverDayItems));
   };
 
   const handleSend = () => {
@@ -59,10 +113,20 @@ const WhatsAppDialog = ({ open, onOpenChange, item }: WhatsAppDialogProps) => {
     onOpenChange(false);
     setSelectedId(null);
     setMensagemFinal("");
+    setModoConsolidado(false);
+  };
+
+  const handleClose = (v: boolean) => {
+    onOpenChange(v);
+    if (!v) {
+      setSelectedId(null);
+      setMensagemFinal("");
+      setModoConsolidado(false);
+    }
   };
 
   return (
-    <Dialog open={open} onOpenChange={(v) => { onOpenChange(v); if (!v) { setSelectedId(null); setMensagemFinal(""); } }}>
+    <Dialog open={open} onOpenChange={handleClose}>
       <DialogContent className="max-w-lg">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
@@ -75,6 +139,27 @@ const WhatsAppDialog = ({ open, onOpenChange, item }: WhatsAppDialogProps) => {
         </DialogHeader>
 
         <div className="space-y-3">
+          {sameDayItems.length > 0 && (
+            <button
+              onClick={handleConsolidado}
+              className={`flex items-center gap-2 w-full rounded-md border p-3 text-left text-sm transition-colors ${
+                modoConsolidado
+                  ? "border-primary bg-primary/5"
+                  : "border-border hover:border-primary/40 hover:bg-muted/50"
+              }`}
+            >
+              <CalendarDays className={`h-4 w-4 shrink-0 ${modoConsolidado ? "text-primary" : "text-muted-foreground"}`} />
+              <div>
+                <p className="font-medium text-foreground">
+                  Todos os serviços do dia ({allDriverDayItems.length} serviços)
+                </p>
+                <p className="mt-0.5 text-xs text-muted-foreground">
+                  Envia todas as tarefas do motorista neste dia em uma única mensagem
+                </p>
+              </div>
+            </button>
+          )}
+
           <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Selecione uma mensagem</p>
           <div className="grid gap-2 max-h-64 overflow-y-auto pr-1">
             {mensagens.map((msg) => (
@@ -96,13 +181,13 @@ const WhatsAppDialog = ({ open, onOpenChange, item }: WhatsAppDialogProps) => {
             ))}
           </div>
 
-          {selectedId && (
+          {(selectedId || modoConsolidado) && (
             <div className="space-y-2">
               <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Pré-visualização (editável)</p>
               <Textarea
                 value={mensagemFinal}
                 onChange={(e) => setMensagemFinal(e.target.value)}
-                rows={4}
+                rows={6}
                 className="text-sm"
               />
               <Button onClick={handleSend} className="w-full gap-2">
