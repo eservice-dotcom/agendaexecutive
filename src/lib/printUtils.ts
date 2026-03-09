@@ -31,20 +31,34 @@ ${body}
   w.onload = () => w.print();
 };
 
-export const printAgenda = (items: any[]) => {
-  const rows = items.map(i => `<tr>
+export const printAgenda = (items: any[], includeFinancials = true) => {
+  const rows = items.map(i => {
+    let row = `<tr>
 <td>${formatDate(i.data)}</td><td>${i.hora}</td><td>${i.cot}</td>
 <td>${i.cliente}</td><td>${i.tipo}</td><td class="c">${i.pax}</td>
 <td>${i.origem}</td><td>${i.destino}</td>
 <td>${i.veiculo} (${i.placa})</td><td>${i.motorista}</td>
-<td>${i.fornecedor}</td>
-<td class="r">${formatCurrency(i.valor)}</td><td class="r">${formatCurrency(i.custo)}</td>
-<td class="r b">${formatCurrency(i.valor - i.custo)}</td>
-<td>${i.observacoes || ""}</td>
-</tr>`).join("");
+<td>${i.fornecedor}</td>`;
+    if (includeFinancials) {
+      row += `<td class="r">${formatCurrency(i.valor)}</td><td class="r">${formatCurrency(i.custo)}</td>
+<td class="r b">${formatCurrency(i.valor - i.custo)}</td>`;
+    }
+    row += `<td>${i.observacoes || ""}</td></tr>`;
+    return row;
+  }).join("");
 
-  const totalValor = items.reduce((s, i) => s + Number(i.valor), 0);
-  const totalCusto = items.reduce((s, i) => s + Number(i.custo), 0);
+  const finHeaders = includeFinancials ? `<th class="r">Valor</th><th class="r">Custo</th><th class="r">Margem</th>` : "";
+
+  let totals = "";
+  if (includeFinancials) {
+    const totalValor = items.reduce((s, i) => s + Number(i.valor), 0);
+    const totalCusto = items.reduce((s, i) => s + Number(i.custo), 0);
+    totals = `<div class="totals">
+<b>Total Valor:</b> ${formatCurrency(totalValor)} &nbsp;|&nbsp;
+<b>Total Custo:</b> ${formatCurrency(totalCusto)} &nbsp;|&nbsp;
+<b>Margem:</b> ${formatCurrency(totalValor - totalCusto)}
+</div>`;
+  }
 
   openPrint("Agenda de Serviços", `
 <p class="sub">${items.length} registro(s)</p>
@@ -52,19 +66,14 @@ export const printAgenda = (items: any[]) => {
 <thead><tr>
 <th>Data</th><th>Hora</th><th>COT</th><th>Cliente</th><th>Tipo</th>
 <th class="c">PAX</th><th>Origem</th><th>Destino</th><th>Veículo</th>
-<th>Motorista</th><th>Fornecedor</th><th class="r">Valor</th><th class="r">Custo</th>
-<th class="r">Margem</th><th>Obs</th>
+<th>Motorista</th><th>Fornecedor</th>${finHeaders}<th>Obs</th>
 </tr></thead>
 <tbody>${rows}</tbody>
 </table>
-<div class="totals">
-<b>Total Valor:</b> ${formatCurrency(totalValor)} &nbsp;|&nbsp;
-<b>Total Custo:</b> ${formatCurrency(totalCusto)} &nbsp;|&nbsp;
-<b>Margem:</b> ${formatCurrency(totalValor - totalCusto)}
-</div>`);
+${totals}`);
 };
 
-export const printFatVeiculo = (items: any[]) => {
+export const printFatVeiculo = (items: any[], includeFinancials = true) => {
   const map = new Map<string, { veiculo: string; placa: string; viagens: number; receita: number; custo: number }>();
   items.forEach(i => {
     const e = map.get(i.placa) || { veiculo: i.veiculo, placa: i.placa, viagens: 0, receita: 0, custo: 0 };
@@ -72,25 +81,34 @@ export const printFatVeiculo = (items: any[]) => {
     map.set(i.placa, e);
   });
   const dados = Array.from(map.values()).sort((a, b) => b.receita - a.receita);
-  const totalR = dados.reduce((s, d) => s + d.receita, 0);
-  const totalC = dados.reduce((s, d) => s + d.custo, 0);
 
   const rows = dados.map(d => {
-    const margem = d.receita - d.custo;
-    const pct = d.receita > 0 ? ((margem / d.receita) * 100).toFixed(1) : "0";
-    return `<tr><td>${d.veiculo}</td><td>${d.placa}</td><td class="c">${d.viagens}</td>
-<td class="r">${formatCurrency(d.receita)}</td><td class="r">${formatCurrency(d.custo)}</td>
-<td class="r b">${formatCurrency(margem)}</td><td class="r">${pct}%</td></tr>`;
+    let row = `<tr><td>${d.veiculo}</td><td>${d.placa}</td><td class="c">${d.viagens}</td>`;
+    if (includeFinancials) {
+      const margem = d.receita - d.custo;
+      const pct = d.receita > 0 ? ((margem / d.receita) * 100).toFixed(1) : "0";
+      row += `<td class="r">${formatCurrency(d.receita)}</td><td class="r">${formatCurrency(d.custo)}</td>
+<td class="r b">${formatCurrency(margem)}</td><td class="r">${pct}%</td>`;
+    }
+    row += `</tr>`;
+    return row;
   }).join("");
 
+  const finHeaders = includeFinancials ? `<th class="r">Receita</th><th class="r">Custo</th><th class="r">Margem</th><th class="r">%</th>` : "";
+  let totals = "";
+  if (includeFinancials) {
+    const totalR = dados.reduce((s, d) => s + d.receita, 0);
+    const totalC = dados.reduce((s, d) => s + d.custo, 0);
+    totals = `<div class="totals"><b>Receita:</b> ${formatCurrency(totalR)} | <b>Custo:</b> ${formatCurrency(totalC)} | <b>Margem:</b> ${formatCurrency(totalR - totalC)}</div>`;
+  }
+
   openPrint("Faturamento por Veículo", `
-<table><thead><tr><th>Veículo</th><th>Placa</th><th class="c">Viagens</th>
-<th class="r">Receita</th><th class="r">Custo</th><th class="r">Margem</th><th class="r">%</th>
+<table><thead><tr><th>Veículo</th><th>Placa</th><th class="c">Viagens</th>${finHeaders}
 </tr></thead><tbody>${rows}</tbody></table>
-<div class="totals"><b>Receita:</b> ${formatCurrency(totalR)} | <b>Custo:</b> ${formatCurrency(totalC)} | <b>Margem:</b> ${formatCurrency(totalR - totalC)}</div>`);
+${totals}`);
 };
 
-export const printFatFornecedor = (items: any[]) => {
+export const printFatFornecedor = (items: any[], includeFinancials = true) => {
   const map = new Map<string, { fornecedor: string; viagens: number; receita: number; custo: number; pax: number }>();
   items.forEach(i => {
     const e = map.get(i.fornecedor) || { fornecedor: i.fornecedor, viagens: 0, receita: 0, custo: 0, pax: 0 };
@@ -98,20 +116,29 @@ export const printFatFornecedor = (items: any[]) => {
     map.set(i.fornecedor, e);
   });
   const dados = Array.from(map.values()).sort((a, b) => b.custo - a.custo);
-  const totalR = dados.reduce((s, d) => s + d.receita, 0);
-  const totalC = dados.reduce((s, d) => s + d.custo, 0);
 
   const rows = dados.map(d => {
-    const margem = d.receita - d.custo;
-    const pct = d.receita > 0 ? ((margem / d.receita) * 100).toFixed(1) : "0";
-    return `<tr><td>${d.fornecedor}</td><td class="c">${d.viagens}</td><td class="c">${d.pax}</td>
-<td class="r">${formatCurrency(d.receita)}</td><td class="r">${formatCurrency(d.custo)}</td>
-<td class="r b">${formatCurrency(margem)}</td><td class="r">${pct}%</td></tr>`;
+    let row = `<tr><td>${d.fornecedor}</td><td class="c">${d.viagens}</td><td class="c">${d.pax}</td>`;
+    if (includeFinancials) {
+      const margem = d.receita - d.custo;
+      const pct = d.receita > 0 ? ((margem / d.receita) * 100).toFixed(1) : "0";
+      row += `<td class="r">${formatCurrency(d.receita)}</td><td class="r">${formatCurrency(d.custo)}</td>
+<td class="r b">${formatCurrency(margem)}</td><td class="r">${pct}%</td>`;
+    }
+    row += `</tr>`;
+    return row;
   }).join("");
 
+  const finHeaders = includeFinancials ? `<th class="r">Receita</th><th class="r">Custo</th><th class="r">Margem</th><th class="r">%</th>` : "";
+  let totals = "";
+  if (includeFinancials) {
+    const totalR = dados.reduce((s, d) => s + d.receita, 0);
+    const totalC = dados.reduce((s, d) => s + d.custo, 0);
+    totals = `<div class="totals"><b>Receita:</b> ${formatCurrency(totalR)} | <b>Custo:</b> ${formatCurrency(totalC)} | <b>Margem:</b> ${formatCurrency(totalR - totalC)}</div>`;
+  }
+
   openPrint("Faturamento por Fornecedor", `
-<table><thead><tr><th>Fornecedor</th><th class="c">Viagens</th><th class="c">PAX</th>
-<th class="r">Receita</th><th class="r">Custo</th><th class="r">Margem</th><th class="r">%</th>
+<table><thead><tr><th>Fornecedor</th><th class="c">Viagens</th><th class="c">PAX</th>${finHeaders}
 </tr></thead><tbody>${rows}</tbody></table>
-<div class="totals"><b>Receita:</b> ${formatCurrency(totalR)} | <b>Custo:</b> ${formatCurrency(totalC)} | <b>Margem:</b> ${formatCurrency(totalR - totalC)}</div>`);
+${totals}`);
 };
