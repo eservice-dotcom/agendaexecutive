@@ -298,6 +298,15 @@ const AgendaTable = ({ items, onEdited }: AgendaTableProps) => {
                   <Button
                     variant="ghost"
                     size="sm"
+                    className="h-7 w-7 p-0 text-muted-foreground hover:text-accent"
+                    onClick={() => handleClone(item)}
+                    title="Clonar serviço"
+                  >
+                    <Copy className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
                     className="h-7 w-7 p-0 text-muted-foreground hover:text-destructive"
                     onClick={() => setDeleteItemId(item.id)}
                     title="Excluir serviço"
