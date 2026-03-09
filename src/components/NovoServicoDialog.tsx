@@ -87,7 +87,7 @@ const NovoServicoDialog = ({ open, onOpenChange, onSaved }: NovoServicoDialogPro
 
     toast.success("Serviço adicionado com sucesso!");
     setForm({
-      data: "", hora: "", clienteId: "", pax: "", cot: "", tipo: "",
+      data: "", hora: "", clienteId: "", pax: "", nomePassageiro: "", numeroVoo: "", cot: "", tipo: "",
       origem: "", destino: "", veiculoId: "", motoristaId: "", valor: "",
       fornecedorId: "", custo: "", observacoes: "",
     });
