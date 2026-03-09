@@ -1,7 +1,9 @@
 import { useMemo, useEffect, useState } from "react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Building2 } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Building2, Printer } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { printElement } from "@/lib/printUtils";
 
 const formatCurrency = (value: number) =>
   new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(value);
@@ -39,8 +41,14 @@ const FaturamentoFornecedor = () => {
         <StatCard label="Custo Total" value={formatCurrency(totalCusto)} />
         <StatCard label="Margem Total" value={formatCurrency(totalReceita - totalCusto)} accent />
       </div>
+      <div className="flex justify-end">
+        <Button variant="outline" size="sm" onClick={() => printElement("print-fat-fornecedor", "Faturamento por Fornecedor")} className="gap-2">
+          <Printer className="h-4 w-4" />
+          Imprimir
+        </Button>
+      </div>
 
-      <div className="overflow-auto rounded-lg border border-border bg-card shadow-sm">
+      <div id="print-fat-fornecedor" className="overflow-auto rounded-lg border border-border bg-card shadow-sm">
         <Table>
           <TableHeader>
             <TableRow className="bg-muted/50 hover:bg-muted/50">

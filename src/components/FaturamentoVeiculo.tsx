@@ -1,7 +1,9 @@
 import { useMemo, useEffect, useState } from "react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Truck } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Truck, Printer } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { printElement } from "@/lib/printUtils";
 
 const formatCurrency = (value: number) =>
   new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(value);
@@ -33,14 +35,22 @@ const FaturamentoVeiculo = () => {
 
   return (
     <div className="space-y-4">
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-        <StatCard label="Veículos" value={dados.length.toString()} />
-        <StatCard label="Total Viagens" value={dados.reduce((s, d) => s + d.viagens, 0).toString()} />
-        <StatCard label="Receita Total" value={formatCurrency(totalReceita)} accent />
-        <StatCard label="Margem Total" value={formatCurrency(totalReceita - totalCusto)} />
+      <div className="flex items-center justify-between">
+        <div className="grid flex-1 grid-cols-2 gap-3 sm:grid-cols-4">
+          <StatCard label="Veículos" value={dados.length.toString()} />
+          <StatCard label="Total Viagens" value={dados.reduce((s, d) => s + d.viagens, 0).toString()} />
+          <StatCard label="Receita Total" value={formatCurrency(totalReceita)} accent />
+          <StatCard label="Margem Total" value={formatCurrency(totalReceita - totalCusto)} />
+        </div>
+      </div>
+      <div className="flex justify-end">
+        <Button variant="outline" size="sm" onClick={() => printElement("print-fat-veiculo", "Faturamento por Veículo")} className="gap-2">
+          <Printer className="h-4 w-4" />
+          Imprimir
+        </Button>
       </div>
 
-      <div className="overflow-auto rounded-lg border border-border bg-card shadow-sm">
+      <div id="print-fat-veiculo" className="overflow-auto rounded-lg border border-border bg-card shadow-sm">
         <Table>
           <TableHeader>
             <TableRow className="bg-muted/50 hover:bg-muted/50">
