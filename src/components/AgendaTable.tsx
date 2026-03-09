@@ -94,6 +94,8 @@ const AgendaTable = ({ items, onEdited }: AgendaTableProps) => {
             <TableHead className="whitespace-nowrap font-semibold">Hora</TableHead>
             <TableHead className="whitespace-nowrap font-semibold">Cliente</TableHead>
             <TableHead className="whitespace-nowrap font-semibold text-center">PAX</TableHead>
+            <TableHead className="whitespace-nowrap font-semibold">Passageiro</TableHead>
+            <TableHead className="whitespace-nowrap font-semibold">Voo</TableHead>
             <TableHead className="whitespace-nowrap font-semibold">COT</TableHead>
             <TableHead className="whitespace-nowrap font-semibold">Tipo</TableHead>
             <TableHead className="whitespace-nowrap font-semibold">Origem</TableHead>
