@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -9,25 +9,40 @@ import { Motorista, getMotoristas, saveMotorista, deleteMotorista } from "@/data
 import { toast } from "sonner";
 
 const CadastroMotoristas = () => {
-  const [items, setItems] = useState<Motorista[]>(getMotoristas());
+  const [items, setItems] = useState<Motorista[]>([]);
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState({ nome: "", cnh: "", telefone: "", email: "", categoria: "" });
 
-  const refresh = () => setItems(getMotoristas());
-
-  const handleSave = () => {
-    if (!form.nome.trim()) { toast.error("Nome é obrigatório"); return; }
-    saveMotorista(form);
-    setForm({ nome: "", cnh: "", telefone: "", email: "", categoria: "" });
-    setOpen(false);
-    refresh();
-    toast.success("Motorista cadastrado!");
+  const refresh = async () => {
+    const data = await getMotoristas();
+    setItems(data);
   };
 
-  const handleDelete = (id: string) => {
-    deleteMotorista(id);
+  useEffect(() => {
     refresh();
-    toast.success("Motorista removido");
+  }, []);
+
+  const handleSave = async () => {
+    if (!form.nome.trim()) { toast.error("Nome é obrigatório"); return; }
+    try {
+      await saveMotorista(form);
+      setForm({ nome: "", cnh: "", telefone: "", email: "", categoria: "" });
+      setOpen(false);
+      await refresh();
+      toast.success("Motorista cadastrado!");
+    } catch (error) {
+      toast.error("Erro ao salvar motorista");
+    }
+  };
+
+  const handleDelete = async (id: string) => {
+    try {
+      await deleteMotorista(id);
+      await refresh();
+      toast.success("Motorista removido");
+    } catch (error) {
+      toast.error("Erro ao remover motorista");
+    }
   };
 
   return (

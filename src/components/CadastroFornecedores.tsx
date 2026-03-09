@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -9,25 +9,40 @@ import { Fornecedor, getFornecedores, saveFornecedor, deleteFornecedor } from "@
 import { toast } from "sonner";
 
 const CadastroFornecedores = () => {
-  const [items, setItems] = useState<Fornecedor[]>(getFornecedores());
+  const [items, setItems] = useState<Fornecedor[]>([]);
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState({ razaoSocial: "", cnpj: "", contato: "", telefone: "", email: "" });
 
-  const refresh = () => setItems(getFornecedores());
-
-  const handleSave = () => {
-    if (!form.razaoSocial.trim()) { toast.error("Razão Social é obrigatória"); return; }
-    saveFornecedor(form);
-    setForm({ razaoSocial: "", cnpj: "", contato: "", telefone: "", email: "" });
-    setOpen(false);
-    refresh();
-    toast.success("Fornecedor cadastrado!");
+  const refresh = async () => {
+    const data = await getFornecedores();
+    setItems(data);
   };
 
-  const handleDelete = (id: string) => {
-    deleteFornecedor(id);
+  useEffect(() => {
     refresh();
-    toast.success("Fornecedor removido");
+  }, []);
+
+  const handleSave = async () => {
+    if (!form.razaoSocial.trim()) { toast.error("Razão Social é obrigatória"); return; }
+    try {
+      await saveFornecedor(form);
+      setForm({ razaoSocial: "", cnpj: "", contato: "", telefone: "", email: "" });
+      setOpen(false);
+      await refresh();
+      toast.success("Fornecedor cadastrado!");
+    } catch (error) {
+      toast.error("Erro ao salvar fornecedor");
+    }
+  };
+
+  const handleDelete = async (id: string) => {
+    try {
+      await deleteFornecedor(id);
+      await refresh();
+      toast.success("Fornecedor removido");
+    } catch (error) {
+      toast.error("Erro ao remover fornecedor");
+    }
   };
 
   return (

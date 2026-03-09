@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -9,25 +9,40 @@ import { Veiculo, getVeiculos, saveVeiculo, deleteVeiculo } from "@/data/cadastr
 import { toast } from "sonner";
 
 const CadastroVeiculos = () => {
-  const [items, setItems] = useState<Veiculo[]>(getVeiculos());
+  const [items, setItems] = useState<Veiculo[]>([]);
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState({ placa: "", modelo: "", tipo: "", capacidade: 0, ano: new Date().getFullYear() });
 
-  const refresh = () => setItems(getVeiculos());
-
-  const handleSave = () => {
-    if (!form.placa.trim()) { toast.error("Placa é obrigatória"); return; }
-    saveVeiculo(form);
-    setForm({ placa: "", modelo: "", tipo: "", capacidade: 0, ano: new Date().getFullYear() });
-    setOpen(false);
-    refresh();
-    toast.success("Veículo cadastrado!");
+  const refresh = async () => {
+    const data = await getVeiculos();
+    setItems(data);
   };
 
-  const handleDelete = (id: string) => {
-    deleteVeiculo(id);
+  useEffect(() => {
     refresh();
-    toast.success("Veículo removido");
+  }, []);
+
+  const handleSave = async () => {
+    if (!form.placa.trim()) { toast.error("Placa é obrigatória"); return; }
+    try {
+      await saveVeiculo(form);
+      setForm({ placa: "", modelo: "", tipo: "", capacidade: 0, ano: new Date().getFullYear() });
+      setOpen(false);
+      await refresh();
+      toast.success("Veículo cadastrado!");
+    } catch (error) {
+      toast.error("Erro ao salvar veículo");
+    }
+  };
+
+  const handleDelete = async (id: string) => {
+    try {
+      await deleteVeiculo(id);
+      await refresh();
+      toast.success("Veículo removido");
+    } catch (error) {
+      toast.error("Erro ao remover veículo");
+    }
   };
 
   return (

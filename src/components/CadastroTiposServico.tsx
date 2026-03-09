@@ -10,11 +10,14 @@ const CadastroTiposServico = () => {
   const [tipos, setTipos] = useState<string[]>([]);
   const [novoTipo, setNovoTipo] = useState("");
 
-  const refresh = () => setTipos(getTiposServico());
+  const refresh = async () => {
+    const data = await getTiposServico();
+    setTipos(data);
+  };
 
   useEffect(() => { refresh(); }, []);
 
-  const handleAdd = () => {
+  const handleAdd = async () => {
     const nome = novoTipo.trim();
     if (!nome) {
       toast.error("Digite o nome do tipo de serviço.");
@@ -24,16 +27,24 @@ const CadastroTiposServico = () => {
       toast.error("Esse tipo de serviço já existe.");
       return;
     }
-    saveTipoServico(nome);
-    setNovoTipo("");
-    refresh();
-    toast.success("Tipo de serviço adicionado!");
+    try {
+      await saveTipoServico(nome);
+      setNovoTipo("");
+      await refresh();
+      toast.success("Tipo de serviço adicionado!");
+    } catch (error) {
+      toast.error("Erro ao adicionar tipo de serviço");
+    }
   };
 
-  const handleDelete = (tipo: string) => {
-    deleteTipoServico(tipo);
-    refresh();
-    toast.success("Tipo de serviço removido!");
+  const handleDelete = async (tipo: string) => {
+    try {
+      await deleteTipoServico(tipo);
+      await refresh();
+      toast.success("Tipo de serviço removido!");
+    } catch (error) {
+      toast.error("Erro ao remover tipo de serviço");
+    }
   };
 
   return (
