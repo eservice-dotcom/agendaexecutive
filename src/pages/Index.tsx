@@ -37,9 +37,16 @@ const Index = () => {
   const canViewFinancials = true;
   const [filters, setFilters] = useState<FiltersState>(initialFilters);
   const [novoDialogOpen, setNovoDialogOpen] = useState(false);
-  const [agendaData, setAgendaData] = useState(getAgendaItems);
+  const [agendaData, setAgendaData] = useState<any[]>([]);
 
-  const reloadData = useCallback(() => setAgendaData(getAgendaItems()), []);
+  const reloadData = useCallback(async () => {
+    const data = await getAgendaItems();
+    setAgendaData(data);
+  }, []);
+
+  useEffect(() => {
+    reloadData();
+  }, [reloadData]);
 
   const motoristas = useMemo(
     () => [...new Set(agendaData.map((i) => i.motorista))].filter(Boolean) as string[],
