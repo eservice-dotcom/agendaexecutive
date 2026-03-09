@@ -80,4 +80,9 @@ export const mensagensPreCadastradas: MensagemTemplate[] = [
     titulo: "Finalização do serviço",
     texto: "Olá! Informamos que o serviço COT {cot} foi finalizado com sucesso. Passageiros transportados: {pax}. Agradecemos a confiança!",
   },
+  {
+    id: "16",
+    titulo: "Dados do serviço para o motorista",
+    texto: "Olá {motorista}! Seguem os dados do serviço: Data: {data} | Hora: {hora} | PAX: {pax} | Voo: {voos} | Origem: {origem} | Destino: {destino}. Qualquer dúvida, entre em contato.",
+  },
 ];
