@@ -71,7 +71,8 @@ const AgendaTable = ({ items, onEdited }: AgendaTableProps) => {
   const handleClone = async (item: AgendaItem) => {
     try {
       const { id, ...rest } = item;
-      await saveAgendaItem({ ...rest, cot: rest.cot ? `${rest.cot}-COPIA` : "" });
+      const baseCot = rest.cot ? rest.cot.replace(/-COPIA.*$/, "") : "";
+      await saveAgendaItem({ ...rest, cot: baseCot ? `${baseCot}-COPIA` : "" });
       toast.success("Serviço clonado! Abrindo para edição...");
       await onEdited?.();
       // Reload to get the new item, then open edit
