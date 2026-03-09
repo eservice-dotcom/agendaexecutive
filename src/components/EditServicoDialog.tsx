@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { AgendaItem, statusFaturamentoOptions, StatusFaturamento, Passageiro } from "@/data/agendaData";
-import { updateAgendaItem, getTiposServico } from "@/data/cadastroStorage";
+import { updateAgendaItem, getTiposServico, getVeiculos, getMotoristas, getClientes, getFornecedores, Veiculo, Motorista, Cliente, Fornecedor } from "@/data/cadastroStorage";
 import { toast } from "sonner";
 import { Pencil } from "lucide-react";
 import PassageirosInput from "./PassageirosInput";
@@ -20,6 +20,11 @@ interface EditServicoDialogProps {
 
 const EditServicoDialog = ({ open, onOpenChange, item, onSaved }: EditServicoDialogProps) => {
   const [tiposServico, setTiposServico] = useState<string[]>([]);
+  const [veiculos, setVeiculos] = useState<Veiculo[]>([]);
+  const [motoristas, setMotoristas] = useState<Motorista[]>([]);
+  const [clientes, setClientes] = useState<Cliente[]>([]);
+  const [fornecedores, setFornecedores] = useState<Fornecedor[]>([]);
+
   const [form, setForm] = useState({
     data: "",
     hora: "",
@@ -45,7 +50,19 @@ const EditServicoDialog = ({ open, onOpenChange, item, onSaved }: EditServicoDia
 
   useEffect(() => {
     if (open) {
-      getTiposServico().then(setTiposServico);
+      Promise.all([
+        getTiposServico(),
+        getVeiculos(),
+        getMotoristas(),
+        getClientes(),
+        getFornecedores(),
+      ]).then(([t, v, m, c, f]) => {
+        setTiposServico(t);
+        setVeiculos(v);
+        setMotoristas(m);
+        setClientes(c);
+        setFornecedores(f);
+      });
     }
   }, [open]);
 
@@ -76,6 +93,54 @@ const EditServicoDialog = ({ open, onOpenChange, item, onSaved }: EditServicoDia
   }, [item, open]);
 
   const update = (key: string, value: string) => setForm((f) => ({ ...f, [key]: value }));
+
+  const handleVeiculoChange = (veiculoId: string) => {
+    if (veiculoId === "_manual") {
+      update("placa", "");
+      update("veiculo", "");
+      return;
+    }
+    const v = veiculos.find((v) => v.id === veiculoId);
+    if (v) {
+      update("placa", v.placa);
+      update("veiculo", v.modelo);
+    }
+  };
+
+  const handleMotoristaChange = (motoristaId: string) => {
+    if (motoristaId === "_manual") {
+      update("motorista", "");
+      update("telefone", "");
+      return;
+    }
+    const m = motoristas.find((m) => m.id === motoristaId);
+    if (m) {
+      update("motorista", m.nome);
+      update("telefone", m.telefone);
+    }
+  };
+
+  const handleClienteChange = (clienteId: string) => {
+    if (clienteId === "_manual") {
+      update("cliente", "");
+      return;
+    }
+    const c = clientes.find((c) => c.id === clienteId);
+    if (c) {
+      update("cliente", c.nome);
+    }
+  };
+
+  const handleFornecedorChange = (fornecedorId: string) => {
+    if (fornecedorId === "_manual") {
+      update("fornecedor", "");
+      return;
+    }
+    const f = fornecedores.find((f) => f.id === fornecedorId);
+    if (f) {
+      update("fornecedor", f.razaoSocial);
+    }
+  };
 
   const handleSave = async () => {
     if (!item) return;
@@ -116,6 +181,12 @@ const EditServicoDialog = ({ open, onOpenChange, item, onSaved }: EditServicoDia
     }
   };
 
+  // Find matching IDs for current values
+  const currentVeiculoId = veiculos.find((v) => v.placa === form.placa && v.modelo === form.veiculo)?.id || "";
+  const currentMotoristaId = motoristas.find((m) => m.nome === form.motorista)?.id || "";
+  const currentClienteId = clientes.find((c) => c.nome === form.cliente)?.id || "";
+  const currentFornecedorId = fornecedores.find((f) => f.razaoSocial === form.fornecedor)?.id || "";
+
   return (
     <TooltipProvider>
       <Dialog open={open} onOpenChange={onOpenChange}>
@@ -139,7 +210,18 @@ const EditServicoDialog = ({ open, onOpenChange, item, onSaved }: EditServicoDia
 
           <div className="space-y-1.5">
             <Label>Cliente *</Label>
-            <Input value={form.cliente} onChange={(e) => update("cliente", e.target.value)} />
+            <Select value={currentClienteId || "_manual"} onValueChange={handleClienteChange}>
+              <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="_manual">-- Digitar manualmente --</SelectItem>
+                {clientes.map((c) => (
+                  <SelectItem key={c.id} value={c.id}>{c.nome}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            {(!currentClienteId) && (
+              <Input value={form.cliente} onChange={(e) => update("cliente", e.target.value)} placeholder="Nome do cliente" className="mt-1" />
+            )}
           </div>
 
           <div className="space-y-1.5">
@@ -177,23 +259,41 @@ const EditServicoDialog = ({ open, onOpenChange, item, onSaved }: EditServicoDia
           </div>
 
           <div className="space-y-1.5">
-            <Label>Placa</Label>
-            <Input value={form.placa} onChange={(e) => update("placa", e.target.value)} placeholder="ABC-1234" />
-          </div>
-
-          <div className="space-y-1.5">
             <Label>Veículo</Label>
-            <Input value={form.veiculo} onChange={(e) => update("veiculo", e.target.value)} placeholder="Modelo do veículo" />
+            <Select value={currentVeiculoId || "_manual"} onValueChange={handleVeiculoChange}>
+              <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="_manual">-- Digitar manualmente --</SelectItem>
+                {veiculos.map((v) => (
+                  <SelectItem key={v.id} value={v.id}>{v.placa} - {v.modelo}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            {(!currentVeiculoId) && (
+              <div className="mt-1 grid grid-cols-2 gap-2">
+                <Input value={form.placa} onChange={(e) => update("placa", e.target.value)} placeholder="Placa" />
+                <Input value={form.veiculo} onChange={(e) => update("veiculo", e.target.value)} placeholder="Modelo" />
+              </div>
+            )}
           </div>
 
           <div className="space-y-1.5">
             <Label>Motorista</Label>
-            <Input value={form.motorista} onChange={(e) => update("motorista", e.target.value)} placeholder="Nome do motorista" />
-          </div>
-
-          <div className="space-y-1.5">
-            <Label>Telefone</Label>
-            <Input value={form.telefone} onChange={(e) => update("telefone", e.target.value)} placeholder="(00) 00000-0000" />
+            <Select value={currentMotoristaId || "_manual"} onValueChange={handleMotoristaChange}>
+              <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="_manual">-- Digitar manualmente --</SelectItem>
+                {motoristas.map((m) => (
+                  <SelectItem key={m.id} value={m.id}>{m.nome}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            {(!currentMotoristaId) && (
+              <div className="mt-1 grid grid-cols-2 gap-2">
+                <Input value={form.motorista} onChange={(e) => update("motorista", e.target.value)} placeholder="Nome" />
+                <Input value={form.telefone} onChange={(e) => update("telefone", e.target.value)} placeholder="Telefone" />
+              </div>
+            )}
           </div>
 
           <div className="space-y-1.5">
@@ -203,7 +303,18 @@ const EditServicoDialog = ({ open, onOpenChange, item, onSaved }: EditServicoDia
 
           <div className="space-y-1.5">
             <Label>Fornecedor</Label>
-            <Input value={form.fornecedor} onChange={(e) => update("fornecedor", e.target.value)} placeholder="Nome do fornecedor" />
+            <Select value={currentFornecedorId || "_manual"} onValueChange={handleFornecedorChange}>
+              <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="_manual">-- Digitar manualmente --</SelectItem>
+                {fornecedores.map((f) => (
+                  <SelectItem key={f.id} value={f.id}>{f.razaoSocial}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            {(!currentFornecedorId) && (
+              <Input value={form.fornecedor} onChange={(e) => update("fornecedor", e.target.value)} placeholder="Nome do fornecedor" className="mt-1" />
+            )}
           </div>
 
           <div className="space-y-1.5">
