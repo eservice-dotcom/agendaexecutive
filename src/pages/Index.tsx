@@ -12,7 +12,7 @@ import FaturamentoFornecedor from "@/components/FaturamentoFornecedor";
 import DashboardOcupacao from "@/components/DashboardOcupacao";
 import NovoServicoDialog from "@/components/NovoServicoDialog";
 import { getAgendaItems } from "@/data/cadastroStorage";
-import { printElement } from "@/lib/printUtils";
+import { printAgenda } from "@/lib/printUtils";
 
 
 interface FiltersState {
@@ -167,7 +167,7 @@ const Index = () => {
                 <span>{filteredData.length} de {agendaData.length} registros</span>
               </div>
               <div className="flex items-center gap-2">
-                <Button variant="outline" size="sm" onClick={() => printElement("print-agenda", "Agenda de Serviços")} className="gap-2">
+                <Button variant="outline" size="sm" onClick={() => printAgenda(filteredData)} className="gap-2">
                   <Printer className="h-4 w-4" />
                   Imprimir
                 </Button>
@@ -177,9 +177,7 @@ const Index = () => {
                 </Button>
               </div>
             </div>
-            <div id="print-agenda">
             <AgendaTable items={filteredData} onEdited={reloadData} />
-            </div>
             <NovoServicoDialog open={novoDialogOpen} onOpenChange={setNovoDialogOpen} onSaved={reloadData} />
           </TabsContent>
 
