@@ -167,8 +167,12 @@ const Index = () => {
                 <ListChecks className="h-4 w-4" />
                 <span>{filteredData.length} de {agendaData.length} registros</span>
               </div>
-              <div className="flex items-center gap-2">
-                <Button variant="outline" size="sm" onClick={() => printAgenda(filteredData)} className="gap-2">
+              <div className="flex items-center gap-3">
+                <label className="flex items-center gap-1.5 text-xs text-muted-foreground cursor-pointer select-none">
+                  <input type="checkbox" checked={printWithFinancials} onChange={e => setPrintWithFinancials(e.target.checked)} className="rounded" />
+                  Incluir financeiro
+                </label>
+                <Button variant="outline" size="sm" onClick={() => printAgenda(filteredData, printWithFinancials)} className="gap-2">
                   <Printer className="h-4 w-4" />
                   Imprimir
                 </Button>
