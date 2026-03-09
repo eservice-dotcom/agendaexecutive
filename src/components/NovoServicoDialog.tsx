@@ -9,6 +9,7 @@ import { Passageiro } from "@/data/agendaData";
 import { toast } from "sonner";
 import { Plus } from "lucide-react";
 import PassageirosInput from "./PassageirosInput";
+import { TooltipProvider } from "@/components/ui/tooltip";
 
 interface NovoServicoDialogProps {
   open: boolean;
