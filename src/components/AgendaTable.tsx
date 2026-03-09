@@ -30,18 +30,18 @@ const tipoBadgeVariant = (tipo: string) => {
 
 const tipoRowColor = (tipo: string): string => {
   const colors: Record<string, string> = {
-    "Transfer In": "bg-blue-50 dark:bg-blue-950/30",
-    "Transfer Out": "bg-emerald-50 dark:bg-emerald-950/30",
-    "City Tour": "bg-amber-50 dark:bg-amber-950/30",
-    "Translado": "bg-purple-50 dark:bg-purple-950/30",
-    "Fretamento": "bg-rose-50 dark:bg-rose-950/30",
-    "Coordenação": "bg-cyan-50 dark:bg-cyan-950/30",
-    "Diária de 5h": "bg-orange-50 dark:bg-orange-950/30",
-    "Diária de 10h": "bg-teal-50 dark:bg-teal-950/30",
-    "Viagem": "bg-indigo-50 dark:bg-indigo-950/30",
-    "Comissaria": "bg-pink-50 dark:bg-pink-950/30",
+    "Transfer In": "bg-sky-100/60 dark:bg-sky-900/20",
+    "Transfer Out": "bg-lime-100/60 dark:bg-lime-900/20",
+    "City Tour": "bg-yellow-100/60 dark:bg-yellow-900/20",
+    "Translado": "bg-violet-100/60 dark:bg-violet-900/20",
+    "Fretamento": "bg-rose-100/60 dark:bg-rose-900/20",
+    "Coordenação": "bg-teal-100/60 dark:bg-teal-900/20",
+    "Diária de 5h": "bg-amber-100/60 dark:bg-amber-900/20",
+    "Diária de 10h": "bg-orange-100/60 dark:bg-orange-900/20",
+    "Viagem": "bg-indigo-100/60 dark:bg-indigo-900/20",
+    "Comissaria": "bg-pink-100/60 dark:bg-pink-900/20",
   };
-  return colors[tipo] || "";
+  return colors[tipo] || "bg-gray-100/40 dark:bg-gray-900/20";
 };
 
 const formatCurrency = (value: number) =>
