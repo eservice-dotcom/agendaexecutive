@@ -237,11 +237,11 @@ export const getAgendaItems = async (): Promise<AgendaItem[]> => {
   
   if (error) {
     console.error("Erro ao buscar itens da agenda:", error);
-    return mockData;
+    return [];
   }
   
   if (!data || data.length === 0) {
-    return mockData;
+    return [];
   }
   
   return data.map((item) => ({
