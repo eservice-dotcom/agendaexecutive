@@ -24,8 +24,6 @@ const EditServicoDialog = ({ open, onOpenChange, item, onSaved }: EditServicoDia
     hora: "",
     cliente: "",
     pax: "",
-    nomePassageiro: "",
-    numeroVoo: "",
     cot: "",
     tipo: "",
     origem: "",
@@ -40,6 +38,8 @@ const EditServicoDialog = ({ open, onOpenChange, item, onSaved }: EditServicoDia
     observacoes: "",
     statusFaturamento: "" as StatusFaturamento,
   });
+  
+  const [passageiros, setPassageiros] = useState<Passageiro[]>([]);
 
   useEffect(() => {
     if (item && open) {
