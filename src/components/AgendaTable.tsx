@@ -52,6 +52,22 @@ const AgendaTable = ({ items, onEdited }: AgendaTableProps) => {
     }
   };
 
+  const handleClone = async (item: AgendaItem) => {
+    try {
+      const { id, ...rest } = item;
+      await saveAgendaItem({ ...rest, cot: rest.cot ? `${rest.cot}-COPIA` : "" });
+      toast.success("Serviço clonado! Abrindo para edição...");
+      await onEdited?.();
+      // Reload to get the new item, then open edit
+      const { getAgendaItems } = await import("@/data/cadastroStorage");
+      const allItems = await getAgendaItems();
+      const cloned = allItems.find(i => i.cot === `${rest.cot}-COPIA` && i.data === rest.data && i.hora === rest.hora);
+      if (cloned) setEditItem(cloned);
+    } catch {
+      toast.error("Erro ao clonar serviço");
+    }
+  };
+
   const cycleStatus = (item: AgendaItem) => {
     const order: StatusFaturamento[] = ["", "enviado", "faturado"];
     const current = order.indexOf(item.statusFaturamento || "");
