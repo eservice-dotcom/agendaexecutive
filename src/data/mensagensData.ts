@@ -83,6 +83,6 @@ export const mensagensPreCadastradas: MensagemTemplate[] = [
   {
     id: "16",
     titulo: "Dados do serviço para o motorista",
-    texto: "Olá {motorista}! Seguem os dados do serviço: Data: {data} | Hora: {hora} | PAX: {pax} | Voo: {voos} | Origem: {origem} | Destino: {destino}. Qualquer dúvida, entre em contato.",
+    texto: "Olá {motorista}! Seguem os dados do serviço: Data: {data} | Hora: {hora} | PAX: {pax} | Passageiros: {passageiros} | Voo: {voos} | Origem: {origem} | Destino: {destino}. Qualquer dúvida, entre em contato.",
   },
 ];
