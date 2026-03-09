@@ -18,11 +18,11 @@ interface NovoServicoDialogProps {
 }
 
 const NovoServicoDialog = ({ open, onOpenChange, onSaved }: NovoServicoDialogProps) => {
-  const [clientes, setClientes] = useState(getClientes());
-  const [veiculos, setVeiculos] = useState(getVeiculos());
-  const [motoristas, setMotoristas] = useState(getMotoristas());
-  const [fornecedores, setFornecedores] = useState(getFornecedores());
-  const [tiposServico, setTiposServico] = useState(getTiposServico());
+  const [clientes, setClientes] = useState<any[]>([]);
+  const [veiculos, setVeiculos] = useState<any[]>([]);
+  const [motoristas, setMotoristas] = useState<any[]>([]);
+  const [fornecedores, setFornecedores] = useState<any[]>([]);
+  const [tiposServico, setTiposServico] = useState<string[]>([]);
 
   const [form, setForm] = useState({
     data: "",
@@ -45,17 +45,26 @@ const NovoServicoDialog = ({ open, onOpenChange, onSaved }: NovoServicoDialogPro
 
   useEffect(() => {
     if (open) {
-      setClientes(getClientes());
-      setVeiculos(getVeiculos());
-      setMotoristas(getMotoristas());
-      setFornecedores(getFornecedores());
-      setTiposServico(getTiposServico());
+      (async () => {
+        const [c, v, m, f, t] = await Promise.all([
+          getClientes(),
+          getVeiculos(),
+          getMotoristas(),
+          getFornecedores(),
+          getTiposServico(),
+        ]);
+        setClientes(c);
+        setVeiculos(v);
+        setMotoristas(m);
+        setFornecedores(f);
+        setTiposServico(t);
+      })();
     }
   }, [open]);
 
   const update = (key: string, value: string) => setForm((f) => ({ ...f, [key]: value }));
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (!form.data || !form.hora || !form.clienteId || !form.tipo || !form.origem || !form.destino) {
       toast.error("Preencha os campos obrigatórios: Data, Hora, Cliente, Tipo, Origem e Destino.");
       return;
@@ -66,36 +75,40 @@ const NovoServicoDialog = ({ open, onOpenChange, onSaved }: NovoServicoDialogPro
     const motorista = motoristas.find((m) => m.id === form.motoristaId);
     const fornecedor = fornecedores.find((f) => f.id === form.fornecedorId);
 
-    saveAgendaItem({
-      data: form.data,
-      hora: form.hora,
-      cliente: cliente?.nome || "",
-      pax: parseInt(form.pax) || 0,
-      passageiros: passageiros,
-      cot: form.cot,
-      tipo: form.tipo,
-      origem: form.origem,
-      destino: form.destino,
-      placa: veiculo?.placa || "",
-      veiculo: veiculo ? `${veiculo.modelo}` : "",
-      motorista: motorista?.nome || "",
-      telefone: motorista?.telefone || "",
-      valor: parseFloat(form.valor) || 0,
-      fornecedor: fornecedor?.razaoSocial || "",
-      custo: parseFloat(form.custo) || 0,
-      observacoes: form.observacoes,
-      statusFaturamento: "",
-    });
+    try {
+      await saveAgendaItem({
+        data: form.data,
+        hora: form.hora,
+        cliente: cliente?.nome || "",
+        pax: parseInt(form.pax) || 0,
+        passageiros: passageiros,
+        cot: form.cot,
+        tipo: form.tipo,
+        origem: form.origem,
+        destino: form.destino,
+        placa: veiculo?.placa || "",
+        veiculo: veiculo ? `${veiculo.modelo}` : "",
+        motorista: motorista?.nome || "",
+        telefone: motorista?.telefone || "",
+        valor: parseFloat(form.valor) || 0,
+        fornecedor: fornecedor?.razaoSocial || "",
+        custo: parseFloat(form.custo) || 0,
+        observacoes: form.observacoes,
+        statusFaturamento: "",
+      });
 
-    toast.success("Serviço adicionado com sucesso!");
-    setForm({
-      data: "", hora: "", clienteId: "", pax: "", cot: "", tipo: "",
-      origem: "", destino: "", veiculoId: "", motoristaId: "", valor: "",
-      fornecedorId: "", custo: "", observacoes: "",
-    });
-    setPassageiros([]);
-    onOpenChange(false);
-    onSaved();
+      toast.success("Serviço adicionado com sucesso!");
+      setForm({
+        data: "", hora: "", clienteId: "", pax: "", cot: "", tipo: "",
+        origem: "", destino: "", veiculoId: "", motoristaId: "", valor: "",
+        fornecedorId: "", custo: "", observacoes: "",
+      });
+      setPassageiros([]);
+      onOpenChange(false);
+      onSaved();
+    } catch (error) {
+      toast.error("Erro ao salvar serviço");
+    }
   };
 
   return (
