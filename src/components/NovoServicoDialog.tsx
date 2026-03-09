@@ -219,6 +219,7 @@ const NovoServicoDialog = ({ open, onOpenChange, onSaved }: NovoServicoDialogPro
         </DialogFooter>
       </DialogContent>
     </Dialog>
+    </TooltipProvider>
   );
 };
 
