@@ -39,6 +39,7 @@ const NovoServicoDialog = ({ open, onOpenChange, onSaved }: NovoServicoDialogPro
     fornecedorId: "",
     custo: "",
     observacoes: "",
+    receptivo: "",
   });
   
   const [passageiros, setPassageiros] = useState<Passageiro[]>([]);
