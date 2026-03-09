@@ -33,7 +33,7 @@ const Cadastros = () => {
         </div>
 
         <Tabs defaultValue="clientes" className="space-y-4">
-          <TabsList className="grid w-full grid-cols-6 sm:w-auto sm:inline-grid">
+          <TabsList className="grid w-full grid-cols-7 sm:w-auto sm:inline-grid">
             <TabsTrigger value="clientes" className="gap-2">
               <Users className="h-4 w-4" />
               Clientes
@@ -53,6 +53,10 @@ const Cadastros = () => {
             <TabsTrigger value="tipos" className="gap-2">
               <ListChecks className="h-4 w-4" />
               Tipos
+            </TabsTrigger>
+            <TabsTrigger value="mensagens" className="gap-2">
+              <MessageCircle className="h-4 w-4" />
+              Mensagens
             </TabsTrigger>
             <TabsTrigger value="usuarios" className="gap-2">
               <UserCog className="h-4 w-4" />
