@@ -44,7 +44,7 @@ const WhatsAppDialog = ({ open, onOpenChange, item }: WhatsAppDialogProps) => {
   if (!item) return null;
 
   const handleSelectTemplate = (id: string) => {
-    const template = mensagensPreCadastradas.find((m) => m.id === id);
+    const template = mensagens.find((m) => m.id === id);
     if (template) {
       setSelectedId(id);
       setMensagemFinal(replacePlaceholders(template.texto, item));
