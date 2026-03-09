@@ -70,8 +70,7 @@ const NovoServicoDialog = ({ open, onOpenChange, onSaved }: NovoServicoDialogPro
       hora: form.hora,
       cliente: cliente?.nome || "",
       pax: parseInt(form.pax) || 0,
-      nomePassageiro: form.nomePassageiro,
-      numeroVoo: form.numeroVoo,
+      passageiros: passageiros,
       cot: form.cot,
       tipo: form.tipo,
       origem: form.origem,
@@ -89,10 +88,11 @@ const NovoServicoDialog = ({ open, onOpenChange, onSaved }: NovoServicoDialogPro
 
     toast.success("Serviço adicionado com sucesso!");
     setForm({
-      data: "", hora: "", clienteId: "", pax: "", nomePassageiro: "", numeroVoo: "", cot: "", tipo: "",
+      data: "", hora: "", clienteId: "", pax: "", cot: "", tipo: "",
       origem: "", destino: "", veiculoId: "", motoristaId: "", valor: "",
       fornecedorId: "", custo: "", observacoes: "",
     });
+    setPassageiros([]);
     onOpenChange(false);
     onSaved();
   };
