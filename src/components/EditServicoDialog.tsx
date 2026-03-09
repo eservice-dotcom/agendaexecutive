@@ -47,6 +47,8 @@ const EditServicoDialog = ({ open, onOpenChange, item, onSaved }: EditServicoDia
         hora: item.hora,
         cliente: item.cliente,
         pax: item.pax.toString(),
+        nomePassageiro: item.nomePassageiro || "",
+        numeroVoo: item.numeroVoo || "",
         cot: item.cot,
         tipo: item.tipo,
         origem: item.origem,
