@@ -54,34 +54,40 @@ const Index = () => {
   );
 
   const filteredData = useMemo(() => {
-    return agendaData.filter((item) => {
-      const search = filters.search.toLowerCase();
-      if (
-        search &&
-        !item.cliente.toLowerCase().includes(search) &&
-        !item.cot.toLowerCase().includes(search) &&
-        !item.placa.toLowerCase().includes(search) &&
-        !item.motorista.toLowerCase().includes(search) &&
-        !item.origem.toLowerCase().includes(search) &&
-        !item.destino.toLowerCase().includes(search)
-      ) {
-        return false;
-      }
-      if (filters.dataInicio && item.data < filters.dataInicio) return false;
-      if (filters.dataFim && item.data > filters.dataFim) return false;
-      if (filters.tipo && item.tipo !== filters.tipo) return false;
-      if (filters.fornecedor && item.fornecedor !== filters.fornecedor) return false;
-      if (filters.motorista && item.motorista !== filters.motorista) return false;
-      if (filters.pax) {
-        const paxSearch = filters.pax.toLowerCase();
-        const hasMatch = item.passageiros.some(p => 
-          p.nome.toLowerCase().includes(paxSearch) || 
-          p.voo.toLowerCase().includes(paxSearch)
-        );
-        if (!hasMatch) return false;
-      }
-      return true;
-    });
+    return agendaData
+      .filter((item) => {
+        const search = filters.search.toLowerCase();
+        if (
+          search &&
+          !item.cliente.toLowerCase().includes(search) &&
+          !item.cot.toLowerCase().includes(search) &&
+          !item.placa.toLowerCase().includes(search) &&
+          !item.motorista.toLowerCase().includes(search) &&
+          !item.origem.toLowerCase().includes(search) &&
+          !item.destino.toLowerCase().includes(search)
+        ) {
+          return false;
+        }
+        if (filters.dataInicio && item.data < filters.dataInicio) return false;
+        if (filters.dataFim && item.data > filters.dataFim) return false;
+        if (filters.tipo && item.tipo !== filters.tipo) return false;
+        if (filters.fornecedor && item.fornecedor !== filters.fornecedor) return false;
+        if (filters.motorista && item.motorista !== filters.motorista) return false;
+        if (filters.pax) {
+          const paxSearch = filters.pax.toLowerCase();
+          const hasMatch = item.passageiros.some(p => 
+            p.nome.toLowerCase().includes(paxSearch) || 
+            p.voo.toLowerCase().includes(paxSearch)
+          );
+          if (!hasMatch) return false;
+        }
+        return true;
+      })
+      .sort((a, b) => {
+        const dateCompare = a.data.localeCompare(b.data);
+        if (dateCompare !== 0) return dateCompare;
+        return a.hora.localeCompare(b.hora);
+      });
   }, [filters, agendaData]);
 
   const totalValor = filteredData.reduce((s, i) => s + i.valor, 0);
