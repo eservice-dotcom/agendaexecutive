@@ -19,7 +19,7 @@ interface EditServicoDialogProps {
 }
 
 const EditServicoDialog = ({ open, onOpenChange, item, onSaved }: EditServicoDialogProps) => {
-  const tiposServico = getTiposServico();
+  const [tiposServico, setTiposServico] = useState<string[]>([]);
   const [form, setForm] = useState({
     data: "",
     hora: "",
@@ -41,6 +41,12 @@ const EditServicoDialog = ({ open, onOpenChange, item, onSaved }: EditServicoDia
   });
   
   const [passageiros, setPassageiros] = useState<Passageiro[]>([]);
+
+  useEffect(() => {
+    if (open) {
+      getTiposServico().then(setTiposServico);
+    }
+  }, [open]);
 
   useEffect(() => {
     if (item && open) {
@@ -69,38 +75,42 @@ const EditServicoDialog = ({ open, onOpenChange, item, onSaved }: EditServicoDia
 
   const update = (key: string, value: string) => setForm((f) => ({ ...f, [key]: value }));
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (!item) return;
     if (!form.data || !form.hora || !form.cliente || !form.tipo || !form.origem || !form.destino) {
       toast.error("Preencha os campos obrigatórios: Data, Hora, Cliente, Tipo, Origem e Destino.");
       return;
     }
 
-    updateAgendaItem({
-      id: item.id,
-      data: form.data,
-      hora: form.hora,
-      cliente: form.cliente,
-      pax: parseInt(form.pax) || 0,
-      passageiros: passageiros,
-      cot: form.cot,
-      tipo: form.tipo,
-      origem: form.origem,
-      destino: form.destino,
-      placa: form.placa,
-      veiculo: form.veiculo,
-      motorista: form.motorista,
-      telefone: form.telefone,
-      valor: parseFloat(form.valor) || 0,
-      fornecedor: form.fornecedor,
-      custo: parseFloat(form.custo) || 0,
-      observacoes: form.observacoes,
-      statusFaturamento: form.statusFaturamento,
-    });
+    try {
+      await updateAgendaItem({
+        id: item.id,
+        data: form.data,
+        hora: form.hora,
+        cliente: form.cliente,
+        pax: parseInt(form.pax) || 0,
+        passageiros: passageiros,
+        cot: form.cot,
+        tipo: form.tipo,
+        origem: form.origem,
+        destino: form.destino,
+        placa: form.placa,
+        veiculo: form.veiculo,
+        motorista: form.motorista,
+        telefone: form.telefone,
+        valor: parseFloat(form.valor) || 0,
+        fornecedor: form.fornecedor,
+        custo: parseFloat(form.custo) || 0,
+        observacoes: form.observacoes,
+        statusFaturamento: form.statusFaturamento,
+      });
 
-    toast.success("Serviço atualizado com sucesso!");
-    onOpenChange(false);
-    onSaved();
+      toast.success("Serviço atualizado com sucesso!");
+      onOpenChange(false);
+      onSaved();
+    } catch (error) {
+      toast.error("Erro ao atualizar serviço");
+    }
   };
 
   return (
