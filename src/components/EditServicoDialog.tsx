@@ -19,7 +19,7 @@ interface EditServicoDialogProps {
 }
 
 const EditServicoDialog = ({ open, onOpenChange, item, onSaved }: EditServicoDialogProps) => {
-  const tiposServico = getTiposServico();
+  const [tiposServico, setTiposServico] = useState<string[]>([]);
   const [form, setForm] = useState({
     data: "",
     hora: "",
@@ -41,6 +41,12 @@ const EditServicoDialog = ({ open, onOpenChange, item, onSaved }: EditServicoDia
   });
   
   const [passageiros, setPassageiros] = useState<Passageiro[]>([]);
+
+  useEffect(() => {
+    if (open) {
+      getTiposServico().then(setTiposServico);
+    }
+  }, [open]);
 
   useEffect(() => {
     if (item && open) {
