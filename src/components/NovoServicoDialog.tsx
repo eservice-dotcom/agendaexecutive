@@ -68,6 +68,8 @@ const NovoServicoDialog = ({ open, onOpenChange, onSaved }: NovoServicoDialogPro
       hora: form.hora,
       cliente: cliente?.nome || "",
       pax: parseInt(form.pax) || 0,
+      nomePassageiro: form.nomePassageiro,
+      numeroVoo: form.numeroVoo,
       cot: form.cot,
       tipo: form.tipo,
       origem: form.origem,
