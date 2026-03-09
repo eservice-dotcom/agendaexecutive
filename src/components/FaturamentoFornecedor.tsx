@@ -1,7 +1,9 @@
 import { useMemo, useEffect, useState } from "react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Building2 } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Building2, Printer } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { printElement } from "@/lib/printUtils";
 
 const formatCurrency = (value: number) =>
   new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(value);
