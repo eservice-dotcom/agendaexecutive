@@ -9,6 +9,7 @@ import AgendaFilters from "@/components/AgendaFilters";
 import AgendaTable from "@/components/AgendaTable";
 import FaturamentoVeiculo from "@/components/FaturamentoVeiculo";
 import FaturamentoFornecedor from "@/components/FaturamentoFornecedor";
+import DashboardOcupacao from "@/components/DashboardOcupacao";
 import NovoServicoDialog from "@/components/NovoServicoDialog";
 import { getAgendaItems } from "@/data/cadastroStorage";
 
