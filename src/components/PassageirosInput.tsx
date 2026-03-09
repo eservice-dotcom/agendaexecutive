@@ -19,7 +19,7 @@ const PassageirosInput = ({ passageiros, onChange }: PassageirosInputProps) => {
     onChange(passageiros.filter((_, i) => i !== index));
   };
 
-  const updatePassageiro = (index: number, field: "nome" | "voo", value: string) => {
+  const updatePassageiro = (index: number, field: "nome" | "voo" | "telefone", value: string) => {
     const updated = [...passageiros];
     updated[index] = { ...updated[index], [field]: value };
     onChange(updated);
