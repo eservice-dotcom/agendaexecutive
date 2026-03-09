@@ -14,6 +14,210 @@ export type Database = {
   }
   public: {
     Tables: {
+      agenda_items: {
+        Row: {
+          cliente: string
+          cot: string
+          created_at: string
+          custo: number
+          data: string
+          destino: string
+          fornecedor: string
+          hora: string
+          id: string
+          motorista: string
+          observacoes: string | null
+          origem: string
+          passageiros: Json
+          pax: number
+          placa: string
+          status_faturamento: string | null
+          telefone: string
+          tipo: string
+          updated_at: string
+          user_id: string
+          valor: number
+          veiculo: string
+        }
+        Insert: {
+          cliente: string
+          cot: string
+          created_at?: string
+          custo: number
+          data: string
+          destino: string
+          fornecedor: string
+          hora: string
+          id?: string
+          motorista: string
+          observacoes?: string | null
+          origem: string
+          passageiros?: Json
+          pax: number
+          placa: string
+          status_faturamento?: string | null
+          telefone: string
+          tipo: string
+          updated_at?: string
+          user_id: string
+          valor: number
+          veiculo: string
+        }
+        Update: {
+          cliente?: string
+          cot?: string
+          created_at?: string
+          custo?: number
+          data?: string
+          destino?: string
+          fornecedor?: string
+          hora?: string
+          id?: string
+          motorista?: string
+          observacoes?: string | null
+          origem?: string
+          passageiros?: Json
+          pax?: number
+          placa?: string
+          status_faturamento?: string | null
+          telefone?: string
+          tipo?: string
+          updated_at?: string
+          user_id?: string
+          valor?: number
+          veiculo?: string
+        }
+        Relationships: []
+      }
+      clientes: {
+        Row: {
+          cnpj_cpf: string
+          created_at: string
+          email: string
+          endereco: string
+          id: string
+          nome: string
+          telefone: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          cnpj_cpf: string
+          created_at?: string
+          email: string
+          endereco: string
+          id?: string
+          nome: string
+          telefone: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          cnpj_cpf?: string
+          created_at?: string
+          email?: string
+          endereco?: string
+          id?: string
+          nome?: string
+          telefone?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      fornecedores: {
+        Row: {
+          cnpj: string
+          contato: string
+          created_at: string
+          email: string
+          id: string
+          razao_social: string
+          telefone: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          cnpj: string
+          contato: string
+          created_at?: string
+          email: string
+          id?: string
+          razao_social: string
+          telefone: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          cnpj?: string
+          contato?: string
+          created_at?: string
+          email?: string
+          id?: string
+          razao_social?: string
+          telefone?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      motoristas: {
+        Row: {
+          categoria: string
+          cnh: string
+          created_at: string
+          email: string
+          id: string
+          nome: string
+          telefone: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          categoria: string
+          cnh: string
+          created_at?: string
+          email: string
+          id?: string
+          nome: string
+          telefone: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          categoria?: string
+          cnh?: string
+          created_at?: string
+          email?: string
+          id?: string
+          nome?: string
+          telefone?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      tipos_servico: {
+        Row: {
+          created_at: string
+          id: string
+          tipo: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          tipo: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          tipo?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_permissions: {
         Row: {
           can_view_financials: boolean
@@ -33,6 +237,42 @@ export type Database = {
           can_view_financials?: boolean
           created_at?: string
           id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      veiculos: {
+        Row: {
+          ano: number
+          capacidade: number
+          created_at: string
+          id: string
+          modelo: string
+          placa: string
+          tipo: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          ano: number
+          capacidade: number
+          created_at?: string
+          id?: string
+          modelo: string
+          placa: string
+          tipo: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          ano?: number
+          capacidade?: number
+          created_at?: string
+          id?: string
+          modelo?: string
+          placa?: string
+          tipo?: string
           updated_at?: string
           user_id?: string
         }
