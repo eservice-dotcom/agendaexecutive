@@ -291,6 +291,7 @@ export type Database = {
           email: string
           id: string
           last_sign_in_at: string
+          name: string
         }[]
       }
     }

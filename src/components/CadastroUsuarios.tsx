@@ -10,6 +10,7 @@ import { format } from "date-fns";
 interface User {
   id: string;
   email: string;
+  name?: string;
   created_at: string;
   last_sign_in_at: string | null;
 }
@@ -82,7 +83,8 @@ const CadastroUsuarios = () => {
               <Table>
                 <TableHeader>
                   <TableRow className="bg-muted/50 hover:bg-muted/50">
-                    <TableHead className="font-semibold">Email</TableHead>
+                    <TableHead className="font-semibold">Nome</TableHead>
+                    <TableHead className="font-semibold">Email / Usuário (Sistema)</TableHead>
                     <TableHead className="font-semibold">Data de Cadastro</TableHead>
                     <TableHead className="font-semibold">Último Acesso</TableHead>
                   </TableRow>
@@ -90,7 +92,8 @@ const CadastroUsuarios = () => {
                 <TableBody>
                   {users.map((user) => (
                     <TableRow key={user.id}>
-                      <TableCell className="font-medium">{user.email}</TableCell>
+                      <TableCell className="font-medium">{user.name || "-"}</TableCell>
+                      <TableCell className="text-sm text-muted-foreground">{user.email}</TableCell>
                       <TableCell className="text-sm">
                         {format(new Date(user.created_at), "dd/MM/yyyy HH:mm")}
                       </TableCell>
