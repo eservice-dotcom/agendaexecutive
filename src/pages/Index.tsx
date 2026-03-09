@@ -21,6 +21,7 @@ interface FiltersState {
   fornecedor: string;
   motorista: string;
   pax: string;
+  receptivo: string;
 }
 
 const initialFilters: FiltersState = {
@@ -31,6 +32,7 @@ const initialFilters: FiltersState = {
   fornecedor: "",
   motorista: "",
   pax: "",
+  receptivo: "",
 };
 
 const Index = () => {
