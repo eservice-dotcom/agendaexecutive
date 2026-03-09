@@ -95,6 +95,7 @@ const NovoServicoDialog = ({ open, onOpenChange, onSaved }: NovoServicoDialogPro
         fornecedor: fornecedor?.razaoSocial || "",
         custo: parseFloat(form.custo) || 0,
         observacoes: form.observacoes,
+        receptivo: form.receptivo,
         statusFaturamento: "",
       });
 
