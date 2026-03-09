@@ -44,7 +44,7 @@ const FaturamentoVeiculo = () => {
         </div>
       </div>
       <div className="flex justify-end">
-        <Button variant="outline" size="sm" onClick={() => printElement("print-fat-veiculo", "Faturamento por Veículo")} className="gap-2">
+        <Button variant="outline" size="sm" onClick={() => printFatVeiculo(items)} className="gap-2">
           <Printer className="h-4 w-4" />
           Imprimir
         </Button>
