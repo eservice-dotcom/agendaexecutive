@@ -222,6 +222,7 @@ const EditServicoDialog = ({ open, onOpenChange, item, onSaved }: EditServicoDia
         </DialogFooter>
       </DialogContent>
     </Dialog>
+    </TooltipProvider>
   );
 };
 
