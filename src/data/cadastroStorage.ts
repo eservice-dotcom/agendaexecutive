@@ -1,3 +1,6 @@
+import { supabase } from "@/integrations/supabase/client";
+import { AgendaItem, mockData, tiposServicoDefault } from "@/data/agendaData";
+
 export interface Cliente {
   id: string;
   nome: string;
@@ -34,137 +37,294 @@ export interface Fornecedor {
   email: string;
 }
 
-function getItems<T>(key: string): T[] {
-  const data = localStorage.getItem(key);
-  return data ? JSON.parse(data) : [];
-}
-
-function setItems<T>(key: string, items: T[]) {
-  localStorage.setItem(key, JSON.stringify(items));
-}
-
-function generateId() {
-  return crypto.randomUUID();
-}
-
 // Clientes
-export const getClientes = () => getItems<Cliente>("cadastro_clientes");
-export const saveCliente = (item: Omit<Cliente, "id">) => {
-  const items = getClientes();
-  items.push({ ...item, id: generateId() });
-  setItems("cadastro_clientes", items);
+export const getClientes = async (): Promise<Cliente[]> => {
+  const { data, error } = await supabase
+    .from("clientes")
+    .select("*")
+    .order("nome");
+  
+  if (error) {
+    console.error("Erro ao buscar clientes:", error);
+    return [];
+  }
+  
+  return (data || []).map((item) => ({
+    id: item.id,
+    nome: item.nome,
+    cnpjCpf: item.cnpj_cpf,
+    email: item.email,
+    telefone: item.telefone,
+    endereco: item.endereco,
+  }));
 };
-export const deleteCliente = (id: string) => {
-  setItems("cadastro_clientes", getClientes().filter((i) => i.id !== id));
+
+export const saveCliente = async (item: Omit<Cliente, "id">) => {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) throw new Error("Usuário não autenticado");
+
+  const { error } = await supabase.from("clientes").insert({
+    user_id: user.id,
+    nome: item.nome,
+    cnpj_cpf: item.cnpjCpf,
+    email: item.email,
+    telefone: item.telefone,
+    endereco: item.endereco,
+  });
+  
+  if (error) throw error;
+};
+
+export const deleteCliente = async (id: string) => {
+  const { error } = await supabase.from("clientes").delete().eq("id", id);
+  if (error) throw error;
 };
 
 // Veículos
-export const getVeiculos = () => getItems<Veiculo>("cadastro_veiculos");
-export const saveVeiculo = (item: Omit<Veiculo, "id">) => {
-  const items = getVeiculos();
-  items.push({ ...item, id: generateId() });
-  setItems("cadastro_veiculos", items);
+export const getVeiculos = async (): Promise<Veiculo[]> => {
+  const { data, error } = await supabase
+    .from("veiculos")
+    .select("*")
+    .order("placa");
+  
+  if (error) {
+    console.error("Erro ao buscar veículos:", error);
+    return [];
+  }
+  
+  return data || [];
 };
-export const deleteVeiculo = (id: string) => {
-  setItems("cadastro_veiculos", getVeiculos().filter((i) => i.id !== id));
+
+export const saveVeiculo = async (item: Omit<Veiculo, "id">) => {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) throw new Error("Usuário não autenticado");
+
+  const { error } = await supabase.from("veiculos").insert({
+    user_id: user.id,
+    ...item,
+  });
+  
+  if (error) throw error;
+};
+
+export const deleteVeiculo = async (id: string) => {
+  const { error } = await supabase.from("veiculos").delete().eq("id", id);
+  if (error) throw error;
 };
 
 // Motoristas
-export const getMotoristas = () => getItems<Motorista>("cadastro_motoristas");
-export const saveMotorista = (item: Omit<Motorista, "id">) => {
-  const items = getMotoristas();
-  items.push({ ...item, id: generateId() });
-  setItems("cadastro_motoristas", items);
+export const getMotoristas = async (): Promise<Motorista[]> => {
+  const { data, error } = await supabase
+    .from("motoristas")
+    .select("*")
+    .order("nome");
+  
+  if (error) {
+    console.error("Erro ao buscar motoristas:", error);
+    return [];
+  }
+  
+  return data || [];
 };
-export const deleteMotorista = (id: string) => {
-  setItems("cadastro_motoristas", getMotoristas().filter((i) => i.id !== id));
+
+export const saveMotorista = async (item: Omit<Motorista, "id">) => {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) throw new Error("Usuário não autenticado");
+
+  const { error } = await supabase.from("motoristas").insert({
+    user_id: user.id,
+    ...item,
+  });
+  
+  if (error) throw error;
+};
+
+export const deleteMotorista = async (id: string) => {
+  const { error } = await supabase.from("motoristas").delete().eq("id", id);
+  if (error) throw error;
 };
 
 // Fornecedores
-export const getFornecedores = () => getItems<Fornecedor>("cadastro_fornecedores");
-export const saveFornecedor = (item: Omit<Fornecedor, "id">) => {
-  const items = getFornecedores();
-  items.push({ ...item, id: generateId() });
-  setItems("cadastro_fornecedores", items);
+export const getFornecedores = async (): Promise<Fornecedor[]> => {
+  const { data, error } = await supabase
+    .from("fornecedores")
+    .select("*")
+    .order("razao_social");
+  
+  if (error) {
+    console.error("Erro ao buscar fornecedores:", error);
+    return [];
+  }
+  
+  return (data || []).map((item) => ({
+    id: item.id,
+    razaoSocial: item.razao_social,
+    cnpj: item.cnpj,
+    contato: item.contato,
+    telefone: item.telefone,
+    email: item.email,
+  }));
 };
-export const deleteFornecedor = (id: string) => {
-  setItems("cadastro_fornecedores", getFornecedores().filter((i) => i.id !== id));
+
+export const saveFornecedor = async (item: Omit<Fornecedor, "id">) => {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) throw new Error("Usuário não autenticado");
+
+  const { error } = await supabase.from("fornecedores").insert({
+    user_id: user.id,
+    razao_social: item.razaoSocial,
+    cnpj: item.cnpj,
+    contato: item.contato,
+    telefone: item.telefone,
+    email: item.email,
+  });
+  
+  if (error) throw error;
+};
+
+export const deleteFornecedor = async (id: string) => {
+  const { error } = await supabase.from("fornecedores").delete().eq("id", id);
+  if (error) throw error;
 };
 
 // Tipos de Serviço
-import { AgendaItem, mockData, tiposServicoDefault } from "@/data/agendaData";
-
-export const getTiposServico = (): string[] => {
-  const data = localStorage.getItem("cadastro_tipos_servico");
-  return data ? JSON.parse(data) : tiposServicoDefault;
+export const getTiposServico = async (): Promise<string[]> => {
+  const { data, error } = await supabase
+    .from("tipos_servico")
+    .select("tipo")
+    .order("tipo");
+  
+  if (error) {
+    console.error("Erro ao buscar tipos de serviço:", error);
+    return tiposServicoDefault;
+  }
+  
+  if (!data || data.length === 0) {
+    return tiposServicoDefault;
+  }
+  
+  return data.map((item) => item.tipo);
 };
 
-export const saveTipoServico = (tipo: string) => {
-  const items = getTiposServico();
-  items.push(tipo);
-  setItems("cadastro_tipos_servico", items);
+export const saveTipoServico = async (tipo: string) => {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) throw new Error("Usuário não autenticado");
+
+  const { error } = await supabase.from("tipos_servico").insert({
+    user_id: user.id,
+    tipo,
+  });
+  
+  if (error) throw error;
 };
 
-export const deleteTipoServico = (tipo: string) => {
-  setItems("cadastro_tipos_servico", getTiposServico().filter((t) => t !== tipo));
+export const deleteTipoServico = async (tipo: string) => {
+  const { error } = await supabase
+    .from("tipos_servico")
+    .delete()
+    .eq("tipo", tipo);
+  
+  if (error) throw error;
 };
 
 // Agenda
-
-const coerceString = (v: unknown) => (typeof v === "string" ? v : v == null ? "" : String(v));
-
-const normalizePassageiros = (raw: unknown): { nome: string; voo: string }[] => {
-  if (!Array.isArray(raw)) return [];
-  return raw
-    .filter(Boolean)
-    .map((p: any) => ({ nome: coerceString(p?.nome), voo: coerceString(p?.voo) }))
-    .filter((p) => p.nome !== "" || p.voo !== "");
+export const getAgendaItems = async (): Promise<AgendaItem[]> => {
+  const { data, error } = await supabase
+    .from("agenda_items")
+    .select("*")
+    .order("data", { ascending: false })
+    .order("hora", { ascending: false });
+  
+  if (error) {
+    console.error("Erro ao buscar itens da agenda:", error);
+    return mockData;
+  }
+  
+  if (!data || data.length === 0) {
+    return mockData;
+  }
+  
+  return data.map((item) => ({
+    id: item.id,
+    data: item.data,
+    hora: item.hora,
+    cliente: item.cliente,
+    pax: item.pax,
+    passageiros: item.passageiros as { nome: string; voo: string }[],
+    cot: item.cot,
+    tipo: item.tipo,
+    origem: item.origem,
+    destino: item.destino,
+    placa: item.placa,
+    veiculo: item.veiculo,
+    motorista: item.motorista,
+    telefone: item.telefone,
+    valor: Number(item.valor),
+    fornecedor: item.fornecedor,
+    custo: Number(item.custo),
+    observacoes: item.observacoes || "",
+    statusFaturamento: (item.status_faturamento || "") as any,
+  }));
 };
 
-const normalizeAgendaItem = (raw: any): AgendaItem => {
-  const passageirosFromArray = normalizePassageiros(raw?.passageiros);
-  const legacyNome = coerceString(raw?.nomePassageiro ?? raw?.passageiro ?? "");
-  const legacyVoo = coerceString(raw?.numeroVoo ?? raw?.voo ?? "");
+export const saveAgendaItem = async (item: Omit<AgendaItem, "id">) => {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) throw new Error("Usuário não autenticado");
 
-  const passageiros =
-    passageirosFromArray.length > 0
-      ? passageirosFromArray
-      : legacyNome || legacyVoo
-        ? [{ nome: legacyNome, voo: legacyVoo }]
-        : [];
-
-  return {
-    ...raw,
-    passageiros,
-    statusFaturamento: coerceString(raw?.statusFaturamento) as any,
-  } as AgendaItem;
+  const { error } = await supabase.from("agenda_items").insert({
+    user_id: user.id,
+    data: item.data,
+    hora: item.hora,
+    cliente: item.cliente,
+    pax: item.pax,
+    passageiros: item.passageiros,
+    cot: item.cot,
+    tipo: item.tipo,
+    origem: item.origem,
+    destino: item.destino,
+    placa: item.placa,
+    veiculo: item.veiculo,
+    motorista: item.motorista,
+    telefone: item.telefone,
+    valor: item.valor,
+    fornecedor: item.fornecedor,
+    custo: item.custo,
+    observacoes: item.observacoes,
+    status_faturamento: item.statusFaturamento,
+  });
+  
+  if (error) throw error;
 };
 
-export const getAgendaItems = (): AgendaItem[] => {
-  const data = localStorage.getItem("agenda_items");
-  const parsed = data ? (JSON.parse(data) as any[]) : null;
-  if (!Array.isArray(parsed)) return mockData;
-
-  const normalized = parsed.map(normalizeAgendaItem);
-
-  // Migração automática de dados antigos para não quebrar após updates
-  const needsWriteBack = parsed.some((r: any) => !Array.isArray(r?.passageiros) || r?.nomePassageiro != null || r?.numeroVoo != null);
-  if (needsWriteBack) setItems("agenda_items", normalized);
-
-  return normalized;
+export const updateAgendaItem = async (updated: AgendaItem) => {
+  const { error } = await supabase
+    .from("agenda_items")
+    .update({
+      data: updated.data,
+      hora: updated.hora,
+      cliente: updated.cliente,
+      pax: updated.pax,
+      passageiros: updated.passageiros,
+      cot: updated.cot,
+      tipo: updated.tipo,
+      origem: updated.origem,
+      destino: updated.destino,
+      placa: updated.placa,
+      veiculo: updated.veiculo,
+      motorista: updated.motorista,
+      telefone: updated.telefone,
+      valor: updated.valor,
+      fornecedor: updated.fornecedor,
+      custo: updated.custo,
+      observacoes: updated.observacoes,
+      status_faturamento: updated.statusFaturamento,
+    })
+    .eq("id", updated.id);
+  
+  if (error) throw error;
 };
 
-export const saveAgendaItem = (item: Omit<AgendaItem, "id">) => {
-  const items = getAgendaItems();
-  items.push({ ...item, id: generateId() });
-  setItems("agenda_items", items);
-};
-
-export const updateAgendaItem = (updated: AgendaItem) => {
-  const items = getAgendaItems().map((i) => (i.id === updated.id ? updated : i));
-  setItems("agenda_items", items);
-};
-
-export const deleteAgendaItem = (id: string) => {
-  setItems("agenda_items", getAgendaItems().filter((i) => i.id !== id));
+export const deleteAgendaItem = async (id: string) => {
+  const { error } = await supabase.from("agenda_items").delete().eq("id", id);
+  if (error) throw error;
 };
