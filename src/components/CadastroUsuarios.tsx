@@ -1,11 +1,23 @@
 import { useState, useEffect } from "react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Users, Shield } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Users, Shield, Trash2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useAuth } from "@/contexts/AuthContext";
 import { format } from "date-fns";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 interface User {
   id: string;
@@ -18,7 +30,8 @@ interface User {
 const CadastroUsuarios = () => {
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
-  const { canViewFinancials } = useAuth();
+  const [deleting, setDeleting] = useState<string | null>(null);
+  const { canViewFinancials, user: currentUser } = useAuth();
 
   const fetchUsers = async () => {
     try {
@@ -31,6 +44,23 @@ const CadastroUsuarios = () => {
       toast.error(error.message || "Erro ao buscar usuários");
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleDeleteUser = async (userId: string) => {
+    setDeleting(userId);
+    try {
+      const { error } = await supabase.rpc('delete_user', { _user_id: userId });
+      
+      if (error) throw error;
+      
+      toast.success("Usuário excluído com sucesso");
+      fetchUsers();
+    } catch (error: any) {
+      console.error("Erro ao excluir usuário:", error);
+      toast.error(error.message || "Erro ao excluir usuário");
+    } finally {
+      setDeleting(null);
     }
   };
 
@@ -87,6 +117,7 @@ const CadastroUsuarios = () => {
                     <TableHead className="font-semibold">Email / Usuário (Sistema)</TableHead>
                     <TableHead className="font-semibold">Data de Cadastro</TableHead>
                     <TableHead className="font-semibold">Último Acesso</TableHead>
+                    <TableHead className="font-semibold w-[100px]">Ações</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -101,6 +132,41 @@ const CadastroUsuarios = () => {
                         {user.last_sign_in_at 
                           ? format(new Date(user.last_sign_in_at), "dd/MM/yyyy HH:mm")
                           : "Nunca"}
+                      </TableCell>
+                      <TableCell>
+                        {user.id !== currentUser?.id ? (
+                          <AlertDialog>
+                            <AlertDialogTrigger asChild>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="h-8 w-8 text-destructive hover:text-destructive hover:bg-destructive/10"
+                                disabled={deleting === user.id}
+                              >
+                                <Trash2 className="h-4 w-4" />
+                              </Button>
+                            </AlertDialogTrigger>
+                            <AlertDialogContent>
+                              <AlertDialogHeader>
+                                <AlertDialogTitle>Excluir usuário?</AlertDialogTitle>
+                                <AlertDialogDescription>
+                                  Esta ação não pode ser desfeita. O usuário <strong>{user.email}</strong> será permanentemente removido do sistema.
+                                </AlertDialogDescription>
+                              </AlertDialogHeader>
+                              <AlertDialogFooter>
+                                <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                                <AlertDialogAction
+                                  onClick={() => handleDeleteUser(user.id)}
+                                  className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                                >
+                                  Excluir
+                                </AlertDialogAction>
+                              </AlertDialogFooter>
+                            </AlertDialogContent>
+                          </AlertDialog>
+                        ) : (
+                          <span className="text-xs text-muted-foreground">Você</span>
+                        )}
                       </TableCell>
                     </TableRow>
                   ))}
