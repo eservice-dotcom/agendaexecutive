@@ -26,6 +26,8 @@ const NovoServicoDialog = ({ open, onOpenChange, onSaved }: NovoServicoDialogPro
     hora: "",
     clienteId: "",
     pax: "",
+    nomePassageiro: "",
+    numeroVoo: "",
     cot: "",
     tipo: "",
     origem: "",
