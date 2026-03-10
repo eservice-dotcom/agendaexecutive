@@ -272,6 +272,7 @@ export const getAgendaItems = async (): Promise<AgendaItem[]> => {
     observacoes: item.observacoes || "",
     receptivo: item.receptivo || "",
     statusFaturamento: (item.status_faturamento || "") as any,
+    corManual: (item as any).cor_manual || undefined,
   }));
 };
 
@@ -328,7 +329,8 @@ export const updateAgendaItem = async (updated: AgendaItem) => {
       observacoes: updated.observacoes,
       receptivo: updated.receptivo || "",
       status_faturamento: updated.statusFaturamento,
-    })
+      cor_manual: updated.corManual || null,
+    } as any)
     .eq("id", updated.id);
   
   if (error) throw error;

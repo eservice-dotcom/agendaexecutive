@@ -3,7 +3,8 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { AgendaItem, StatusFaturamento } from "@/data/agendaData";
-import { MapPin, Phone, User, Truck, MessageCircle, Pencil, Trash2, Circle, Send, CheckCircle2, Users, Copy } from "lucide-react";
+import { MapPin, Phone, User, Truck, MessageCircle, Pencil, Trash2, Circle, Send, CheckCircle2, Users, Copy, Palette, X } from "lucide-react";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import WhatsAppDialog from "./WhatsAppDialog";
 import WhatsAppFornecedorDialog from "./WhatsAppFornecedorDialog";
 import EditServicoDialog from "./EditServicoDialog";
@@ -43,6 +44,19 @@ const tipoRowColor = (tipo: string): string => {
   };
   return colors[tipo] || "bg-gray-100/40 dark:bg-gray-900/20";
 };
+
+const manualColorOptions = [
+  { value: "#dbeafe", label: "Azul" },
+  { value: "#dcfce7", label: "Verde" },
+  { value: "#fef9c3", label: "Amarelo" },
+  { value: "#fce7f3", label: "Rosa" },
+  { value: "#f3e8ff", label: "Lilás" },
+  { value: "#ffedd5", label: "Laranja" },
+  { value: "#e0f2fe", label: "Ciano" },
+  { value: "#f1f5f9", label: "Cinza" },
+  { value: "#fecaca", label: "Vermelho" },
+  { value: "#d1fae5", label: "Menta" },
+];
 
 const formatCurrency = (value: number) =>
   new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(value);
@@ -91,6 +105,15 @@ const AgendaTable = ({ items, onEdited }: AgendaTableProps) => {
     const next = order[(current + 1) % order.length];
     updateAgendaItem({ ...item, statusFaturamento: next });
     onEdited?.();
+  };
+
+  const handleColorChange = (item: AgendaItem, color: string | undefined) => {
+    updateAgendaItem({ ...item, corManual: color });
+    onEdited?.();
+  };
+
+  const getRowBg = (item: AgendaItem): string | undefined => {
+    return item.corManual || undefined;
   };
 
   const statusIcon = (status: StatusFaturamento) => {
@@ -154,7 +177,7 @@ const AgendaTable = ({ items, onEdited }: AgendaTableProps) => {
           <col style={{ width: '52px' }} />  {/* Receptivo */}
           <col style={{ width: '70px' }} />  {/* Observações */}
           <col style={{ width: '24px' }} />  {/* Fat. */}
-          <col style={{ width: '56px' }} />  {/* Ações */}
+          <col style={{ width: '68px' }} />  {/* Ações */}
         </colgroup>
         <TableHeader className="sticky top-0 z-30 bg-muted">
           <TableRow className="hover:bg-muted/50">
@@ -187,9 +210,9 @@ const AgendaTable = ({ items, onEdited }: AgendaTableProps) => {
         </TableHeader>
         <TableBody>
           {items.map((item, idx) => (
-            <TableRow key={item.id} className={`transition-colors hover:bg-primary/10 ${!item.motorista ? 'bg-blue-200 dark:bg-blue-900/40' : idx % 2 === 1 ? 'bg-yellow-50/60 dark:bg-yellow-900/10' : tipoRowColor(item.tipo)}`}>
-              <TableCell className={`px-0.5 py-0 font-mono text-[9px] truncate sticky left-0 z-10 ${tipoRowColor(item.tipo)}`}>{formatDate(item.data)}</TableCell>
-              <TableCell className={`px-0.5 py-0 font-mono text-[9px] font-medium truncate sticky left-[58px] z-10 ${tipoRowColor(item.tipo)}`}>{item.hora}</TableCell>
+            <TableRow key={item.id} className={`transition-colors hover:bg-primary/10 ${!item.corManual ? (!item.motorista ? 'bg-blue-200 dark:bg-blue-900/40' : idx % 2 === 1 ? 'bg-yellow-50/60 dark:bg-yellow-900/10' : tipoRowColor(item.tipo)) : ''}`} style={item.corManual ? { backgroundColor: item.corManual } : undefined}>
+              <TableCell className={`px-0.5 py-0 font-mono text-[9px] truncate sticky left-0 z-10`} style={item.corManual ? { backgroundColor: item.corManual } : undefined} >{formatDate(item.data)}</TableCell>
+              <TableCell className={`px-0.5 py-0 font-mono text-[9px] font-medium truncate sticky left-[58px] z-10`} style={item.corManual ? { backgroundColor: item.corManual } : undefined}>{item.hora}</TableCell>
               <TableCell className="px-0.5 py-0 font-medium text-[9px] truncate">{item.cliente}</TableCell>
               <TableCell className="px-0.5 py-0 text-center">
                 <span className="inline-flex h-4 w-4 items-center justify-center rounded-full bg-primary/10 text-[8px] font-bold text-primary">
@@ -330,6 +353,36 @@ const AgendaTable = ({ items, onEdited }: AgendaTableProps) => {
               </TableCell>
               <TableCell className="px-0.5 py-0 text-center">
                 <span className="flex items-center justify-center gap-0">
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="h-4 w-4 p-0"
+                        title="Mudar cor da linha"
+                      >
+                        <Palette className="h-2.5 w-2.5" style={item.corManual ? { color: item.corManual } : undefined} />
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-2" side="left">
+                      <div className="grid grid-cols-5 gap-1">
+                        {manualColorOptions.map((c) => (
+                          <button
+                            key={c.value}
+                            className="h-5 w-5 rounded border border-border hover:scale-110 transition-transform"
+                            style={{ backgroundColor: c.value }}
+                            title={c.label}
+                            onClick={() => handleColorChange(item, c.value)}
+                          />
+                        ))}
+                      </div>
+                      {item.corManual && (
+                        <Button variant="ghost" size="sm" className="w-full mt-1 h-5 text-[9px]" onClick={() => handleColorChange(item, undefined)}>
+                          <X className="h-2.5 w-2.5 mr-1" /> Remover cor
+                        </Button>
+                      )}
+                    </PopoverContent>
+                  </Popover>
                   <Button
                     variant="ghost"
                     size="sm"
