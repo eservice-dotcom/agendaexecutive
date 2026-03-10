@@ -190,7 +190,8 @@ export const saveFornecedor = async (item: Omit<Fornecedor, "id">) => {
     contato: item.contato,
     telefone: item.telefone,
     email: item.email,
-  });
+    pix: item.pix,
+  } as any);
   
   if (error) throw error;
 };

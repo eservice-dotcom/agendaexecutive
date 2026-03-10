@@ -103,6 +103,7 @@ const CadastroFornecedores = () => {
                   <TableCell className="text-sm">{item.contato}</TableCell>
                   <TableCell className="text-sm">{item.telefone}</TableCell>
                   <TableCell className="text-sm">{item.email}</TableCell>
+                  <TableCell className="text-sm">{item.pix}</TableCell>
                   <TableCell>
                     <Button variant="ghost" size="sm" className="h-7 w-7 p-0 text-destructive" onClick={() => handleDelete(item.id)}>
                       <Trash2 className="h-4 w-4" />
