@@ -299,6 +299,13 @@ export const getAgendaItems = async (): Promise<AgendaItem[]> => {
     receptivo: item.receptivo || "",
     statusFaturamento: (item.status_faturamento || "") as any,
     corManual: (item as any).cor_manual || undefined,
+    kmIn: Number((item as any).km_in) || 0,
+    kmFim: Number((item as any).km_fim) || 0,
+    kmExtra: Number((item as any).km_extra) || 0,
+    horaIn: (item as any).hora_in || "",
+    horaFim: (item as any).hora_fim || "",
+    estacionamento: Number((item as any).estacionamento) || 0,
+    outros: Number((item as any).outros) || 0,
   }));
 };
 
