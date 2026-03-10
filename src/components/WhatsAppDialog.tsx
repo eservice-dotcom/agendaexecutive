@@ -34,7 +34,8 @@ const replacePlaceholders = (texto: string, item: AgendaItem) => {
     .replace(/{cot}/g, item.cot)
     .replace(/{tipo}/g, item.tipo)
     .replace(/{voos}/g, voos)
-    .replace(/{passageiros}/g, passageiros);
+    .replace(/{passageiros}/g, passageiros)
+    .replace(/{observacoes}/g, item.observacoes || "—");
 };
 
 const buildConsolidatedMessage = (items: AgendaItem[]) => {
@@ -62,6 +63,9 @@ const buildConsolidatedMessage = (items: AgendaItem[]) => {
       msg += `✈️ Voo: ${voos}\n`;
       msg += `📍 Origem: ${item.origem}\n`;
       msg += `📍 Destino: ${item.destino}\n`;
+      if (item.observacoes) {
+        msg += `📝 Obs: ${item.observacoes}\n`;
+      }
     });
 
   msg += `\nQualquer dúvida, entre em contato.`;
