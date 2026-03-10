@@ -127,10 +127,10 @@ const AgendaTable = ({ items, onEdited }: AgendaTableProps) => {
       items={fornecedorWhatsapp?.items || []}
     />
     <EditServicoDialog open={!!editItem} onOpenChange={(v) => { if (!v) setEditItem(null); }} item={editItem} onSaved={() => onEdited?.()} />
-    <div className="overflow-auto rounded-lg border border-border bg-card shadow-sm">
+    <div className="overflow-auto rounded-lg border border-border bg-card shadow-sm max-h-[70vh]">
       <Table>
-        <TableHeader>
-          <TableRow className="bg-muted/50 hover:bg-muted/50">
+        <TableHeader className="sticky top-0 z-30 bg-muted">
+          <TableRow className="hover:bg-muted/50">
             <TableHead className="whitespace-nowrap font-semibold sticky left-0 z-20 bg-muted/95 backdrop-blur-sm">Data</TableHead>
             <TableHead className="whitespace-nowrap font-semibold sticky left-[85px] z-20 bg-muted/95 backdrop-blur-sm">Hora</TableHead>
             <TableHead className="whitespace-nowrap font-semibold">Cliente</TableHead>
