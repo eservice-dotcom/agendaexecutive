@@ -28,6 +28,13 @@ export interface AgendaItem {
   receptivo: string;
   statusFaturamento: StatusFaturamento;
   corManual?: string;
+  kmIn?: number;
+  kmFim?: number;
+  kmExtra?: number;
+  horaIn?: string;
+  horaFim?: string;
+  estacionamento?: number;
+  outros?: number;
 }
 
 export const tiposServicoDefault = ["Transfer In", "Transfer Out", "City Tour", "Translado", "Fretamento", "Coordenação", "Diária de 5h", "Diária de 10h", "Viagem", "Comissaria"];
