@@ -34,7 +34,8 @@ const replacePlaceholders = (texto: string, item: AgendaItem) => {
     .replace(/{cot}/g, item.cot)
     .replace(/{tipo}/g, item.tipo)
     .replace(/{voos}/g, voos)
-    .replace(/{passageiros}/g, passageiros);
+    .replace(/{passageiros}/g, passageiros)
+    .replace(/{observacoes}/g, item.observacoes || "—");
 };
 
 const buildConsolidatedMessage = (items: AgendaItem[]) => {
