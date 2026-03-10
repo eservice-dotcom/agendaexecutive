@@ -107,6 +107,15 @@ const AgendaTable = ({ items, onEdited }: AgendaTableProps) => {
     onEdited?.();
   };
 
+  const handleColorChange = (item: AgendaItem, color: string | undefined) => {
+    updateAgendaItem({ ...item, corManual: color });
+    onEdited?.();
+  };
+
+  const getRowBg = (item: AgendaItem): string | undefined => {
+    return item.corManual || undefined;
+  };
+
   const statusIcon = (status: StatusFaturamento) => {
     switch (status) {
       case "enviado": return <Send className="h-4 w-4 text-amber-500" />;
