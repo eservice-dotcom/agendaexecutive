@@ -193,6 +193,7 @@ const EditServicoDialog = ({ open, onOpenChange, item, onSaved }: EditServicoDia
         horaIn: form.horaIn || "",
         horaFim: form.horaFim || "",
         estacionamento: parseFloat(form.estacionamento) || 0,
+        horaExtra: form.horaExtra || "",
         outrosDespesas: outrosDespesas,
       });
 
