@@ -76,6 +76,17 @@ export const saveCliente = async (item: Omit<Cliente, "id">) => {
   if (error) throw error;
 };
 
+export const updateCliente = async (id: string, item: Omit<Cliente, "id">) => {
+  const { error } = await supabase.from("clientes").update({
+    nome: item.nome,
+    cnpj_cpf: item.cnpjCpf,
+    email: item.email,
+    telefone: item.telefone,
+    endereco: item.endereco,
+  }).eq("id", id);
+  if (error) throw error;
+};
+
 export const deleteCliente = async (id: string) => {
   const { error } = await supabase.from("clientes").delete().eq("id", id);
   if (error) throw error;
