@@ -282,6 +282,10 @@ const NovoServicoDialog = ({ open, onOpenChange, onSaved }: NovoServicoDialogPro
                 <Label>Outros (R$)</Label>
                 <Input type="number" min={0} step="0.01" value={form.outros} onChange={(e) => update("outros", e.target.value)} placeholder="0,00" />
               </div>
+              <div className="space-y-1.5 sm:col-span-2">
+                <Label>Descrição Outros</Label>
+                <Input value={form.outrosDescricao} onChange={(e) => update("outrosDescricao", e.target.value)} placeholder="Descreva a despesa..." />
+              </div>
             </div>
           </div>
         </div>
