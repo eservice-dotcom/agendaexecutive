@@ -128,33 +128,33 @@ const AgendaTable = ({ items, onEdited }: AgendaTableProps) => {
     />
     <EditServicoDialog open={!!editItem} onOpenChange={(v) => { if (!v) setEditItem(null); }} item={editItem} onSaved={() => onEdited?.()} />
     <div className="overflow-x-auto overflow-y-auto rounded-lg border border-border bg-card shadow-sm max-h-[70vh]">
-      <table className="w-full caption-bottom text-[11px]" style={{ tableLayout: 'fixed' }}>
+      <table className="w-full caption-bottom text-[9px]" style={{ tableLayout: 'fixed' }}>
         <colgroup>
-          <col style={{ width: '70px' }} />  {/* Data */}
-          <col style={{ width: '42px' }} />  {/* Hora */}
-          <col style={{ width: '90px' }} />  {/* Cliente */}
-          <col style={{ width: '32px' }} />  {/* PAX */}
-          <col style={{ width: '100px' }} /> {/* Passageiro */}
-          <col style={{ width: '48px' }} />  {/* Voo */}
-          <col style={{ width: '55px' }} />  {/* COT */}
-          <col style={{ width: '70px' }} />  {/* Tipo */}
-          <col style={{ width: '90px' }} />  {/* Origem */}
-          <col style={{ width: '90px' }} />  {/* Destino */}
-          <col style={{ width: '60px' }} />  {/* Placa */}
-          <col style={{ width: '80px' }} />  {/* Veículo */}
-          <col style={{ width: '80px' }} />  {/* Motorista */}
-          <col style={{ width: '100px' }} /> {/* Telefone */}
+          <col style={{ width: '58px' }} />  {/* Data */}
+          <col style={{ width: '34px' }} />  {/* Hora */}
+          <col style={{ width: '72px' }} />  {/* Cliente */}
+          <col style={{ width: '24px' }} />  {/* PAX */}
+          <col style={{ width: '80px' }} /> {/* Passageiro */}
+          <col style={{ width: '38px' }} />  {/* Voo */}
+          <col style={{ width: '42px' }} />  {/* COT */}
+          <col style={{ width: '58px' }} />  {/* Tipo */}
+          <col style={{ width: '72px' }} />  {/* Origem */}
+          <col style={{ width: '72px' }} />  {/* Destino */}
+          <col style={{ width: '50px' }} />  {/* Placa */}
+          <col style={{ width: '64px' }} />  {/* Veículo */}
+          <col style={{ width: '64px' }} />  {/* Motorista */}
+          <col style={{ width: '82px' }} /> {/* Telefone */}
           {canViewFinancials && (
             <>
-              <col style={{ width: '70px' }} />  {/* Valor */}
-              <col style={{ width: '80px' }} />  {/* Fornecedor */}
-              <col style={{ width: '70px' }} />  {/* Custo */}
+              <col style={{ width: '58px' }} />  {/* Valor */}
+              <col style={{ width: '64px' }} />  {/* Fornecedor */}
+              <col style={{ width: '58px' }} />  {/* Custo */}
             </>
           )}
-          <col style={{ width: '65px' }} />  {/* Receptivo */}
-          <col style={{ width: '90px' }} />  {/* Observações */}
-          <col style={{ width: '32px' }} />  {/* Fat. */}
-          <col style={{ width: '72px' }} />  {/* Ações */}
+          <col style={{ width: '52px' }} />  {/* Receptivo */}
+          <col style={{ width: '70px' }} />  {/* Observações */}
+          <col style={{ width: '24px' }} />  {/* Fat. */}
+          <col style={{ width: '56px' }} />  {/* Ações */}
         </colgroup>
         <TableHeader className="sticky top-0 z-30 bg-muted">
           <TableRow className="hover:bg-muted/50">
