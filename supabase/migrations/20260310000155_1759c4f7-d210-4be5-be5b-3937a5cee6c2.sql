@@ -1,0 +1,1 @@
+UPDATE agenda_items SET cot = regexp_replace(cot, '(-COPIA)+$', '-COPIA') WHERE cot LIKE '%-COPIA-COPIA%';
