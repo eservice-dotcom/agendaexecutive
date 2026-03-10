@@ -44,6 +44,13 @@ const EditServicoDialog = ({ open, onOpenChange, item, onSaved }: EditServicoDia
     observacoes: "",
     receptivo: "",
     statusFaturamento: "" as StatusFaturamento,
+    kmIn: "",
+    kmFim: "",
+    kmExtra: "",
+    horaIn: "",
+    horaFim: "",
+    estacionamento: "",
+    outros: "",
   });
   
   const [passageiros, setPassageiros] = useState<Passageiro[]>([]);
