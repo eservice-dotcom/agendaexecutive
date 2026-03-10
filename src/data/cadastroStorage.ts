@@ -340,8 +340,7 @@ export const saveAgendaItem = async (item: Omit<AgendaItem, "id">) => {
     hora_in: item.horaIn || null,
     hora_fim: item.horaFim || null,
     estacionamento: item.estacionamento || 0,
-    outros: item.outros || 0,
-    outros_descricao: item.outrosDescricao || "",
+    outros_despesas: item.outrosDespesas || [],
   } as any);
   
   if (error) throw error;
