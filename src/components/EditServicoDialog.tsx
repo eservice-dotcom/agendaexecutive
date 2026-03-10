@@ -44,6 +44,13 @@ const EditServicoDialog = ({ open, onOpenChange, item, onSaved }: EditServicoDia
     observacoes: "",
     receptivo: "",
     statusFaturamento: "" as StatusFaturamento,
+    kmIn: "",
+    kmFim: "",
+    kmExtra: "",
+    horaIn: "",
+    horaFim: "",
+    estacionamento: "",
+    outros: "",
   });
   
   const [passageiros, setPassageiros] = useState<Passageiro[]>([]);
@@ -87,6 +94,13 @@ const EditServicoDialog = ({ open, onOpenChange, item, onSaved }: EditServicoDia
         observacoes: item.observacoes || "",
         receptivo: item.receptivo || "",
         statusFaturamento: item.statusFaturamento || "",
+        kmIn: (item.kmIn || 0).toString(),
+        kmFim: (item.kmFim || 0).toString(),
+        kmExtra: (item.kmExtra || 0).toString(),
+        horaIn: item.horaIn || "",
+        horaFim: item.horaFim || "",
+        estacionamento: (item.estacionamento || 0).toString(),
+        outros: (item.outros || 0).toString(),
       });
       setPassageiros(item.passageiros || []);
     }
@@ -171,6 +185,13 @@ const EditServicoDialog = ({ open, onOpenChange, item, onSaved }: EditServicoDia
         observacoes: form.observacoes,
         receptivo: form.receptivo,
         statusFaturamento: form.statusFaturamento,
+        kmIn: parseFloat(form.kmIn) || 0,
+        kmFim: parseFloat(form.kmFim) || 0,
+        kmExtra: parseFloat(form.kmExtra) || 0,
+        horaIn: form.horaIn || "",
+        horaFim: form.horaFim || "",
+        estacionamento: parseFloat(form.estacionamento) || 0,
+        outros: parseFloat(form.outros) || 0,
       });
 
       toast.success("Serviço atualizado com sucesso!");
@@ -342,6 +363,41 @@ const EditServicoDialog = ({ open, onOpenChange, item, onSaved }: EditServicoDia
                 ))}
               </SelectContent>
             </Select>
+          </div>
+
+          {/* Fechamento */}
+          <div className="sm:col-span-2 border-t pt-3 mt-2">
+            <p className="text-sm font-semibold text-muted-foreground mb-3">Fechamento</p>
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+              <div className="space-y-1.5">
+                <Label>KM Início</Label>
+                <Input type="number" min={0} value={form.kmIn} onChange={(e) => update("kmIn", e.target.value)} placeholder="0" />
+              </div>
+              <div className="space-y-1.5">
+                <Label>KM Fim</Label>
+                <Input type="number" min={0} value={form.kmFim} onChange={(e) => update("kmFim", e.target.value)} placeholder="0" />
+              </div>
+              <div className="space-y-1.5">
+                <Label>KM Extra</Label>
+                <Input type="number" min={0} value={form.kmExtra} onChange={(e) => update("kmExtra", e.target.value)} placeholder="0" />
+              </div>
+              <div className="space-y-1.5">
+                <Label>Hora Início</Label>
+                <Input type="time" value={form.horaIn} onChange={(e) => update("horaIn", e.target.value)} />
+              </div>
+              <div className="space-y-1.5">
+                <Label>Hora Fim</Label>
+                <Input type="time" value={form.horaFim} onChange={(e) => update("horaFim", e.target.value)} />
+              </div>
+              <div className="space-y-1.5">
+                <Label>Estacionamento (R$)</Label>
+                <Input type="number" min={0} step="0.01" value={form.estacionamento} onChange={(e) => update("estacionamento", e.target.value)} placeholder="0,00" />
+              </div>
+              <div className="space-y-1.5">
+                <Label>Outros (R$)</Label>
+                <Input type="number" min={0} step="0.01" value={form.outros} onChange={(e) => update("outros", e.target.value)} placeholder="0,00" />
+              </div>
+            </div>
           </div>
         </div>
 

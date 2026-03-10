@@ -299,6 +299,13 @@ export const getAgendaItems = async (): Promise<AgendaItem[]> => {
     receptivo: item.receptivo || "",
     statusFaturamento: (item.status_faturamento || "") as any,
     corManual: (item as any).cor_manual || undefined,
+    kmIn: Number((item as any).km_in) || 0,
+    kmFim: Number((item as any).km_fim) || 0,
+    kmExtra: Number((item as any).km_extra) || 0,
+    horaIn: (item as any).hora_in || "",
+    horaFim: (item as any).hora_fim || "",
+    estacionamento: Number((item as any).estacionamento) || 0,
+    outros: Number((item as any).outros) || 0,
   }));
 };
 
@@ -327,7 +334,14 @@ export const saveAgendaItem = async (item: Omit<AgendaItem, "id">) => {
     observacoes: item.observacoes,
     receptivo: item.receptivo || "",
     status_faturamento: item.statusFaturamento,
-  });
+    km_in: item.kmIn || 0,
+    km_fim: item.kmFim || 0,
+    km_extra: item.kmExtra || 0,
+    hora_in: item.horaIn || null,
+    hora_fim: item.horaFim || null,
+    estacionamento: item.estacionamento || 0,
+    outros: item.outros || 0,
+  } as any);
   
   if (error) throw error;
 };
@@ -356,6 +370,13 @@ export const updateAgendaItem = async (updated: AgendaItem) => {
       receptivo: updated.receptivo || "",
       status_faturamento: updated.statusFaturamento,
       cor_manual: updated.corManual || null,
+      km_in: updated.kmIn || 0,
+      km_fim: updated.kmFim || 0,
+      km_extra: updated.kmExtra || 0,
+      hora_in: updated.horaIn || null,
+      hora_fim: updated.horaFim || null,
+      estacionamento: updated.estacionamento || 0,
+      outros: updated.outros || 0,
     } as any)
     .eq("id", updated.id);
   
