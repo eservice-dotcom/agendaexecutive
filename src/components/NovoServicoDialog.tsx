@@ -119,9 +119,9 @@ const NovoServicoDialog = ({ open, onOpenChange, onSaved }: NovoServicoDialogPro
         origem: "", destino: "", veiculoId: "", motoristaId: "", valor: "",
         fornecedorId: "", custo: "", observacoes: "", receptivo: "",
         kmIn: "", kmFim: "", kmExtra: "", horaIn: "", horaFim: "",
-        estacionamento: "", outros: "", outrosDescricao: "",
+        estacionamento: "",
       });
-      setPassageiros([]);
+      setOutrosDespesas([]);
       onOpenChange(false);
       onSaved();
     } catch (error) {
