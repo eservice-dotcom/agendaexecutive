@@ -73,6 +73,7 @@ const CadastroFornecedores = () => {
               <div><Label>Telefone</Label><Input value={form.telefone} onChange={(e) => setForm({ ...form, telefone: e.target.value })} /></div>
               <div><Label>Email</Label><Input type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} /></div>
             </div>
+            <div><Label>PIX</Label><Input value={form.pix} onChange={(e) => setForm({ ...form, pix: e.target.value })} placeholder="Chave PIX (CPF, CNPJ, e-mail, telefone ou aleatória)" /></div>
             <Button onClick={handleSave}>Salvar</Button>
           </div>
         </DialogContent>
