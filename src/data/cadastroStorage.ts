@@ -341,6 +341,7 @@ export const saveAgendaItem = async (item: Omit<AgendaItem, "id">) => {
     hora_in: item.horaIn || null,
     hora_fim: item.horaFim || null,
     estacionamento: item.estacionamento || 0,
+    hora_extra: item.horaExtra || "",
     outros_despesas: item.outrosDespesas || [],
   } as any);
   
