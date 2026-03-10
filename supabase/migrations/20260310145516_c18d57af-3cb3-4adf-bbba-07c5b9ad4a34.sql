@@ -1,0 +1,1 @@
+ALTER TABLE public.agenda_items ADD COLUMN cor_manual TEXT DEFAULT NULL;

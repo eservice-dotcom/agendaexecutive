@@ -17,6 +17,7 @@ export type Database = {
       agenda_items: {
         Row: {
           cliente: string
+          cor_manual: string | null
           cot: string
           created_at: string
           custo: number
@@ -42,6 +43,7 @@ export type Database = {
         }
         Insert: {
           cliente: string
+          cor_manual?: string | null
           cot: string
           created_at?: string
           custo: number
@@ -67,6 +69,7 @@ export type Database = {
         }
         Update: {
           cliente?: string
+          cor_manual?: string | null
           cot?: string
           created_at?: string
           custo?: number
