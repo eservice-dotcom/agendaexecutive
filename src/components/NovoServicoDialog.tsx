@@ -46,6 +46,7 @@ const NovoServicoDialog = ({ open, onOpenChange, onSaved }: NovoServicoDialogPro
     horaIn: "",
     horaFim: "",
     estacionamento: "",
+    horaExtra: "",
   });
   
   const [passageiros, setPassageiros] = useState<Passageiro[]>([]);
