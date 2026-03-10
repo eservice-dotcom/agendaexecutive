@@ -11,7 +11,7 @@ import { toast } from "sonner";
 const CadastroFornecedores = () => {
   const [items, setItems] = useState<Fornecedor[]>([]);
   const [open, setOpen] = useState(false);
-  const [form, setForm] = useState({ razaoSocial: "", cnpj: "", contato: "", telefone: "", email: "" });
+  const [form, setForm] = useState({ razaoSocial: "", cnpj: "", contato: "", telefone: "", email: "", pix: "" });
 
   const refresh = async () => {
     const data = await getFornecedores();
