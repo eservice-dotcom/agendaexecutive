@@ -139,6 +139,17 @@ export const saveMotorista = async (item: Omit<Motorista, "id">) => {
   if (error) throw error;
 };
 
+export const updateMotorista = async (id: string, item: Omit<Motorista, "id">) => {
+  const { error } = await supabase.from("motoristas").update({
+    nome: item.nome,
+    cnh: item.cnh,
+    telefone: item.telefone,
+    email: item.email,
+    categoria: item.categoria,
+  }).eq("id", id);
+  if (error) throw error;
+};
+
 export const deleteMotorista = async (id: string) => {
   const { error } = await supabase.from("motoristas").delete().eq("id", id);
   if (error) throw error;
