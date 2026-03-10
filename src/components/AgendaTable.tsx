@@ -353,6 +353,36 @@ const AgendaTable = ({ items, onEdited }: AgendaTableProps) => {
               </TableCell>
               <TableCell className="px-0.5 py-0 text-center">
                 <span className="flex items-center justify-center gap-0">
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="h-4 w-4 p-0"
+                        title="Mudar cor da linha"
+                      >
+                        <Palette className="h-2.5 w-2.5" style={item.corManual ? { color: item.corManual } : undefined} />
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-2" side="left">
+                      <div className="grid grid-cols-5 gap-1">
+                        {manualColorOptions.map((c) => (
+                          <button
+                            key={c.value}
+                            className="h-5 w-5 rounded border border-border hover:scale-110 transition-transform"
+                            style={{ backgroundColor: c.value }}
+                            title={c.label}
+                            onClick={() => handleColorChange(item, c.value)}
+                          />
+                        ))}
+                      </div>
+                      {item.corManual && (
+                        <Button variant="ghost" size="sm" className="w-full mt-1 h-5 text-[9px]" onClick={() => handleColorChange(item, undefined)}>
+                          <X className="h-2.5 w-2.5 mr-1" /> Remover cor
+                        </Button>
+                      )}
+                    </PopoverContent>
+                  </Popover>
                   <Button
                     variant="ghost"
                     size="sm"
