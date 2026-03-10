@@ -177,7 +177,7 @@ const AgendaTable = ({ items, onEdited }: AgendaTableProps) => {
           <col style={{ width: '52px' }} />  {/* Receptivo */}
           <col style={{ width: '70px' }} />  {/* Observações */}
           <col style={{ width: '24px' }} />  {/* Fat. */}
-          <col style={{ width: '56px' }} />  {/* Ações */}
+          <col style={{ width: '68px' }} />  {/* Ações */}
         </colgroup>
         <TableHeader className="sticky top-0 z-30 bg-muted">
           <TableRow className="hover:bg-muted/50">
