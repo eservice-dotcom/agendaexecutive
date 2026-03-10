@@ -23,12 +23,19 @@ export type Database = {
           custo: number
           data: string
           destino: string
+          estacionamento: number | null
           fornecedor: string
           hora: string
+          hora_fim: string | null
+          hora_in: string | null
           id: string
+          km_extra: number | null
+          km_fim: number | null
+          km_in: number | null
           motorista: string
           observacoes: string | null
           origem: string
+          outros: number | null
           passageiros: Json
           pax: number
           placa: string
@@ -49,12 +56,19 @@ export type Database = {
           custo: number
           data: string
           destino: string
+          estacionamento?: number | null
           fornecedor: string
           hora: string
+          hora_fim?: string | null
+          hora_in?: string | null
           id?: string
+          km_extra?: number | null
+          km_fim?: number | null
+          km_in?: number | null
           motorista: string
           observacoes?: string | null
           origem: string
+          outros?: number | null
           passageiros?: Json
           pax: number
           placa: string
@@ -75,12 +89,19 @@ export type Database = {
           custo?: number
           data?: string
           destino?: string
+          estacionamento?: number | null
           fornecedor?: string
           hora?: string
+          hora_fim?: string | null
+          hora_in?: string | null
           id?: string
+          km_extra?: number | null
+          km_fim?: number | null
+          km_in?: number | null
           motorista?: string
           observacoes?: string | null
           origem?: string
+          outros?: number | null
           passageiros?: Json
           pax?: number
           placa?: string
