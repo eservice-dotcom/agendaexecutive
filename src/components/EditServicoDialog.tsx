@@ -51,6 +51,7 @@ const EditServicoDialog = ({ open, onOpenChange, item, onSaved }: EditServicoDia
     horaFim: "",
     estacionamento: "",
     outros: "",
+    outrosDescricao: "",
   });
   
   const [passageiros, setPassageiros] = useState<Passageiro[]>([]);
@@ -101,6 +102,7 @@ const EditServicoDialog = ({ open, onOpenChange, item, onSaved }: EditServicoDia
         horaFim: item.horaFim || "",
         estacionamento: (item.estacionamento || 0).toString(),
         outros: (item.outros || 0).toString(),
+        outrosDescricao: item.outrosDescricao || "",
       });
       setPassageiros(item.passageiros || []);
     }
@@ -192,6 +194,7 @@ const EditServicoDialog = ({ open, onOpenChange, item, onSaved }: EditServicoDia
         horaFim: form.horaFim || "",
         estacionamento: parseFloat(form.estacionamento) || 0,
         outros: parseFloat(form.outros) || 0,
+        outrosDescricao: form.outrosDescricao,
       });
 
       toast.success("Serviço atualizado com sucesso!");
@@ -396,6 +399,10 @@ const EditServicoDialog = ({ open, onOpenChange, item, onSaved }: EditServicoDia
               <div className="space-y-1.5">
                 <Label>Outros (R$)</Label>
                 <Input type="number" min={0} step="0.01" value={form.outros} onChange={(e) => update("outros", e.target.value)} placeholder="0,00" />
+              </div>
+              <div className="space-y-1.5 sm:col-span-2">
+                <Label>Descrição Outros</Label>
+                <Input value={form.outrosDescricao} onChange={(e) => update("outrosDescricao", e.target.value)} placeholder="Descreva a despesa..." />
               </div>
             </div>
           </div>
