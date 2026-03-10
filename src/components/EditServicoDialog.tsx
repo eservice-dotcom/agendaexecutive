@@ -102,6 +102,7 @@ const EditServicoDialog = ({ open, onOpenChange, item, onSaved }: EditServicoDia
         horaFim: item.horaFim || "",
         estacionamento: (item.estacionamento || 0).toString(),
         outros: (item.outros || 0).toString(),
+        outrosDescricao: item.outrosDescricao || "",
       });
       setPassageiros(item.passageiros || []);
     }
