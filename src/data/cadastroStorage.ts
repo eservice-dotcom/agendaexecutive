@@ -378,6 +378,7 @@ export const updateAgendaItem = async (updated: AgendaItem) => {
       hora_in: updated.horaIn || null,
       hora_fim: updated.horaFim || null,
       estacionamento: updated.estacionamento || 0,
+      hora_extra: updated.horaExtra || "",
       outros_despesas: updated.outrosDespesas || [],
     } as any)
     .eq("id", updated.id);

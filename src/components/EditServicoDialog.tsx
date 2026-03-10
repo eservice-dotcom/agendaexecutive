@@ -396,6 +396,10 @@ const EditServicoDialog = ({ open, onOpenChange, item, onSaved }: EditServicoDia
                 <Label>Estacionamento (R$)</Label>
                 <Input type="number" min={0} step="0.01" value={form.estacionamento} onChange={(e) => update("estacionamento", e.target.value)} placeholder="0,00" />
               </div>
+              <div className="space-y-1.5">
+                <Label>Hora Extra</Label>
+                <Input type="time" value={form.horaExtra} onChange={(e) => update("horaExtra", e.target.value)} />
+              </div>
               {/* Outras Despesas */}
               <div className="sm:col-span-4 space-y-2">
                 <div className="flex items-center justify-between">
