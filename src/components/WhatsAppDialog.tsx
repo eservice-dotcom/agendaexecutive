@@ -63,6 +63,9 @@ const buildConsolidatedMessage = (items: AgendaItem[]) => {
       msg += `✈️ Voo: ${voos}\n`;
       msg += `📍 Origem: ${item.origem}\n`;
       msg += `📍 Destino: ${item.destino}\n`;
+      if (item.observacoes) {
+        msg += `📝 Obs: ${item.observacoes}\n`;
+      }
     });
 
   msg += `\nQualquer dúvida, entre em contato.`;
