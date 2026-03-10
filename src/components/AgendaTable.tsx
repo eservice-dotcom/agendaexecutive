@@ -128,7 +128,7 @@ const AgendaTable = ({ items, onEdited }: AgendaTableProps) => {
     />
     <EditServicoDialog open={!!editItem} onOpenChange={(v) => { if (!v) setEditItem(null); }} item={editItem} onSaved={() => onEdited?.()} />
     <div className="overflow-x-scroll overflow-y-auto rounded-lg border border-border bg-card shadow-sm max-h-[70vh]">
-      <Table>
+      <table className="w-full caption-bottom text-sm">
         <TableHeader className="sticky top-0 z-30 bg-muted">
           <TableRow className="hover:bg-muted/50">
             <TableHead className="whitespace-nowrap font-semibold sticky left-0 z-20 bg-muted/95 backdrop-blur-sm">Data</TableHead>
@@ -335,7 +335,7 @@ const AgendaTable = ({ items, onEdited }: AgendaTableProps) => {
             </TableRow>
           ))}
         </TableBody>
-      </Table>
+      </table>
     </div>
     <AlertDialog open={!!deleteItemId} onOpenChange={(v) => { if (!v) setDeleteItemId(null); }}>
       <AlertDialogContent>
