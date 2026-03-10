@@ -334,7 +334,14 @@ export const saveAgendaItem = async (item: Omit<AgendaItem, "id">) => {
     observacoes: item.observacoes,
     receptivo: item.receptivo || "",
     status_faturamento: item.statusFaturamento,
-  });
+    km_in: item.kmIn || 0,
+    km_fim: item.kmFim || 0,
+    km_extra: item.kmExtra || 0,
+    hora_in: item.horaIn || null,
+    hora_fim: item.horaFim || null,
+    estacionamento: item.estacionamento || 0,
+    outros: item.outros || 0,
+  } as any);
   
   if (error) throw error;
 };
