@@ -210,9 +210,9 @@ const AgendaTable = ({ items, onEdited }: AgendaTableProps) => {
         </TableHeader>
         <TableBody>
           {items.map((item, idx) => (
-            <TableRow key={item.id} className={`transition-colors hover:bg-primary/10 ${!item.motorista ? 'bg-blue-200 dark:bg-blue-900/40' : idx % 2 === 1 ? 'bg-yellow-50/60 dark:bg-yellow-900/10' : tipoRowColor(item.tipo)}`}>
-              <TableCell className={`px-0.5 py-0 font-mono text-[9px] truncate sticky left-0 z-10 ${tipoRowColor(item.tipo)}`}>{formatDate(item.data)}</TableCell>
-              <TableCell className={`px-0.5 py-0 font-mono text-[9px] font-medium truncate sticky left-[58px] z-10 ${tipoRowColor(item.tipo)}`}>{item.hora}</TableCell>
+            <TableRow key={item.id} className={`transition-colors hover:bg-primary/10 ${!item.corManual ? (!item.motorista ? 'bg-blue-200 dark:bg-blue-900/40' : idx % 2 === 1 ? 'bg-yellow-50/60 dark:bg-yellow-900/10' : tipoRowColor(item.tipo)) : ''}`} style={item.corManual ? { backgroundColor: item.corManual } : undefined}>
+              <TableCell className={`px-0.5 py-0 font-mono text-[9px] truncate sticky left-0 z-10`} style={item.corManual ? { backgroundColor: item.corManual } : undefined} >{formatDate(item.data)}</TableCell>
+              <TableCell className={`px-0.5 py-0 font-mono text-[9px] font-medium truncate sticky left-[58px] z-10`} style={item.corManual ? { backgroundColor: item.corManual } : undefined}>{item.hora}</TableCell>
               <TableCell className="px-0.5 py-0 font-medium text-[9px] truncate">{item.cliente}</TableCell>
               <TableCell className="px-0.5 py-0 text-center">
                 <span className="inline-flex h-4 w-4 items-center justify-center rounded-full bg-primary/10 text-[8px] font-bold text-primary">
