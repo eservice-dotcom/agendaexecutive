@@ -104,6 +104,13 @@ const NovoServicoDialog = ({ open, onOpenChange, onSaved }: NovoServicoDialogPro
         observacoes: form.observacoes,
         receptivo: form.receptivo,
         statusFaturamento: "",
+        kmIn: parseFloat(form.kmIn) || 0,
+        kmFim: parseFloat(form.kmFim) || 0,
+        kmExtra: parseFloat(form.kmExtra) || 0,
+        horaIn: form.horaIn || "",
+        horaFim: form.horaFim || "",
+        estacionamento: parseFloat(form.estacionamento) || 0,
+        outros: parseFloat(form.outros) || 0,
       });
 
       toast.success("Serviço adicionado com sucesso!");
