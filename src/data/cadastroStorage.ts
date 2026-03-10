@@ -175,6 +175,7 @@ export const getFornecedores = async (): Promise<Fornecedor[]> => {
     contato: item.contato,
     telefone: item.telefone,
     email: item.email,
+    pix: (item as any).pix || "",
   }));
 };
 
