@@ -111,6 +111,7 @@ const NovoServicoDialog = ({ open, onOpenChange, onSaved }: NovoServicoDialogPro
         horaIn: form.horaIn || "",
         horaFim: form.horaFim || "",
         estacionamento: parseFloat(form.estacionamento) || 0,
+        horaExtra: form.horaExtra || "",
         outrosDespesas: outrosDespesas,
       });
 
