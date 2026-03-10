@@ -6,6 +6,11 @@ export interface Passageiro {
   telefone?: string;
 }
 
+export interface OutraDespesa {
+  descricao: string;
+  valor: number;
+}
+
 export interface AgendaItem {
   id: string;
   data: string;
@@ -34,8 +39,7 @@ export interface AgendaItem {
   horaIn?: string;
   horaFim?: string;
   estacionamento?: number;
-  outros?: number;
-  outrosDescricao?: string;
+  outrosDespesas?: OutraDespesa[];
 }
 
 export const tiposServicoDefault = ["Transfer In", "Transfer Out", "City Tour", "Translado", "Fretamento", "Coordenação", "Diária de 5h", "Diária de 10h", "Viagem", "Comissaria"];

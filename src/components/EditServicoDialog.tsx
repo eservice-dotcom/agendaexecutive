@@ -4,10 +4,10 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { AgendaItem, statusFaturamentoOptions, StatusFaturamento, Passageiro } from "@/data/agendaData";
+import { AgendaItem, statusFaturamentoOptions, StatusFaturamento, Passageiro, OutraDespesa } from "@/data/agendaData";
 import { updateAgendaItem, getTiposServico, getVeiculos, getMotoristas, getClientes, getFornecedores, Veiculo, Motorista, Cliente, Fornecedor } from "@/data/cadastroStorage";
 import { toast } from "sonner";
-import { Pencil } from "lucide-react";
+import { Pencil, Plus, Trash2 } from "lucide-react";
 import PassageirosInput from "./PassageirosInput";
 import { TooltipProvider } from "@/components/ui/tooltip";
 
@@ -50,11 +50,10 @@ const EditServicoDialog = ({ open, onOpenChange, item, onSaved }: EditServicoDia
     horaIn: "",
     horaFim: "",
     estacionamento: "",
-    outros: "",
-    outrosDescricao: "",
   });
   
   const [passageiros, setPassageiros] = useState<Passageiro[]>([]);
+  const [outrosDespesas, setOutrosDespesas] = useState<OutraDespesa[]>([]);
 
   useEffect(() => {
     if (open) {
@@ -101,10 +100,9 @@ const EditServicoDialog = ({ open, onOpenChange, item, onSaved }: EditServicoDia
         horaIn: item.horaIn || "",
         horaFim: item.horaFim || "",
         estacionamento: (item.estacionamento || 0).toString(),
-        outros: (item.outros || 0).toString(),
-        outrosDescricao: item.outrosDescricao || "",
       });
       setPassageiros(item.passageiros || []);
+      setOutrosDespesas(item.outrosDespesas || []);
     }
   }, [item, open]);
 
@@ -193,8 +191,7 @@ const EditServicoDialog = ({ open, onOpenChange, item, onSaved }: EditServicoDia
         horaIn: form.horaIn || "",
         horaFim: form.horaFim || "",
         estacionamento: parseFloat(form.estacionamento) || 0,
-        outros: parseFloat(form.outros) || 0,
-        outrosDescricao: form.outrosDescricao,
+        outrosDespesas: outrosDespesas,
       });
 
       toast.success("Serviço atualizado com sucesso!");
@@ -396,13 +393,34 @@ const EditServicoDialog = ({ open, onOpenChange, item, onSaved }: EditServicoDia
                 <Label>Estacionamento (R$)</Label>
                 <Input type="number" min={0} step="0.01" value={form.estacionamento} onChange={(e) => update("estacionamento", e.target.value)} placeholder="0,00" />
               </div>
-              <div className="space-y-1.5">
-                <Label>Outros (R$)</Label>
-                <Input type="number" min={0} step="0.01" value={form.outros} onChange={(e) => update("outros", e.target.value)} placeholder="0,00" />
-              </div>
-              <div className="space-y-1.5 sm:col-span-2">
-                <Label>Descrição Outros</Label>
-                <Input value={form.outrosDescricao} onChange={(e) => update("outrosDescricao", e.target.value)} placeholder="Descreva a despesa..." />
+              {/* Outras Despesas */}
+              <div className="sm:col-span-4 space-y-2">
+                <div className="flex items-center justify-between">
+                  <Label>Outras Despesas</Label>
+                  <Button type="button" variant="outline" size="sm" onClick={() => setOutrosDespesas([...outrosDespesas, { descricao: "", valor: 0 }])} className="gap-1 h-7 text-xs">
+                    <Plus className="h-3 w-3" /> Adicionar
+                  </Button>
+                </div>
+                {outrosDespesas.map((d, idx) => (
+                  <div key={idx} className="flex items-center gap-2">
+                    <Input
+                      value={d.descricao}
+                      onChange={(e) => { const arr = [...outrosDespesas]; arr[idx] = { ...arr[idx], descricao: e.target.value }; setOutrosDespesas(arr); }}
+                      placeholder="Descrição da despesa"
+                      className="flex-1"
+                    />
+                    <Input
+                      type="number" min={0} step="0.01"
+                      value={d.valor || ""}
+                      onChange={(e) => { const arr = [...outrosDespesas]; arr[idx] = { ...arr[idx], valor: parseFloat(e.target.value) || 0 }; setOutrosDespesas(arr); }}
+                      placeholder="R$ 0,00"
+                      className="w-28"
+                    />
+                    <Button type="button" variant="ghost" size="icon" className="h-8 w-8 text-destructive" onClick={() => setOutrosDespesas(outrosDespesas.filter((_, i) => i !== idx))}>
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </div>
+                ))}
               </div>
             </div>
           </div>

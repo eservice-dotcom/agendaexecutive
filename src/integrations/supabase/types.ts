@@ -37,6 +37,7 @@ export type Database = {
           origem: string
           outros: number | null
           outros_descricao: string | null
+          outros_despesas: Json | null
           passageiros: Json
           pax: number
           placa: string
@@ -71,6 +72,7 @@ export type Database = {
           origem: string
           outros?: number | null
           outros_descricao?: string | null
+          outros_despesas?: Json | null
           passageiros?: Json
           pax: number
           placa: string
@@ -105,6 +107,7 @@ export type Database = {
           origem?: string
           outros?: number | null
           outros_descricao?: string | null
+          outros_despesas?: Json | null
           passageiros?: Json
           pax?: number
           placa?: string

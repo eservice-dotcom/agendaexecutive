@@ -305,8 +305,7 @@ export const getAgendaItems = async (): Promise<AgendaItem[]> => {
     horaIn: (item as any).hora_in || "",
     horaFim: (item as any).hora_fim || "",
     estacionamento: Number((item as any).estacionamento) || 0,
-    outros: Number((item as any).outros) || 0,
-    outrosDescricao: (item as any).outros_descricao || "",
+    outrosDespesas: ((item as any).outros_despesas || []) as { descricao: string; valor: number }[],
   }));
 };
 
@@ -341,8 +340,7 @@ export const saveAgendaItem = async (item: Omit<AgendaItem, "id">) => {
     hora_in: item.horaIn || null,
     hora_fim: item.horaFim || null,
     estacionamento: item.estacionamento || 0,
-    outros: item.outros || 0,
-    outros_descricao: item.outrosDescricao || "",
+    outros_despesas: item.outrosDespesas || [],
   } as any);
   
   if (error) throw error;
@@ -378,8 +376,7 @@ export const updateAgendaItem = async (updated: AgendaItem) => {
       hora_in: updated.horaIn || null,
       hora_fim: updated.horaFim || null,
       estacionamento: updated.estacionamento || 0,
-      outros: updated.outros || 0,
-      outros_descricao: updated.outrosDescricao || "",
+      outros_despesas: updated.outrosDespesas || [],
     } as any)
     .eq("id", updated.id);
   
