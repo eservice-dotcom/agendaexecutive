@@ -26,6 +26,7 @@ export type Database = {
           estacionamento: number | null
           fornecedor: string
           hora: string
+          hora_extra: string | null
           hora_fim: string | null
           hora_in: string | null
           id: string
@@ -61,6 +62,7 @@ export type Database = {
           estacionamento?: number | null
           fornecedor: string
           hora: string
+          hora_extra?: string | null
           hora_fim?: string | null
           hora_in?: string | null
           id?: string
@@ -96,6 +98,7 @@ export type Database = {
           estacionamento?: number | null
           fornecedor?: string
           hora?: string
+          hora_extra?: string | null
           hora_fim?: string | null
           hora_in?: string | null
           id?: string
