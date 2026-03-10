@@ -188,24 +188,24 @@ const AgendaTable = ({ items, onEdited }: AgendaTableProps) => {
         <TableBody>
           {items.map((item, idx) => (
             <TableRow key={item.id} className={`transition-colors hover:bg-primary/10 ${!item.motorista ? 'bg-blue-200 dark:bg-blue-900/40' : idx % 2 === 1 ? 'bg-yellow-50/60 dark:bg-yellow-900/10' : tipoRowColor(item.tipo)}`}>
-              <TableCell className={`whitespace-nowrap font-mono text-sm sticky left-0 z-10 ${tipoRowColor(item.tipo)}`}>{formatDate(item.data)}</TableCell>
-              <TableCell className={`whitespace-nowrap font-mono text-sm font-medium sticky left-[85px] z-10 ${tipoRowColor(item.tipo)}`}>{item.hora}</TableCell>
-              <TableCell className="whitespace-nowrap font-medium">{item.cliente}</TableCell>
-              <TableCell className="text-center">
-                <span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-primary/10 text-xs font-bold text-primary">
+              <TableCell className={`px-1 py-0.5 font-mono text-[11px] truncate sticky left-0 z-10 ${tipoRowColor(item.tipo)}`}>{formatDate(item.data)}</TableCell>
+              <TableCell className={`px-1 py-0.5 font-mono text-[11px] font-medium truncate sticky left-[70px] z-10 ${tipoRowColor(item.tipo)}`}>{item.hora}</TableCell>
+              <TableCell className="px-1 py-0.5 font-medium text-[11px] truncate">{item.cliente}</TableCell>
+              <TableCell className="px-1 py-0.5 text-center">
+                <span className="inline-flex h-5 w-5 items-center justify-center rounded-full bg-primary/10 text-[10px] font-bold text-primary">
                   {item.pax}
                 </span>
               </TableCell>
-              <TableCell className="max-w-[180px]">
+              <TableCell className="px-1 py-0.5 truncate">
                 {item.passageiros.length > 0 ? (
                   <TooltipProvider>
                     <Tooltip>
                       <TooltipTrigger asChild>
-                        <div className="flex items-center gap-1 cursor-help">
+                        <div className="flex items-center gap-0.5 cursor-help">
                           <User className="h-3 w-3 text-muted-foreground shrink-0" />
-                          <span className="truncate text-sm">{item.passageiros[0].nome}</span>
+                          <span className="truncate text-[11px]">{item.passageiros[0].nome}</span>
                           {item.passageiros.length > 1 && (
-                            <Badge variant="secondary" className="ml-1 h-5 px-1.5 text-xs">
+                            <Badge variant="secondary" className="ml-0.5 h-4 px-1 text-[9px]">
                               +{item.passageiros.length - 1}
                             </Badge>
                           )}
@@ -223,71 +223,71 @@ const AgendaTable = ({ items, onEdited }: AgendaTableProps) => {
                     </Tooltip>
                   </TooltipProvider>
                 ) : (
-                  <span className="text-muted-foreground text-sm">—</span>
+                  <span className="text-muted-foreground text-[11px]">—</span>
                 )}
               </TableCell>
-              <TableCell className="whitespace-nowrap font-mono text-xs text-muted-foreground">
+              <TableCell className="px-1 py-0.5 font-mono text-[10px] text-muted-foreground truncate">
                 {item.passageiros.length > 0 ? item.passageiros[0].voo : "—"}
               </TableCell>
-              <TableCell className="whitespace-nowrap font-mono text-xs text-muted-foreground">{item.cot}</TableCell>
-              <TableCell>
-                <Badge variant={tipoBadgeVariant(item.tipo) as any} className="whitespace-nowrap text-xs">
+              <TableCell className="px-1 py-0.5 font-mono text-[10px] text-muted-foreground truncate">{item.cot}</TableCell>
+              <TableCell className="px-1 py-0.5">
+                <Badge variant={tipoBadgeVariant(item.tipo) as any} className="text-[9px] px-1 py-0">
                   {item.tipo}
                 </Badge>
               </TableCell>
-              <TableCell className="max-w-[160px] truncate text-sm" title={item.origem}>
-                <span className="flex items-center gap-1">
-                  <MapPin className="h-3 w-3 shrink-0 text-accent" />
-                  {item.origem}
+              <TableCell className="px-1 py-0.5 truncate text-[11px]" title={item.origem}>
+                <span className="flex items-center gap-0.5">
+                  <MapPin className="h-2.5 w-2.5 shrink-0 text-accent" />
+                  <span className="truncate">{item.origem}</span>
                 </span>
               </TableCell>
-              <TableCell className="max-w-[160px] truncate text-sm" title={item.destino}>
-                <span className="flex items-center gap-1">
-                  <MapPin className="h-3 w-3 shrink-0 text-destructive" />
-                  {item.destino}
+              <TableCell className="px-1 py-0.5 truncate text-[11px]" title={item.destino}>
+                <span className="flex items-center gap-0.5">
+                  <MapPin className="h-2.5 w-2.5 shrink-0 text-destructive" />
+                  <span className="truncate">{item.destino}</span>
                 </span>
               </TableCell>
-              <TableCell className="whitespace-nowrap font-mono text-xs">{item.placa}</TableCell>
-              <TableCell className="whitespace-nowrap text-sm">
-                <span className="flex items-center gap-1">
-                  <Truck className="h-3 w-3 text-muted-foreground" />
-                  {item.veiculo}
+              <TableCell className="px-1 py-0.5 font-mono text-[10px] truncate">{item.placa}</TableCell>
+              <TableCell className="px-1 py-0.5 text-[11px] truncate">
+                <span className="flex items-center gap-0.5">
+                  <Truck className="h-2.5 w-2.5 text-muted-foreground shrink-0" />
+                  <span className="truncate">{item.veiculo}</span>
                 </span>
               </TableCell>
-              <TableCell className="whitespace-nowrap text-sm">
-                <span className="flex items-center gap-1">
-                  <User className="h-3 w-3 text-muted-foreground" />
-                  {item.motorista}
+              <TableCell className="px-1 py-0.5 text-[11px] truncate">
+                <span className="flex items-center gap-0.5">
+                  <User className="h-2.5 w-2.5 text-muted-foreground shrink-0" />
+                  <span className="truncate">{item.motorista}</span>
                 </span>
               </TableCell>
-              <TableCell className="whitespace-nowrap text-sm">
-                <span className="flex items-center gap-2">
-                  <Phone className="h-3 w-3 text-muted-foreground" />
-                  {item.telefone}
+              <TableCell className="px-1 py-0.5 text-[11px]">
+                <span className="flex items-center gap-1">
+                  <Phone className="h-2.5 w-2.5 text-muted-foreground shrink-0" />
+                  <span className="truncate">{item.telefone}</span>
                   <Button
                     variant="ghost"
                     size="sm"
-                    className="h-7 w-7 p-0 text-accent hover:text-accent/80"
+                    className="h-5 w-5 p-0 text-accent hover:text-accent/80 shrink-0"
                     onClick={() => setWhatsappItem(item)}
                     title="Enviar mensagem no WhatsApp"
                   >
-                    <MessageCircle className="h-4 w-4" />
+                    <MessageCircle className="h-3 w-3" />
                   </Button>
                 </span>
               </TableCell>
               {canViewFinancials && (
                 <>
-                  <TableCell className="whitespace-nowrap text-right font-mono text-sm font-semibold text-foreground">
+                  <TableCell className="px-1 py-0.5 text-right font-mono text-[11px] font-semibold text-foreground truncate">
                     {formatCurrency(item.valor)}
                   </TableCell>
-                  <TableCell className="whitespace-nowrap text-sm">
-                    <span className="flex items-center gap-1">
-                      {item.fornecedor}
+                  <TableCell className="px-1 py-0.5 text-[11px] truncate">
+                    <span className="flex items-center gap-0.5">
+                      <span className="truncate">{item.fornecedor}</span>
                       {item.fornecedor && (
                         <Button
                           variant="ghost"
                           size="sm"
-                          className="h-7 w-7 p-0 text-accent hover:text-accent/80"
+                          className="h-5 w-5 p-0 text-accent hover:text-accent/80 shrink-0"
                           onClick={() => {
                             const fornecedorItems = items.filter(
                               (i) => i.fornecedor === item.fornecedor && i.data === item.data
@@ -296,28 +296,28 @@ const AgendaTable = ({ items, onEdited }: AgendaTableProps) => {
                           }}
                           title="Enviar serviços do dia ao fornecedor via WhatsApp"
                         >
-                          <MessageCircle className="h-4 w-4" />
+                          <MessageCircle className="h-3 w-3" />
                         </Button>
                       )}
                     </span>
                   </TableCell>
-                  <TableCell className="whitespace-nowrap text-right font-mono text-sm text-muted-foreground">
+                  <TableCell className="px-1 py-0.5 text-right font-mono text-[11px] text-muted-foreground truncate">
                     {formatCurrency(item.custo)}
                   </TableCell>
                 </>
               )}
-              <TableCell className="whitespace-nowrap text-sm">{item.receptivo || "—"}</TableCell>
-              <TableCell className="max-w-[200px] truncate text-sm text-muted-foreground" title={item.observacoes}>
+              <TableCell className="px-1 py-0.5 text-[11px] truncate">{item.receptivo || "—"}</TableCell>
+              <TableCell className="px-1 py-0.5 truncate text-[11px] text-muted-foreground" title={item.observacoes}>
                 {item.observacoes || "—"}
               </TableCell>
-              <TableCell className="text-center">
+              <TableCell className="px-1 py-0.5 text-center">
                 <TooltipProvider>
                   <Tooltip>
                     <TooltipTrigger asChild>
                       <Button
                         variant="ghost"
                         size="sm"
-                        className="h-7 w-7 p-0"
+                        className="h-5 w-5 p-0"
                         onClick={() => cycleStatus(item)}
                         title={statusLabel(item.statusFaturamento || "")}
                       >
@@ -328,34 +328,34 @@ const AgendaTable = ({ items, onEdited }: AgendaTableProps) => {
                   </Tooltip>
                 </TooltipProvider>
               </TableCell>
-              <TableCell className="text-center">
-                <span className="flex items-center justify-center gap-1">
+              <TableCell className="px-1 py-0.5 text-center">
+                <span className="flex items-center justify-center gap-0">
                   <Button
                     variant="ghost"
                     size="sm"
-                    className="h-7 w-7 p-0 text-muted-foreground hover:text-primary"
+                    className="h-5 w-5 p-0 text-muted-foreground hover:text-primary"
                     onClick={() => setEditItem(item)}
                     title="Editar serviço"
                   >
-                    <Pencil className="h-4 w-4" />
+                    <Pencil className="h-3 w-3" />
                   </Button>
                   <Button
                     variant="ghost"
                     size="sm"
-                    className="h-7 w-7 p-0 text-muted-foreground hover:text-accent"
+                    className="h-5 w-5 p-0 text-muted-foreground hover:text-accent"
                     onClick={() => handleClone(item)}
                     title="Clonar serviço"
                   >
-                    <Copy className="h-4 w-4" />
+                    <Copy className="h-3 w-3" />
                   </Button>
                   <Button
                     variant="ghost"
                     size="sm"
-                    className="h-7 w-7 p-0 text-muted-foreground hover:text-destructive"
+                    className="h-5 w-5 p-0 text-muted-foreground hover:text-destructive"
                     onClick={() => setDeleteItemId(item.id)}
                     title="Excluir serviço"
                   >
-                    <Trash2 className="h-4 w-4" />
+                    <Trash2 className="h-3 w-3" />
                   </Button>
                 </span>
               </TableCell>
