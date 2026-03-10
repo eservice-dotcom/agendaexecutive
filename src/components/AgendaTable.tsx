@@ -127,7 +127,7 @@ const AgendaTable = ({ items, onEdited }: AgendaTableProps) => {
       items={fornecedorWhatsapp?.items || []}
     />
     <EditServicoDialog open={!!editItem} onOpenChange={(v) => { if (!v) setEditItem(null); }} item={editItem} onSaved={() => onEdited?.()} />
-    <div className="overflow-auto rounded-lg border border-border bg-card shadow-sm max-h-[70vh]">
+    <div className="overflow-x-scroll overflow-y-auto rounded-lg border border-border bg-card shadow-sm max-h-[70vh]">
       <Table>
         <TableHeader className="sticky top-0 z-30 bg-muted">
           <TableRow className="hover:bg-muted/50">
