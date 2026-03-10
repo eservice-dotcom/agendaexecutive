@@ -351,8 +351,33 @@ const EditServicoDialog = ({ open, onOpenChange, item, onSaved }: EditServicoDia
             <Input value={form.receptivo} onChange={(e) => update("receptivo", e.target.value)} placeholder="Nome do receptivo" />
           </div>
 
-          <div className="space-y-1.5">
+          <div className="space-y-1.5 sm:col-span-2">
             <Label>Observações</Label>
+            <div className="flex flex-wrap gap-2 mb-1.5">
+              {["Motorista Recepciona", "Terá Coordenador"].map((chip) => {
+                const isActive = form.observacoes.includes(chip);
+                return (
+                  <button
+                    key={chip}
+                    type="button"
+                    onClick={() => {
+                      if (isActive) {
+                        update("observacoes", form.observacoes.replace(chip, "").replace(/\s{2,}/g, " ").replace(/^[\s,]+|[\s,]+$/g, "").trim());
+                      } else {
+                        update("observacoes", form.observacoes ? `${form.observacoes.trim()}, ${chip}` : chip);
+                      }
+                    }}
+                    className={`px-3 py-1 rounded-full text-xs font-medium border transition-colors ${
+                      isActive
+                        ? "bg-primary text-primary-foreground border-primary"
+                        : "bg-muted text-muted-foreground border-border hover:border-primary/40"
+                    }`}
+                  >
+                    {chip}
+                  </button>
+                );
+              })}
+            </div>
             <Input value={form.observacoes} onChange={(e) => update("observacoes", e.target.value)} placeholder="Observações sobre o serviço" />
           </div>
 
