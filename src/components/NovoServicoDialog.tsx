@@ -5,9 +5,9 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { getClientes, getVeiculos, getMotoristas, getFornecedores, saveAgendaItem, getTiposServico } from "@/data/cadastroStorage";
-import { Passageiro } from "@/data/agendaData";
+import { Passageiro, OutraDespesa } from "@/data/agendaData";
 import { toast } from "sonner";
-import { Plus } from "lucide-react";
+import { Plus, Trash2 } from "lucide-react";
 import PassageirosInput from "./PassageirosInput";
 import { TooltipProvider } from "@/components/ui/tooltip";
 
