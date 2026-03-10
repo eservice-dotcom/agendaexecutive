@@ -76,6 +76,17 @@ export const saveCliente = async (item: Omit<Cliente, "id">) => {
   if (error) throw error;
 };
 
+export const updateCliente = async (id: string, item: Omit<Cliente, "id">) => {
+  const { error } = await supabase.from("clientes").update({
+    nome: item.nome,
+    cnpj_cpf: item.cnpjCpf,
+    email: item.email,
+    telefone: item.telefone,
+    endereco: item.endereco,
+  }).eq("id", id);
+  if (error) throw error;
+};
+
 export const deleteCliente = async (id: string) => {
   const { error } = await supabase.from("clientes").delete().eq("id", id);
   if (error) throw error;
@@ -193,6 +204,18 @@ export const saveFornecedor = async (item: Omit<Fornecedor, "id">) => {
     pix: item.pix,
   } as any);
   
+  if (error) throw error;
+};
+
+export const updateFornecedor = async (id: string, item: Omit<Fornecedor, "id">) => {
+  const { error } = await supabase.from("fornecedores").update({
+    razao_social: item.razaoSocial,
+    cnpj: item.cnpj,
+    contato: item.contato,
+    telefone: item.telefone,
+    email: item.email,
+    pix: item.pix,
+  } as any).eq("id", id);
   if (error) throw error;
 };
 

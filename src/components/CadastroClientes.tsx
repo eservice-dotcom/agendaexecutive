@@ -4,13 +4,14 @@ import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
-import { Plus, Trash2, Users } from "lucide-react";
-import { Cliente, getClientes, saveCliente, deleteCliente } from "@/data/cadastroStorage";
+import { Plus, Trash2, Users, Pencil } from "lucide-react";
+import { Cliente, getClientes, saveCliente, updateCliente, deleteCliente } from "@/data/cadastroStorage";
 import { toast } from "sonner";
 
 const CadastroClientes = () => {
   const [items, setItems] = useState<Cliente[]>([]);
   const [open, setOpen] = useState(false);
+  const [editingId, setEditingId] = useState<string | null>(null);
   const [form, setForm] = useState({ nome: "", cnpjCpf: "", email: "", telefone: "", endereco: "" });
 
   const refresh = async () => {
@@ -25,14 +26,26 @@ const CadastroClientes = () => {
   const handleSave = async () => {
     if (!form.nome.trim()) { toast.error("Nome é obrigatório"); return; }
     try {
-      await saveCliente(form);
+      if (editingId) {
+        await updateCliente(editingId, form);
+        toast.success("Cliente atualizado!");
+      } else {
+        await saveCliente(form);
+        toast.success("Cliente cadastrado!");
+      }
       setForm({ nome: "", cnpjCpf: "", email: "", telefone: "", endereco: "" });
+      setEditingId(null);
       setOpen(false);
       await refresh();
-      toast.success("Cliente cadastrado!");
     } catch (error) {
       toast.error("Erro ao salvar cliente");
     }
+  };
+
+  const handleEdit = (item: Cliente) => {
+    setEditingId(item.id);
+    setForm({ nome: item.nome, cnpjCpf: item.cnpjCpf, email: item.email, telefone: item.telefone, endereco: item.endereco });
+    setOpen(true);
   };
 
   const handleDelete = async (id: string) => {
@@ -45,6 +58,11 @@ const CadastroClientes = () => {
     }
   };
 
+  const handleOpenNew = () => {
+    setEditingId(null);
+    setForm({ nome: "", cnpjCpf: "", email: "", telefone: "", endereco: "" });
+    setOpen(true);
+  };
 
   return (
     <div className="space-y-4">
@@ -53,7 +71,7 @@ const CadastroClientes = () => {
           <Users className="h-4 w-4" />
           {items.length} cliente(s) cadastrado(s)
         </div>
-        <Button onClick={() => setOpen(true)} className="gap-2">
+        <Button onClick={handleOpenNew} className="gap-2">
           <Plus className="h-4 w-4" /> Novo Cliente
         </Button>
       </div>
@@ -61,7 +79,7 @@ const CadastroClientes = () => {
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Novo Cliente</DialogTitle>
+            <DialogTitle>{editingId ? "Editar Cliente" : "Novo Cliente"}</DialogTitle>
             <DialogDescription>Preencha os dados do cliente</DialogDescription>
           </DialogHeader>
           <div className="grid gap-3">
@@ -72,7 +90,7 @@ const CadastroClientes = () => {
               <div><Label>Telefone</Label><Input value={form.telefone} onChange={(e) => setForm({ ...form, telefone: e.target.value })} /></div>
             </div>
             <div><Label>Endereço</Label><Input value={form.endereco} onChange={(e) => setForm({ ...form, endereco: e.target.value })} /></div>
-            <Button onClick={handleSave}>Salvar</Button>
+            <Button onClick={handleSave}>{editingId ? "Atualizar" : "Salvar"}</Button>
           </div>
         </DialogContent>
       </Dialog>
@@ -89,7 +107,7 @@ const CadastroClientes = () => {
                 <TableHead className="font-semibold">Email</TableHead>
                 <TableHead className="font-semibold">Telefone</TableHead>
                 <TableHead className="font-semibold">Endereço</TableHead>
-                <TableHead className="w-12"></TableHead>
+                <TableHead className="w-20"></TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -101,9 +119,14 @@ const CadastroClientes = () => {
                   <TableCell className="text-sm">{item.telefone}</TableCell>
                   <TableCell className="text-sm">{item.endereco}</TableCell>
                   <TableCell>
-                    <Button variant="ghost" size="sm" className="h-7 w-7 p-0 text-destructive" onClick={() => handleDelete(item.id)}>
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
+                    <div className="flex gap-1">
+                      <Button variant="ghost" size="sm" className="h-7 w-7 p-0 text-muted-foreground hover:text-foreground" onClick={() => handleEdit(item)}>
+                        <Pencil className="h-4 w-4" />
+                      </Button>
+                      <Button variant="ghost" size="sm" className="h-7 w-7 p-0 text-destructive" onClick={() => handleDelete(item.id)}>
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
                   </TableCell>
                 </TableRow>
               ))}

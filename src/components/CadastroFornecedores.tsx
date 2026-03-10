@@ -4,13 +4,14 @@ import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
-import { Plus, Trash2, Building2 } from "lucide-react";
-import { Fornecedor, getFornecedores, saveFornecedor, deleteFornecedor } from "@/data/cadastroStorage";
+import { Plus, Trash2, Building2, Pencil } from "lucide-react";
+import { Fornecedor, getFornecedores, saveFornecedor, updateFornecedor, deleteFornecedor } from "@/data/cadastroStorage";
 import { toast } from "sonner";
 
 const CadastroFornecedores = () => {
   const [items, setItems] = useState<Fornecedor[]>([]);
   const [open, setOpen] = useState(false);
+  const [editingId, setEditingId] = useState<string | null>(null);
   const [form, setForm] = useState({ razaoSocial: "", cnpj: "", contato: "", telefone: "", email: "", pix: "" });
 
   const refresh = async () => {
@@ -25,14 +26,26 @@ const CadastroFornecedores = () => {
   const handleSave = async () => {
     if (!form.razaoSocial.trim()) { toast.error("Razão Social é obrigatória"); return; }
     try {
-      await saveFornecedor(form);
+      if (editingId) {
+        await updateFornecedor(editingId, form);
+        toast.success("Fornecedor atualizado!");
+      } else {
+        await saveFornecedor(form);
+        toast.success("Fornecedor cadastrado!");
+      }
       setForm({ razaoSocial: "", cnpj: "", contato: "", telefone: "", email: "", pix: "" });
+      setEditingId(null);
       setOpen(false);
       await refresh();
-      toast.success("Fornecedor cadastrado!");
     } catch (error) {
       toast.error("Erro ao salvar fornecedor");
     }
+  };
+
+  const handleEdit = (item: Fornecedor) => {
+    setEditingId(item.id);
+    setForm({ razaoSocial: item.razaoSocial, cnpj: item.cnpj, contato: item.contato, telefone: item.telefone, email: item.email, pix: item.pix });
+    setOpen(true);
   };
 
   const handleDelete = async (id: string) => {
@@ -45,6 +58,12 @@ const CadastroFornecedores = () => {
     }
   };
 
+  const handleOpenNew = () => {
+    setEditingId(null);
+    setForm({ razaoSocial: "", cnpj: "", contato: "", telefone: "", email: "", pix: "" });
+    setOpen(true);
+  };
+
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
@@ -52,7 +71,7 @@ const CadastroFornecedores = () => {
           <Building2 className="h-4 w-4" />
           {items.length} fornecedor(es) cadastrado(s)
         </div>
-        <Button onClick={() => setOpen(true)} className="gap-2">
+        <Button onClick={handleOpenNew} className="gap-2">
           <Plus className="h-4 w-4" /> Novo Fornecedor
         </Button>
       </div>
@@ -60,7 +79,7 @@ const CadastroFornecedores = () => {
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Novo Fornecedor</DialogTitle>
+            <DialogTitle>{editingId ? "Editar Fornecedor" : "Novo Fornecedor"}</DialogTitle>
             <DialogDescription>Preencha os dados do fornecedor</DialogDescription>
           </DialogHeader>
           <div className="grid gap-3">
@@ -74,7 +93,7 @@ const CadastroFornecedores = () => {
               <div><Label>Email</Label><Input type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} /></div>
             </div>
             <div><Label>PIX</Label><Input value={form.pix} onChange={(e) => setForm({ ...form, pix: e.target.value })} placeholder="Chave PIX (CPF, CNPJ, e-mail, telefone ou aleatória)" /></div>
-            <Button onClick={handleSave}>Salvar</Button>
+            <Button onClick={handleSave}>{editingId ? "Atualizar" : "Salvar"}</Button>
           </div>
         </DialogContent>
       </Dialog>
@@ -92,7 +111,7 @@ const CadastroFornecedores = () => {
                 <TableHead className="font-semibold">Telefone</TableHead>
                 <TableHead className="font-semibold">Email</TableHead>
                 <TableHead className="font-semibold">PIX</TableHead>
-                <TableHead className="w-12"></TableHead>
+                <TableHead className="w-20"></TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -105,9 +124,14 @@ const CadastroFornecedores = () => {
                   <TableCell className="text-sm">{item.email}</TableCell>
                   <TableCell className="text-sm">{item.pix}</TableCell>
                   <TableCell>
-                    <Button variant="ghost" size="sm" className="h-7 w-7 p-0 text-destructive" onClick={() => handleDelete(item.id)}>
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
+                    <div className="flex gap-1">
+                      <Button variant="ghost" size="sm" className="h-7 w-7 p-0 text-muted-foreground hover:text-foreground" onClick={() => handleEdit(item)}>
+                        <Pencil className="h-4 w-4" />
+                      </Button>
+                      <Button variant="ghost" size="sm" className="h-7 w-7 p-0 text-destructive" onClick={() => handleDelete(item.id)}>
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
                   </TableCell>
                 </TableRow>
               ))}
