@@ -191,8 +191,7 @@ const EditServicoDialog = ({ open, onOpenChange, item, onSaved }: EditServicoDia
         horaIn: form.horaIn || "",
         horaFim: form.horaFim || "",
         estacionamento: parseFloat(form.estacionamento) || 0,
-        outros: parseFloat(form.outros) || 0,
-        outrosDescricao: form.outrosDescricao,
+        outrosDespesas: outrosDespesas,
       });
 
       toast.success("Serviço atualizado com sucesso!");
