@@ -35,6 +35,7 @@ export interface AgendaItem {
   horaFim?: string;
   estacionamento?: number;
   outros?: number;
+  outrosDescricao?: string;
 }
 
 export const tiposServicoDefault = ["Transfer In", "Transfer Out", "City Tour", "Translado", "Fretamento", "Coordenação", "Diária de 5h", "Diária de 10h", "Viagem", "Comissaria"];
