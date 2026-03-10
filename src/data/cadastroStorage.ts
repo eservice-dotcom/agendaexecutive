@@ -228,8 +228,8 @@ export const getAgendaItems = async (): Promise<AgendaItem[]> => {
   const { data, error } = await supabase
     .from("agenda_items")
     .select("*")
-    .order("data", { ascending: false })
-    .order("hora", { ascending: false });
+    .order("data", { ascending: true })
+    .order("hora", { ascending: true });
   
   if (error) {
     console.error("Erro ao buscar itens da agenda:", error);
