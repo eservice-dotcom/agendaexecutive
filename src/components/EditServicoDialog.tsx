@@ -50,6 +50,7 @@ const EditServicoDialog = ({ open, onOpenChange, item, onSaved }: EditServicoDia
     horaIn: "",
     horaFim: "",
     estacionamento: "",
+    horaExtra: "",
   });
   
   const [passageiros, setPassageiros] = useState<Passageiro[]>([]);
