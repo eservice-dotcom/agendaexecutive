@@ -91,6 +91,7 @@ const CadastroFornecedores = () => {
                 <TableHead className="font-semibold">Contato</TableHead>
                 <TableHead className="font-semibold">Telefone</TableHead>
                 <TableHead className="font-semibold">Email</TableHead>
+                <TableHead className="font-semibold">PIX</TableHead>
                 <TableHead className="w-12"></TableHead>
               </TableRow>
             </TableHeader>
