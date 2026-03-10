@@ -101,3 +101,23 @@ All colors MUST be HSL.
     @apply bg-background text-foreground;
   }
 }
+
+/* Always show horizontal scrollbar on agenda table */
+.overflow-x-scroll {
+  overflow-x: scroll !important;
+}
+.overflow-x-scroll::-webkit-scrollbar {
+  height: 12px;
+  display: block !important;
+}
+.overflow-x-scroll::-webkit-scrollbar-track {
+  background: hsl(var(--muted));
+  border-radius: 6px;
+}
+.overflow-x-scroll::-webkit-scrollbar-thumb {
+  background: hsl(var(--muted-foreground) / 0.4);
+  border-radius: 6px;
+}
+.overflow-x-scroll::-webkit-scrollbar-thumb:hover {
+  background: hsl(var(--muted-foreground) / 0.6);
+}
