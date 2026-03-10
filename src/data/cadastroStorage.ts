@@ -207,6 +207,18 @@ export const saveFornecedor = async (item: Omit<Fornecedor, "id">) => {
   if (error) throw error;
 };
 
+export const updateFornecedor = async (id: string, item: Omit<Fornecedor, "id">) => {
+  const { error } = await supabase.from("fornecedores").update({
+    razao_social: item.razaoSocial,
+    cnpj: item.cnpj,
+    contato: item.contato,
+    telefone: item.telefone,
+    email: item.email,
+    pix: item.pix,
+  } as any).eq("id", id);
+  if (error) throw error;
+};
+
 export const deleteFornecedor = async (id: string) => {
   const { error } = await supabase.from("fornecedores").delete().eq("id", id);
   if (error) throw error;
