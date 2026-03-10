@@ -40,6 +40,13 @@ const NovoServicoDialog = ({ open, onOpenChange, onSaved }: NovoServicoDialogPro
     custo: "",
     observacoes: "",
     receptivo: "",
+    kmIn: "",
+    kmFim: "",
+    kmExtra: "",
+    horaIn: "",
+    horaFim: "",
+    estacionamento: "",
+    outros: "",
   });
   
   const [passageiros, setPassageiros] = useState<Passageiro[]>([]);
