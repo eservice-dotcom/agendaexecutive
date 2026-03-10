@@ -26,7 +26,7 @@ const CadastroFornecedores = () => {
     if (!form.razaoSocial.trim()) { toast.error("Razão Social é obrigatória"); return; }
     try {
       await saveFornecedor(form);
-      setForm({ razaoSocial: "", cnpj: "", contato: "", telefone: "", email: "" });
+      setForm({ razaoSocial: "", cnpj: "", contato: "", telefone: "", email: "", pix: "" });
       setOpen(false);
       await refresh();
       toast.success("Fornecedor cadastrado!");
