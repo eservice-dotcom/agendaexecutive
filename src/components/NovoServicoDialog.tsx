@@ -112,6 +112,7 @@ const NovoServicoDialog = ({ open, onOpenChange, onSaved }: NovoServicoDialogPro
         horaFim: form.horaFim || "",
         estacionamento: parseFloat(form.estacionamento) || 0,
         outros: parseFloat(form.outros) || 0,
+        outrosDescricao: form.outrosDescricao,
       });
 
       toast.success("Serviço adicionado com sucesso!");
