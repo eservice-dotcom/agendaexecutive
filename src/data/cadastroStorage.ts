@@ -35,6 +35,7 @@ export interface Fornecedor {
   contato: string;
   telefone: string;
   email: string;
+  pix: string;
 }
 
 // Clientes
