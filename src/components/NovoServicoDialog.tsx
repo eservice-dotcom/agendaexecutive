@@ -118,6 +118,8 @@ const NovoServicoDialog = ({ open, onOpenChange, onSaved }: NovoServicoDialogPro
         data: "", hora: "", clienteId: "", pax: "", cot: "", tipo: "",
         origem: "", destino: "", veiculoId: "", motoristaId: "", valor: "",
         fornecedorId: "", custo: "", observacoes: "", receptivo: "",
+        kmIn: "", kmFim: "", kmExtra: "", horaIn: "", horaFim: "",
+        estacionamento: "", outros: "",
       });
       setPassageiros([]);
       onOpenChange(false);
