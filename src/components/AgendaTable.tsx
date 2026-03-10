@@ -45,6 +45,19 @@ const tipoRowColor = (tipo: string): string => {
   return colors[tipo] || "bg-gray-100/40 dark:bg-gray-900/20";
 };
 
+const manualColorOptions = [
+  { value: "#dbeafe", label: "Azul" },
+  { value: "#dcfce7", label: "Verde" },
+  { value: "#fef9c3", label: "Amarelo" },
+  { value: "#fce7f3", label: "Rosa" },
+  { value: "#f3e8ff", label: "Lilás" },
+  { value: "#ffedd5", label: "Laranja" },
+  { value: "#e0f2fe", label: "Ciano" },
+  { value: "#f1f5f9", label: "Cinza" },
+  { value: "#fecaca", label: "Vermelho" },
+  { value: "#d1fae5", label: "Menta" },
+];
+
 const formatCurrency = (value: number) =>
   new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(value);
 
