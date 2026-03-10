@@ -335,7 +335,7 @@ const AgendaTable = ({ items, onEdited }: AgendaTableProps) => {
             </TableRow>
           ))}
         </TableBody>
-      </Table>
+      </table>
     </div>
     <AlertDialog open={!!deleteItemId} onOpenChange={(v) => { if (!v) setDeleteItemId(null); }}>
       <AlertDialogContent>
