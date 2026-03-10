@@ -3,7 +3,8 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { AgendaItem, StatusFaturamento } from "@/data/agendaData";
-import { MapPin, Phone, User, Truck, MessageCircle, Pencil, Trash2, Circle, Send, CheckCircle2, Users, Copy } from "lucide-react";
+import { MapPin, Phone, User, Truck, MessageCircle, Pencil, Trash2, Circle, Send, CheckCircle2, Users, Copy, Palette, X } from "lucide-react";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import WhatsAppDialog from "./WhatsAppDialog";
 import WhatsAppFornecedorDialog from "./WhatsAppFornecedorDialog";
 import EditServicoDialog from "./EditServicoDialog";
