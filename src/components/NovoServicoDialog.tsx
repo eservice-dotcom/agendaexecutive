@@ -46,6 +46,7 @@ const NovoServicoDialog = ({ open, onOpenChange, onSaved }: NovoServicoDialogPro
     horaIn: "",
     horaFim: "",
     estacionamento: "",
+    horaExtra: "",
   });
   
   const [passageiros, setPassageiros] = useState<Passageiro[]>([]);
@@ -110,6 +111,7 @@ const NovoServicoDialog = ({ open, onOpenChange, onSaved }: NovoServicoDialogPro
         horaIn: form.horaIn || "",
         horaFim: form.horaFim || "",
         estacionamento: parseFloat(form.estacionamento) || 0,
+        horaExtra: form.horaExtra || "",
         outrosDespesas: outrosDespesas,
       });
 
@@ -119,7 +121,7 @@ const NovoServicoDialog = ({ open, onOpenChange, onSaved }: NovoServicoDialogPro
         origem: "", destino: "", veiculoId: "", motoristaId: "", valor: "",
         fornecedorId: "", custo: "", observacoes: "", receptivo: "",
         kmIn: "", kmFim: "", kmExtra: "", horaIn: "", horaFim: "",
-        estacionamento: "",
+        estacionamento: "", horaExtra: "",
       });
       setPassageiros([]);
       setOutrosDespesas([]);
@@ -276,6 +278,10 @@ const NovoServicoDialog = ({ open, onOpenChange, onSaved }: NovoServicoDialogPro
               <div className="space-y-1.5">
                 <Label>Estacionamento (R$)</Label>
                 <Input type="number" min={0} step="0.01" value={form.estacionamento} onChange={(e) => update("estacionamento", e.target.value)} placeholder="0,00" />
+              </div>
+              <div className="space-y-1.5">
+                <Label>Hora Extra</Label>
+                <Input type="time" value={form.horaExtra} onChange={(e) => update("horaExtra", e.target.value)} />
               </div>
               {/* Outras Despesas */}
               <div className="sm:col-span-4 space-y-2">

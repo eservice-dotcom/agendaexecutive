@@ -39,6 +39,7 @@ export interface AgendaItem {
   horaIn?: string;
   horaFim?: string;
   estacionamento?: number;
+  horaExtra?: string;
   outrosDespesas?: OutraDespesa[];
 }
 
