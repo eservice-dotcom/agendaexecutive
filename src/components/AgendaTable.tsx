@@ -127,35 +127,62 @@ const AgendaTable = ({ items, onEdited }: AgendaTableProps) => {
       items={fornecedorWhatsapp?.items || []}
     />
     <EditServicoDialog open={!!editItem} onOpenChange={(v) => { if (!v) setEditItem(null); }} item={editItem} onSaved={() => onEdited?.()} />
-    <div className="overflow-x-scroll overflow-y-auto rounded-lg border border-border bg-card shadow-sm max-h-[70vh]">
-      <table className="w-full caption-bottom text-sm">
+    <div className="overflow-x-auto overflow-y-auto rounded-lg border border-border bg-card shadow-sm max-h-[70vh]">
+      <table className="w-full caption-bottom text-[11px]" style={{ tableLayout: 'fixed' }}>
+        <colgroup>
+          <col style={{ width: '70px' }} />  {/* Data */}
+          <col style={{ width: '42px' }} />  {/* Hora */}
+          <col style={{ width: '90px' }} />  {/* Cliente */}
+          <col style={{ width: '32px' }} />  {/* PAX */}
+          <col style={{ width: '100px' }} /> {/* Passageiro */}
+          <col style={{ width: '48px' }} />  {/* Voo */}
+          <col style={{ width: '55px' }} />  {/* COT */}
+          <col style={{ width: '70px' }} />  {/* Tipo */}
+          <col style={{ width: '90px' }} />  {/* Origem */}
+          <col style={{ width: '90px' }} />  {/* Destino */}
+          <col style={{ width: '60px' }} />  {/* Placa */}
+          <col style={{ width: '80px' }} />  {/* Veículo */}
+          <col style={{ width: '80px' }} />  {/* Motorista */}
+          <col style={{ width: '100px' }} /> {/* Telefone */}
+          {canViewFinancials && (
+            <>
+              <col style={{ width: '70px' }} />  {/* Valor */}
+              <col style={{ width: '80px' }} />  {/* Fornecedor */}
+              <col style={{ width: '70px' }} />  {/* Custo */}
+            </>
+          )}
+          <col style={{ width: '65px' }} />  {/* Receptivo */}
+          <col style={{ width: '90px' }} />  {/* Observações */}
+          <col style={{ width: '32px' }} />  {/* Fat. */}
+          <col style={{ width: '72px' }} />  {/* Ações */}
+        </colgroup>
         <TableHeader className="sticky top-0 z-30 bg-muted">
           <TableRow className="hover:bg-muted/50">
-            <TableHead className="whitespace-nowrap font-semibold sticky left-0 z-20 bg-muted/95 backdrop-blur-sm">Data</TableHead>
-            <TableHead className="whitespace-nowrap font-semibold sticky left-[85px] z-20 bg-muted/95 backdrop-blur-sm">Hora</TableHead>
-            <TableHead className="whitespace-nowrap font-semibold">Cliente</TableHead>
-            <TableHead className="whitespace-nowrap font-semibold text-center">PAX</TableHead>
-            <TableHead className="whitespace-nowrap font-semibold">Passageiro</TableHead>
-            <TableHead className="whitespace-nowrap font-semibold">Voo</TableHead>
-            <TableHead className="whitespace-nowrap font-semibold">COT</TableHead>
-            <TableHead className="whitespace-nowrap font-semibold">Tipo</TableHead>
-            <TableHead className="whitespace-nowrap font-semibold">Origem</TableHead>
-            <TableHead className="whitespace-nowrap font-semibold">Destino</TableHead>
-            <TableHead className="whitespace-nowrap font-semibold">Placa</TableHead>
-            <TableHead className="whitespace-nowrap font-semibold">Veículo</TableHead>
-            <TableHead className="whitespace-nowrap font-semibold">Motorista</TableHead>
-            <TableHead className="whitespace-nowrap font-semibold">Telefone</TableHead>
+            <TableHead className="font-semibold px-1 py-1 text-[11px] sticky left-0 z-20 bg-muted/95 backdrop-blur-sm">Data</TableHead>
+            <TableHead className="font-semibold px-1 py-1 text-[11px] sticky left-[70px] z-20 bg-muted/95 backdrop-blur-sm">Hora</TableHead>
+            <TableHead className="font-semibold px-1 py-1 text-[11px]">Cliente</TableHead>
+            <TableHead className="font-semibold px-1 py-1 text-[11px] text-center">PAX</TableHead>
+            <TableHead className="font-semibold px-1 py-1 text-[11px]">Passageiro</TableHead>
+            <TableHead className="font-semibold px-1 py-1 text-[11px]">Voo</TableHead>
+            <TableHead className="font-semibold px-1 py-1 text-[11px]">COT</TableHead>
+            <TableHead className="font-semibold px-1 py-1 text-[11px]">Tipo</TableHead>
+            <TableHead className="font-semibold px-1 py-1 text-[11px]">Origem</TableHead>
+            <TableHead className="font-semibold px-1 py-1 text-[11px]">Destino</TableHead>
+            <TableHead className="font-semibold px-1 py-1 text-[11px]">Placa</TableHead>
+            <TableHead className="font-semibold px-1 py-1 text-[11px]">Veículo</TableHead>
+            <TableHead className="font-semibold px-1 py-1 text-[11px]">Motorista</TableHead>
+            <TableHead className="font-semibold px-1 py-1 text-[11px]">Telefone</TableHead>
             {canViewFinancials && (
               <>
-                <TableHead className="whitespace-nowrap font-semibold text-right">Valor</TableHead>
-                <TableHead className="whitespace-nowrap font-semibold">Fornecedor</TableHead>
-                <TableHead className="whitespace-nowrap font-semibold text-right">Custo</TableHead>
+                <TableHead className="font-semibold px-1 py-1 text-[11px] text-right">Valor</TableHead>
+                <TableHead className="font-semibold px-1 py-1 text-[11px]">Fornec.</TableHead>
+                <TableHead className="font-semibold px-1 py-1 text-[11px] text-right">Custo</TableHead>
               </>
             )}
-            <TableHead className="whitespace-nowrap font-semibold">Receptivo</TableHead>
-            <TableHead className="whitespace-nowrap font-semibold">Observações</TableHead>
-            <TableHead className="whitespace-nowrap font-semibold text-center">Fat.</TableHead>
-            <TableHead className="whitespace-nowrap font-semibold text-center">Ações</TableHead>
+            <TableHead className="font-semibold px-1 py-1 text-[11px]">Recept.</TableHead>
+            <TableHead className="font-semibold px-1 py-1 text-[11px]">Obs.</TableHead>
+            <TableHead className="font-semibold px-1 py-1 text-[11px] text-center">Fat.</TableHead>
+            <TableHead className="font-semibold px-1 py-1 text-[11px] text-center">Ações</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
