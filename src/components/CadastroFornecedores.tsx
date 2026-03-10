@@ -11,7 +11,7 @@ import { toast } from "sonner";
 const CadastroFornecedores = () => {
   const [items, setItems] = useState<Fornecedor[]>([]);
   const [open, setOpen] = useState(false);
-  const [form, setForm] = useState({ razaoSocial: "", cnpj: "", contato: "", telefone: "", email: "" });
+  const [form, setForm] = useState({ razaoSocial: "", cnpj: "", contato: "", telefone: "", email: "", pix: "" });
 
   const refresh = async () => {
     const data = await getFornecedores();
@@ -26,7 +26,7 @@ const CadastroFornecedores = () => {
     if (!form.razaoSocial.trim()) { toast.error("Razão Social é obrigatória"); return; }
     try {
       await saveFornecedor(form);
-      setForm({ razaoSocial: "", cnpj: "", contato: "", telefone: "", email: "" });
+      setForm({ razaoSocial: "", cnpj: "", contato: "", telefone: "", email: "", pix: "" });
       setOpen(false);
       await refresh();
       toast.success("Fornecedor cadastrado!");
@@ -73,6 +73,7 @@ const CadastroFornecedores = () => {
               <div><Label>Telefone</Label><Input value={form.telefone} onChange={(e) => setForm({ ...form, telefone: e.target.value })} /></div>
               <div><Label>Email</Label><Input type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} /></div>
             </div>
+            <div><Label>PIX</Label><Input value={form.pix} onChange={(e) => setForm({ ...form, pix: e.target.value })} placeholder="Chave PIX (CPF, CNPJ, e-mail, telefone ou aleatória)" /></div>
             <Button onClick={handleSave}>Salvar</Button>
           </div>
         </DialogContent>
@@ -90,6 +91,7 @@ const CadastroFornecedores = () => {
                 <TableHead className="font-semibold">Contato</TableHead>
                 <TableHead className="font-semibold">Telefone</TableHead>
                 <TableHead className="font-semibold">Email</TableHead>
+                <TableHead className="font-semibold">PIX</TableHead>
                 <TableHead className="w-12"></TableHead>
               </TableRow>
             </TableHeader>
@@ -101,6 +103,7 @@ const CadastroFornecedores = () => {
                   <TableCell className="text-sm">{item.contato}</TableCell>
                   <TableCell className="text-sm">{item.telefone}</TableCell>
                   <TableCell className="text-sm">{item.email}</TableCell>
+                  <TableCell className="text-sm">{item.pix}</TableCell>
                   <TableCell>
                     <Button variant="ghost" size="sm" className="h-7 w-7 p-0 text-destructive" onClick={() => handleDelete(item.id)}>
                       <Trash2 className="h-4 w-4" />

@@ -1,0 +1,1 @@
+ALTER TABLE public.fornecedores ADD COLUMN pix TEXT NOT NULL DEFAULT '';

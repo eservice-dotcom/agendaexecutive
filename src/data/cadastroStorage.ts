@@ -35,6 +35,7 @@ export interface Fornecedor {
   contato: string;
   telefone: string;
   email: string;
+  pix: string;
 }
 
 // Clientes
@@ -174,6 +175,7 @@ export const getFornecedores = async (): Promise<Fornecedor[]> => {
     contato: item.contato,
     telefone: item.telefone,
     email: item.email,
+    pix: (item as any).pix || "",
   }));
 };
 
@@ -188,7 +190,8 @@ export const saveFornecedor = async (item: Omit<Fornecedor, "id">) => {
     contato: item.contato,
     telefone: item.telefone,
     email: item.email,
-  });
+    pix: item.pix,
+  } as any);
   
   if (error) throw error;
 };
