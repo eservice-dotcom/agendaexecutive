@@ -13,9 +13,20 @@ const FaturamentoFornecedor = () => {
   const [printWithFinancials, setPrintWithFinancials] = useState(true);
 
   useEffect(() => {
-    supabase.from("agenda_items").select("*").then(({ data }) => {
-      if (data) setItems(data);
-    });
+    const fetchAll = async () => {
+      let all: any[] = [];
+      let from = 0;
+      const pageSize = 1000;
+      while (true) {
+        const { data } = await supabase.from("agenda_items").select("fornecedor, valor, custo, pax").range(from, from + pageSize - 1);
+        if (!data || data.length === 0) break;
+        all = all.concat(data);
+        if (data.length < pageSize) break;
+        from += pageSize;
+      }
+      setItems(all);
+    };
+    fetchAll();
   }, []);
 
   const dados = useMemo(() => {
