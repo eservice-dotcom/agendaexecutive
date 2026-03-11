@@ -18,6 +18,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 interface AgendaTableProps {
   items: AgendaItem[];
   onEdited?: () => void;
+  hideFinancials?: boolean;
 }
 
 const tipoBadgeVariant = (tipo: string) => {
@@ -67,12 +68,13 @@ const formatDate = (dateStr: string) => {
   return `${d}/${m}/${y}`;
 };
 
-const AgendaTable = ({ items, onEdited }: AgendaTableProps) => {
+const AgendaTable = ({ items, onEdited, hideFinancials }: AgendaTableProps) => {
   const [whatsappItem, setWhatsappItem] = useState<AgendaItem | null>(null);
   const [editItem, setEditItem] = useState<AgendaItem | null>(null);
   const [deleteItemId, setDeleteItemId] = useState<string | null>(null);
   const [fornecedorWhatsapp, setFornecedorWhatsapp] = useState<{ nome: string; items: AgendaItem[] } | null>(null);
-  const { canViewFinancials, session } = useAuth();
+  const { canViewFinancials: hasFinancialPermission, session } = useAuth();
+  const canViewFinancials = hasFinancialPermission && !hideFinancials;
 
   const tryEditItem = useCallback(async (item: AgendaItem) => {
     if (!session?.user) return;
