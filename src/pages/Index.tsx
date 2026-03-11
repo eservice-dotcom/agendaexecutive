@@ -119,11 +119,27 @@ const Index = () => {
           <img src={logo} alt="Executive Service - Transportes e Eventos" className="h-10" />
           <div className="flex items-center gap-4">
             
+            {hasPermission && (
+              <button
+                onClick={() => setShowFinancials(!showFinancials)}
+                className="flex items-center gap-1 text-sm text-primary-foreground/80 hover:text-primary-foreground"
+                title={showFinancials ? "Ocultar financeiro" : "Mostrar financeiro"}
+              >
+                {showFinancials ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                {showFinancials ? "Ocultar $" : "Mostrar $"}
+              </button>
+            )}
             <Link to="/cadastros">
               <span className="flex items-center gap-1 text-sm text-primary-foreground/80 hover:text-primary-foreground">
                 <ClipboardList className="h-4 w-4" /> Cadastros
               </span>
             </Link>
+            <button
+              onClick={signOut}
+              className="flex items-center gap-1 text-sm text-primary-foreground/80 hover:text-primary-foreground"
+            >
+              Sair
+            </button>
           </div>
         </div>
       </header>
