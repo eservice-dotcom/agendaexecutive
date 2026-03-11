@@ -18,6 +18,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 interface AgendaTableProps {
   items: AgendaItem[];
   onEdited?: () => void;
+  hideFinancials?: boolean;
 }
 
 const tipoBadgeVariant = (tipo: string) => {
