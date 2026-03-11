@@ -418,7 +418,7 @@ const AgendaTable = ({ items, onEdited }: AgendaTableProps) => {
                     variant="ghost"
                     size="sm"
                     className="h-4 w-4 p-0 text-muted-foreground hover:text-primary"
-                    onClick={() => setEditItem(item)}
+                    onClick={() => tryEditItem(item)}
                     title="Editar serviço"
                   >
                     <Pencil className="h-2.5 w-2.5" />
