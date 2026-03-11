@@ -229,11 +229,11 @@ const AgendaTable = ({ items, onEdited, hideFinancials }: AgendaTableProps) => {
             <TableHead className="font-semibold px-0.5 py-0.5 text-[9px]">Motorista</TableHead>
             <TableHead className="font-semibold px-0.5 py-0.5 text-[9px]">Telefone</TableHead>
             {canViewFinancials && (
-              <>
-                <TableHead className="font-semibold px-0.5 py-0.5 text-[9px] text-right">Valor</TableHead>
-                <TableHead className="font-semibold px-0.5 py-0.5 text-[9px]">Fornec.</TableHead>
-                <TableHead className="font-semibold px-0.5 py-0.5 text-[9px] text-right">Custo</TableHead>
-              </>
+              <TableHead className="font-semibold px-0.5 py-0.5 text-[9px] text-right">Valor</TableHead>
+            )}
+            <TableHead className="font-semibold px-0.5 py-0.5 text-[9px]">Fornec.</TableHead>
+            {canViewFinancials && (
+              <TableHead className="font-semibold px-0.5 py-0.5 text-[9px] text-right">Custo</TableHead>
             )}
             <TableHead className="font-semibold px-0.5 py-0.5 text-[9px]">Recept.</TableHead>
             <TableHead className="font-semibold px-0.5 py-0.5 text-[9px]">Obs.</TableHead>
