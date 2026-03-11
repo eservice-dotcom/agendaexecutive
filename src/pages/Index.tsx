@@ -201,7 +201,7 @@ const Index = () => {
                 </Button>
               </div>
             </div>
-            <AgendaTable items={filteredData} onEdited={reloadData} />
+            <AgendaTable items={filteredData} onEdited={reloadData} hideFinancials={!showFinancials} />
             <NovoServicoDialog open={novoDialogOpen} onOpenChange={setNovoDialogOpen} onSaved={reloadData} />
           </TabsContent>
 
