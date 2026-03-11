@@ -1,8 +1,9 @@
 import { useState, useMemo, useCallback, useEffect } from "react";
-import { CalendarDays, ListChecks, Truck, Building2, Plus, BarChart3, Printer } from "lucide-react";
+import { CalendarDays, ListChecks, Truck, Building2, Plus, BarChart3, Printer, EyeOff, Eye } from "lucide-react";
 import logo from "@/assets/logo-executive-service.png";
 import { Link } from "react-router-dom";
 import { ClipboardList } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import AgendaFilters from "@/components/AgendaFilters";
@@ -38,7 +39,9 @@ const initialFilters: FiltersState = {
 };
 
 const Index = () => {
-  const canViewFinancials = true;
+  const { canViewFinancials: hasPermission, signOut } = useAuth();
+  const [showFinancials, setShowFinancials] = useState(true);
+  const canViewFinancials = hasPermission && showFinancials;
   const [filters, setFilters] = useState<FiltersState>(initialFilters);
   const [novoDialogOpen, setNovoDialogOpen] = useState(false);
   const [agendaData, setAgendaData] = useState<any[]>([]);
@@ -116,11 +119,27 @@ const Index = () => {
           <img src={logo} alt="Executive Service - Transportes e Eventos" className="h-10" />
           <div className="flex items-center gap-4">
             
+            {hasPermission && (
+              <button
+                onClick={() => setShowFinancials(!showFinancials)}
+                className="flex items-center gap-1 text-sm text-primary-foreground/80 hover:text-primary-foreground"
+                title={showFinancials ? "Ocultar financeiro" : "Mostrar financeiro"}
+              >
+                {showFinancials ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                {showFinancials ? "Ocultar $" : "Mostrar $"}
+              </button>
+            )}
             <Link to="/cadastros">
               <span className="flex items-center gap-1 text-sm text-primary-foreground/80 hover:text-primary-foreground">
                 <ClipboardList className="h-4 w-4" /> Cadastros
               </span>
             </Link>
+            <button
+              onClick={signOut}
+              className="flex items-center gap-1 text-sm text-primary-foreground/80 hover:text-primary-foreground"
+            >
+              Sair
+            </button>
           </div>
         </div>
       </header>
