@@ -103,7 +103,7 @@ const Login = () => {
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-1.5">
-            <Label htmlFor="username">Usuário (ou e-mail)</Label>
+            <Label htmlFor="username" className="font-bold">Usuário (ou e-mail)</Label>
             <Input
               id="username"
               type="text"
@@ -115,7 +115,7 @@ const Login = () => {
             />
           </div>
           <div className="space-y-1.5">
-            <Label htmlFor="password">Senha</Label>
+            <Label htmlFor="password" className="font-bold">Senha</Label>
             <Input
               id="password"
               type="password"
@@ -133,7 +133,7 @@ const Login = () => {
           </Button>
         </form>
 
-        <p className="text-center text-sm text-muted-foreground">
+        <p className="text-center text-sm font-bold text-muted-foreground">
           {isSignUp ? "Já tem uma conta?" : "Não tem conta?"}{" "}
           <button
             type="button"
