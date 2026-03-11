@@ -133,7 +133,7 @@ const Login = () => {
           </Button>
         </form>
 
-        <p className="text-center text-sm text-muted-foreground">
+        <p className="text-center text-sm font-bold text-muted-foreground">
           {isSignUp ? "Já tem uma conta?" : "Não tem conta?"}{" "}
           <button
             type="button"
