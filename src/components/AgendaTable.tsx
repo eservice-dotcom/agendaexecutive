@@ -332,35 +332,35 @@ const AgendaTable = ({ items, onEdited, hideFinancials }: AgendaTableProps) => {
                 </span>
               </TableCell>
               {canViewFinancials && (
-                <>
-                  <TableCell className="px-0.5 py-0 text-right font-mono text-[9px] font-semibold text-foreground truncate">
-                    {formatCurrency(item.valor)}
-                  </TableCell>
-                  <TableCell className="px-0.5 py-0 text-[9px] truncate">
-                    <span className="flex items-center gap-0.5">
-                      <span className="truncate">{item.fornecedor}</span>
-                      {item.fornecedor && (
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          className="h-4 w-4 p-0 text-accent hover:text-accent/80 shrink-0"
-                          onClick={() => {
-                            const fornecedorItems = items.filter(
-                              (i) => i.fornecedor === item.fornecedor && i.data === item.data
-                            );
-                            setFornecedorWhatsapp({ nome: item.fornecedor, items: fornecedorItems });
-                          }}
-                          title="Enviar serviços do dia ao fornecedor via WhatsApp"
-                        >
-                          <MessageCircle className="h-2.5 w-2.5" />
-                        </Button>
-                      )}
-                    </span>
-                  </TableCell>
-                  <TableCell className="px-0.5 py-0 text-right font-mono text-[9px] text-muted-foreground truncate">
-                    {formatCurrency(item.custo)}
-                  </TableCell>
-                </>
+                <TableCell className="px-0.5 py-0 text-right font-mono text-[9px] font-semibold text-foreground truncate">
+                  {formatCurrency(item.valor)}
+                </TableCell>
+              )}
+              <TableCell className="px-0.5 py-0 text-[9px] truncate">
+                <span className="flex items-center gap-0.5">
+                  <span className="truncate">{item.fornecedor}</span>
+                  {item.fornecedor && (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="h-4 w-4 p-0 text-accent hover:text-accent/80 shrink-0"
+                      onClick={() => {
+                        const fornecedorItems = items.filter(
+                          (i) => i.fornecedor === item.fornecedor && i.data === item.data
+                        );
+                        setFornecedorWhatsapp({ nome: item.fornecedor, items: fornecedorItems });
+                      }}
+                      title="Enviar serviços do dia ao fornecedor via WhatsApp"
+                    >
+                      <MessageCircle className="h-2.5 w-2.5" />
+                    </Button>
+                  )}
+                </span>
+              </TableCell>
+              {canViewFinancials && (
+                <TableCell className="px-0.5 py-0 text-right font-mono text-[9px] text-muted-foreground truncate">
+                  {formatCurrency(item.custo)}
+                </TableCell>
               )}
               <TableCell className="px-0.5 py-0 text-[9px] truncate">{item.receptivo || "—"}</TableCell>
               <TableCell className="px-0.5 py-0 truncate text-[9px] text-muted-foreground" title={item.observacoes}>
