@@ -201,11 +201,11 @@ const AgendaTable = ({ items, onEdited, hideFinancials }: AgendaTableProps) => {
           <col style={{ width: '64px' }} />  {/* Motorista */}
           <col style={{ width: '82px' }} /> {/* Telefone */}
           {canViewFinancials && (
-            <>
-              <col style={{ width: '58px' }} />  {/* Valor */}
-              <col style={{ width: '64px' }} />  {/* Fornecedor */}
-              <col style={{ width: '58px' }} />  {/* Custo */}
-            </>
+            <col style={{ width: '58px' }} />
+          )}
+          <col style={{ width: '64px' }} />  {/* Fornecedor */}
+          {canViewFinancials && (
+            <col style={{ width: '58px' }} />
           )}
           <col style={{ width: '52px' }} />  {/* Receptivo */}
           <col style={{ width: '70px' }} />  {/* Observações */}
