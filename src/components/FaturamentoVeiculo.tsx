@@ -102,6 +102,18 @@ const FaturamentoVeiculo = () => {
                 </TableCell>
               </TableRow>
             ))}
+            {dados.length > 0 && (
+              <TableRow className="bg-muted/50 font-bold hover:bg-muted/50">
+                <TableCell colSpan={2} className="font-semibold">TOTAL</TableCell>
+                <TableCell className="text-center">{dados.reduce((s, d) => s + d.viagens, 0)}</TableCell>
+                <TableCell className="text-right font-mono text-sm">{formatCurrency(totalReceita)}</TableCell>
+                <TableCell className="text-right font-mono text-sm">{formatCurrency(totalCusto)}</TableCell>
+                <TableCell className="text-right font-mono text-sm text-accent">{formatCurrency(totalReceita - totalCusto)}</TableCell>
+                <TableCell className="text-right font-mono text-sm">
+                  {totalReceita > 0 ? `${(((totalReceita - totalCusto) / totalReceita) * 100).toFixed(1)}%` : "0%"}
+                </TableCell>
+              </TableRow>
+            )}
           </TableBody>
         </Table>
       </div>
