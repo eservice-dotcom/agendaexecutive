@@ -72,7 +72,37 @@ const AgendaTable = ({ items, onEdited }: AgendaTableProps) => {
   const [editItem, setEditItem] = useState<AgendaItem | null>(null);
   const [deleteItemId, setDeleteItemId] = useState<string | null>(null);
   const [fornecedorWhatsapp, setFornecedorWhatsapp] = useState<{ nome: string; items: AgendaItem[] } | null>(null);
-  const { canViewFinancials } = useAuth();
+  const { canViewFinancials, session } = useAuth();
+
+  const tryEditItem = useCallback(async (item: AgendaItem) => {
+    if (!session?.user) return;
+    // Clean stale locks (>5min)
+    await supabase.from("editing_locks").delete().lt("locked_at", new Date(Date.now() - 5 * 60 * 1000).toISOString());
+    // Check existing lock
+    const { data: existing } = await supabase.from("editing_locks").select("*").eq("item_id", item.id).maybeSingle();
+    if (existing && existing.user_id !== session.user.id) {
+      toast.error(`Este serviço está sendo editado por ${existing.user_email || "outro usuário"}.`);
+      return;
+    }
+    // Acquire lock
+    if (!existing) {
+      const { error } = await supabase.from("editing_locks").insert({
+        item_id: item.id,
+        user_id: session.user.id,
+        user_email: session.user.email || "",
+      });
+      if (error) {
+        toast.error("Este serviço está sendo editado por outro usuário.");
+        return;
+      }
+    }
+    setEditItem(item);
+  }, [session]);
+
+  const releaseLock = useCallback(async (itemId: string) => {
+    if (!session?.user) return;
+    await supabase.from("editing_locks").delete().eq("item_id", itemId).eq("user_id", session.user.id);
+  }, [session]);
 
   const handleDelete = () => {
     if (deleteItemId) {
