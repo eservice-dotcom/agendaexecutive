@@ -180,7 +180,7 @@ const AgendaTable = ({ items, onEdited }: AgendaTableProps) => {
       fornecedorNome={fornecedorWhatsapp?.nome || ""}
       items={fornecedorWhatsapp?.items || []}
     />
-    <EditServicoDialog open={!!editItem} onOpenChange={(v) => { if (!v) setEditItem(null); }} item={editItem} onSaved={() => onEdited?.()} />
+    <EditServicoDialog open={!!editItem} onOpenChange={(v) => { if (!v) { if (editItem) releaseLock(editItem.id); setEditItem(null); } }} item={editItem} onSaved={() => { if (editItem) releaseLock(editItem.id); onEdited?.(); }} />
     <div className="overflow-x-auto overflow-y-auto rounded-lg border border-border bg-card shadow-sm max-h-[70vh]">
       <table className="w-full caption-bottom text-[9px]" style={{ tableLayout: 'fixed' }}>
         <colgroup>
