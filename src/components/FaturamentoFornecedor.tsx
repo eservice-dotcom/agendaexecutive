@@ -13,9 +13,20 @@ const FaturamentoFornecedor = () => {
   const [printWithFinancials, setPrintWithFinancials] = useState(true);
 
   useEffect(() => {
-    supabase.from("agenda_items").select("*").then(({ data }) => {
-      if (data) setItems(data);
-    });
+    const fetchAll = async () => {
+      let all: any[] = [];
+      let from = 0;
+      const pageSize = 1000;
+      while (true) {
+        const { data } = await supabase.from("agenda_items").select("fornecedor, valor, custo, pax").range(from, from + pageSize - 1);
+        if (!data || data.length === 0) break;
+        all = all.concat(data);
+        if (data.length < pageSize) break;
+        from += pageSize;
+      }
+      setItems(all);
+    };
+    fetchAll();
   }, []);
 
   const dados = useMemo(() => {
@@ -89,6 +100,19 @@ const FaturamentoFornecedor = () => {
                 </TableCell>
               </TableRow>
             ))}
+            {dados.length > 0 && (
+              <TableRow className="bg-muted/50 font-bold hover:bg-muted/50">
+                <TableCell className="font-semibold">TOTAL</TableCell>
+                <TableCell className="text-center">{dados.reduce((s, d) => s + d.viagens, 0)}</TableCell>
+                <TableCell className="text-center">{dados.reduce((s, d) => s + d.pax, 0)}</TableCell>
+                <TableCell className="text-right font-mono text-sm">{formatCurrency(totalReceita)}</TableCell>
+                <TableCell className="text-right font-mono text-sm">{formatCurrency(totalCusto)}</TableCell>
+                <TableCell className="text-right font-mono text-sm text-accent">{formatCurrency(totalReceita - totalCusto)}</TableCell>
+                <TableCell className="text-right font-mono text-sm">
+                  {totalReceita > 0 ? `${(((totalReceita - totalCusto) / totalReceita) * 100).toFixed(1)}%` : "0%"}
+                </TableCell>
+              </TableRow>
+            )}
           </TableBody>
         </Table>
       </div>
