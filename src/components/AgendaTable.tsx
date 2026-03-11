@@ -124,7 +124,7 @@ const AgendaTable = ({ items, onEdited }: AgendaTableProps) => {
       const { getAgendaItems } = await import("@/data/cadastroStorage");
       const allItems = await getAgendaItems();
       const cloned = allItems.find(i => i.cot === `${rest.cot}-COPIA` && i.data === rest.data && i.hora === rest.hora);
-      if (cloned) setEditItem(cloned);
+      if (cloned) tryEditItem(cloned);
     } catch {
       toast.error("Erro ao clonar serviço");
     }
