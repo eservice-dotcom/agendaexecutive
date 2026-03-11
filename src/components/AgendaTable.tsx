@@ -1,9 +1,10 @@
-import { useState } from "react";
+import { useState, useCallback } from "react";
+import { supabase } from "@/integrations/supabase/client";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { AgendaItem, StatusFaturamento } from "@/data/agendaData";
-import { MapPin, Phone, User, Truck, MessageCircle, Pencil, Trash2, Circle, Send, CheckCircle2, Users, Copy, Palette, X } from "lucide-react";
+import { MapPin, Phone, User, Truck, MessageCircle, Pencil, Trash2, Circle, Send, CheckCircle2, Users, Copy, Palette, X, Lock } from "lucide-react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import WhatsAppDialog from "./WhatsAppDialog";
 import WhatsAppFornecedorDialog from "./WhatsAppFornecedorDialog";
@@ -71,7 +72,37 @@ const AgendaTable = ({ items, onEdited }: AgendaTableProps) => {
   const [editItem, setEditItem] = useState<AgendaItem | null>(null);
   const [deleteItemId, setDeleteItemId] = useState<string | null>(null);
   const [fornecedorWhatsapp, setFornecedorWhatsapp] = useState<{ nome: string; items: AgendaItem[] } | null>(null);
-  const { canViewFinancials } = useAuth();
+  const { canViewFinancials, session } = useAuth();
+
+  const tryEditItem = useCallback(async (item: AgendaItem) => {
+    if (!session?.user) return;
+    // Clean stale locks (>5min)
+    await supabase.from("editing_locks").delete().lt("locked_at", new Date(Date.now() - 5 * 60 * 1000).toISOString());
+    // Check existing lock
+    const { data: existing } = await supabase.from("editing_locks").select("*").eq("item_id", item.id).maybeSingle();
+    if (existing && existing.user_id !== session.user.id) {
+      toast.error(`Este serviço está sendo editado por ${existing.user_email || "outro usuário"}.`);
+      return;
+    }
+    // Acquire lock
+    if (!existing) {
+      const { error } = await supabase.from("editing_locks").insert({
+        item_id: item.id,
+        user_id: session.user.id,
+        user_email: session.user.email || "",
+      });
+      if (error) {
+        toast.error("Este serviço está sendo editado por outro usuário.");
+        return;
+      }
+    }
+    setEditItem(item);
+  }, [session]);
+
+  const releaseLock = useCallback(async (itemId: string) => {
+    if (!session?.user) return;
+    await supabase.from("editing_locks").delete().eq("item_id", itemId).eq("user_id", session.user.id);
+  }, [session]);
 
   const handleDelete = () => {
     if (deleteItemId) {
@@ -93,7 +124,7 @@ const AgendaTable = ({ items, onEdited }: AgendaTableProps) => {
       const { getAgendaItems } = await import("@/data/cadastroStorage");
       const allItems = await getAgendaItems();
       const cloned = allItems.find(i => i.cot === `${rest.cot}-COPIA` && i.data === rest.data && i.hora === rest.hora);
-      if (cloned) setEditItem(cloned);
+      if (cloned) tryEditItem(cloned);
     } catch {
       toast.error("Erro ao clonar serviço");
     }
@@ -149,7 +180,7 @@ const AgendaTable = ({ items, onEdited }: AgendaTableProps) => {
       fornecedorNome={fornecedorWhatsapp?.nome || ""}
       items={fornecedorWhatsapp?.items || []}
     />
-    <EditServicoDialog open={!!editItem} onOpenChange={(v) => { if (!v) setEditItem(null); }} item={editItem} onSaved={() => onEdited?.()} />
+    <EditServicoDialog open={!!editItem} onOpenChange={(v) => { if (!v) { if (editItem) releaseLock(editItem.id); setEditItem(null); } }} item={editItem} onSaved={() => { if (editItem) releaseLock(editItem.id); onEdited?.(); }} />
     <div className="overflow-x-auto overflow-y-auto rounded-lg border border-border bg-card shadow-sm max-h-[70vh]">
       <table className="w-full caption-bottom text-[9px]" style={{ tableLayout: 'fixed' }}>
         <colgroup>
@@ -387,7 +418,7 @@ const AgendaTable = ({ items, onEdited }: AgendaTableProps) => {
                     variant="ghost"
                     size="sm"
                     className="h-4 w-4 p-0 text-muted-foreground hover:text-primary"
-                    onClick={() => setEditItem(item)}
+                    onClick={() => tryEditItem(item)}
                     title="Editar serviço"
                   >
                     <Pencil className="h-2.5 w-2.5" />

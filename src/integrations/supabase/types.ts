@@ -161,6 +161,30 @@ export type Database = {
         }
         Relationships: []
       }
+      editing_locks: {
+        Row: {
+          id: string
+          item_id: string
+          locked_at: string
+          user_email: string
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          item_id: string
+          locked_at?: string
+          user_email?: string
+          user_id: string
+        }
+        Update: {
+          id?: string
+          item_id?: string
+          locked_at?: string
+          user_email?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       fornecedores: {
         Row: {
           cnpj: string
