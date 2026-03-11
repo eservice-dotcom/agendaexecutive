@@ -115,7 +115,7 @@ const Login = () => {
             />
           </div>
           <div className="space-y-1.5">
-            <Label htmlFor="password">Senha</Label>
+            <Label htmlFor="password" className="font-bold">Senha</Label>
             <Input
               id="password"
               type="password"
