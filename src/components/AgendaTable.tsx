@@ -19,6 +19,7 @@ interface AgendaTableProps {
   items: AgendaItem[];
   onEdited?: () => void;
   hideFinancials?: boolean;
+  onClone?: (item: AgendaItem) => void;
 }
 
 const tipoBadgeVariant = (tipo: string) => {
