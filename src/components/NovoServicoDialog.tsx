@@ -110,6 +110,20 @@ const NovoServicoDialog = ({ open, onOpenChange, onSaved }: NovoServicoDialogPro
     } catch { toast.error("Erro ao cadastrar fornecedor"); }
   };
 
+  const handleSaveNewCliente = async () => {
+    if (!newCliente.nome) { toast.error("Nome do cliente é obrigatório"); return; }
+    try {
+      await saveCliente(newCliente);
+      const updated = await getClientes();
+      setClientes(updated);
+      const created = updated.find((c) => c.nome === newCliente.nome);
+      if (created) update("clienteId", created.id);
+      setNewCliente({ nome: "", cnpjCpf: "", telefone: "", email: "", endereco: "" });
+      setShowNewCliente(false);
+      toast.success("Cliente cadastrado!");
+    } catch { toast.error("Erro ao cadastrar cliente"); }
+  };
+
   useEffect(() => {
     if (open) {
       (async () => {
