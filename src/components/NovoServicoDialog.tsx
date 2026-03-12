@@ -4,10 +4,10 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { getClientes, getVeiculos, getMotoristas, getFornecedores, saveAgendaItem, getTiposServico } from "@/data/cadastroStorage";
+import { getClientes, getVeiculos, getMotoristas, getFornecedores, saveAgendaItem, getTiposServico, saveMotorista, saveFornecedor } from "@/data/cadastroStorage";
 import { Passageiro, OutraDespesa } from "@/data/agendaData";
 import { toast } from "sonner";
-import { Plus, Trash2 } from "lucide-react";
+import { Plus, Trash2, UserPlus } from "lucide-react";
 import PassageirosInput from "./PassageirosInput";
 import { TooltipProvider } from "@/components/ui/tooltip";
 
@@ -51,6 +51,42 @@ const NovoServicoDialog = ({ open, onOpenChange, onSaved }: NovoServicoDialogPro
   
   const [passageiros, setPassageiros] = useState<Passageiro[]>([]);
   const [outrosDespesas, setOutrosDespesas] = useState<OutraDespesa[]>([]);
+
+  // Quick-add motorista
+  const [showNewMotorista, setShowNewMotorista] = useState(false);
+  const [newMotorista, setNewMotorista] = useState({ nome: "", cnh: "", telefone: "", email: "", categoria: "" });
+
+  // Quick-add fornecedor
+  const [showNewFornecedor, setShowNewFornecedor] = useState(false);
+  const [newFornecedor, setNewFornecedor] = useState({ razaoSocial: "", cnpj: "", contato: "", telefone: "", email: "", pix: "" });
+
+  const handleSaveNewMotorista = async () => {
+    if (!newMotorista.nome) { toast.error("Nome do motorista é obrigatório"); return; }
+    try {
+      await saveMotorista(newMotorista);
+      const updated = await getMotoristas();
+      setMotoristas(updated);
+      const created = updated.find((m) => m.nome === newMotorista.nome);
+      if (created) update("motoristaId", created.id);
+      setNewMotorista({ nome: "", cnh: "", telefone: "", email: "", categoria: "" });
+      setShowNewMotorista(false);
+      toast.success("Motorista cadastrado!");
+    } catch { toast.error("Erro ao cadastrar motorista"); }
+  };
+
+  const handleSaveNewFornecedor = async () => {
+    if (!newFornecedor.razaoSocial) { toast.error("Razão social é obrigatória"); return; }
+    try {
+      await saveFornecedor(newFornecedor);
+      const updated = await getFornecedores();
+      setFornecedores(updated);
+      const created = updated.find((f) => f.razaoSocial === newFornecedor.razaoSocial);
+      if (created) update("fornecedorId", created.id);
+      setNewFornecedor({ razaoSocial: "", cnpj: "", contato: "", telefone: "", email: "", pix: "" });
+      setShowNewFornecedor(false);
+      toast.success("Fornecedor cadastrado!");
+    } catch { toast.error("Erro ao cadastrar fornecedor"); }
+  };
 
   useEffect(() => {
     if (open) {
@@ -210,14 +246,32 @@ const NovoServicoDialog = ({ open, onOpenChange, onSaved }: NovoServicoDialogPro
           </div>
 
           <div className="space-y-1.5">
-            <Label>Motorista</Label>
-            <Select value={form.motoristaId} onValueChange={(v) => update("motoristaId", v)}>
-              <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
-              <SelectContent>
-                {motoristas.length === 0 && <SelectItem value="_none" disabled>Nenhum cadastrado</SelectItem>}
-                {motoristas.map((m) => <SelectItem key={m.id} value={m.id}>{m.nome}</SelectItem>)}
-              </SelectContent>
-            </Select>
+            <div className="flex items-center justify-between">
+              <Label>Motorista</Label>
+              <Button type="button" variant="ghost" size="sm" className="h-6 gap-1 text-xs px-2" onClick={() => setShowNewMotorista(!showNewMotorista)}>
+                <UserPlus className="h-3 w-3" /> Novo
+              </Button>
+            </div>
+            {showNewMotorista ? (
+              <div className="space-y-2 rounded-md border border-border p-2 bg-muted/30">
+                <Input value={newMotorista.nome} onChange={(e) => setNewMotorista({ ...newMotorista, nome: e.target.value })} placeholder="Nome *" />
+                <Input value={newMotorista.telefone} onChange={(e) => setNewMotorista({ ...newMotorista, telefone: e.target.value })} placeholder="Telefone" />
+                <Input value={newMotorista.cnh} onChange={(e) => setNewMotorista({ ...newMotorista, cnh: e.target.value })} placeholder="CNH" />
+                <Input value={newMotorista.categoria} onChange={(e) => setNewMotorista({ ...newMotorista, categoria: e.target.value })} placeholder="Categoria" />
+                <div className="flex gap-2">
+                  <Button type="button" size="sm" className="h-7 text-xs" onClick={handleSaveNewMotorista}>Salvar</Button>
+                  <Button type="button" variant="outline" size="sm" className="h-7 text-xs" onClick={() => setShowNewMotorista(false)}>Cancelar</Button>
+                </div>
+              </div>
+            ) : (
+              <Select value={form.motoristaId} onValueChange={(v) => update("motoristaId", v)}>
+                <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
+                <SelectContent>
+                  {motoristas.length === 0 && <SelectItem value="_none" disabled>Nenhum cadastrado</SelectItem>}
+                  {motoristas.map((m) => <SelectItem key={m.id} value={m.id}>{m.nome}</SelectItem>)}
+                </SelectContent>
+              </Select>
+            )}
           </div>
 
           <div className="space-y-1.5">
@@ -226,14 +280,33 @@ const NovoServicoDialog = ({ open, onOpenChange, onSaved }: NovoServicoDialogPro
           </div>
 
           <div className="space-y-1.5">
-            <Label>Fornecedor</Label>
-            <Select value={form.fornecedorId} onValueChange={(v) => update("fornecedorId", v)}>
-              <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
-              <SelectContent>
-                {fornecedores.length === 0 && <SelectItem value="_none" disabled>Nenhum cadastrado</SelectItem>}
-                {fornecedores.map((f) => <SelectItem key={f.id} value={f.id}>{f.razaoSocial}</SelectItem>)}
-              </SelectContent>
-            </Select>
+            <div className="flex items-center justify-between">
+              <Label>Fornecedor</Label>
+              <Button type="button" variant="ghost" size="sm" className="h-6 gap-1 text-xs px-2" onClick={() => setShowNewFornecedor(!showNewFornecedor)}>
+                <UserPlus className="h-3 w-3" /> Novo
+              </Button>
+            </div>
+            {showNewFornecedor ? (
+              <div className="space-y-2 rounded-md border border-border p-2 bg-muted/30">
+                <Input value={newFornecedor.razaoSocial} onChange={(e) => setNewFornecedor({ ...newFornecedor, razaoSocial: e.target.value })} placeholder="Razão Social *" />
+                <Input value={newFornecedor.cnpj} onChange={(e) => setNewFornecedor({ ...newFornecedor, cnpj: e.target.value })} placeholder="CNPJ" />
+                <Input value={newFornecedor.contato} onChange={(e) => setNewFornecedor({ ...newFornecedor, contato: e.target.value })} placeholder="Contato" />
+                <Input value={newFornecedor.telefone} onChange={(e) => setNewFornecedor({ ...newFornecedor, telefone: e.target.value })} placeholder="Telefone" />
+                <Input value={newFornecedor.pix} onChange={(e) => setNewFornecedor({ ...newFornecedor, pix: e.target.value })} placeholder="PIX" />
+                <div className="flex gap-2">
+                  <Button type="button" size="sm" className="h-7 text-xs" onClick={handleSaveNewFornecedor}>Salvar</Button>
+                  <Button type="button" variant="outline" size="sm" className="h-7 text-xs" onClick={() => setShowNewFornecedor(false)}>Cancelar</Button>
+                </div>
+              </div>
+            ) : (
+              <Select value={form.fornecedorId} onValueChange={(v) => update("fornecedorId", v)}>
+                <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
+                <SelectContent>
+                  {fornecedores.length === 0 && <SelectItem value="_none" disabled>Nenhum cadastrado</SelectItem>}
+                  {fornecedores.map((f) => <SelectItem key={f.id} value={f.id}>{f.razaoSocial}</SelectItem>)}
+                </SelectContent>
+              </Select>
+            )}
           </div>
 
           <div className="space-y-1.5">
