@@ -15,9 +15,10 @@ interface NovoServicoDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onSaved: () => void;
+  initialData?: import("@/data/agendaData").AgendaItem | null;
 }
 
-const NovoServicoDialog = ({ open, onOpenChange, onSaved }: NovoServicoDialogProps) => {
+const NovoServicoDialog = ({ open, onOpenChange, onSaved, initialData }: NovoServicoDialogProps) => {
   const [clientes, setClientes] = useState<any[]>([]);
   const [veiculos, setVeiculos] = useState<any[]>([]);
   const [motoristas, setMotoristas] = useState<any[]>([]);
