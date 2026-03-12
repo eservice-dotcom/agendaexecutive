@@ -52,6 +52,42 @@ const NovoServicoDialog = ({ open, onOpenChange, onSaved }: NovoServicoDialogPro
   const [passageiros, setPassageiros] = useState<Passageiro[]>([]);
   const [outrosDespesas, setOutrosDespesas] = useState<OutraDespesa[]>([]);
 
+  // Quick-add motorista
+  const [showNewMotorista, setShowNewMotorista] = useState(false);
+  const [newMotorista, setNewMotorista] = useState({ nome: "", cnh: "", telefone: "", email: "", categoria: "" });
+
+  // Quick-add fornecedor
+  const [showNewFornecedor, setShowNewFornecedor] = useState(false);
+  const [newFornecedor, setNewFornecedor] = useState({ razaoSocial: "", cnpj: "", contato: "", telefone: "", email: "", pix: "" });
+
+  const handleSaveNewMotorista = async () => {
+    if (!newMotorista.nome) { toast.error("Nome do motorista é obrigatório"); return; }
+    try {
+      await saveMotorista(newMotorista);
+      const updated = await getMotoristas();
+      setMotoristas(updated);
+      const created = updated.find((m) => m.nome === newMotorista.nome);
+      if (created) update("motoristaId", created.id);
+      setNewMotorista({ nome: "", cnh: "", telefone: "", email: "", categoria: "" });
+      setShowNewMotorista(false);
+      toast.success("Motorista cadastrado!");
+    } catch { toast.error("Erro ao cadastrar motorista"); }
+  };
+
+  const handleSaveNewFornecedor = async () => {
+    if (!newFornecedor.razaoSocial) { toast.error("Razão social é obrigatória"); return; }
+    try {
+      await saveFornecedor(newFornecedor);
+      const updated = await getFornecedores();
+      setFornecedores(updated);
+      const created = updated.find((f) => f.razaoSocial === newFornecedor.razaoSocial);
+      if (created) update("fornecedorId", created.id);
+      setNewFornecedor({ razaoSocial: "", cnpj: "", contato: "", telefone: "", email: "", pix: "" });
+      setShowNewFornecedor(false);
+      toast.success("Fornecedor cadastrado!");
+    } catch { toast.error("Erro ao cadastrar fornecedor"); }
+  };
+
   useEffect(() => {
     if (open) {
       (async () => {
