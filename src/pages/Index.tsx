@@ -44,6 +44,7 @@ const Index = () => {
   const canViewFinancials = hasPermission && showFinancials;
   const [filters, setFilters] = useState<FiltersState>(initialFilters);
   const [novoDialogOpen, setNovoDialogOpen] = useState(false);
+  const [cloneData, setCloneData] = useState<any | null>(null);
   const [agendaData, setAgendaData] = useState<any[]>([]);
   const [printWithFinancials, setPrintWithFinancials] = useState(true);
 
