@@ -246,14 +246,32 @@ const NovoServicoDialog = ({ open, onOpenChange, onSaved }: NovoServicoDialogPro
           </div>
 
           <div className="space-y-1.5">
-            <Label>Motorista</Label>
-            <Select value={form.motoristaId} onValueChange={(v) => update("motoristaId", v)}>
-              <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
-              <SelectContent>
-                {motoristas.length === 0 && <SelectItem value="_none" disabled>Nenhum cadastrado</SelectItem>}
-                {motoristas.map((m) => <SelectItem key={m.id} value={m.id}>{m.nome}</SelectItem>)}
-              </SelectContent>
-            </Select>
+            <div className="flex items-center justify-between">
+              <Label>Motorista</Label>
+              <Button type="button" variant="ghost" size="sm" className="h-6 gap-1 text-xs px-2" onClick={() => setShowNewMotorista(!showNewMotorista)}>
+                <UserPlus className="h-3 w-3" /> Novo
+              </Button>
+            </div>
+            {showNewMotorista ? (
+              <div className="space-y-2 rounded-md border border-border p-2 bg-muted/30">
+                <Input value={newMotorista.nome} onChange={(e) => setNewMotorista({ ...newMotorista, nome: e.target.value })} placeholder="Nome *" />
+                <Input value={newMotorista.telefone} onChange={(e) => setNewMotorista({ ...newMotorista, telefone: e.target.value })} placeholder="Telefone" />
+                <Input value={newMotorista.cnh} onChange={(e) => setNewMotorista({ ...newMotorista, cnh: e.target.value })} placeholder="CNH" />
+                <Input value={newMotorista.categoria} onChange={(e) => setNewMotorista({ ...newMotorista, categoria: e.target.value })} placeholder="Categoria" />
+                <div className="flex gap-2">
+                  <Button type="button" size="sm" className="h-7 text-xs" onClick={handleSaveNewMotorista}>Salvar</Button>
+                  <Button type="button" variant="outline" size="sm" className="h-7 text-xs" onClick={() => setShowNewMotorista(false)}>Cancelar</Button>
+                </div>
+              </div>
+            ) : (
+              <Select value={form.motoristaId} onValueChange={(v) => update("motoristaId", v)}>
+                <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
+                <SelectContent>
+                  {motoristas.length === 0 && <SelectItem value="_none" disabled>Nenhum cadastrado</SelectItem>}
+                  {motoristas.map((m) => <SelectItem key={m.id} value={m.id}>{m.nome}</SelectItem>)}
+                </SelectContent>
+              </Select>
+            )}
           </div>
 
           <div className="space-y-1.5">
