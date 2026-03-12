@@ -69,7 +69,7 @@ const formatDate = (dateStr: string) => {
   return `${d}/${m}/${y}`;
 };
 
-const AgendaTable = ({ items, onEdited, hideFinancials }: AgendaTableProps) => {
+const AgendaTable = ({ items, onEdited, hideFinancials, onClone }: AgendaTableProps) => {
   const [whatsappItem, setWhatsappItem] = useState<AgendaItem | null>(null);
   const [editItem, setEditItem] = useState<AgendaItem | null>(null);
   const [deleteItemId, setDeleteItemId] = useState<string | null>(null);
