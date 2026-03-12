@@ -64,6 +64,20 @@ const NovoServicoDialog = ({ open, onOpenChange, onSaved }: NovoServicoDialogPro
   const [showNewFornecedor, setShowNewFornecedor] = useState(false);
   const [newFornecedor, setNewFornecedor] = useState({ razaoSocial: "", cnpj: "", contato: "", telefone: "", email: "", pix: "" });
 
+  const handleSaveNewVeiculo = async () => {
+    if (!newVeiculo.placa || !newVeiculo.modelo) { toast.error("Placa e modelo são obrigatórios"); return; }
+    try {
+      await saveVeiculo({ ...newVeiculo, ano: parseInt(newVeiculo.ano) || new Date().getFullYear(), capacidade: parseInt(newVeiculo.capacidade) || 0 });
+      const updated = await getVeiculos();
+      setVeiculos(updated);
+      const created = updated.find((v) => v.placa === newVeiculo.placa);
+      if (created) update("veiculoId", created.id);
+      setNewVeiculo({ placa: "", modelo: "", tipo: "", ano: "", capacidade: "" });
+      setShowNewVeiculo(false);
+      toast.success("Veículo cadastrado!");
+    } catch { toast.error("Erro ao cadastrar veículo"); }
+  };
+
   const handleSaveNewMotorista = async () => {
     if (!newMotorista.nome) { toast.error("Nome do motorista é obrigatório"); return; }
     try {
