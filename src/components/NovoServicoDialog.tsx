@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { getClientes, getVeiculos, getMotoristas, getFornecedores, saveAgendaItem, getTiposServico, saveMotorista, saveFornecedor } from "@/data/cadastroStorage";
+import { getClientes, getVeiculos, getMotoristas, getFornecedores, saveAgendaItem, getTiposServico, saveMotorista, saveFornecedor, saveVeiculo } from "@/data/cadastroStorage";
 import { Passageiro, OutraDespesa } from "@/data/agendaData";
 import { toast } from "sonner";
 import { Plus, Trash2, UserPlus } from "lucide-react";
