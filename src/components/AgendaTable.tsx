@@ -10,7 +10,7 @@ import WhatsAppDialog from "./WhatsAppDialog";
 import WhatsAppFornecedorDialog from "./WhatsAppFornecedorDialog";
 import EditServicoDialog from "./EditServicoDialog";
 import { useAuth } from "@/contexts/AuthContext";
-import { deleteAgendaItem, updateAgendaItem, saveAgendaItem } from "@/data/cadastroStorage";
+import { deleteAgendaItem, updateAgendaItem } from "@/data/cadastroStorage";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { toast } from "sonner";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
@@ -19,6 +19,7 @@ interface AgendaTableProps {
   items: AgendaItem[];
   onEdited?: () => void;
   hideFinancials?: boolean;
+  onClone?: (item: AgendaItem) => void;
 }
 
 const tipoBadgeVariant = (tipo: string) => {
@@ -68,7 +69,7 @@ const formatDate = (dateStr: string) => {
   return `${d}/${m}/${y}`;
 };
 
-const AgendaTable = ({ items, onEdited, hideFinancials }: AgendaTableProps) => {
+const AgendaTable = ({ items, onEdited, hideFinancials, onClone }: AgendaTableProps) => {
   const [whatsappItem, setWhatsappItem] = useState<AgendaItem | null>(null);
   const [editItem, setEditItem] = useState<AgendaItem | null>(null);
   const [deleteItemId, setDeleteItemId] = useState<string | null>(null);
@@ -115,20 +116,9 @@ const AgendaTable = ({ items, onEdited, hideFinancials }: AgendaTableProps) => {
     }
   };
 
-  const handleClone = async (item: AgendaItem) => {
-    try {
-      const { id, ...rest } = item;
-      const baseCot = rest.cot ? rest.cot.replace(/-COPIA.*$/, "") : "";
-      await saveAgendaItem({ ...rest, cot: baseCot });
-      toast.success("Serviço clonado! Abrindo para edição...");
-      await onEdited?.();
-      // Reload to get the new item, then open edit
-      const { getAgendaItems } = await import("@/data/cadastroStorage");
-      const allItems = await getAgendaItems();
-      const cloned = allItems.find(i => i.cot === `${rest.cot}-COPIA` && i.data === rest.data && i.hora === rest.hora);
-      if (cloned) tryEditItem(cloned);
-    } catch {
-      toast.error("Erro ao clonar serviço");
+  const handleClone = (item: AgendaItem) => {
+    if (onClone) {
+      onClone(item);
     }
   };
 

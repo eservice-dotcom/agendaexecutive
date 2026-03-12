@@ -44,6 +44,7 @@ const Index = () => {
   const canViewFinancials = hasPermission && showFinancials;
   const [filters, setFilters] = useState<FiltersState>(initialFilters);
   const [novoDialogOpen, setNovoDialogOpen] = useState(false);
+  const [cloneData, setCloneData] = useState<any | null>(null);
   const [agendaData, setAgendaData] = useState<any[]>([]);
   const [printWithFinancials, setPrintWithFinancials] = useState(true);
 
@@ -201,8 +202,8 @@ const Index = () => {
                 </Button>
               </div>
             </div>
-            <AgendaTable items={filteredData} onEdited={reloadData} hideFinancials={!showFinancials} />
-            <NovoServicoDialog open={novoDialogOpen} onOpenChange={setNovoDialogOpen} onSaved={reloadData} />
+            <AgendaTable items={filteredData} onEdited={reloadData} hideFinancials={!showFinancials} onClone={(item) => { setCloneData(item); setNovoDialogOpen(true); }} />
+            <NovoServicoDialog open={novoDialogOpen} onOpenChange={(v) => { setNovoDialogOpen(v); if (!v) setCloneData(null); }} onSaved={reloadData} initialData={cloneData} />
           </TabsContent>
 
           {canViewFinancials && (
