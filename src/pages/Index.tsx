@@ -202,8 +202,8 @@ const Index = () => {
                 </Button>
               </div>
             </div>
-            <AgendaTable items={filteredData} onEdited={reloadData} hideFinancials={!showFinancials} />
-            <NovoServicoDialog open={novoDialogOpen} onOpenChange={setNovoDialogOpen} onSaved={reloadData} />
+            <AgendaTable items={filteredData} onEdited={reloadData} hideFinancials={!showFinancials} onClone={(item) => { setCloneData(item); setNovoDialogOpen(true); }} />
+            <NovoServicoDialog open={novoDialogOpen} onOpenChange={(v) => { setNovoDialogOpen(v); if (!v) setCloneData(null); }} onSaved={reloadData} initialData={cloneData} />
           </TabsContent>
 
           {canViewFinancials && (
