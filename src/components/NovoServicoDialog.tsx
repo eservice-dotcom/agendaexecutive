@@ -253,14 +253,33 @@ const NovoServicoDialog = ({ open, onOpenChange, onSaved }: NovoServicoDialogPro
           </div>
 
           <div className="space-y-1.5">
-            <Label>Veículo</Label>
-            <Select value={form.veiculoId} onValueChange={(v) => update("veiculoId", v)}>
-              <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
-              <SelectContent>
-                {veiculos.length === 0 && <SelectItem value="_none" disabled>Nenhum cadastrado</SelectItem>}
-                {veiculos.map((v) => <SelectItem key={v.id} value={v.id}>{v.placa} - {v.modelo}</SelectItem>)}
-              </SelectContent>
-            </Select>
+            <div className="flex items-center justify-between">
+              <Label>Veículo</Label>
+              <Button type="button" variant="ghost" size="sm" className="h-6 gap-1 text-xs px-2" onClick={() => setShowNewVeiculo(!showNewVeiculo)}>
+                <UserPlus className="h-3 w-3" /> Novo
+              </Button>
+            </div>
+            {showNewVeiculo ? (
+              <div className="space-y-2 rounded-md border border-border p-2 bg-muted/30">
+                <Input value={newVeiculo.placa} onChange={(e) => setNewVeiculo({ ...newVeiculo, placa: e.target.value })} placeholder="Placa *" />
+                <Input value={newVeiculo.modelo} onChange={(e) => setNewVeiculo({ ...newVeiculo, modelo: e.target.value })} placeholder="Modelo *" />
+                <Input value={newVeiculo.tipo} onChange={(e) => setNewVeiculo({ ...newVeiculo, tipo: e.target.value })} placeholder="Tipo (ex: Sedan)" />
+                <Input type="number" value={newVeiculo.ano} onChange={(e) => setNewVeiculo({ ...newVeiculo, ano: e.target.value })} placeholder="Ano" />
+                <Input type="number" value={newVeiculo.capacidade} onChange={(e) => setNewVeiculo({ ...newVeiculo, capacidade: e.target.value })} placeholder="Capacidade" />
+                <div className="flex gap-2">
+                  <Button type="button" size="sm" className="h-7 text-xs" onClick={handleSaveNewVeiculo}>Salvar</Button>
+                  <Button type="button" variant="outline" size="sm" className="h-7 text-xs" onClick={() => setShowNewVeiculo(false)}>Cancelar</Button>
+                </div>
+              </div>
+            ) : (
+              <Select value={form.veiculoId} onValueChange={(v) => update("veiculoId", v)}>
+                <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
+                <SelectContent>
+                  {veiculos.length === 0 && <SelectItem value="_none" disabled>Nenhum cadastrado</SelectItem>}
+                  {veiculos.map((v) => <SelectItem key={v.id} value={v.id}>{v.placa} - {v.modelo}</SelectItem>)}
+                </SelectContent>
+              </Select>
+            )}
           </div>
 
           <div className="space-y-1.5">
