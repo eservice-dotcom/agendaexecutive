@@ -140,9 +140,44 @@ const NovoServicoDialog = ({ open, onOpenChange, onSaved, initialData }: NovoSer
         setMotoristas(m);
         setFornecedores(f);
         setTiposServico(t);
+
+        // Pre-fill form if initialData is provided (clone)
+        if (initialData) {
+          const clienteMatch = c.find((cl: any) => cl.nome === initialData.cliente);
+          const veiculoMatch = v.find((ve: any) => ve.placa === initialData.placa);
+          const motoristaMatch = m.find((mo: any) => mo.nome === initialData.motorista);
+          const fornecedorMatch = f.find((fo: any) => fo.razaoSocial === initialData.fornecedor);
+
+          setForm({
+            data: initialData.data,
+            hora: initialData.hora,
+            clienteId: clienteMatch?.id || "",
+            pax: String(initialData.pax || ""),
+            cot: initialData.cot,
+            tipo: initialData.tipo,
+            origem: initialData.origem,
+            destino: initialData.destino,
+            veiculoId: veiculoMatch?.id || "",
+            motoristaId: motoristaMatch?.id || "",
+            valor: String(initialData.valor || ""),
+            fornecedorId: fornecedorMatch?.id || "",
+            custo: String(initialData.custo || ""),
+            observacoes: initialData.observacoes || "",
+            receptivo: initialData.receptivo || "",
+            kmIn: String(initialData.kmIn || ""),
+            kmFim: String(initialData.kmFim || ""),
+            kmExtra: String(initialData.kmExtra || ""),
+            horaIn: initialData.horaIn || "",
+            horaFim: initialData.horaFim || "",
+            estacionamento: String(initialData.estacionamento || ""),
+            horaExtra: initialData.horaExtra || "",
+          });
+          setPassageiros(initialData.passageiros || []);
+          setOutrosDespesas(initialData.outrosDespesas || []);
+        }
       })();
     }
-  }, [open]);
+  }, [open, initialData]);
 
   const update = (key: string, value: string) => setForm((f) => ({ ...f, [key]: value }));
 
