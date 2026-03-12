@@ -64,6 +64,10 @@ const NovoServicoDialog = ({ open, onOpenChange, onSaved }: NovoServicoDialogPro
   const [showNewFornecedor, setShowNewFornecedor] = useState(false);
   const [newFornecedor, setNewFornecedor] = useState({ razaoSocial: "", cnpj: "", contato: "", telefone: "", email: "", pix: "" });
 
+  // Quick-add cliente
+  const [showNewCliente, setShowNewCliente] = useState(false);
+  const [newCliente, setNewCliente] = useState({ nome: "", cnpjCpf: "", telefone: "", email: "", endereco: "" });
+
   const handleSaveNewVeiculo = async () => {
     if (!newVeiculo.placa || !newVeiculo.modelo) { toast.error("Placa e modelo são obrigatórios"); return; }
     try {
