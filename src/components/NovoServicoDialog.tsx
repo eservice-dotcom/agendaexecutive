@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { getClientes, getVeiculos, getMotoristas, getFornecedores, saveAgendaItem, getTiposServico, saveMotorista, saveFornecedor, saveVeiculo } from "@/data/cadastroStorage";
+import { getClientes, getVeiculos, getMotoristas, getFornecedores, saveAgendaItem, getTiposServico, saveMotorista, saveFornecedor, saveVeiculo, saveCliente } from "@/data/cadastroStorage";
 import { Passageiro, OutraDespesa } from "@/data/agendaData";
 import { toast } from "sonner";
 import { Plus, Trash2, UserPlus } from "lucide-react";
@@ -64,6 +64,10 @@ const NovoServicoDialog = ({ open, onOpenChange, onSaved }: NovoServicoDialogPro
   const [showNewFornecedor, setShowNewFornecedor] = useState(false);
   const [newFornecedor, setNewFornecedor] = useState({ razaoSocial: "", cnpj: "", contato: "", telefone: "", email: "", pix: "" });
 
+  // Quick-add cliente
+  const [showNewCliente, setShowNewCliente] = useState(false);
+  const [newCliente, setNewCliente] = useState({ nome: "", cnpjCpf: "", telefone: "", email: "", endereco: "" });
+
   const handleSaveNewVeiculo = async () => {
     if (!newVeiculo.placa || !newVeiculo.modelo) { toast.error("Placa e modelo são obrigatórios"); return; }
     try {
@@ -104,6 +108,20 @@ const NovoServicoDialog = ({ open, onOpenChange, onSaved }: NovoServicoDialogPro
       setShowNewFornecedor(false);
       toast.success("Fornecedor cadastrado!");
     } catch { toast.error("Erro ao cadastrar fornecedor"); }
+  };
+
+  const handleSaveNewCliente = async () => {
+    if (!newCliente.nome) { toast.error("Nome do cliente é obrigatório"); return; }
+    try {
+      await saveCliente(newCliente);
+      const updated = await getClientes();
+      setClientes(updated);
+      const created = updated.find((c) => c.nome === newCliente.nome);
+      if (created) update("clienteId", created.id);
+      setNewCliente({ nome: "", cnpjCpf: "", telefone: "", email: "", endereco: "" });
+      setShowNewCliente(false);
+      toast.success("Cliente cadastrado!");
+    } catch { toast.error("Erro ao cadastrar cliente"); }
   };
 
   useEffect(() => {
@@ -208,14 +226,33 @@ const NovoServicoDialog = ({ open, onOpenChange, onSaved }: NovoServicoDialogPro
           </div>
 
           <div className="space-y-1.5">
-            <Label>Cliente *</Label>
-            <Select value={form.clienteId} onValueChange={(v) => update("clienteId", v)}>
-              <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
-              <SelectContent>
-                {clientes.length === 0 && <SelectItem value="_none" disabled>Nenhum cadastrado</SelectItem>}
-                {clientes.map((c) => <SelectItem key={c.id} value={c.id}>{c.nome}</SelectItem>)}
-              </SelectContent>
-            </Select>
+            <div className="flex items-center justify-between">
+              <Label>Cliente *</Label>
+              <Button type="button" variant="ghost" size="sm" className="h-6 gap-1 text-xs px-2" onClick={() => setShowNewCliente(!showNewCliente)}>
+                <UserPlus className="h-3 w-3" /> Novo
+              </Button>
+            </div>
+            {showNewCliente ? (
+              <div className="space-y-2 rounded-md border border-border p-2 bg-muted/30">
+                <Input value={newCliente.nome} onChange={(e) => setNewCliente({ ...newCliente, nome: e.target.value })} placeholder="Nome *" />
+                <Input value={newCliente.cnpjCpf} onChange={(e) => setNewCliente({ ...newCliente, cnpjCpf: e.target.value })} placeholder="CNPJ/CPF" />
+                <Input value={newCliente.telefone} onChange={(e) => setNewCliente({ ...newCliente, telefone: e.target.value })} placeholder="Telefone" />
+                <Input value={newCliente.email} onChange={(e) => setNewCliente({ ...newCliente, email: e.target.value })} placeholder="Email" />
+                <Input value={newCliente.endereco} onChange={(e) => setNewCliente({ ...newCliente, endereco: e.target.value })} placeholder="Endereço" />
+                <div className="flex gap-2">
+                  <Button type="button" size="sm" className="h-7 text-xs" onClick={handleSaveNewCliente}>Salvar</Button>
+                  <Button type="button" variant="outline" size="sm" className="h-7 text-xs" onClick={() => setShowNewCliente(false)}>Cancelar</Button>
+                </div>
+              </div>
+            ) : (
+              <Select value={form.clienteId} onValueChange={(v) => update("clienteId", v)}>
+                <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
+                <SelectContent>
+                  {clientes.length === 0 && <SelectItem value="_none" disabled>Nenhum cadastrado</SelectItem>}
+                  {clientes.map((c) => <SelectItem key={c.id} value={c.id}>{c.nome}</SelectItem>)}
+                </SelectContent>
+              </Select>
+            )}
           </div>
 
           <div className="space-y-1.5">
