@@ -52,6 +52,10 @@ const NovoServicoDialog = ({ open, onOpenChange, onSaved }: NovoServicoDialogPro
   const [passageiros, setPassageiros] = useState<Passageiro[]>([]);
   const [outrosDespesas, setOutrosDespesas] = useState<OutraDespesa[]>([]);
 
+  // Quick-add veiculo
+  const [showNewVeiculo, setShowNewVeiculo] = useState(false);
+  const [newVeiculo, setNewVeiculo] = useState({ placa: "", modelo: "", tipo: "", ano: "", capacidade: "" });
+
   // Quick-add motorista
   const [showNewMotorista, setShowNewMotorista] = useState(false);
   const [newMotorista, setNewMotorista] = useState({ nome: "", cnh: "", telefone: "", email: "", categoria: "" });
