@@ -1508,7 +1508,81 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
                   </label>
                 ))}
               </div>
-              <p className="text-sm text-muted-foreground">{fechamentoSelected.size} de {fechamentoItems.length} selecionados</p>
+              <p className="text-sm text-muted-foreground">{fechamentoSelected.size} de {fechamentoItems.length} serviços selecionados</p>
+
+              {/* Extras section */}
+              <div className="border-t pt-3 mt-3">
+                <p className="text-sm font-medium mb-2">Extras</p>
+                {fechamentoExtras.length > 0 && (
+                  <div className="border rounded-md divide-y mb-2">
+                    {fechamentoExtras.map((extra, idx) => (
+                      <label key={idx} className="flex items-center gap-3 px-3 py-2 hover:bg-muted/50 cursor-pointer">
+                        <Checkbox
+                          checked={fechamentoExtrasSelected.has(idx)}
+                          onCheckedChange={(checked) => {
+                            const next = new Set(fechamentoExtrasSelected);
+                            checked ? next.add(idx) : next.delete(idx);
+                            setFechamentoExtrasSelected(next);
+                          }}
+                        />
+                        <span className="flex-1 text-sm">{extra.descricao}</span>
+                        <span className="text-xs font-mono">{formatCurrency(extra.valor)}</span>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-6 w-6"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            const next = fechamentoExtras.filter((_, i) => i !== idx);
+                            setFechamentoExtras(next);
+                            const nextSel = new Set<number>();
+                            fechamentoExtrasSelected.forEach((i) => {
+                              if (i < idx) nextSel.add(i);
+                              else if (i > idx) nextSel.add(i - 1);
+                            });
+                            setFechamentoExtrasSelected(nextSel);
+                          }}
+                        >
+                          <Trash2 className="h-3 w-3 text-destructive" />
+                        </Button>
+                      </label>
+                    ))}
+                  </div>
+                )}
+                <div className="flex gap-2 items-end">
+                  <div className="flex-1">
+                    <Input
+                      placeholder="Descrição do extra"
+                      value={fechamentoNovoExtra.descricao}
+                      onChange={(e) => setFechamentoNovoExtra(prev => ({ ...prev, descricao: e.target.value }))}
+                      className="h-8 text-sm"
+                    />
+                  </div>
+                  <div className="w-28">
+                    <Input
+                      type="number"
+                      placeholder="Valor"
+                      value={fechamentoNovoExtra.valor}
+                      onChange={(e) => setFechamentoNovoExtra(prev => ({ ...prev, valor: e.target.value }))}
+                      className="h-8 text-sm"
+                    />
+                  </div>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="h-8"
+                    disabled={!fechamentoNovoExtra.descricao.trim() || !fechamentoNovoExtra.valor}
+                    onClick={() => {
+                      const newIdx = fechamentoExtras.length;
+                      setFechamentoExtras(prev => [...prev, { descricao: fechamentoNovoExtra.descricao.trim(), valor: Number(fechamentoNovoExtra.valor) }]);
+                      setFechamentoExtrasSelected(prev => new Set([...prev, newIdx]));
+                      setFechamentoNovoExtra({ descricao: "", valor: "" });
+                    }}
+                  >
+                    <Plus className="h-3 w-3 mr-1" /> Adicionar
+                  </Button>
+                </div>
+              </div>
             </div>
             <DialogFooter>
               <Button variant="outline" onClick={() => setFechamentoDialog(null)}>Cancelar</Button>
