@@ -161,6 +161,56 @@ export type Database = {
         }
         Relationships: []
       }
+      contas_pagar: {
+        Row: {
+          created_at: string
+          data: string
+          data_vencimento: string | null
+          descritivo: string
+          fornecedor: string
+          id: string
+          status: string
+          updated_at: string
+          user_id: string
+          valor: number
+          venda_id: string
+        }
+        Insert: {
+          created_at?: string
+          data?: string
+          data_vencimento?: string | null
+          descritivo?: string
+          fornecedor?: string
+          id?: string
+          status?: string
+          updated_at?: string
+          user_id: string
+          valor?: number
+          venda_id: string
+        }
+        Update: {
+          created_at?: string
+          data?: string
+          data_vencimento?: string | null
+          descritivo?: string
+          fornecedor?: string
+          id?: string
+          status?: string
+          updated_at?: string
+          user_id?: string
+          valor?: number
+          venda_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "contas_pagar_venda_id_fkey"
+            columns: ["venda_id"]
+            isOneToOne: false
+            referencedRelation: "vendas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       editing_locks: {
         Row: {
           id: string
