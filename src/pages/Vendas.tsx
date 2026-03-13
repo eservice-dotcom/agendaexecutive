@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo, useCallback } from "react";
 import { Link } from "react-router-dom";
-import { ArrowLeft, Plus, Trash2, ShoppingCart, Search, Check, FileText, XCircle } from "lucide-react";
+import { ArrowLeft, Plus, Trash2, ShoppingCart, Search, Check, FileText, XCircle, DollarSign, CheckCircle } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
@@ -12,6 +12,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "@/hooks/use-toast";
 import logo from "@/assets/logo-executive-service.png";
 
@@ -35,10 +36,12 @@ interface AgendaItem {
   origem: string;
   destino: string;
   valor: number;
+  custo: number;
   motorista: string;
   veiculo: string;
   pax: number;
   cot: string;
+  fornecedor: string;
   status_faturamento: string | null;
 }
 
@@ -48,6 +51,30 @@ interface ContaPagar {
   valor: number;
   data: string;
   data_vencimento: string;
+}
+
+interface ContaPagarDB {
+  id: string;
+  venda_id: string;
+  fornecedor: string;
+  descritivo: string;
+  valor: number;
+  data: string;
+  data_vencimento: string | null;
+  data_pagamento: string | null;
+  status: string;
+}
+
+interface ContaReceberDB {
+  id: string;
+  venda_id: string;
+  cliente: string;
+  descritivo: string;
+  valor: number;
+  data: string;
+  data_vencimento: string | null;
+  data_pagamento: string | null;
+  status: string;
 }
 
 const formatCurrency = (v: number) =>
@@ -63,6 +90,7 @@ const Vendas = () => {
   const [vendas, setVendas] = useState<Venda[]>([]);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [activeTab, setActiveTab] = useState("vendas");
 
   // Form state
   const [cliente, setCliente] = useState("");
@@ -75,6 +103,14 @@ const Vendas = () => {
   const [searchAgenda, setSearchAgenda] = useState("");
   const [contasPagar, setContasPagar] = useState<ContaPagar[]>([]);
   const [fornecedores, setFornecedores] = useState<string[]>([]);
+
+  // Contas lists
+  const [contasPagarList, setContasPagarList] = useState<ContaPagarDB[]>([]);
+  const [contasReceberList, setContasReceberList] = useState<ContaReceberDB[]>([]);
+
+  // Edit dialog
+  const [editDialog, setEditDialog] = useState<{ type: "pagar" | "receber"; item: any } | null>(null);
+  const [editForm, setEditForm] = useState({ descritivo: "", valor: "", data_vencimento: "", data_pagamento: "" });
 
   const loadVendas = useCallback(async () => {
     const { data, error } = await supabase
@@ -105,11 +141,29 @@ const Vendas = () => {
     }
   }, []);
 
+  const loadContasPagar = useCallback(async () => {
+    const { data } = await supabase
+      .from("contas_pagar")
+      .select("*")
+      .order("data_vencimento", { ascending: true });
+    if (data) setContasPagarList(data as ContaPagarDB[]);
+  }, []);
+
+  const loadContasReceber = useCallback(async () => {
+    const { data } = await supabase
+      .from("contas_receber")
+      .select("*")
+      .order("data_vencimento", { ascending: true });
+    if (data) setContasReceberList(data as ContaReceberDB[]);
+  }, []);
+
   useEffect(() => {
     loadVendas();
     loadClientes();
     loadFornecedores();
-  }, [loadVendas, loadClientes, loadFornecedores]);
+    loadContasPagar();
+    loadContasReceber();
+  }, [loadVendas, loadClientes, loadFornecedores, loadContasPagar, loadContasReceber]);
 
   useEffect(() => {
     if (!cliente) {
@@ -119,7 +173,7 @@ const Vendas = () => {
     const load = async () => {
       const { data } = await supabase
         .from("agenda_items")
-        .select("id, cliente, data, hora, tipo, origem, destino, valor, motorista, veiculo, pax, cot, status_faturamento")
+        .select("id, cliente, data, hora, tipo, origem, destino, valor, custo, motorista, veiculo, pax, cot, fornecedor, status_faturamento")
         .eq("cliente", cliente)
         .order("data", { ascending: true });
       if (data) setAgendaItems(data as AgendaItem[]);
@@ -200,26 +254,66 @@ const Vendas = () => {
         .update({ status_faturamento: "faturado" })
         .in("id", Array.from(selectedItems));
 
-      // Save contas a pagar
-      if (contasPagar.length > 0) {
-        const contas = contasPagar.map((cp) => ({
-          venda_id: venda.id,
-          user_id: session!.user.id,
-          fornecedor: cp.fornecedor,
-          descritivo: cp.descritivo,
-          valor: cp.valor,
-          data: cp.data,
-          data_vencimento: cp.data_vencimento || null,
-          status: "pendente",
-        }));
-        const { error: contasError } = await supabase.from("contas_pagar").insert(contas);
-        if (contasError) throw contasError;
+      // Auto-generate conta a receber (client owes)
+      const { error: crError } = await supabase.from("contas_receber").insert({
+        venda_id: venda.id,
+        user_id: session!.user.id,
+        cliente,
+        descritivo: `Venda - ${items.length} serviço(s)`,
+        valor: totalSelected,
+        data: dataVenda,
+        data_vencimento: dataVencimento || null,
+        status: "pendente",
+      });
+      if (crError) throw crError;
+
+      // Auto-generate contas a pagar from selected services (supplier costs)
+      const selectedAgendaItems = agendaItems.filter((i) => selectedItems.has(i.id));
+      const fornecedorMap = new Map<string, { total: number; count: number }>();
+      selectedAgendaItems.forEach((item) => {
+        if (item.fornecedor && item.custo > 0) {
+          const existing = fornecedorMap.get(item.fornecedor) || { total: 0, count: 0 };
+          existing.total += item.custo;
+          existing.count += 1;
+          fornecedorMap.set(item.fornecedor, existing);
+        }
+      });
+
+      const autoContasPagar = Array.from(fornecedorMap.entries()).map(([fornecedor, info]) => ({
+        venda_id: venda.id,
+        user_id: session!.user.id,
+        fornecedor,
+        descritivo: `${info.count} serviço(s) - ${cliente}`,
+        valor: info.total,
+        data: dataVenda,
+        data_vencimento: dataVencimento || null,
+        status: "pendente",
+      }));
+
+      // Also add manually entered contas a pagar
+      const manualContas = contasPagar.map((cp) => ({
+        venda_id: venda.id,
+        user_id: session!.user.id,
+        fornecedor: cp.fornecedor,
+        descritivo: cp.descritivo,
+        valor: cp.valor,
+        data: cp.data,
+        data_vencimento: cp.data_vencimento || null,
+        status: "pendente",
+      }));
+
+      const allContasPagar = [...autoContasPagar, ...manualContas];
+      if (allContasPagar.length > 0) {
+        const { error: cpError } = await supabase.from("contas_pagar").insert(allContasPagar);
+        if (cpError) throw cpError;
       }
 
-      toast({ title: "Venda criada com sucesso!" });
+      toast({ title: "Venda criada com sucesso! Contas geradas automaticamente." });
       setDialogOpen(false);
       resetForm();
       loadVendas();
+      loadContasPagar();
+      loadContasReceber();
     } catch (err: any) {
       toast({ title: "Erro ao salvar venda", description: err.message, variant: "destructive" });
     } finally {
@@ -256,19 +350,19 @@ const Vendas = () => {
     if (!confirm("Excluir esta venda?")) return;
     await supabase.from("vendas").delete().eq("id", id);
     loadVendas();
+    loadContasPagar();
+    loadContasReceber();
     toast({ title: "Venda excluída" });
   };
 
   const handleCancelar = async (venda: Venda) => {
     if (!confirm("Cancelar esta venda? Os serviços vinculados voltarão ao status anterior.")) return;
     try {
-      // Get linked agenda_item_ids
       const { data: items } = await supabase
         .from("venda_items")
         .select("agenda_item_id")
         .eq("venda_id", venda.id);
 
-      // Revert status_faturamento
       if (items && items.length > 0) {
         await supabase
           .from("agenda_items")
@@ -276,25 +370,28 @@ const Vendas = () => {
           .in("id", items.map((i) => i.agenda_item_id));
       }
 
-      // Update venda status
       await supabase.from("vendas").update({ status: "cancelado" }).eq("id", venda.id);
+
+      // Cancel related financial records
+      await supabase.from("contas_pagar").update({ status: "cancelado" }).eq("venda_id", venda.id);
+      await supabase.from("contas_receber").update({ status: "cancelado" }).eq("venda_id", venda.id);
 
       toast({ title: "Venda cancelada" });
       loadVendas();
+      loadContasPagar();
+      loadContasReceber();
     } catch (err: any) {
       toast({ title: "Erro ao cancelar", description: err.message, variant: "destructive" });
     }
   };
 
   const handleGerarFatura = async (venda: Venda) => {
-    // Load venda_items with agenda details
     const { data: vendaItems } = await supabase
       .from("venda_items")
       .select("*, agenda_items:agenda_item_id(cot, data, hora, tipo, origem, destino, pax, motorista, veiculo)")
       .eq("venda_id", venda.id);
 
     const items = vendaItems || [];
-
     const logoUrl = new URL(logo, window.location.origin).href;
 
     const rows = items.map((item: any, idx: number) => {
@@ -340,7 +437,6 @@ th{background:#2d3748;color:#fff;font-weight:600;font-size:10px;text-transform:u
     <p>Emitida em: ${new Date().toLocaleString("pt-BR")}</p>
   </div>
 </div>
-
 <div class="info-grid">
   <div class="info-box">
     <h3>Cliente</h3>
@@ -353,7 +449,6 @@ th{background:#2d3748;color:#fff;font-weight:600;font-size:10px;text-transform:u
     <p><strong>Status:</strong> ${venda.status.toUpperCase()}</p>
   </div>
 </div>
-
 <table>
   <thead><tr>
     <th class="c">#</th><th>O.S.</th><th>Data</th><th>Tipo</th>
@@ -367,15 +462,65 @@ th{background:#2d3748;color:#fff;font-weight:600;font-size:10px;text-transform:u
     </tr>
   </tbody>
 </table>
-
 ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffbeb;border:1px solid #f0d68a;border-radius:4px"><strong>Observações:</strong> ${venda.observacoes}</div>` : ""}
-
 <div class="footer">
   <p>Executive Service — Fatura gerada automaticamente</p>
 </div>
 </body></html>`);
     w.document.close();
     w.onload = () => w.print();
+  };
+
+  // Edit conta
+  const openEditDialog = (type: "pagar" | "receber", item: any) => {
+    setEditForm({
+      descritivo: item.descritivo || "",
+      valor: String(item.valor),
+      data_vencimento: item.data_vencimento || "",
+      data_pagamento: item.data_pagamento || "",
+    });
+    setEditDialog({ type, item });
+  };
+
+  const handleSaveEdit = async () => {
+    if (!editDialog) return;
+    const { type, item } = editDialog;
+    const table = type === "pagar" ? "contas_pagar" : "contas_receber";
+    const updates: any = {
+      descritivo: editForm.descritivo,
+      valor: parseFloat(editForm.valor) || 0,
+      data_vencimento: editForm.data_vencimento || null,
+      data_pagamento: editForm.data_pagamento || null,
+      status: editForm.data_pagamento ? "pago" : "pendente",
+    };
+    
+    const { error } = await supabase.from(table).update(updates).eq("id", item.id);
+    if (error) {
+      toast({ title: "Erro ao salvar", description: error.message, variant: "destructive" });
+    } else {
+      toast({ title: "Registro atualizado!" });
+      setEditDialog(null);
+      if (type === "pagar") loadContasPagar();
+      else loadContasReceber();
+    }
+  };
+
+  const handleBaixa = async (type: "pagar" | "receber", id: string) => {
+    const today = new Date().toISOString().split("T")[0];
+    const table = type === "pagar" ? "contas_pagar" : "contas_receber";
+    await supabase.from(table).update({ data_pagamento: today, status: "pago" }).eq("id", id);
+    toast({ title: "Baixa realizada!" });
+    if (type === "pagar") loadContasPagar();
+    else loadContasReceber();
+  };
+
+  const handleDeleteConta = async (type: "pagar" | "receber", id: string) => {
+    if (!confirm("Excluir este registro?")) return;
+    const table = type === "pagar" ? "contas_pagar" : "contas_receber";
+    await supabase.from(table).delete().eq("id", id);
+    toast({ title: "Registro excluído" });
+    if (type === "pagar") loadContasPagar();
+    else loadContasReceber();
   };
 
   const statusColor = (s: string) => {
@@ -386,6 +531,9 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
       default: return "outline";
     }
   };
+
+  const totalPagarPendente = contasPagarList.filter(c => c.status === "pendente").reduce((s, c) => s + Number(c.valor), 0);
+  const totalReceberPendente = contasReceberList.filter(c => c.status === "pendente").reduce((s, c) => s + Number(c.valor), 0);
 
   return (
     <div className="min-h-screen bg-background">
@@ -408,70 +556,202 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
       <main className="mx-auto max-w-[1600px] space-y-4 px-4 py-6 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between">
           <h1 className="text-2xl font-bold text-foreground flex items-center gap-2">
-            <ShoppingCart className="h-6 w-6" /> Vendas
+            <DollarSign className="h-6 w-6" /> Financeiro
           </h1>
           <Button onClick={() => { resetForm(); setDialogOpen(true); }} className="gap-2">
             <Plus className="h-4 w-4" /> Nova Venda
           </Button>
         </div>
 
-        <div className="rounded-lg border border-border bg-card shadow-sm">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Data</TableHead>
-                <TableHead>Vencimento</TableHead>
-                <TableHead>Cliente</TableHead>
-                <TableHead className="text-right">Valor Total</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Observações</TableHead>
-                <TableHead className="w-[100px]" />
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {vendas.length === 0 ? (
-                <TableRow>
-                  <TableCell colSpan={7} className="text-center text-muted-foreground py-8">
-                    Nenhuma venda registrada
-                  </TableCell>
-                </TableRow>
-              ) : (
-                vendas.map((v) => (
-                  <TableRow key={v.id}>
-                    <TableCell className="font-mono text-sm">{formatDate(v.data_venda)}</TableCell>
-                    <TableCell className="font-mono text-sm">
-                      {v.data_vencimento ? formatDate(v.data_vencimento) : "—"}
-                    </TableCell>
-                    <TableCell className="font-medium">{v.cliente}</TableCell>
-                    <TableCell className="text-right font-mono">{formatCurrency(v.valor_total)}</TableCell>
-                    <TableCell>
-                      <Badge variant={statusColor(v.status) as any}>{v.status}</Badge>
-                    </TableCell>
-                    <TableCell className="text-sm text-muted-foreground max-w-[200px] truncate">
-                      {v.observacoes}
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex gap-1">
-                        <Button variant="ghost" size="icon" onClick={() => handleGerarFatura(v)} title="Gerar Fatura">
-                          <FileText className="h-4 w-4 text-primary" />
-                        </Button>
-                        {v.status !== "cancelado" && (
-                          <Button variant="ghost" size="icon" onClick={() => handleCancelar(v)} title="Cancelar Venda">
-                            <XCircle className="h-4 w-4 text-amber-500" />
-                          </Button>
-                        )}
-                        <Button variant="ghost" size="icon" onClick={() => handleDelete(v.id)} title="Excluir">
-                          <Trash2 className="h-4 w-4 text-destructive" />
-                        </Button>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ))
-              )}
-            </TableBody>
-          </Table>
-        </div>
+        <Tabs value={activeTab} onValueChange={setActiveTab}>
+          <TabsList>
+            <TabsTrigger value="vendas">Vendas</TabsTrigger>
+            <TabsTrigger value="receber" className="gap-1">
+              A Receber <Badge variant="secondary" className="ml-1 text-xs">{formatCurrency(totalReceberPendente)}</Badge>
+            </TabsTrigger>
+            <TabsTrigger value="pagar" className="gap-1">
+              A Pagar <Badge variant="secondary" className="ml-1 text-xs">{formatCurrency(totalPagarPendente)}</Badge>
+            </TabsTrigger>
+          </TabsList>
 
+          {/* ===== VENDAS TAB ===== */}
+          <TabsContent value="vendas">
+            <div className="rounded-lg border border-border bg-card shadow-sm">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Data</TableHead>
+                    <TableHead>Vencimento</TableHead>
+                    <TableHead>Cliente</TableHead>
+                    <TableHead className="text-right">Valor Total</TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead>Observações</TableHead>
+                    <TableHead className="w-[100px]" />
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {vendas.length === 0 ? (
+                    <TableRow>
+                      <TableCell colSpan={7} className="text-center text-muted-foreground py-8">
+                        Nenhuma venda registrada
+                      </TableCell>
+                    </TableRow>
+                  ) : (
+                    vendas.map((v) => (
+                      <TableRow key={v.id}>
+                        <TableCell className="font-mono text-sm">{formatDate(v.data_venda)}</TableCell>
+                        <TableCell className="font-mono text-sm">
+                          {v.data_vencimento ? formatDate(v.data_vencimento) : "—"}
+                        </TableCell>
+                        <TableCell className="font-medium">{v.cliente}</TableCell>
+                        <TableCell className="text-right font-mono">{formatCurrency(v.valor_total)}</TableCell>
+                        <TableCell>
+                          <Badge variant={statusColor(v.status) as any}>{v.status}</Badge>
+                        </TableCell>
+                        <TableCell className="text-sm text-muted-foreground max-w-[200px] truncate">
+                          {v.observacoes}
+                        </TableCell>
+                        <TableCell>
+                          <div className="flex gap-1">
+                            <Button variant="ghost" size="icon" onClick={() => handleGerarFatura(v)} title="Gerar Fatura">
+                              <FileText className="h-4 w-4 text-primary" />
+                            </Button>
+                            {v.status !== "cancelado" && (
+                              <Button variant="ghost" size="icon" onClick={() => handleCancelar(v)} title="Cancelar Venda">
+                                <XCircle className="h-4 w-4 text-destructive" />
+                              </Button>
+                            )}
+                            <Button variant="ghost" size="icon" onClick={() => handleDelete(v.id)} title="Excluir">
+                              <Trash2 className="h-4 w-4 text-destructive" />
+                            </Button>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    ))
+                  )}
+                </TableBody>
+              </Table>
+            </div>
+          </TabsContent>
+
+          {/* ===== CONTAS A RECEBER TAB ===== */}
+          <TabsContent value="receber">
+            <div className="rounded-lg border border-border bg-card shadow-sm">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Data</TableHead>
+                    <TableHead>Cliente</TableHead>
+                    <TableHead>Descritivo</TableHead>
+                    <TableHead className="text-right">Valor</TableHead>
+                    <TableHead>Vencimento</TableHead>
+                    <TableHead>Pagamento</TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead className="w-[100px]" />
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {contasReceberList.length === 0 ? (
+                    <TableRow>
+                      <TableCell colSpan={8} className="text-center text-muted-foreground py-8">
+                        Nenhuma conta a receber
+                      </TableCell>
+                    </TableRow>
+                  ) : (
+                    contasReceberList.map((cr) => (
+                      <TableRow key={cr.id}>
+                        <TableCell className="font-mono text-xs">{formatDate(cr.data)}</TableCell>
+                        <TableCell className="font-medium text-sm">{cr.cliente}</TableCell>
+                        <TableCell className="text-sm">{cr.descritivo}</TableCell>
+                        <TableCell className="text-right font-mono">{formatCurrency(cr.valor)}</TableCell>
+                        <TableCell className="font-mono text-xs">{cr.data_vencimento ? formatDate(cr.data_vencimento) : "—"}</TableCell>
+                        <TableCell className="font-mono text-xs">{cr.data_pagamento ? formatDate(cr.data_pagamento) : "—"}</TableCell>
+                        <TableCell>
+                          <Badge variant={statusColor(cr.status) as any}>{cr.status}</Badge>
+                        </TableCell>
+                        <TableCell>
+                          <div className="flex gap-1">
+                            {cr.status === "pendente" && (
+                              <Button variant="ghost" size="icon" onClick={() => handleBaixa("receber", cr.id)} title="Dar Baixa">
+                                <CheckCircle className="h-4 w-4 text-green-600" />
+                              </Button>
+                            )}
+                            <Button variant="ghost" size="icon" onClick={() => openEditDialog("receber", cr)} title="Editar">
+                              <FileText className="h-4 w-4 text-primary" />
+                            </Button>
+                            <Button variant="ghost" size="icon" onClick={() => handleDeleteConta("receber", cr.id)} title="Excluir">
+                              <Trash2 className="h-4 w-4 text-destructive" />
+                            </Button>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    ))
+                  )}
+                </TableBody>
+              </Table>
+            </div>
+          </TabsContent>
+
+          {/* ===== CONTAS A PAGAR TAB ===== */}
+          <TabsContent value="pagar">
+            <div className="rounded-lg border border-border bg-card shadow-sm">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Data</TableHead>
+                    <TableHead>Fornecedor</TableHead>
+                    <TableHead>Descritivo</TableHead>
+                    <TableHead className="text-right">Valor</TableHead>
+                    <TableHead>Vencimento</TableHead>
+                    <TableHead>Pagamento</TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead className="w-[100px]" />
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {contasPagarList.length === 0 ? (
+                    <TableRow>
+                      <TableCell colSpan={8} className="text-center text-muted-foreground py-8">
+                        Nenhuma conta a pagar
+                      </TableCell>
+                    </TableRow>
+                  ) : (
+                    contasPagarList.map((cp) => (
+                      <TableRow key={cp.id}>
+                        <TableCell className="font-mono text-xs">{formatDate(cp.data)}</TableCell>
+                        <TableCell className="font-medium text-sm">{cp.fornecedor}</TableCell>
+                        <TableCell className="text-sm">{cp.descritivo}</TableCell>
+                        <TableCell className="text-right font-mono">{formatCurrency(cp.valor)}</TableCell>
+                        <TableCell className="font-mono text-xs">{cp.data_vencimento ? formatDate(cp.data_vencimento) : "—"}</TableCell>
+                        <TableCell className="font-mono text-xs">{cp.data_pagamento ? formatDate(cp.data_pagamento) : "—"}</TableCell>
+                        <TableCell>
+                          <Badge variant={statusColor(cp.status) as any}>{cp.status}</Badge>
+                        </TableCell>
+                        <TableCell>
+                          <div className="flex gap-1">
+                            {cp.status === "pendente" && (
+                              <Button variant="ghost" size="icon" onClick={() => handleBaixa("pagar", cp.id)} title="Dar Baixa">
+                                <CheckCircle className="h-4 w-4 text-green-600" />
+                              </Button>
+                            )}
+                            <Button variant="ghost" size="icon" onClick={() => openEditDialog("pagar", cp)} title="Editar">
+                              <FileText className="h-4 w-4 text-primary" />
+                            </Button>
+                            <Button variant="ghost" size="icon" onClick={() => handleDeleteConta("pagar", cp.id)} title="Excluir">
+                              <Trash2 className="h-4 w-4 text-destructive" />
+                            </Button>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    ))
+                  )}
+                </TableBody>
+              </Table>
+            </div>
+          </TabsContent>
+        </Tabs>
+
+        {/* ===== NOVA VENDA DIALOG ===== */}
         <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
           <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
@@ -510,90 +790,91 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
               </div>
 
               {cliente && (
-                <>
-                  <div className="space-y-2">
-                    <div className="flex items-center justify-between">
-                      <Label>Serviços da Agenda</Label>
-                      <div className="flex items-center gap-2">
-                        <div className="relative">
-                          <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
-                          <Input
-                            placeholder="Buscar..."
-                            value={searchAgenda}
-                            onChange={(e) => setSearchAgenda(e.target.value)}
-                            className="pl-8 h-9 w-48"
-                          />
-                        </div>
-                        <Button variant="outline" size="sm" onClick={selectAll}>
-                          <Check className="h-4 w-4 mr-1" />
-                          {selectedItems.size === filteredAgendaItems.length ? "Desmarcar" : "Selecionar"} Todos
-                        </Button>
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <Label>Serviços da Agenda</Label>
+                    <div className="flex items-center gap-2">
+                      <div className="relative">
+                        <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+                        <Input
+                          placeholder="Buscar..."
+                          value={searchAgenda}
+                          onChange={(e) => setSearchAgenda(e.target.value)}
+                          className="pl-8 h-9 w-48"
+                        />
                       </div>
+                      <Button variant="outline" size="sm" onClick={selectAll}>
+                        <Check className="h-4 w-4 mr-1" />
+                        {selectedItems.size === filteredAgendaItems.length ? "Desmarcar" : "Selecionar"} Todos
+                      </Button>
                     </div>
+                  </div>
 
-                    <div className="rounded-md border border-border max-h-[300px] overflow-y-auto">
-                      <Table>
-                        <TableHeader>
+                  <div className="rounded-md border border-border max-h-[300px] overflow-y-auto">
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead className="w-[40px]" />
+                          <TableHead>O.S.</TableHead>
+                          <TableHead>Data</TableHead>
+                          <TableHead>Tipo</TableHead>
+                          <TableHead>Origem → Destino</TableHead>
+                          <TableHead>PAX</TableHead>
+                          <TableHead className="text-right">Valor</TableHead>
+                          <TableHead>Status</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {filteredAgendaItems.length === 0 ? (
                           <TableRow>
-                            <TableHead className="w-[40px]" />
-                            <TableHead>O.S.</TableHead>
-                            <TableHead>Data</TableHead>
-                            <TableHead>Tipo</TableHead>
-                            <TableHead>Origem → Destino</TableHead>
-                            <TableHead>PAX</TableHead>
-                            <TableHead className="text-right">Valor</TableHead>
-                            <TableHead>Status</TableHead>
+                            <TableCell colSpan={8} className="text-center text-muted-foreground py-4">
+                              Nenhum serviço encontrado para este cliente
+                            </TableCell>
                           </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                          {filteredAgendaItems.length === 0 ? (
-                            <TableRow>
-                              <TableCell colSpan={8} className="text-center text-muted-foreground py-4">
-                                Nenhum serviço encontrado para este cliente
+                        ) : (
+                          filteredAgendaItems.map((item) => (
+                            <TableRow
+                              key={item.id}
+                              className={`cursor-pointer ${selectedItems.has(item.id) ? "bg-accent/50" : ""}`}
+                              onClick={() => toggleItem(item.id)}
+                            >
+                              <TableCell>
+                                <Checkbox checked={selectedItems.has(item.id)} />
+                              </TableCell>
+                              <TableCell className="font-mono text-xs">{item.cot}</TableCell>
+                              <TableCell className="font-mono text-xs">{formatDate(item.data)}</TableCell>
+                              <TableCell className="text-xs">{item.tipo}</TableCell>
+                              <TableCell className="text-xs">{item.origem} → {item.destino}</TableCell>
+                              <TableCell className="text-center">{item.pax}</TableCell>
+                              <TableCell className="text-right font-mono text-xs">{formatCurrency(item.valor)}</TableCell>
+                              <TableCell>
+                                {item.status_faturamento && (
+                                  <Badge variant="outline" className="text-xs">{item.status_faturamento}</Badge>
+                                )}
                               </TableCell>
                             </TableRow>
-                          ) : (
-                            filteredAgendaItems.map((item) => (
-                              <TableRow
-                                key={item.id}
-                                className={`cursor-pointer ${selectedItems.has(item.id) ? "bg-accent/50" : ""}`}
-                                onClick={() => toggleItem(item.id)}
-                              >
-                                <TableCell>
-                                  <Checkbox checked={selectedItems.has(item.id)} />
-                                </TableCell>
-                                <TableCell className="font-mono text-xs">{item.cot}</TableCell>
-                                <TableCell className="font-mono text-xs">{formatDate(item.data)}</TableCell>
-                                <TableCell className="text-xs">{item.tipo}</TableCell>
-                                <TableCell className="text-xs">{item.origem} → {item.destino}</TableCell>
-                                <TableCell className="text-center">{item.pax}</TableCell>
-                                <TableCell className="text-right font-mono text-xs">{formatCurrency(item.valor)}</TableCell>
-                                <TableCell>
-                                  {item.status_faturamento && (
-                                    <Badge variant="outline" className="text-xs">{item.status_faturamento}</Badge>
-                                  )}
-                                </TableCell>
-                              </TableRow>
-                            ))
-                          )}
-                        </TableBody>
-                      </Table>
-                    </div>
-                    <p className="text-xs text-muted-foreground">
-                      {selectedItems.size} serviço(s) selecionado(s)
-                    </p>
+                          ))
+                        )}
+                      </TableBody>
+                    </Table>
                   </div>
-                </>
+                  <p className="text-xs text-muted-foreground">
+                    {selectedItems.size} serviço(s) selecionado(s)
+                  </p>
+                </div>
               )}
 
-              {/* Contas a Pagar */}
+              {/* Contas a Pagar extras */}
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
-                  <Label className="text-base font-semibold">Contas a Pagar</Label>
+                  <Label className="text-base font-semibold">Contas a Pagar (adicionais)</Label>
                   <Button variant="outline" size="sm" onClick={addContaPagar} type="button">
                     <Plus className="h-4 w-4 mr-1" /> Adicionar
                   </Button>
                 </div>
+                <p className="text-xs text-muted-foreground">
+                  As contas a pagar dos fornecedores dos serviços serão geradas automaticamente. Adicione aqui despesas extras.
+                </p>
 
                 {contasPagar.length > 0 && (
                   <div className="space-y-3">
@@ -632,7 +913,7 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
                       </div>
                     ))}
                     <p className="text-xs text-muted-foreground">
-                      Total contas: {formatCurrency(contasPagar.reduce((s, cp) => s + cp.valor, 0))}
+                      Total extras: {formatCurrency(contasPagar.reduce((s, cp) => s + cp.valor, 0))}
                     </p>
                   </div>
                 )}
@@ -649,6 +930,40 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
               <Button onClick={handleSave} disabled={loading || selectedItems.size === 0}>
                 {loading ? "Salvando..." : "Criar Venda"}
               </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
+        {/* ===== EDIT DIALOG ===== */}
+        <Dialog open={!!editDialog} onOpenChange={(v) => !v && setEditDialog(null)}>
+          <DialogContent className="max-w-md">
+            <DialogHeader>
+              <DialogTitle>
+                Editar {editDialog?.type === "pagar" ? "Conta a Pagar" : "Conta a Receber"}
+              </DialogTitle>
+            </DialogHeader>
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <Label>Descritivo</Label>
+                <Input value={editForm.descritivo} onChange={(e) => setEditForm({ ...editForm, descritivo: e.target.value })} />
+              </div>
+              <div className="space-y-2">
+                <Label>Valor</Label>
+                <Input type="number" step="0.01" value={editForm.valor} onChange={(e) => setEditForm({ ...editForm, valor: e.target.value })} />
+              </div>
+              <div className="space-y-2">
+                <Label>Data de Vencimento</Label>
+                <Input type="date" value={editForm.data_vencimento} onChange={(e) => setEditForm({ ...editForm, data_vencimento: e.target.value })} />
+              </div>
+              <div className="space-y-2">
+                <Label>Data de Pagamento (baixa)</Label>
+                <Input type="date" value={editForm.data_pagamento} onChange={(e) => setEditForm({ ...editForm, data_pagamento: e.target.value })} />
+                <p className="text-xs text-muted-foreground">Preencher para dar baixa no registro</p>
+              </div>
+            </div>
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setEditDialog(null)}>Cancelar</Button>
+              <Button onClick={handleSaveEdit}>Salvar</Button>
             </DialogFooter>
           </DialogContent>
         </Dialog>

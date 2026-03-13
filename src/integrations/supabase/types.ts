@@ -165,6 +165,7 @@ export type Database = {
         Row: {
           created_at: string
           data: string
+          data_pagamento: string | null
           data_vencimento: string | null
           descritivo: string
           fornecedor: string
@@ -178,6 +179,7 @@ export type Database = {
         Insert: {
           created_at?: string
           data?: string
+          data_pagamento?: string | null
           data_vencimento?: string | null
           descritivo?: string
           fornecedor?: string
@@ -191,6 +193,7 @@ export type Database = {
         Update: {
           created_at?: string
           data?: string
+          data_pagamento?: string | null
           data_vencimento?: string | null
           descritivo?: string
           fornecedor?: string
@@ -204,6 +207,59 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "contas_pagar_venda_id_fkey"
+            columns: ["venda_id"]
+            isOneToOne: false
+            referencedRelation: "vendas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      contas_receber: {
+        Row: {
+          cliente: string
+          created_at: string
+          data: string
+          data_pagamento: string | null
+          data_vencimento: string | null
+          descritivo: string
+          id: string
+          status: string
+          updated_at: string
+          user_id: string
+          valor: number
+          venda_id: string
+        }
+        Insert: {
+          cliente?: string
+          created_at?: string
+          data?: string
+          data_pagamento?: string | null
+          data_vencimento?: string | null
+          descritivo?: string
+          id?: string
+          status?: string
+          updated_at?: string
+          user_id: string
+          valor?: number
+          venda_id: string
+        }
+        Update: {
+          cliente?: string
+          created_at?: string
+          data?: string
+          data_pagamento?: string | null
+          data_vencimento?: string | null
+          descritivo?: string
+          id?: string
+          status?: string
+          updated_at?: string
+          user_id?: string
+          valor?: number
+          venda_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "contas_receber_venda_id_fkey"
             columns: ["venda_id"]
             isOneToOne: false
             referencedRelation: "vendas"
