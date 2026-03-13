@@ -581,6 +581,7 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
               <Table>
                 <TableHeader>
                   <TableRow>
+                    <TableHead className="w-[60px]">Nº</TableHead>
                     <TableHead>Data</TableHead>
                     <TableHead>Vencimento</TableHead>
                     <TableHead>Cliente</TableHead>
