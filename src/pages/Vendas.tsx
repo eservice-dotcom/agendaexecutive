@@ -606,6 +606,7 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
       data_vencimento: venda.data_vencimento || "",
       observacoes: venda.observacoes || "",
       status: venda.status,
+      forma_pagamento: venda.forma_pagamento || "",
     });
     setEditVendaSearch("");
 
