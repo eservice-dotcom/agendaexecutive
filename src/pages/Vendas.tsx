@@ -706,6 +706,17 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
       // Update conta a receber value
       await supabase.from("contas_receber").update({ valor: newTotal }).eq("venda_id", vendaId).eq("status", "pendente");
 
+      // Replace extras
+      await supabase.from("venda_extras").delete().eq("venda_id", vendaId);
+      const validExtras = editVendaExtras.filter(e => e.descricao && e.valor > 0);
+      if (validExtras.length > 0) {
+        await supabase.from("venda_extras").insert(validExtras.map(e => ({
+          venda_id: vendaId,
+          descricao: e.descricao,
+          valor: e.valor,
+        })));
+      }
+
       toast({ title: "Venda atualizada com sucesso!" });
       setEditVendaDialog(null);
       loadVendas();
