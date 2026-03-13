@@ -108,7 +108,8 @@ const Vendas = () => {
   useEffect(() => {
     loadVendas();
     loadClientes();
-  }, [loadVendas, loadClientes]);
+    loadFornecedores();
+  }, [loadVendas, loadClientes, loadFornecedores]);
 
   useEffect(() => {
     if (!cliente) {
