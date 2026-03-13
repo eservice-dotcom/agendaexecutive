@@ -130,11 +130,13 @@ const Index = () => {
                 {showFinancials ? "Ocultar $" : "Mostrar $"}
               </button>
             )}
-            <Link to="/vendas">
-              <span className="flex items-center gap-1 text-sm text-primary-foreground/80 hover:text-primary-foreground">
-                <ShoppingCart className="h-4 w-4" /> Vendas
-              </span>
-            </Link>
+            {hasPermission && (
+              <Link to="/vendas">
+                <span className="flex items-center gap-1 text-sm text-primary-foreground/80 hover:text-primary-foreground">
+                  <ShoppingCart className="h-4 w-4" /> Vendas
+                </span>
+              </Link>
+            )}
             <Link to="/cadastros">
               <span className="flex items-center gap-1 text-sm text-primary-foreground/80 hover:text-primary-foreground">
                 <ClipboardList className="h-4 w-4" /> Cadastros
