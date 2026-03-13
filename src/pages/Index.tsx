@@ -212,7 +212,7 @@ const Index = () => {
                     fornecedor: i.fornecedor, valor: i.valor, custo: i.custo,
                     km_in: i.kmIn, km_fim: i.kmFim, km_extra: i.kmExtra,
                     hora_in: i.horaIn, hora_fim: i.horaFim, hora_extra: i.horaExtra,
-                    estacionamento: i.estacionamento, outros: i.outros,
+                    estacionamento: i.estacionamento,
                     outros_despesas: i.outrosDespesas, cliente: i.cliente,
                   })),
                   "Relatório de Fechamento",
