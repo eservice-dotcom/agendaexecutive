@@ -255,6 +255,7 @@ const Vendas = () => {
           valor_total: totalSelected,
           status: "pendente",
           observacoes,
+          forma_pagamento: formaPagamento,
         })
         .select()
         .single();
