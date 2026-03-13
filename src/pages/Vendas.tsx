@@ -42,6 +42,14 @@ interface AgendaItem {
   status_faturamento: string | null;
 }
 
+interface ContaPagar {
+  fornecedor: string;
+  descritivo: string;
+  valor: number;
+  data: string;
+  data_vencimento: string;
+}
+
 const formatCurrency = (v: number) =>
   new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(v);
 
@@ -65,6 +73,8 @@ const Vendas = () => {
   const [dataVenda, setDataVenda] = useState(new Date().toISOString().split("T")[0]);
   const [dataVencimento, setDataVencimento] = useState("");
   const [searchAgenda, setSearchAgenda] = useState("");
+  const [contasPagar, setContasPagar] = useState<ContaPagar[]>([]);
+  const [fornecedores, setFornecedores] = useState<string[]>([]);
 
   const loadVendas = useCallback(async () => {
     const { data, error } = await supabase
@@ -85,10 +95,21 @@ const Vendas = () => {
     }
   }, []);
 
+  const loadFornecedores = useCallback(async () => {
+    const { data } = await supabase
+      .from("fornecedores")
+      .select("razao_social")
+      .order("razao_social");
+    if (data) {
+      setFornecedores(data.map((f) => f.razao_social).filter(Boolean));
+    }
+  }, []);
+
   useEffect(() => {
     loadVendas();
     loadClientes();
-  }, [loadVendas, loadClientes]);
+    loadFornecedores();
+  }, [loadVendas, loadClientes, loadFornecedores]);
 
   useEffect(() => {
     if (!cliente) {
@@ -179,6 +200,22 @@ const Vendas = () => {
         .update({ status_faturamento: "faturado" })
         .in("id", Array.from(selectedItems));
 
+      // Save contas a pagar
+      if (contasPagar.length > 0) {
+        const contas = contasPagar.map((cp) => ({
+          venda_id: venda.id,
+          user_id: session!.user.id,
+          fornecedor: cp.fornecedor,
+          descritivo: cp.descritivo,
+          valor: cp.valor,
+          data: cp.data,
+          data_vencimento: cp.data_vencimento || null,
+          status: "pendente",
+        }));
+        const { error: contasError } = await supabase.from("contas_pagar").insert(contas);
+        if (contasError) throw contasError;
+      }
+
       toast({ title: "Venda criada com sucesso!" });
       setDialogOpen(false);
       resetForm();
@@ -197,6 +234,22 @@ const Vendas = () => {
     setDataVenda(new Date().toISOString().split("T")[0]);
     setDataVencimento("");
     setSearchAgenda("");
+    setContasPagar([]);
+  };
+
+  const addContaPagar = () => {
+    setContasPagar((prev) => [
+      ...prev,
+      { fornecedor: "", descritivo: "", valor: 0, data: new Date().toISOString().split("T")[0], data_vencimento: "" },
+    ]);
+  };
+
+  const updateContaPagar = (index: number, field: keyof ContaPagar, value: string | number) => {
+    setContasPagar((prev) => prev.map((cp, i) => (i === index ? { ...cp, [field]: value } : cp)));
+  };
+
+  const removeContaPagar = (index: number) => {
+    setContasPagar((prev) => prev.filter((_, i) => i !== index));
   };
 
   const handleDelete = async (id: string) => {
@@ -532,6 +585,58 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
                   </div>
                 </>
               )}
+
+              {/* Contas a Pagar */}
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <Label className="text-base font-semibold">Contas a Pagar</Label>
+                  <Button variant="outline" size="sm" onClick={addContaPagar} type="button">
+                    <Plus className="h-4 w-4 mr-1" /> Adicionar
+                  </Button>
+                </div>
+
+                {contasPagar.length > 0 && (
+                  <div className="space-y-3">
+                    {contasPagar.map((cp, idx) => (
+                      <div key={idx} className="grid grid-cols-1 sm:grid-cols-6 gap-2 items-end rounded-md border border-border p-3 bg-muted/30">
+                        <div className="sm:col-span-2 space-y-1">
+                          <Label className="text-xs">Fornecedor</Label>
+                          <Select value={cp.fornecedor} onValueChange={(v) => updateContaPagar(idx, "fornecedor", v)}>
+                            <SelectTrigger className="h-9">
+                              <SelectValue placeholder="Selecione" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {fornecedores.map((f) => (
+                                <SelectItem key={f} value={f}>{f}</SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        <div className="space-y-1">
+                          <Label className="text-xs">Descritivo</Label>
+                          <Input className="h-9" value={cp.descritivo} onChange={(e) => updateContaPagar(idx, "descritivo", e.target.value)} placeholder="Descrição" />
+                        </div>
+                        <div className="space-y-1">
+                          <Label className="text-xs">Valor</Label>
+                          <Input className="h-9" type="number" step="0.01" value={cp.valor || ""} onChange={(e) => updateContaPagar(idx, "valor", parseFloat(e.target.value) || 0)} />
+                        </div>
+                        <div className="space-y-1">
+                          <Label className="text-xs">Vencimento</Label>
+                          <Input className="h-9" type="date" value={cp.data_vencimento} onChange={(e) => updateContaPagar(idx, "data_vencimento", e.target.value)} />
+                        </div>
+                        <div className="flex items-end">
+                          <Button variant="ghost" size="icon" className="h-9 w-9" onClick={() => removeContaPagar(idx)}>
+                            <Trash2 className="h-4 w-4 text-destructive" />
+                          </Button>
+                        </div>
+                      </div>
+                    ))}
+                    <p className="text-xs text-muted-foreground">
+                      Total contas: {formatCurrency(contasPagar.reduce((s, cp) => s + cp.valor, 0))}
+                    </p>
+                  </div>
+                )}
+              </div>
 
               <div className="space-y-2">
                 <Label>Observações</Label>
