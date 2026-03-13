@@ -1,0 +1,1 @@
+ALTER TABLE public.vendas ADD COLUMN IF NOT EXISTS forma_pagamento TEXT NOT NULL DEFAULT '';
