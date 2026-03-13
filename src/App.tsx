@@ -8,6 +8,7 @@ import Index from "./pages/Index";
 import Cadastros from "./pages/Cadastros";
 import Login from "./pages/Login";
 import NotFound from "./pages/NotFound";
+import Vendas from "./pages/Vendas";
 
 const queryClient = new QueryClient();
 
