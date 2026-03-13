@@ -116,6 +116,10 @@ const Vendas = () => {
   // Edit venda dialog
   const [editVendaDialog, setEditVendaDialog] = useState<Venda | null>(null);
   const [editVendaForm, setEditVendaForm] = useState({ data_venda: "", data_vencimento: "", observacoes: "", status: "" });
+  const [editVendaItems, setEditVendaItems] = useState<AgendaItem[]>([]);
+  const [editVendaSelectedIds, setEditVendaSelectedIds] = useState<Set<string>>(new Set());
+  const [editVendaAvailableItems, setEditVendaAvailableItems] = useState<AgendaItem[]>([]);
+  const [editVendaSearch, setEditVendaSearch] = useState("");
 
   const loadVendas = useCallback(async () => {
     const { data, error } = await supabase
@@ -547,34 +551,131 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
     else loadContasReceber();
   };
 
-  const openEditVenda = (venda: Venda) => {
+  const openEditVenda = async (venda: Venda) => {
     setEditVendaForm({
       data_venda: venda.data_venda,
       data_vencimento: venda.data_vencimento || "",
       observacoes: venda.observacoes || "",
       status: venda.status,
     });
+    setEditVendaSearch("");
+
+    // Load current venda items
+    const { data: vendaItems } = await supabase
+      .from("venda_items")
+      .select("agenda_item_id, valor")
+      .eq("venda_id", venda.id);
+    const currentIds = new Set((vendaItems || []).map((vi: any) => vi.agenda_item_id));
+    setEditVendaSelectedIds(currentIds);
+
+    // Load all agenda items for this client (current + available)
+    const { data: allItems } = await supabase
+      .from("agenda_items")
+      .select("id, cliente, data, hora, tipo, origem, destino, valor, custo, motorista, veiculo, pax, cot, fornecedor, status_faturamento")
+      .eq("cliente", venda.cliente)
+      .order("data", { ascending: true });
+
+    const items = (allItems || []) as AgendaItem[];
+    // Show items that are in the venda OR not yet billed
+    const relevant = items.filter((i) => currentIds.has(i.id) || !i.status_faturamento || i.status_faturamento === "");
+    setEditVendaAvailableItems(relevant);
+
     setEditVendaDialog(venda);
+  };
+
+  const editVendaFilteredItems = useMemo(() => {
+    if (!editVendaSearch) return editVendaAvailableItems;
+    const q = editVendaSearch.toLowerCase();
+    return editVendaAvailableItems.filter(
+      (i) =>
+        i.cot.toLowerCase().includes(q) ||
+        i.tipo.toLowerCase().includes(q) ||
+        i.origem.toLowerCase().includes(q) ||
+        i.destino.toLowerCase().includes(q)
+    );
+  }, [editVendaAvailableItems, editVendaSearch]);
+
+  const editVendaTotal = useMemo(() => {
+    return editVendaAvailableItems
+      .filter((i) => editVendaSelectedIds.has(i.id))
+      .reduce((sum, i) => sum + i.valor, 0);
+  }, [editVendaAvailableItems, editVendaSelectedIds]);
+
+  const toggleEditVendaItem = (id: string) => {
+    setEditVendaSelectedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
   };
 
   const handleSaveEditVenda = async () => {
     if (!editVendaDialog) return;
-    const { error } = await supabase.from("vendas").update({
-      data_venda: editVendaForm.data_venda,
-      data_vencimento: editVendaForm.data_vencimento || null,
-      observacoes: editVendaForm.observacoes,
-      status: editVendaForm.status,
-    }).eq("id", editVendaDialog.id);
-    if (error) {
-      toast({ title: "Erro ao salvar", description: error.message, variant: "destructive" });
-    } else {
-      toast({ title: "Venda atualizada!" });
+    if (editVendaSelectedIds.size === 0) {
+      toast({ title: "Selecione pelo menos um serviço", variant: "destructive" });
+      return;
+    }
+    setLoading(true);
+    try {
+      const vendaId = editVendaDialog.id;
+
+      // Get original item ids
+      const { data: originalItems } = await supabase
+        .from("venda_items")
+        .select("agenda_item_id")
+        .eq("venda_id", vendaId);
+      const originalIds = new Set((originalItems || []).map((oi: any) => oi.agenda_item_id));
+
+      const newIds = editVendaSelectedIds;
+      const addedIds = [...newIds].filter((id) => !originalIds.has(id));
+      const removedIds = [...originalIds].filter((id) => !newIds.has(id));
+
+      // Remove venda_items for removed services
+      if (removedIds.length > 0) {
+        await supabase.from("venda_items").delete().eq("venda_id", vendaId).in("agenda_item_id", removedIds);
+        // Reset status_faturamento for removed items
+        await supabase.from("agenda_items").update({ status_faturamento: "" }).in("id", removedIds);
+      }
+
+      // Add venda_items for newly added services
+      if (addedIds.length > 0) {
+        const newVendaItems = addedIds.map((agenda_item_id) => ({
+          venda_id: vendaId,
+          agenda_item_id,
+          valor: editVendaAvailableItems.find((i) => i.id === agenda_item_id)?.valor || 0,
+        }));
+        await supabase.from("venda_items").insert(newVendaItems);
+        await supabase.from("agenda_items").update({ status_faturamento: "faturado" }).in("id", addedIds);
+      }
+
+      // Update venda record
+      const newTotal = editVendaTotal;
+      const { error } = await supabase.from("vendas").update({
+        data_venda: editVendaForm.data_venda,
+        data_vencimento: editVendaForm.data_vencimento || null,
+        observacoes: editVendaForm.observacoes,
+        status: editVendaForm.status,
+        valor_total: newTotal,
+      }).eq("id", vendaId);
+      if (error) throw error;
+
+      // Update conta a receber value
+      await supabase.from("contas_receber").update({ valor: newTotal }).eq("venda_id", vendaId).eq("status", "pendente");
+
+      toast({ title: "Venda atualizada com sucesso!" });
       setEditVendaDialog(null);
       loadVendas();
+      loadContasPagar();
+      loadContasReceber();
+    } catch (err: any) {
+      toast({ title: "Erro ao salvar", description: err.message, variant: "destructive" });
+    } finally {
+      setLoading(false);
     }
   };
 
-
+  const statusColor = (s: string) => {
     switch (s) {
       case "pago": return "default";
       case "pendente": return "secondary";
@@ -1029,16 +1130,16 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
 
         {/* ===== EDIT VENDA DIALOG ===== */}
         <Dialog open={!!editVendaDialog} onOpenChange={(v) => !v && setEditVendaDialog(null)}>
-          <DialogContent className="max-w-md">
+          <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle>Editar Venda {editVendaDialog?.numero_venda ? `Nº ${editVendaDialog.numero_venda}` : ""}</DialogTitle>
             </DialogHeader>
             <div className="space-y-4">
-              <div className="space-y-2">
-                <Label>Cliente</Label>
-                <Input value={editVendaDialog?.cliente || ""} disabled className="bg-muted" />
-              </div>
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
+                <div className="space-y-2">
+                  <Label>Cliente</Label>
+                  <Input value={editVendaDialog?.cliente || ""} disabled className="bg-muted" />
+                </div>
                 <div className="space-y-2">
                   <Label>Data da Venda</Label>
                   <Input type="date" value={editVendaForm.data_venda} onChange={(e) => setEditVendaForm({ ...editVendaForm, data_venda: e.target.value })} />
@@ -1047,28 +1148,100 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
                   <Label>Data de Vencimento</Label>
                   <Input type="date" value={editVendaForm.data_vencimento} onChange={(e) => setEditVendaForm({ ...editVendaForm, data_vencimento: e.target.value })} />
                 </div>
+                <div className="space-y-2">
+                  <Label>Total</Label>
+                  <div className="h-10 flex items-center rounded-md border border-input bg-muted px-3 font-bold text-foreground">
+                    {formatCurrency(editVendaTotal)}
+                  </div>
+                </div>
               </div>
-              <div className="space-y-2">
-                <Label>Status</Label>
-                <Select value={editVendaForm.status} onValueChange={(v) => setEditVendaForm({ ...editVendaForm, status: v })}>
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="pendente">Pendente</SelectItem>
-                    <SelectItem value="pago">Pago</SelectItem>
-                    <SelectItem value="cancelado">Cancelado</SelectItem>
-                  </SelectContent>
-                </Select>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label>Status</Label>
+                  <Select value={editVendaForm.status} onValueChange={(v) => setEditVendaForm({ ...editVendaForm, status: v })}>
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="pendente">Pendente</SelectItem>
+                      <SelectItem value="pago">Pago</SelectItem>
+                      <SelectItem value="cancelado">Cancelado</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2">
+                  <Label>Observações</Label>
+                  <Input value={editVendaForm.observacoes} onChange={(e) => setEditVendaForm({ ...editVendaForm, observacoes: e.target.value })} />
+                </div>
               </div>
+
+              {/* Serviços da Agenda */}
               <div className="space-y-2">
-                <Label>Observações</Label>
-                <Textarea value={editVendaForm.observacoes} onChange={(e) => setEditVendaForm({ ...editVendaForm, observacoes: e.target.value })} rows={3} />
+                <div className="flex items-center justify-between">
+                  <Label className="text-base font-semibold">Serviços da Agenda</Label>
+                  <div className="relative">
+                    <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+                    <Input
+                      placeholder="Buscar..."
+                      value={editVendaSearch}
+                      onChange={(e) => setEditVendaSearch(e.target.value)}
+                      className="pl-8 h-9 w-48"
+                    />
+                  </div>
+                </div>
+                <div className="rounded-md border border-border max-h-[300px] overflow-y-auto">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead className="w-[40px]" />
+                        <TableHead>O.S.</TableHead>
+                        <TableHead>Data</TableHead>
+                        <TableHead>Tipo</TableHead>
+                        <TableHead>Origem → Destino</TableHead>
+                        <TableHead>PAX</TableHead>
+                        <TableHead className="text-right">Valor</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {editVendaFilteredItems.length === 0 ? (
+                        <TableRow>
+                          <TableCell colSpan={7} className="text-center text-muted-foreground py-4">
+                            Nenhum serviço encontrado
+                          </TableCell>
+                        </TableRow>
+                      ) : (
+                        editVendaFilteredItems.map((item) => (
+                          <TableRow
+                            key={item.id}
+                            className={`cursor-pointer ${editVendaSelectedIds.has(item.id) ? "bg-accent/50" : ""}`}
+                            onClick={() => toggleEditVendaItem(item.id)}
+                          >
+                            <TableCell>
+                              <Checkbox checked={editVendaSelectedIds.has(item.id)} />
+                            </TableCell>
+                            <TableCell className="font-mono text-xs">{item.cot}</TableCell>
+                            <TableCell className="font-mono text-xs">{formatDate(item.data)}</TableCell>
+                            <TableCell className="text-xs">{item.tipo}</TableCell>
+                            <TableCell className="text-xs">{item.origem} → {item.destino}</TableCell>
+                            <TableCell className="text-center">{item.pax}</TableCell>
+                            <TableCell className="text-right font-mono text-xs">{formatCurrency(item.valor)}</TableCell>
+                          </TableRow>
+                        ))
+                      )}
+                    </TableBody>
+                  </Table>
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  {editVendaSelectedIds.size} serviço(s) selecionado(s)
+                </p>
               </div>
             </div>
             <DialogFooter>
               <Button variant="outline" onClick={() => setEditVendaDialog(null)}>Cancelar</Button>
-              <Button onClick={handleSaveEditVenda}>Salvar</Button>
+              <Button onClick={handleSaveEditVenda} disabled={loading}>
+                {loading ? "Salvando..." : "Salvar"}
+              </Button>
             </DialogFooter>
           </DialogContent>
         </Dialog>
