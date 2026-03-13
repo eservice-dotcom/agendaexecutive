@@ -434,7 +434,7 @@ th{background:#2d3748;color:#fff;font-weight:600;font-size:10px;text-transform:u
 <div class="header">
   <img src="${logoUrl}" alt="Executive Service" />
   <div class="header-info">
-    <h1>FATURA</h1>
+    <h1>FATURA Nº ${venda.numero_venda}</h1>
     <p>Emitida em: ${new Date().toLocaleString("pt-BR")}</p>
   </div>
 </div>
