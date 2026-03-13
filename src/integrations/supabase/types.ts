@@ -493,6 +493,7 @@ export type Database = {
           data_vencimento: string | null
           data_venda: string
           id: string
+          numero_venda: number
           observacoes: string | null
           status: string
           updated_at: string
@@ -505,6 +506,7 @@ export type Database = {
           data_vencimento?: string | null
           data_venda?: string
           id?: string
+          numero_venda?: number
           observacoes?: string | null
           status?: string
           updated_at?: string
@@ -517,6 +519,7 @@ export type Database = {
           data_vencimento?: string | null
           data_venda?: string
           id?: string
+          numero_venda?: number
           observacoes?: string | null
           status?: string
           updated_at?: string
