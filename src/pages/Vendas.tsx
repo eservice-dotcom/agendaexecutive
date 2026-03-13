@@ -1078,6 +1078,38 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
                 </div>
               )}
 
+              {/* Extras da Venda */}
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <Label className="text-base font-semibold">Extras (somados ao valor total)</Label>
+                  <Button variant="outline" size="sm" onClick={addExtra} type="button">
+                    <Plus className="h-4 w-4 mr-1" /> Adicionar Extra
+                  </Button>
+                </div>
+                {extras.length > 0 && (
+                  <div className="space-y-2">
+                    {extras.map((ex, idx) => (
+                      <div key={idx} className="grid grid-cols-1 sm:grid-cols-4 gap-2 items-end rounded-md border border-border p-3 bg-muted/30">
+                        <div className="sm:col-span-2 space-y-1">
+                          <Label className="text-xs">Descrição</Label>
+                          <Input className="h-9" value={ex.descricao} onChange={(e) => updateExtra(idx, "descricao", e.target.value)} placeholder="Ex: Taxa de pedágio" />
+                        </div>
+                        <div className="space-y-1">
+                          <Label className="text-xs">Valor</Label>
+                          <Input className="h-9" type="number" step="0.01" value={ex.valor || ""} onChange={(e) => updateExtra(idx, "valor", parseFloat(e.target.value) || 0)} />
+                        </div>
+                        <div className="flex items-end">
+                          <Button variant="ghost" size="icon" className="h-9 w-9" onClick={() => removeExtra(idx)}>
+                            <Trash2 className="h-4 w-4 text-destructive" />
+                          </Button>
+                        </div>
+                      </div>
+                    ))}
+                    <p className="text-xs text-muted-foreground">Total extras: {formatCurrency(extrasTotal)}</p>
+                  </div>
+                )}
+              </div>
+
               {/* Contas a Pagar extras */}
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
