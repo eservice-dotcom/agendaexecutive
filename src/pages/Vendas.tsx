@@ -360,6 +360,8 @@ const Vendas = () => {
   const updateEditVendaExtra = (idx: number, field: keyof ExtraItem, value: string | number) =>
     setEditVendaExtras((prev) => prev.map((e, i) => (i === idx ? { ...e, [field]: value } : e)));
   const removeEditVendaExtra = (idx: number) => setEditVendaExtras((prev) => prev.filter((_, i) => i !== idx));
+
+  const addContaPagar = () => {
     setContasPagar((prev) => [
       ...prev,
       { fornecedor: "", descritivo: "", valor: 0, data: new Date().toISOString().split("T")[0], data_vencimento: "" },
