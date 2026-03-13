@@ -1,5 +1,5 @@
 import { useState, useMemo, useCallback, useEffect } from "react";
-import { CalendarDays, ListChecks, Truck, Building2, Plus, BarChart3, Printer, EyeOff, Eye } from "lucide-react";
+import { CalendarDays, ListChecks, Truck, Building2, Plus, BarChart3, Printer, EyeOff, Eye, ShoppingCart } from "lucide-react";
 import logo from "@/assets/logo-executive-service.png";
 import { Link } from "react-router-dom";
 import { ClipboardList } from "lucide-react";
@@ -130,6 +130,11 @@ const Index = () => {
                 {showFinancials ? "Ocultar $" : "Mostrar $"}
               </button>
             )}
+            <Link to="/vendas">
+              <span className="flex items-center gap-1 text-sm text-primary-foreground/80 hover:text-primary-foreground">
+                <ShoppingCart className="h-4 w-4" /> Vendas
+              </span>
+            </Link>
             <Link to="/cadastros">
               <span className="flex items-center gap-1 text-sm text-primary-foreground/80 hover:text-primary-foreground">
                 <ClipboardList className="h-4 w-4" /> Cadastros

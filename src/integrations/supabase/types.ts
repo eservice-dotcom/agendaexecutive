@@ -341,6 +341,81 @@ export type Database = {
         }
         Relationships: []
       }
+      venda_items: {
+        Row: {
+          agenda_item_id: string
+          created_at: string
+          id: string
+          valor: number
+          venda_id: string
+        }
+        Insert: {
+          agenda_item_id: string
+          created_at?: string
+          id?: string
+          valor?: number
+          venda_id: string
+        }
+        Update: {
+          agenda_item_id?: string
+          created_at?: string
+          id?: string
+          valor?: number
+          venda_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "venda_items_agenda_item_id_fkey"
+            columns: ["agenda_item_id"]
+            isOneToOne: false
+            referencedRelation: "agenda_items"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "venda_items_venda_id_fkey"
+            columns: ["venda_id"]
+            isOneToOne: false
+            referencedRelation: "vendas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      vendas: {
+        Row: {
+          cliente: string
+          created_at: string
+          data_venda: string
+          id: string
+          observacoes: string | null
+          status: string
+          updated_at: string
+          user_id: string
+          valor_total: number
+        }
+        Insert: {
+          cliente: string
+          created_at?: string
+          data_venda?: string
+          id?: string
+          observacoes?: string | null
+          status?: string
+          updated_at?: string
+          user_id: string
+          valor_total?: number
+        }
+        Update: {
+          cliente?: string
+          created_at?: string
+          data_venda?: string
+          id?: string
+          observacoes?: string | null
+          status?: string
+          updated_at?: string
+          user_id?: string
+          valor_total?: number
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
