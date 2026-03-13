@@ -356,7 +356,7 @@ th{background:#2d3748;color:#fff;font-weight:600;font-size:10px;text-transform:u
 
 <table>
   <thead><tr>
-    <th class="c">#</th><th>COT</th><th>Data</th><th>Tipo</th>
+    <th class="c">#</th><th>O.S.</th><th>Data</th><th>Tipo</th>
     <th>Origem → Destino</th><th class="c">PAX</th><th class="r">Valor</th>
   </tr></thead>
   <tbody>
@@ -536,7 +536,7 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
                         <TableHeader>
                           <TableRow>
                             <TableHead className="w-[40px]" />
-                            <TableHead>COT</TableHead>
+                            <TableHead>O.S.</TableHead>
                             <TableHead>Data</TableHead>
                             <TableHead>Tipo</TableHead>
                             <TableHead>Origem → Destino</TableHead>
