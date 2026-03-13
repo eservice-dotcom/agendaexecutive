@@ -200,6 +200,22 @@ const Vendas = () => {
         .update({ status_faturamento: "faturado" })
         .in("id", Array.from(selectedItems));
 
+      // Save contas a pagar
+      if (contasPagar.length > 0) {
+        const contas = contasPagar.map((cp) => ({
+          venda_id: venda.id,
+          user_id: session!.user.id,
+          fornecedor: cp.fornecedor,
+          descritivo: cp.descritivo,
+          valor: cp.valor,
+          data: cp.data,
+          data_vencimento: cp.data_vencimento || null,
+          status: "pendente",
+        }));
+        const { error: contasError } = await supabase.from("contas_pagar").insert(contas);
+        if (contasError) throw contasError;
+      }
+
       toast({ title: "Venda criada com sucesso!" });
       setDialogOpen(false);
       resetForm();
