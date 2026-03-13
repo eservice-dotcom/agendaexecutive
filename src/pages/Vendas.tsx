@@ -25,6 +25,7 @@ interface Venda {
   valor_total: number;
   status: string;
   observacoes: string;
+  forma_pagamento: string;
   created_at: string;
 }
 
@@ -86,6 +87,8 @@ interface ContaReceberDB {
 const formatCurrency = (v: number) =>
   new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(v);
 
+const FORMAS_PAGAMENTO = ["PIX", "Boleto", "Transferência Bancária", "Cartão de Crédito", "Cartão de Débito", "Dinheiro", "Cheque"];
+
 const formatDate = (d: string) => {
   const [y, m, day] = d.split("-");
   return `${day}/${m}/${y}`;
@@ -106,6 +109,7 @@ const Vendas = () => {
   const [observacoes, setObservacoes] = useState("");
   const [dataVenda, setDataVenda] = useState(new Date().toISOString().split("T")[0]);
   const [dataVencimento, setDataVencimento] = useState("");
+  const [formaPagamento, setFormaPagamento] = useState("");
   const [searchAgenda, setSearchAgenda] = useState("");
   const [contasPagar, setContasPagar] = useState<ContaPagar[]>([]);
   const [fornecedores, setFornecedores] = useState<string[]>([]);
@@ -121,7 +125,7 @@ const Vendas = () => {
 
   // Edit venda dialog
   const [editVendaDialog, setEditVendaDialog] = useState<Venda | null>(null);
-  const [editVendaForm, setEditVendaForm] = useState({ data_venda: "", data_vencimento: "", observacoes: "", status: "" });
+  const [editVendaForm, setEditVendaForm] = useState({ data_venda: "", data_vencimento: "", observacoes: "", status: "", forma_pagamento: "" });
   const [editVendaItems, setEditVendaItems] = useState<AgendaItem[]>([]);
   const [editVendaSelectedIds, setEditVendaSelectedIds] = useState<Set<string>>(new Set());
   const [editVendaAvailableItems, setEditVendaAvailableItems] = useState<AgendaItem[]>([]);
@@ -253,6 +257,7 @@ const Vendas = () => {
           valor_total: totalSelected,
           status: "pendente",
           observacoes,
+          forma_pagamento: formaPagamento,
         })
         .select()
         .single();
@@ -361,6 +366,7 @@ const Vendas = () => {
     setSearchAgenda("");
     setContasPagar([]);
     setExtras([]);
+    setFormaPagamento("");
   };
 
   const addExtra = () => setExtras((prev) => [...prev, { descricao: "", valor: 0 }]);
@@ -498,6 +504,7 @@ th{background:#2d3748;color:#fff;font-weight:600;font-size:10px;text-transform:u
     <h3>Detalhes</h3>
     <p><strong>Data da Venda:</strong> ${formatDate(venda.data_venda)}</p>
     ${venda.data_vencimento ? `<p><strong>Vencimento:</strong> ${formatDate(venda.data_vencimento)}</p>` : ""}
+    ${venda.forma_pagamento ? `<p><strong>Forma de Pagamento:</strong> ${venda.forma_pagamento}</p>` : ""}
     <p><strong>Status:</strong> ${venda.status.toUpperCase()}</p>
   </div>
 </div>
@@ -603,6 +610,7 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
       data_vencimento: venda.data_vencimento || "",
       observacoes: venda.observacoes || "",
       status: venda.status,
+      forma_pagamento: venda.forma_pagamento || "",
     });
     setEditVendaSearch("");
 
@@ -712,6 +720,7 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
         data_vencimento: editVendaForm.data_vencimento || null,
         observacoes: editVendaForm.observacoes,
         status: editVendaForm.status,
+        forma_pagamento: editVendaForm.forma_pagamento,
         valor_total: newTotal,
       }).eq("id", vendaId);
       if (error) throw error;
@@ -986,7 +995,7 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
             </DialogHeader>
 
             <div className="space-y-4">
-              <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-5 gap-4">
                 <div className="space-y-2">
                   <Label>Cliente</Label>
                   <Select value={cliente} onValueChange={setCliente}>
@@ -1007,6 +1016,19 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
                 <div className="space-y-2">
                   <Label>Data de Vencimento</Label>
                   <Input type="date" value={dataVencimento} onChange={(e) => setDataVencimento(e.target.value)} />
+                </div>
+                <div className="space-y-2">
+                  <Label>Forma de Pagamento</Label>
+                  <Select value={formaPagamento} onValueChange={setFormaPagamento}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Selecione" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {FORMAS_PAGAMENTO.map((f) => (
+                        <SelectItem key={f} value={f}>{f}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
                 <div className="space-y-2">
                   <Label>Total Selecionado</Label>
@@ -1234,7 +1256,7 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
               <DialogTitle>Editar Venda {editVendaDialog?.numero_venda ? `Nº ${editVendaDialog.numero_venda}` : ""}</DialogTitle>
             </DialogHeader>
             <div className="space-y-4">
-              <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-5 gap-4">
                 <div className="space-y-2">
                   <Label>Cliente</Label>
                   <Input value={editVendaDialog?.cliente || ""} disabled className="bg-muted" />
@@ -1246,6 +1268,19 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
                 <div className="space-y-2">
                   <Label>Data de Vencimento</Label>
                   <Input type="date" value={editVendaForm.data_vencimento} onChange={(e) => setEditVendaForm({ ...editVendaForm, data_vencimento: e.target.value })} />
+                </div>
+                <div className="space-y-2">
+                  <Label>Forma de Pagamento</Label>
+                  <Select value={editVendaForm.forma_pagamento} onValueChange={(v) => setEditVendaForm({ ...editVendaForm, forma_pagamento: v })}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Selecione" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {FORMAS_PAGAMENTO.map((f) => (
+                        <SelectItem key={f} value={f}>{f}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
                 <div className="space-y-2">
                   <Label>Total</Label>

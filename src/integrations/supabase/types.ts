@@ -524,6 +524,7 @@ export type Database = {
           created_at: string
           data_vencimento: string | null
           data_venda: string
+          forma_pagamento: string
           id: string
           numero_venda: number
           observacoes: string | null
@@ -537,6 +538,7 @@ export type Database = {
           created_at?: string
           data_vencimento?: string | null
           data_venda?: string
+          forma_pagamento?: string
           id?: string
           numero_venda?: number
           observacoes?: string | null
@@ -550,6 +552,7 @@ export type Database = {
           created_at?: string
           data_vencimento?: string | null
           data_venda?: string
+          forma_pagamento?: string
           id?: string
           numero_venda?: number
           observacoes?: string | null
