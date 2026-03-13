@@ -73,6 +73,8 @@ const Vendas = () => {
   const [dataVenda, setDataVenda] = useState(new Date().toISOString().split("T")[0]);
   const [dataVencimento, setDataVencimento] = useState("");
   const [searchAgenda, setSearchAgenda] = useState("");
+  const [contasPagar, setContasPagar] = useState<ContaPagar[]>([]);
+  const [fornecedores, setFornecedores] = useState<string[]>([]);
 
   const loadVendas = useCallback(async () => {
     const { data, error } = await supabase
