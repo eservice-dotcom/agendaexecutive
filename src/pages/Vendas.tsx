@@ -206,6 +206,33 @@ const Vendas = () => {
     toast({ title: "Venda excluída" });
   };
 
+  const handleCancelar = async (venda: Venda) => {
+    if (!confirm("Cancelar esta venda? Os serviços vinculados voltarão ao status anterior.")) return;
+    try {
+      // Get linked agenda_item_ids
+      const { data: items } = await supabase
+        .from("venda_items")
+        .select("agenda_item_id")
+        .eq("venda_id", venda.id);
+
+      // Revert status_faturamento
+      if (items && items.length > 0) {
+        await supabase
+          .from("agenda_items")
+          .update({ status_faturamento: "" })
+          .in("id", items.map((i) => i.agenda_item_id));
+      }
+
+      // Update venda status
+      await supabase.from("vendas").update({ status: "cancelado" }).eq("id", venda.id);
+
+      toast({ title: "Venda cancelada" });
+      loadVendas();
+    } catch (err: any) {
+      toast({ title: "Erro ao cancelar", description: err.message, variant: "destructive" });
+    }
+  };
+
   const handleGerarFatura = async (venda: Venda) => {
     // Load venda_items with agenda details
     const { data: vendaItems } = await supabase
