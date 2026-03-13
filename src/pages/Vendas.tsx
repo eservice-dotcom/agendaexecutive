@@ -666,6 +666,9 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
                         </TableCell>
                         <TableCell>
                           <div className="flex gap-1">
+                            <Button variant="ghost" size="icon" onClick={() => openEditVenda(v)} title="Editar Venda">
+                              <Pencil className="h-4 w-4 text-primary" />
+                            </Button>
                             <Button variant="ghost" size="icon" onClick={() => handleGerarFatura(v)} title="Imprimir Fatura">
                               <FileText className="h-4 w-4 text-primary" />
                             </Button>
