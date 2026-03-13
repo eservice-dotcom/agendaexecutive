@@ -560,7 +560,28 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
       .eq("venda_id", venda.id);
 
     const items = (vendaItems || []).map((vi: any) => vi.agenda_items).filter(Boolean);
-    generateClosingReport(items, `Fechamento - ${venda.cliente}`, `Venda Nº ${venda.numero_venda} — ${venda.cliente}`);
+
+    const { data: extrasData } = await supabase
+      .from("venda_extras")
+      .select("descricao, valor")
+      .eq("venda_id", venda.id);
+
+    generateClosingReport(
+      items,
+      `Fechamento - ${venda.cliente}`,
+      `Venda Nº ${venda.numero_venda} — ${venda.cliente}`,
+      {
+        numero_venda: venda.numero_venda,
+        cliente: venda.cliente,
+        data_venda: venda.data_venda,
+        data_vencimento: venda.data_vencimento,
+        forma_pagamento: venda.forma_pagamento,
+        status: venda.status,
+        observacoes: venda.observacoes,
+        valor_total: venda.valor_total,
+        extras: (extrasData || []).map((e: any) => ({ descricao: e.descricao, valor: Number(e.valor) })),
+      }
+    );
   };
 
   const openEditDialog = (type: "pagar" | "receber", item: any) => {
