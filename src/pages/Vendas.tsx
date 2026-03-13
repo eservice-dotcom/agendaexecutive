@@ -18,6 +18,7 @@ import logo from "@/assets/logo-executive-service.png";
 
 interface Venda {
   id: string;
+  numero_venda: number;
   cliente: string;
   data_venda: string;
   data_vencimento: string | null;
@@ -433,7 +434,7 @@ th{background:#2d3748;color:#fff;font-weight:600;font-size:10px;text-transform:u
 <div class="header">
   <img src="${logoUrl}" alt="Executive Service" />
   <div class="header-info">
-    <h1>FATURA</h1>
+    <h1>FATURA Nº ${venda.numero_venda}</h1>
     <p>Emitida em: ${new Date().toLocaleString("pt-BR")}</p>
   </div>
 </div>
@@ -580,6 +581,7 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
               <Table>
                 <TableHeader>
                   <TableRow>
+                    <TableHead className="w-[60px]">Nº</TableHead>
                     <TableHead>Data</TableHead>
                     <TableHead>Vencimento</TableHead>
                     <TableHead>Cliente</TableHead>
@@ -592,13 +594,14 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
                 <TableBody>
                   {vendas.length === 0 ? (
                     <TableRow>
-                      <TableCell colSpan={7} className="text-center text-muted-foreground py-8">
+                      <TableCell colSpan={8} className="text-center text-muted-foreground py-8">
                         Nenhuma venda registrada
                       </TableCell>
                     </TableRow>
                   ) : (
                     vendas.map((v) => (
                       <TableRow key={v.id}>
+                        <TableCell className="font-mono text-sm font-bold">{v.numero_venda}</TableCell>
                         <TableCell className="font-mono text-sm">{formatDate(v.data_venda)}</TableCell>
                         <TableCell className="font-mono text-sm">
                           {v.data_vencimento ? formatDate(v.data_vencimento) : "—"}
