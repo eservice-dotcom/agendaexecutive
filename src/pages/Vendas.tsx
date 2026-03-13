@@ -109,6 +109,7 @@ const Vendas = () => {
   const [searchAgenda, setSearchAgenda] = useState("");
   const [contasPagar, setContasPagar] = useState<ContaPagar[]>([]);
   const [fornecedores, setFornecedores] = useState<string[]>([]);
+  const [extras, setExtras] = useState<ExtraItem[]>([]);
 
   // Contas lists
   const [contasPagarList, setContasPagarList] = useState<ContaPagarDB[]>([]);
