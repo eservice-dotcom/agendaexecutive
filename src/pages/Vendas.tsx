@@ -717,6 +717,7 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
         data_vencimento: editVendaForm.data_vencimento || null,
         observacoes: editVendaForm.observacoes,
         status: editVendaForm.status,
+        forma_pagamento: editVendaForm.forma_pagamento,
         valor_total: newTotal,
       }).eq("id", vendaId);
       if (error) throw error;
