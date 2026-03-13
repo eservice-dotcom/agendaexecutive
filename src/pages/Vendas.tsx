@@ -46,6 +46,11 @@ interface AgendaItem {
   status_faturamento: string | null;
 }
 
+interface ExtraItem {
+  descricao: string;
+  valor: number;
+}
+
 interface ContaPagar {
   fornecedor: string;
   descritivo: string;
@@ -104,6 +109,7 @@ const Vendas = () => {
   const [searchAgenda, setSearchAgenda] = useState("");
   const [contasPagar, setContasPagar] = useState<ContaPagar[]>([]);
   const [fornecedores, setFornecedores] = useState<string[]>([]);
+  const [extras, setExtras] = useState<ExtraItem[]>([]);
 
   // Contas lists
   const [contasPagarList, setContasPagarList] = useState<ContaPagarDB[]>([]);
@@ -120,6 +126,7 @@ const Vendas = () => {
   const [editVendaSelectedIds, setEditVendaSelectedIds] = useState<Set<string>>(new Set());
   const [editVendaAvailableItems, setEditVendaAvailableItems] = useState<AgendaItem[]>([]);
   const [editVendaSearch, setEditVendaSearch] = useState("");
+  const [editVendaExtras, setEditVendaExtras] = useState<ExtraItem[]>([]);
 
   const loadVendas = useCallback(async () => {
     const { data, error } = await supabase
@@ -203,11 +210,14 @@ const Vendas = () => {
     );
   }, [agendaItems, searchAgenda]);
 
+  const extrasTotal = useMemo(() => extras.reduce((s, e) => s + e.valor, 0), [extras]);
+
   const totalSelected = useMemo(() => {
-    return agendaItems
+    const servicos = agendaItems
       .filter((i) => selectedItems.has(i.id))
       .reduce((sum, i) => sum + i.valor, 0);
-  }, [agendaItems, selectedItems]);
+    return servicos + extrasTotal;
+  }, [agendaItems, selectedItems, extrasTotal]);
 
   const toggleItem = (id: string) => {
     setSelectedItems((prev) => {
@@ -317,6 +327,18 @@ const Vendas = () => {
         if (cpError) throw cpError;
       }
 
+      // Save extras
+      if (extras.length > 0) {
+        const extrasToInsert = extras.filter(e => e.descricao && e.valor > 0).map(e => ({
+          venda_id: venda.id,
+          descricao: e.descricao,
+          valor: e.valor,
+        }));
+        if (extrasToInsert.length > 0) {
+          await supabase.from("venda_extras").insert(extrasToInsert);
+        }
+      }
+
       toast({ title: "Venda criada com sucesso! Contas geradas automaticamente." });
       setDialogOpen(false);
       resetForm();
@@ -338,7 +360,18 @@ const Vendas = () => {
     setDataVencimento("");
     setSearchAgenda("");
     setContasPagar([]);
+    setExtras([]);
   };
+
+  const addExtra = () => setExtras((prev) => [...prev, { descricao: "", valor: 0 }]);
+  const updateExtra = (idx: number, field: keyof ExtraItem, value: string | number) =>
+    setExtras((prev) => prev.map((e, i) => (i === idx ? { ...e, [field]: value } : e)));
+  const removeExtra = (idx: number) => setExtras((prev) => prev.filter((_, i) => i !== idx));
+
+  const addEditVendaExtra = () => setEditVendaExtras((prev) => [...prev, { descricao: "", valor: 0 }]);
+  const updateEditVendaExtra = (idx: number, field: keyof ExtraItem, value: string | number) =>
+    setEditVendaExtras((prev) => prev.map((e, i) => (i === idx ? { ...e, [field]: value } : e)));
+  const removeEditVendaExtra = (idx: number) => setEditVendaExtras((prev) => prev.filter((_, i) => i !== idx));
 
   const addContaPagar = () => {
     setContasPagar((prev) => [
@@ -403,6 +436,12 @@ const Vendas = () => {
     const items = vendaItems || [];
     const logoUrl = new URL(logo, window.location.origin).href;
 
+    const { data: extrasData } = await supabase
+      .from("venda_extras")
+      .select("descricao, valor")
+      .eq("venda_id", venda.id);
+    const vendaExtras = extrasData || [];
+
     const rows = items.map((item: any, idx: number) => {
       const ai = item.agenda_items;
       return `<tr>
@@ -415,6 +454,12 @@ const Vendas = () => {
         <td class="r">${formatCurrency(item.valor)}</td>
       </tr>`;
     }).join("");
+
+    const extrasRows = vendaExtras.map((ex: any, idx: number) => `<tr>
+      <td class="c">${items.length + idx + 1}</td>
+      <td colspan="5"><em>Extra: ${ex.descricao}</em></td>
+      <td class="r">${formatCurrency(Number(ex.valor))}</td>
+    </tr>`).join("");
 
     return `<!DOCTYPE html><html><head><title>Fatura - ${venda.cliente}</title>
 <style>
@@ -463,6 +508,7 @@ th{background:#2d3748;color:#fff;font-weight:600;font-size:10px;text-transform:u
   </tr></thead>
   <tbody>
     ${rows}
+    ${extrasRows}
     <tr class="total-row">
       <td colspan="6" class="r">TOTAL</td>
       <td class="r">${formatCurrency(venda.valor_total)}</td>
@@ -580,6 +626,13 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
     const relevant = items.filter((i) => currentIds.has(i.id) || !i.status_faturamento || i.status_faturamento === "");
     setEditVendaAvailableItems(relevant);
 
+    // Load extras
+    const { data: extrasData } = await supabase
+      .from("venda_extras")
+      .select("*")
+      .eq("venda_id", venda.id);
+    setEditVendaExtras((extrasData || []).map((e: any) => ({ descricao: e.descricao, valor: Number(e.valor) })));
+
     setEditVendaDialog(venda);
   };
 
@@ -595,11 +648,14 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
     );
   }, [editVendaAvailableItems, editVendaSearch]);
 
+  const editVendaExtrasTotal = useMemo(() => editVendaExtras.reduce((s, e) => s + e.valor, 0), [editVendaExtras]);
+
   const editVendaTotal = useMemo(() => {
-    return editVendaAvailableItems
+    const servicos = editVendaAvailableItems
       .filter((i) => editVendaSelectedIds.has(i.id))
       .reduce((sum, i) => sum + i.valor, 0);
-  }, [editVendaAvailableItems, editVendaSelectedIds]);
+    return servicos + editVendaExtrasTotal;
+  }, [editVendaAvailableItems, editVendaSelectedIds, editVendaExtrasTotal]);
 
   const toggleEditVendaItem = (id: string) => {
     setEditVendaSelectedIds((prev) => {
@@ -662,6 +718,17 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
 
       // Update conta a receber value
       await supabase.from("contas_receber").update({ valor: newTotal }).eq("venda_id", vendaId).eq("status", "pendente");
+
+      // Replace extras
+      await supabase.from("venda_extras").delete().eq("venda_id", vendaId);
+      const validExtras = editVendaExtras.filter(e => e.descricao && e.valor > 0);
+      if (validExtras.length > 0) {
+        await supabase.from("venda_extras").insert(validExtras.map(e => ({
+          venda_id: vendaId,
+          descricao: e.descricao,
+          valor: e.valor,
+        })));
+      }
 
       toast({ title: "Venda atualizada com sucesso!" });
       setEditVendaDialog(null);
@@ -1024,6 +1091,38 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
                 </div>
               )}
 
+              {/* Extras da Venda */}
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <Label className="text-base font-semibold">Extras (somados ao valor total)</Label>
+                  <Button variant="outline" size="sm" onClick={addExtra} type="button">
+                    <Plus className="h-4 w-4 mr-1" /> Adicionar Extra
+                  </Button>
+                </div>
+                {extras.length > 0 && (
+                  <div className="space-y-2">
+                    {extras.map((ex, idx) => (
+                      <div key={idx} className="grid grid-cols-1 sm:grid-cols-4 gap-2 items-end rounded-md border border-border p-3 bg-muted/30">
+                        <div className="sm:col-span-2 space-y-1">
+                          <Label className="text-xs">Descrição</Label>
+                          <Input className="h-9" value={ex.descricao} onChange={(e) => updateExtra(idx, "descricao", e.target.value)} placeholder="Ex: Taxa de pedágio" />
+                        </div>
+                        <div className="space-y-1">
+                          <Label className="text-xs">Valor</Label>
+                          <Input className="h-9" type="number" step="0.01" value={ex.valor || ""} onChange={(e) => updateExtra(idx, "valor", parseFloat(e.target.value) || 0)} />
+                        </div>
+                        <div className="flex items-end">
+                          <Button variant="ghost" size="icon" className="h-9 w-9" onClick={() => removeExtra(idx)}>
+                            <Trash2 className="h-4 w-4 text-destructive" />
+                          </Button>
+                        </div>
+                      </div>
+                    ))}
+                    <p className="text-xs text-muted-foreground">Total extras: {formatCurrency(extrasTotal)}</p>
+                  </div>
+                )}
+              </div>
+
               {/* Contas a Pagar extras */}
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
@@ -1235,6 +1334,38 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
                 <p className="text-xs text-muted-foreground">
                   {editVendaSelectedIds.size} serviço(s) selecionado(s)
                 </p>
+              </div>
+
+              {/* Extras */}
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <Label className="text-base font-semibold">Extras (somados ao valor total)</Label>
+                  <Button variant="outline" size="sm" onClick={addEditVendaExtra} type="button">
+                    <Plus className="h-4 w-4 mr-1" /> Adicionar Extra
+                  </Button>
+                </div>
+                {editVendaExtras.length > 0 && (
+                  <div className="space-y-2">
+                    {editVendaExtras.map((ex, idx) => (
+                      <div key={idx} className="grid grid-cols-1 sm:grid-cols-4 gap-2 items-end rounded-md border border-border p-3 bg-muted/30">
+                        <div className="sm:col-span-2 space-y-1">
+                          <Label className="text-xs">Descrição</Label>
+                          <Input className="h-9" value={ex.descricao} onChange={(e) => updateEditVendaExtra(idx, "descricao", e.target.value)} placeholder="Ex: Taxa de pedágio" />
+                        </div>
+                        <div className="space-y-1">
+                          <Label className="text-xs">Valor</Label>
+                          <Input className="h-9" type="number" step="0.01" value={ex.valor || ""} onChange={(e) => updateEditVendaExtra(idx, "valor", parseFloat(e.target.value) || 0)} />
+                        </div>
+                        <div className="flex items-end">
+                          <Button variant="ghost" size="icon" className="h-9 w-9" onClick={() => removeEditVendaExtra(idx)}>
+                            <Trash2 className="h-4 w-4 text-destructive" />
+                          </Button>
+                        </div>
+                      </div>
+                    ))}
+                    <p className="text-xs text-muted-foreground">Total extras: {formatCurrency(editVendaExtrasTotal)}</p>
+                  </div>
+                )}
               </div>
             </div>
             <DialogFooter>
