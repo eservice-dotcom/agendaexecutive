@@ -616,11 +616,14 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
     );
   }, [editVendaAvailableItems, editVendaSearch]);
 
+  const editVendaExtrasTotal = useMemo(() => editVendaExtras.reduce((s, e) => s + e.valor, 0), [editVendaExtras]);
+
   const editVendaTotal = useMemo(() => {
-    return editVendaAvailableItems
+    const servicos = editVendaAvailableItems
       .filter((i) => editVendaSelectedIds.has(i.id))
       .reduce((sum, i) => sum + i.valor, 0);
-  }, [editVendaAvailableItems, editVendaSelectedIds]);
+    return servicos + editVendaExtrasTotal;
+  }, [editVendaAvailableItems, editVendaSelectedIds, editVendaExtrasTotal]);
 
   const toggleEditVendaItem = (id: string) => {
     setEditVendaSelectedIds((prev) => {
