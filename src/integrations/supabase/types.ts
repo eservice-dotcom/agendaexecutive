@@ -447,6 +447,38 @@ export type Database = {
         }
         Relationships: []
       }
+      venda_extras: {
+        Row: {
+          created_at: string
+          descricao: string
+          id: string
+          valor: number
+          venda_id: string
+        }
+        Insert: {
+          created_at?: string
+          descricao?: string
+          id?: string
+          valor?: number
+          venda_id: string
+        }
+        Update: {
+          created_at?: string
+          descricao?: string
+          id?: string
+          valor?: number
+          venda_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "venda_extras_venda_id_fkey"
+            columns: ["venda_id"]
+            isOneToOne: false
+            referencedRelation: "vendas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       venda_items: {
         Row: {
           agenda_item_id: string
