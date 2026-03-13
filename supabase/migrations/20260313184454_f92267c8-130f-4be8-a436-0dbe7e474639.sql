@@ -1,0 +1,1 @@
+ALTER TABLE public.vendas ADD COLUMN data_vencimento date DEFAULT NULL;

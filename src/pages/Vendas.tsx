@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo, useCallback } from "react";
 import { Link } from "react-router-dom";
-import { ArrowLeft, Plus, Trash2, ShoppingCart, Search, Check } from "lucide-react";
+import { ArrowLeft, Plus, Trash2, ShoppingCart, Search, Check, FileText } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
@@ -19,18 +19,11 @@ interface Venda {
   id: string;
   cliente: string;
   data_venda: string;
+  data_vencimento: string | null;
   valor_total: number;
   status: string;
   observacoes: string;
   created_at: string;
-  items?: VendaItem[];
-}
-
-interface VendaItem {
-  id: string;
-  venda_id: string;
-  agenda_item_id: string;
-  valor: number;
 }
 
 interface AgendaItem {
@@ -49,6 +42,14 @@ interface AgendaItem {
   status_faturamento: string | null;
 }
 
+const formatCurrency = (v: number) =>
+  new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(v);
+
+const formatDate = (d: string) => {
+  const [y, m, day] = d.split("-");
+  return `${day}/${m}/${y}`;
+};
+
 const Vendas = () => {
   const { session, signOut } = useAuth();
   const [vendas, setVendas] = useState<Venda[]>([]);
@@ -62,6 +63,7 @@ const Vendas = () => {
   const [selectedItems, setSelectedItems] = useState<Set<string>>(new Set());
   const [observacoes, setObservacoes] = useState("");
   const [dataVenda, setDataVenda] = useState(new Date().toISOString().split("T")[0]);
+  const [dataVencimento, setDataVencimento] = useState("");
   const [searchAgenda, setSearchAgenda] = useState("");
 
   const loadVendas = useCallback(async () => {
@@ -69,7 +71,7 @@ const Vendas = () => {
       .from("vendas")
       .select("*")
       .order("created_at", { ascending: false });
-    if (!error && data) setVendas(data);
+    if (!error && data) setVendas(data as Venda[]);
   }, []);
 
   const loadClientes = useCallback(async () => {
@@ -88,7 +90,6 @@ const Vendas = () => {
     loadClientes();
   }, [loadVendas, loadClientes]);
 
-  // Load agenda items for selected client
   useEffect(() => {
     if (!cliente) {
       setAgendaItems([]);
@@ -154,6 +155,7 @@ const Vendas = () => {
           user_id: session!.user.id,
           cliente,
           data_venda: dataVenda,
+          data_vencimento: dataVencimento || null,
           valor_total: totalSelected,
           status: "pendente",
           observacoes,
@@ -172,7 +174,6 @@ const Vendas = () => {
       const { error: itemsError } = await supabase.from("venda_items").insert(items);
       if (itemsError) throw itemsError;
 
-      // Update status_faturamento on agenda items
       await supabase
         .from("agenda_items")
         .update({ status_faturamento: "faturado" })
@@ -194,6 +195,7 @@ const Vendas = () => {
     setSelectedItems(new Set());
     setObservacoes("");
     setDataVenda(new Date().toISOString().split("T")[0]);
+    setDataVencimento("");
     setSearchAgenda("");
   };
 
@@ -204,12 +206,96 @@ const Vendas = () => {
     toast({ title: "Venda excluída" });
   };
 
-  const formatCurrency = (v: number) =>
-    new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(v);
+  const handleGerarFatura = async (venda: Venda) => {
+    // Load venda_items with agenda details
+    const { data: vendaItems } = await supabase
+      .from("venda_items")
+      .select("*, agenda_items:agenda_item_id(cot, data, hora, tipo, origem, destino, pax, motorista, veiculo)")
+      .eq("venda_id", venda.id);
 
-  const formatDate = (d: string) => {
-    const [y, m, day] = d.split("-");
-    return `${day}/${m}/${y}`;
+    const items = vendaItems || [];
+
+    const logoUrl = new URL(logo, window.location.origin).href;
+
+    const rows = items.map((item: any, idx: number) => {
+      const ai = item.agenda_items;
+      return `<tr>
+        <td class="c">${idx + 1}</td>
+        <td>${ai?.cot || ""}</td>
+        <td>${ai?.data ? formatDate(ai.data) : ""}</td>
+        <td>${ai?.tipo || ""}</td>
+        <td>${ai?.origem || ""} → ${ai?.destino || ""}</td>
+        <td class="c">${ai?.pax || ""}</td>
+        <td class="r">${formatCurrency(item.valor)}</td>
+      </tr>`;
+    }).join("");
+
+    const w = window.open("", "_blank");
+    if (!w) return;
+    w.document.write(`<!DOCTYPE html><html><head><title>Fatura - ${venda.cliente}</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:Arial,sans-serif;padding:30px;color:#1a1a1a;font-size:12px}
+.header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:24px;border-bottom:3px solid #b8860b;padding-bottom:16px}
+.header img{height:60px}
+.header-info{text-align:right}
+.header-info h1{font-size:22px;color:#b8860b;margin-bottom:4px}
+.header-info p{font-size:11px;color:#666}
+.info-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px}
+.info-box{background:#f9f9f9;border:1px solid #e0e0e0;border-radius:6px;padding:12px}
+.info-box h3{font-size:11px;text-transform:uppercase;color:#888;margin-bottom:6px;letter-spacing:0.5px}
+.info-box p{font-size:12px;margin-bottom:2px}
+table{width:100%;border-collapse:collapse;margin-top:12px}
+th,td{border:1px solid #ddd;padding:6px 8px;text-align:left;font-size:11px}
+th{background:#2d3748;color:#fff;font-weight:600;font-size:10px;text-transform:uppercase}
+.r{text-align:right}.c{text-align:center}
+.total-row{background:#f7f7f7;font-weight:bold;font-size:13px}
+.footer{margin-top:24px;padding-top:12px;border-top:2px solid #b8860b;text-align:center;font-size:10px;color:#888}
+@media print{body{padding:15px}@page{size:A4 portrait;margin:15mm}}
+</style></head><body>
+<div class="header">
+  <img src="${logoUrl}" alt="Executive Service" />
+  <div class="header-info">
+    <h1>FATURA</h1>
+    <p>Emitida em: ${new Date().toLocaleString("pt-BR")}</p>
+  </div>
+</div>
+
+<div class="info-grid">
+  <div class="info-box">
+    <h3>Cliente</h3>
+    <p><strong>${venda.cliente}</strong></p>
+  </div>
+  <div class="info-box">
+    <h3>Detalhes</h3>
+    <p><strong>Data da Venda:</strong> ${formatDate(venda.data_venda)}</p>
+    ${venda.data_vencimento ? `<p><strong>Vencimento:</strong> ${formatDate(venda.data_vencimento)}</p>` : ""}
+    <p><strong>Status:</strong> ${venda.status.toUpperCase()}</p>
+  </div>
+</div>
+
+<table>
+  <thead><tr>
+    <th class="c">#</th><th>COT</th><th>Data</th><th>Tipo</th>
+    <th>Origem → Destino</th><th class="c">PAX</th><th class="r">Valor</th>
+  </tr></thead>
+  <tbody>
+    ${rows}
+    <tr class="total-row">
+      <td colspan="6" class="r">TOTAL</td>
+      <td class="r">${formatCurrency(venda.valor_total)}</td>
+    </tr>
+  </tbody>
+</table>
+
+${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffbeb;border:1px solid #f0d68a;border-radius:4px"><strong>Observações:</strong> ${venda.observacoes}</div>` : ""}
+
+<div class="footer">
+  <p>Executive Service — Fatura gerada automaticamente</p>
+</div>
+</body></html>`);
+    w.document.close();
+    w.onload = () => w.print();
   };
 
   const statusColor = (s: string) => {
@@ -249,23 +335,23 @@ const Vendas = () => {
           </Button>
         </div>
 
-        {/* Lista de vendas */}
         <div className="rounded-lg border border-border bg-card shadow-sm">
           <Table>
             <TableHeader>
               <TableRow>
                 <TableHead>Data</TableHead>
+                <TableHead>Vencimento</TableHead>
                 <TableHead>Cliente</TableHead>
                 <TableHead className="text-right">Valor Total</TableHead>
                 <TableHead>Status</TableHead>
                 <TableHead>Observações</TableHead>
-                <TableHead className="w-[60px]" />
+                <TableHead className="w-[100px]" />
               </TableRow>
             </TableHeader>
             <TableBody>
               {vendas.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={6} className="text-center text-muted-foreground py-8">
+                  <TableCell colSpan={7} className="text-center text-muted-foreground py-8">
                     Nenhuma venda registrada
                   </TableCell>
                 </TableRow>
@@ -273,6 +359,9 @@ const Vendas = () => {
                 vendas.map((v) => (
                   <TableRow key={v.id}>
                     <TableCell className="font-mono text-sm">{formatDate(v.data_venda)}</TableCell>
+                    <TableCell className="font-mono text-sm">
+                      {v.data_vencimento ? formatDate(v.data_vencimento) : "—"}
+                    </TableCell>
                     <TableCell className="font-medium">{v.cliente}</TableCell>
                     <TableCell className="text-right font-mono">{formatCurrency(v.valor_total)}</TableCell>
                     <TableCell>
@@ -282,9 +371,14 @@ const Vendas = () => {
                       {v.observacoes}
                     </TableCell>
                     <TableCell>
-                      <Button variant="ghost" size="icon" onClick={() => handleDelete(v.id)}>
-                        <Trash2 className="h-4 w-4 text-destructive" />
-                      </Button>
+                      <div className="flex gap-1">
+                        <Button variant="ghost" size="icon" onClick={() => handleGerarFatura(v)} title="Gerar Fatura">
+                          <FileText className="h-4 w-4 text-primary" />
+                        </Button>
+                        <Button variant="ghost" size="icon" onClick={() => handleDelete(v.id)}>
+                          <Trash2 className="h-4 w-4 text-destructive" />
+                        </Button>
+                      </div>
                     </TableCell>
                   </TableRow>
                 ))
@@ -293,7 +387,6 @@ const Vendas = () => {
           </Table>
         </div>
 
-        {/* Dialog Nova Venda */}
         <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
           <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
@@ -301,7 +394,7 @@ const Vendas = () => {
             </DialogHeader>
 
             <div className="space-y-4">
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
                 <div className="space-y-2">
                   <Label>Cliente</Label>
                   <Select value={cliente} onValueChange={setCliente}>
@@ -318,6 +411,10 @@ const Vendas = () => {
                 <div className="space-y-2">
                   <Label>Data da Venda</Label>
                   <Input type="date" value={dataVenda} onChange={(e) => setDataVenda(e.target.value)} />
+                </div>
+                <div className="space-y-2">
+                  <Label>Data de Vencimento</Label>
+                  <Input type="date" value={dataVencimento} onChange={(e) => setDataVencimento(e.target.value)} />
                 </div>
                 <div className="space-y-2">
                   <Label>Total Selecionado</Label>
