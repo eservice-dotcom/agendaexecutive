@@ -107,6 +107,7 @@ const Vendas = () => {
   const [observacoes, setObservacoes] = useState("");
   const [dataVenda, setDataVenda] = useState(new Date().toISOString().split("T")[0]);
   const [dataVencimento, setDataVencimento] = useState("");
+  const [formaPagamento, setFormaPagamento] = useState("");
   const [searchAgenda, setSearchAgenda] = useState("");
   const [contasPagar, setContasPagar] = useState<ContaPagar[]>([]);
   const [fornecedores, setFornecedores] = useState<string[]>([]);
