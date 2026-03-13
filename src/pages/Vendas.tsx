@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo, useCallback } from "react";
 import { Link } from "react-router-dom";
-import { ArrowLeft, Plus, Trash2, ShoppingCart, Search, Check, FileText } from "lucide-react";
+import { ArrowLeft, Plus, Trash2, ShoppingCart, Search, Check, FileText, XCircle } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
@@ -206,6 +206,33 @@ const Vendas = () => {
     toast({ title: "Venda excluída" });
   };
 
+  const handleCancelar = async (venda: Venda) => {
+    if (!confirm("Cancelar esta venda? Os serviços vinculados voltarão ao status anterior.")) return;
+    try {
+      // Get linked agenda_item_ids
+      const { data: items } = await supabase
+        .from("venda_items")
+        .select("agenda_item_id")
+        .eq("venda_id", venda.id);
+
+      // Revert status_faturamento
+      if (items && items.length > 0) {
+        await supabase
+          .from("agenda_items")
+          .update({ status_faturamento: "" })
+          .in("id", items.map((i) => i.agenda_item_id));
+      }
+
+      // Update venda status
+      await supabase.from("vendas").update({ status: "cancelado" }).eq("id", venda.id);
+
+      toast({ title: "Venda cancelada" });
+      loadVendas();
+    } catch (err: any) {
+      toast({ title: "Erro ao cancelar", description: err.message, variant: "destructive" });
+    }
+  };
+
   const handleGerarFatura = async (venda: Venda) => {
     // Load venda_items with agenda details
     const { data: vendaItems } = await supabase
@@ -375,7 +402,12 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
                         <Button variant="ghost" size="icon" onClick={() => handleGerarFatura(v)} title="Gerar Fatura">
                           <FileText className="h-4 w-4 text-primary" />
                         </Button>
-                        <Button variant="ghost" size="icon" onClick={() => handleDelete(v.id)}>
+                        {v.status !== "cancelado" && (
+                          <Button variant="ghost" size="icon" onClick={() => handleCancelar(v)} title="Cancelar Venda">
+                            <XCircle className="h-4 w-4 text-amber-500" />
+                          </Button>
+                        )}
+                        <Button variant="ghost" size="icon" onClick={() => handleDelete(v.id)} title="Excluir">
                           <Trash2 className="h-4 w-4 text-destructive" />
                         </Button>
                       </div>
