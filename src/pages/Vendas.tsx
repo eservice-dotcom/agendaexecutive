@@ -574,7 +574,7 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
     }
   };
 
-
+  const statusColor = (s: string) => {
     switch (s) {
       case "pago": return "default";
       case "pendente": return "secondary";
