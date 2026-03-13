@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo, useCallback } from "react";
 import { Link } from "react-router-dom";
-import { ArrowLeft, Plus, Trash2, ShoppingCart, Search, Check, FileText, XCircle, DollarSign, CheckCircle, Download } from "lucide-react";
+import { ArrowLeft, Plus, Trash2, ShoppingCart, Search, Check, FileText, XCircle, DollarSign, CheckCircle, Download, Pencil } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
@@ -109,9 +109,13 @@ const Vendas = () => {
   const [contasPagarList, setContasPagarList] = useState<ContaPagarDB[]>([]);
   const [contasReceberList, setContasReceberList] = useState<ContaReceberDB[]>([]);
 
-  // Edit dialog
+  // Edit conta dialog
   const [editDialog, setEditDialog] = useState<{ type: "pagar" | "receber"; item: any } | null>(null);
   const [editForm, setEditForm] = useState({ descritivo: "", valor: "", data_vencimento: "", data_pagamento: "" });
+
+  // Edit venda dialog
+  const [editVendaDialog, setEditVendaDialog] = useState<Venda | null>(null);
+  const [editVendaForm, setEditVendaForm] = useState({ data_venda: "", data_vencimento: "", observacoes: "", status: "" });
 
   const loadVendas = useCallback(async () => {
     const { data, error } = await supabase
@@ -543,7 +547,34 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
     else loadContasReceber();
   };
 
-  const statusColor = (s: string) => {
+  const openEditVenda = (venda: Venda) => {
+    setEditVendaForm({
+      data_venda: venda.data_venda,
+      data_vencimento: venda.data_vencimento || "",
+      observacoes: venda.observacoes || "",
+      status: venda.status,
+    });
+    setEditVendaDialog(venda);
+  };
+
+  const handleSaveEditVenda = async () => {
+    if (!editVendaDialog) return;
+    const { error } = await supabase.from("vendas").update({
+      data_venda: editVendaForm.data_venda,
+      data_vencimento: editVendaForm.data_vencimento || null,
+      observacoes: editVendaForm.observacoes,
+      status: editVendaForm.status,
+    }).eq("id", editVendaDialog.id);
+    if (error) {
+      toast({ title: "Erro ao salvar", description: error.message, variant: "destructive" });
+    } else {
+      toast({ title: "Venda atualizada!" });
+      setEditVendaDialog(null);
+      loadVendas();
+    }
+  };
+
+
     switch (s) {
       case "pago": return "default";
       case "pendente": return "secondary";
@@ -635,6 +666,9 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
                         </TableCell>
                         <TableCell>
                           <div className="flex gap-1">
+                            <Button variant="ghost" size="icon" onClick={() => openEditVenda(v)} title="Editar Venda">
+                              <Pencil className="h-4 w-4 text-primary" />
+                            </Button>
                             <Button variant="ghost" size="icon" onClick={() => handleGerarFatura(v)} title="Imprimir Fatura">
                               <FileText className="h-4 w-4 text-primary" />
                             </Button>
@@ -989,6 +1023,52 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
             <DialogFooter>
               <Button variant="outline" onClick={() => setEditDialog(null)}>Cancelar</Button>
               <Button onClick={handleSaveEdit}>Salvar</Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
+        {/* ===== EDIT VENDA DIALOG ===== */}
+        <Dialog open={!!editVendaDialog} onOpenChange={(v) => !v && setEditVendaDialog(null)}>
+          <DialogContent className="max-w-md">
+            <DialogHeader>
+              <DialogTitle>Editar Venda {editVendaDialog?.numero_venda ? `Nº ${editVendaDialog.numero_venda}` : ""}</DialogTitle>
+            </DialogHeader>
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <Label>Cliente</Label>
+                <Input value={editVendaDialog?.cliente || ""} disabled className="bg-muted" />
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label>Data da Venda</Label>
+                  <Input type="date" value={editVendaForm.data_venda} onChange={(e) => setEditVendaForm({ ...editVendaForm, data_venda: e.target.value })} />
+                </div>
+                <div className="space-y-2">
+                  <Label>Data de Vencimento</Label>
+                  <Input type="date" value={editVendaForm.data_vencimento} onChange={(e) => setEditVendaForm({ ...editVendaForm, data_vencimento: e.target.value })} />
+                </div>
+              </div>
+              <div className="space-y-2">
+                <Label>Status</Label>
+                <Select value={editVendaForm.status} onValueChange={(v) => setEditVendaForm({ ...editVendaForm, status: v })}>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="pendente">Pendente</SelectItem>
+                    <SelectItem value="pago">Pago</SelectItem>
+                    <SelectItem value="cancelado">Cancelado</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-2">
+                <Label>Observações</Label>
+                <Textarea value={editVendaForm.observacoes} onChange={(e) => setEditVendaForm({ ...editVendaForm, observacoes: e.target.value })} rows={3} />
+              </div>
+            </div>
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setEditVendaDialog(null)}>Cancelar</Button>
+              <Button onClick={handleSaveEditVenda}>Salvar</Button>
             </DialogFooter>
           </DialogContent>
         </Dialog>
