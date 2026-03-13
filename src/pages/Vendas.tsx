@@ -572,8 +572,19 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
       .select("descricao, valor")
       .eq("venda_id", venda.id);
 
+    setFechamentoItems(items);
+    setFechamentoSelected(new Set(items.map((_: any, i: number) => i)));
+    setFechamentoExtras((extrasData || []).map((e: any) => ({ descricao: e.descricao, valor: Number(e.valor) })));
+    setFechamentoDialog(venda);
+  };
+
+  const handleGerarFechamento = () => {
+    if (!fechamentoDialog) return;
+    const venda = fechamentoDialog;
+    const selectedItems = fechamentoItems.filter((_: any, i: number) => fechamentoSelected.has(i));
+
     generateClosingReport(
-      items,
+      selectedItems,
       `Fechamento - ${venda.cliente}`,
       `Venda Nº ${venda.numero_venda} — ${venda.cliente}`,
       {
@@ -585,9 +596,10 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
         status: venda.status,
         observacoes: venda.observacoes,
         valor_total: venda.valor_total,
-        extras: (extrasData || []).map((e: any) => ({ descricao: e.descricao, valor: Number(e.valor) })),
+        extras: fechamentoExtras,
       }
     );
+    setFechamentoDialog(null);
   };
 
   const openEditDialog = (type: "pagar" | "receber", item: any) => {
