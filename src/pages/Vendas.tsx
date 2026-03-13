@@ -551,30 +551,127 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
     else loadContasReceber();
   };
 
-  const openEditVenda = (venda: Venda) => {
+  const openEditVenda = async (venda: Venda) => {
     setEditVendaForm({
       data_venda: venda.data_venda,
       data_vencimento: venda.data_vencimento || "",
       observacoes: venda.observacoes || "",
       status: venda.status,
     });
+    setEditVendaSearch("");
+
+    // Load current venda items
+    const { data: vendaItems } = await supabase
+      .from("venda_items")
+      .select("agenda_item_id, valor")
+      .eq("venda_id", venda.id);
+    const currentIds = new Set((vendaItems || []).map((vi: any) => vi.agenda_item_id));
+    setEditVendaSelectedIds(currentIds);
+
+    // Load all agenda items for this client (current + available)
+    const { data: allItems } = await supabase
+      .from("agenda_items")
+      .select("id, cliente, data, hora, tipo, origem, destino, valor, custo, motorista, veiculo, pax, cot, fornecedor, status_faturamento")
+      .eq("cliente", venda.cliente)
+      .order("data", { ascending: true });
+
+    const items = (allItems || []) as AgendaItem[];
+    // Show items that are in the venda OR not yet billed
+    const relevant = items.filter((i) => currentIds.has(i.id) || !i.status_faturamento || i.status_faturamento === "");
+    setEditVendaAvailableItems(relevant);
+
     setEditVendaDialog(venda);
+  };
+
+  const editVendaFilteredItems = useMemo(() => {
+    if (!editVendaSearch) return editVendaAvailableItems;
+    const q = editVendaSearch.toLowerCase();
+    return editVendaAvailableItems.filter(
+      (i) =>
+        i.cot.toLowerCase().includes(q) ||
+        i.tipo.toLowerCase().includes(q) ||
+        i.origem.toLowerCase().includes(q) ||
+        i.destino.toLowerCase().includes(q)
+    );
+  }, [editVendaAvailableItems, editVendaSearch]);
+
+  const editVendaTotal = useMemo(() => {
+    return editVendaAvailableItems
+      .filter((i) => editVendaSelectedIds.has(i.id))
+      .reduce((sum, i) => sum + i.valor, 0);
+  }, [editVendaAvailableItems, editVendaSelectedIds]);
+
+  const toggleEditVendaItem = (id: string) => {
+    setEditVendaSelectedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
   };
 
   const handleSaveEditVenda = async () => {
     if (!editVendaDialog) return;
-    const { error } = await supabase.from("vendas").update({
-      data_venda: editVendaForm.data_venda,
-      data_vencimento: editVendaForm.data_vencimento || null,
-      observacoes: editVendaForm.observacoes,
-      status: editVendaForm.status,
-    }).eq("id", editVendaDialog.id);
-    if (error) {
-      toast({ title: "Erro ao salvar", description: error.message, variant: "destructive" });
-    } else {
-      toast({ title: "Venda atualizada!" });
+    if (editVendaSelectedIds.size === 0) {
+      toast({ title: "Selecione pelo menos um serviço", variant: "destructive" });
+      return;
+    }
+    setLoading(true);
+    try {
+      const vendaId = editVendaDialog.id;
+
+      // Get original item ids
+      const { data: originalItems } = await supabase
+        .from("venda_items")
+        .select("agenda_item_id")
+        .eq("venda_id", vendaId);
+      const originalIds = new Set((originalItems || []).map((oi: any) => oi.agenda_item_id));
+
+      const newIds = editVendaSelectedIds;
+      const addedIds = [...newIds].filter((id) => !originalIds.has(id));
+      const removedIds = [...originalIds].filter((id) => !newIds.has(id));
+
+      // Remove venda_items for removed services
+      if (removedIds.length > 0) {
+        await supabase.from("venda_items").delete().eq("venda_id", vendaId).in("agenda_item_id", removedIds);
+        // Reset status_faturamento for removed items
+        await supabase.from("agenda_items").update({ status_faturamento: "" }).in("id", removedIds);
+      }
+
+      // Add venda_items for newly added services
+      if (addedIds.length > 0) {
+        const newVendaItems = addedIds.map((agenda_item_id) => ({
+          venda_id: vendaId,
+          agenda_item_id,
+          valor: editVendaAvailableItems.find((i) => i.id === agenda_item_id)?.valor || 0,
+        }));
+        await supabase.from("venda_items").insert(newVendaItems);
+        await supabase.from("agenda_items").update({ status_faturamento: "faturado" }).in("id", addedIds);
+      }
+
+      // Update venda record
+      const newTotal = editVendaTotal;
+      const { error } = await supabase.from("vendas").update({
+        data_venda: editVendaForm.data_venda,
+        data_vencimento: editVendaForm.data_vencimento || null,
+        observacoes: editVendaForm.observacoes,
+        status: editVendaForm.status,
+        valor_total: newTotal,
+      }).eq("id", vendaId);
+      if (error) throw error;
+
+      // Update conta a receber value
+      await supabase.from("contas_receber").update({ valor: newTotal }).eq("venda_id", vendaId).eq("status", "pendente");
+
+      toast({ title: "Venda atualizada com sucesso!" });
       setEditVendaDialog(null);
       loadVendas();
+      loadContasPagar();
+      loadContasReceber();
+    } catch (err: any) {
+      toast({ title: "Erro ao salvar", description: err.message, variant: "destructive" });
+    } finally {
+      setLoading(false);
     }
   };
 
