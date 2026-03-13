@@ -234,6 +234,22 @@ const Vendas = () => {
     setDataVenda(new Date().toISOString().split("T")[0]);
     setDataVencimento("");
     setSearchAgenda("");
+    setContasPagar([]);
+  };
+
+  const addContaPagar = () => {
+    setContasPagar((prev) => [
+      ...prev,
+      { fornecedor: "", descritivo: "", valor: 0, data: new Date().toISOString().split("T")[0], data_vencimento: "" },
+    ]);
+  };
+
+  const updateContaPagar = (index: number, field: keyof ContaPagar, value: string | number) => {
+    setContasPagar((prev) => prev.map((cp, i) => (i === index ? { ...cp, [field]: value } : cp)));
+  };
+
+  const removeContaPagar = (index: number) => {
+    setContasPagar((prev) => prev.filter((_, i) => i !== index));
   };
 
   const handleDelete = async (id: string) => {
