@@ -994,7 +994,7 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
             </DialogHeader>
 
             <div className="space-y-4">
-              <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-5 gap-4">
                 <div className="space-y-2">
                   <Label>Cliente</Label>
                   <Select value={cliente} onValueChange={setCliente}>
