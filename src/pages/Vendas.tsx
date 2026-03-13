@@ -547,7 +547,34 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
     else loadContasReceber();
   };
 
-  const statusColor = (s: string) => {
+  const openEditVenda = (venda: Venda) => {
+    setEditVendaForm({
+      data_venda: venda.data_venda,
+      data_vencimento: venda.data_vencimento || "",
+      observacoes: venda.observacoes || "",
+      status: venda.status,
+    });
+    setEditVendaDialog(venda);
+  };
+
+  const handleSaveEditVenda = async () => {
+    if (!editVendaDialog) return;
+    const { error } = await supabase.from("vendas").update({
+      data_venda: editVendaForm.data_venda,
+      data_vencimento: editVendaForm.data_vencimento || null,
+      observacoes: editVendaForm.observacoes,
+      status: editVendaForm.status,
+    }).eq("id", editVendaDialog.id);
+    if (error) {
+      toast({ title: "Erro ao salvar", description: error.message, variant: "destructive" });
+    } else {
+      toast({ title: "Venda atualizada!" });
+      setEditVendaDialog(null);
+      loadVendas();
+    }
+  };
+
+
     switch (s) {
       case "pago": return "default";
       case "pendente": return "secondary";
