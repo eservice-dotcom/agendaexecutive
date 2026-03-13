@@ -34,10 +34,23 @@ export interface ClosingReportItem {
   cliente?: string;
 }
 
+export interface ClosingReportVendaInfo {
+  numero_venda?: number;
+  cliente?: string;
+  data_venda?: string;
+  data_vencimento?: string | null;
+  forma_pagamento?: string;
+  status?: string;
+  observacoes?: string | null;
+  valor_total?: number;
+  extras?: { descricao: string; valor: number }[];
+}
+
 export const generateClosingReport = (
   items: ClosingReportItem[],
   title: string,
-  subtitle: string
+  subtitle: string,
+  vendaInfo?: ClosingReportVendaInfo
 ) => {
   const logoUrl = new URL(logo, window.location.origin).href;
 
@@ -80,6 +93,40 @@ export const generateClosingReport = (
   const totalKm = items.reduce((s, ai) => s + ((Number(ai.km_fim) || 0) - (Number(ai.km_in) || 0)), 0);
   const totalKmExtra = items.reduce((s, ai) => s + (Number(ai.km_extra) || 0), 0);
 
+  // Venda info section
+  let vendaInfoHTML = "";
+  if (vendaInfo) {
+    const extras = vendaInfo.extras || [];
+    const extrasTotal = extras.reduce((s, e) => s + (Number(e.valor) || 0), 0);
+    const extrasHTML = extras.length > 0
+      ? `<p><strong>Extras:</strong> ${extras.map(e => `${e.descricao} (${formatCurrency(Number(e.valor))})`).join(", ")}</p>`
+      : "";
+
+    vendaInfoHTML = `
+    <div class="info-grid">
+      <div class="info-box">
+        <h3>Cliente</h3>
+        <p><strong>${vendaInfo.cliente || ""}</strong></p>
+      </div>
+      <div class="info-box">
+        <h3>Detalhes da Venda</h3>
+        ${vendaInfo.numero_venda ? `<p><strong>Venda Nº:</strong> ${vendaInfo.numero_venda}</p>` : ""}
+        ${vendaInfo.data_venda ? `<p><strong>Data da Venda:</strong> ${formatDate(vendaInfo.data_venda)}</p>` : ""}
+        ${vendaInfo.data_vencimento ? `<p><strong>Vencimento:</strong> ${formatDate(vendaInfo.data_vencimento)}</p>` : ""}
+        ${vendaInfo.forma_pagamento ? `<p><strong>Forma de Pagamento:</strong> ${vendaInfo.forma_pagamento}</p>` : ""}
+        ${vendaInfo.status ? `<p><strong>Status:</strong> ${vendaInfo.status.toUpperCase()}</p>` : ""}
+        ${vendaInfo.valor_total != null ? `<p><strong>Valor Total:</strong> ${formatCurrency(vendaInfo.valor_total)}</p>` : ""}
+        ${extrasHTML}
+      </div>
+    </div>`;
+  }
+
+  // Observações
+  let obsHTML = "";
+  if (vendaInfo?.observacoes) {
+    obsHTML = `<div style="margin-top:16px;padding:10px;background:#fffbeb;border:1px solid #f0d68a;border-radius:4px"><strong>Observações:</strong> ${vendaInfo.observacoes}</div>`;
+  }
+
   const html = `<!DOCTYPE html><html><head><title>${title}</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
@@ -89,6 +136,10 @@ body{font-family:Arial,sans-serif;padding:20px;color:#1a1a1a;font-size:10px}
 .header-info{text-align:right}
 .header-info h1{font-size:18px;color:#b8860b;margin-bottom:4px}
 .header-info p{font-size:10px;color:#666}
+.info-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px}
+.info-box{background:#f9f9f9;border:1px solid #e0e0e0;border-radius:6px;padding:10px}
+.info-box h3{font-size:9px;text-transform:uppercase;color:#888;margin-bottom:4px;letter-spacing:0.5px}
+.info-box p{font-size:10px;margin-bottom:2px}
 .summary{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:16px}
 .summary-box{background:#f9f9f9;border:1px solid #e0e0e0;border-radius:4px;padding:8px;text-align:center}
 .summary-box .label{font-size:9px;text-transform:uppercase;color:#888;margin-bottom:2px}
@@ -109,6 +160,7 @@ th{background:#2d3748;color:#fff;font-weight:600;font-size:8px;text-transform:up
     <p>Emitido em: ${new Date().toLocaleString("pt-BR")}</p>
   </div>
 </div>
+${vendaInfoHTML}
 <div class="summary">
   <div class="summary-box"><div class="label">Serviços</div><div class="value">${items.length}</div></div>
   <div class="summary-box"><div class="label">KM Total</div><div class="value">${totalKm}</div></div>
@@ -138,6 +190,7 @@ th{background:#2d3748;color:#fff;font-weight:600;font-size:8px;text-transform:up
     </tr>
   </tbody>
 </table>
+${obsHTML}
 <div class="footer">
   <p>Executive Service — Relatório de Fechamento gerado automaticamente</p>
 </div>
