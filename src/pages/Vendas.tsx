@@ -1255,7 +1255,7 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
               <DialogTitle>Editar Venda {editVendaDialog?.numero_venda ? `Nº ${editVendaDialog.numero_venda}` : ""}</DialogTitle>
             </DialogHeader>
             <div className="space-y-4">
-              <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-5 gap-4">
                 <div className="space-y-2">
                   <Label>Cliente</Label>
                   <Input value={editVendaDialog?.cliente || ""} disabled className="bg-muted" />
@@ -1267,6 +1267,19 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
                 <div className="space-y-2">
                   <Label>Data de Vencimento</Label>
                   <Input type="date" value={editVendaForm.data_vencimento} onChange={(e) => setEditVendaForm({ ...editVendaForm, data_vencimento: e.target.value })} />
+                </div>
+                <div className="space-y-2">
+                  <Label>Forma de Pagamento</Label>
+                  <Select value={editVendaForm.forma_pagamento} onValueChange={(v) => setEditVendaForm({ ...editVendaForm, forma_pagamento: v })}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Selecione" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {FORMAS_PAGAMENTO.map((f) => (
+                        <SelectItem key={f} value={f}>{f}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
                 <div className="space-y-2">
                   <Label>Total</Label>
