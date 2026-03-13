@@ -437,7 +437,7 @@ const AgendaTable = ({ items, onEdited, hideFinancials, onClone }: AgendaTablePr
                         fornecedor: item.fornecedor, valor: item.valor, custo: item.custo,
                         km_in: item.kmIn, km_fim: item.kmFim, km_extra: item.kmExtra,
                         hora_in: item.horaIn, hora_fim: item.horaFim, hora_extra: item.horaExtra,
-                        estacionamento: item.estacionamento, outros: item.outros,
+                        estacionamento: item.estacionamento,
                         outros_despesas: item.outrosDespesas, cliente: item.cliente,
                       }],
                       `Fechamento - ${item.cot}`,
