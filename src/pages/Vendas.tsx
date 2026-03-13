@@ -601,6 +601,13 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
     const relevant = items.filter((i) => currentIds.has(i.id) || !i.status_faturamento || i.status_faturamento === "");
     setEditVendaAvailableItems(relevant);
 
+    // Load extras
+    const { data: extrasData } = await supabase
+      .from("venda_extras")
+      .select("*")
+      .eq("venda_id", venda.id);
+    setEditVendaExtras((extrasData || []).map((e: any) => ({ descricao: e.descricao, valor: Number(e.valor) })));
+
     setEditVendaDialog(venda);
   };
 
