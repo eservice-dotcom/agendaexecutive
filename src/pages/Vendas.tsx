@@ -1463,6 +1463,57 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
             </DialogFooter>
           </DialogContent>
         </Dialog>
+
+        {/* Fechamento Selection Dialog */}
+        <Dialog open={!!fechamentoDialog} onOpenChange={(v) => { if (!v) setFechamentoDialog(null); }}>
+          <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle>Relatório de Fechamento — {fechamentoDialog?.cliente}</DialogTitle>
+            </DialogHeader>
+            <div className="space-y-3">
+              <div className="flex items-center gap-2">
+                <Checkbox
+                  checked={fechamentoSelected.size === fechamentoItems.length && fechamentoItems.length > 0}
+                  onCheckedChange={(checked) => {
+                    setFechamentoSelected(checked ? new Set(fechamentoItems.map((_: any, i: number) => i)) : new Set());
+                  }}
+                />
+                <span className="text-sm font-medium">Selecionar todos ({fechamentoItems.length} itens)</span>
+              </div>
+              <div className="border rounded-md divide-y max-h-[40vh] overflow-y-auto">
+                {fechamentoItems.map((item: any, idx: number) => (
+                  <label key={idx} className="flex items-center gap-3 px-3 py-2 hover:bg-muted/50 cursor-pointer">
+                    <Checkbox
+                      checked={fechamentoSelected.has(idx)}
+                      onCheckedChange={(checked) => {
+                        const next = new Set(fechamentoSelected);
+                        checked ? next.add(idx) : next.delete(idx);
+                        setFechamentoSelected(next);
+                      }}
+                    />
+                    <div className="flex-1 text-sm">
+                      <span className="font-mono text-xs text-muted-foreground mr-2">{item.cot}</span>
+                      <span>{item.data ? formatDate(item.data) : ""}</span>
+                      <span className="mx-1">—</span>
+                      <span>{item.tipo}</span>
+                      <span className="mx-1">|</span>
+                      <span className="text-muted-foreground">{item.origem} → {item.destino}</span>
+                    </div>
+                    <span className="text-xs font-mono">{formatCurrency(Number(item.valor) || 0)}</span>
+                  </label>
+                ))}
+              </div>
+              <p className="text-sm text-muted-foreground">{fechamentoSelected.size} de {fechamentoItems.length} selecionados</p>
+            </div>
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setFechamentoDialog(null)}>Cancelar</Button>
+              <Button onClick={handleGerarFechamento} disabled={fechamentoSelected.size === 0} className="gap-2">
+                <ClipboardList className="h-4 w-4" />
+                Gerar Relatório
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
       </main>
     </div>
   );
