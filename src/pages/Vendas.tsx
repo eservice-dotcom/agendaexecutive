@@ -25,6 +25,7 @@ interface Venda {
   valor_total: number;
   status: string;
   observacoes: string;
+  forma_pagamento: string;
   created_at: string;
 }
 
