@@ -327,6 +327,18 @@ const Vendas = () => {
         if (cpError) throw cpError;
       }
 
+      // Save extras
+      if (extras.length > 0) {
+        const extrasToInsert = extras.filter(e => e.descricao && e.valor > 0).map(e => ({
+          venda_id: venda.id,
+          descricao: e.descricao,
+          valor: e.valor,
+        }));
+        if (extrasToInsert.length > 0) {
+          await supabase.from("venda_extras").insert(extrasToInsert);
+        }
+      }
+
       toast({ title: "Venda criada com sucesso! Contas geradas automaticamente." });
       setDialogOpen(false);
       resetForm();
