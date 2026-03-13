@@ -504,6 +504,7 @@ th{background:#2d3748;color:#fff;font-weight:600;font-size:10px;text-transform:u
     <h3>Detalhes</h3>
     <p><strong>Data da Venda:</strong> ${formatDate(venda.data_venda)}</p>
     ${venda.data_vencimento ? `<p><strong>Vencimento:</strong> ${formatDate(venda.data_vencimento)}</p>` : ""}
+    ${venda.forma_pagamento ? `<p><strong>Forma de Pagamento:</strong> ${venda.forma_pagamento}</p>` : ""}
     <p><strong>Status:</strong> ${venda.status.toUpperCase()}</p>
   </div>
 </div>
