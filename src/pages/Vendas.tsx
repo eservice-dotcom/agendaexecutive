@@ -109,9 +109,13 @@ const Vendas = () => {
   const [contasPagarList, setContasPagarList] = useState<ContaPagarDB[]>([]);
   const [contasReceberList, setContasReceberList] = useState<ContaReceberDB[]>([]);
 
-  // Edit dialog
+  // Edit conta dialog
   const [editDialog, setEditDialog] = useState<{ type: "pagar" | "receber"; item: any } | null>(null);
   const [editForm, setEditForm] = useState({ descritivo: "", valor: "", data_vencimento: "", data_pagamento: "" });
+
+  // Edit venda dialog
+  const [editVendaDialog, setEditVendaDialog] = useState<Venda | null>(null);
+  const [editVendaForm, setEditVendaForm] = useState({ data_venda: "", data_vencimento: "", observacoes: "", status: "" });
 
   const loadVendas = useCallback(async () => {
     const { data, error } = await supabase
