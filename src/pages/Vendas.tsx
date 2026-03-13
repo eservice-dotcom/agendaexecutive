@@ -18,6 +18,7 @@ import logo from "@/assets/logo-executive-service.png";
 
 interface Venda {
   id: string;
+  numero_venda: number;
   cliente: string;
   data_venda: string;
   data_vencimento: string | null;
