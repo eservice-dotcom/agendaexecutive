@@ -348,9 +348,18 @@ const Vendas = () => {
     setDataVencimento("");
     setSearchAgenda("");
     setContasPagar([]);
+    setExtras([]);
   };
 
-  const addContaPagar = () => {
+  const addExtra = () => setExtras((prev) => [...prev, { descricao: "", valor: 0 }]);
+  const updateExtra = (idx: number, field: keyof ExtraItem, value: string | number) =>
+    setExtras((prev) => prev.map((e, i) => (i === idx ? { ...e, [field]: value } : e)));
+  const removeExtra = (idx: number) => setExtras((prev) => prev.filter((_, i) => i !== idx));
+
+  const addEditVendaExtra = () => setEditVendaExtras((prev) => [...prev, { descricao: "", valor: 0 }]);
+  const updateEditVendaExtra = (idx: number, field: keyof ExtraItem, value: string | number) =>
+    setEditVendaExtras((prev) => prev.map((e, i) => (i === idx ? { ...e, [field]: value } : e)));
+  const removeEditVendaExtra = (idx: number) => setEditVendaExtras((prev) => prev.filter((_, i) => i !== idx));
     setContasPagar((prev) => [
       ...prev,
       { fornecedor: "", descritivo: "", valor: 0, data: new Date().toISOString().split("T")[0], data_vencimento: "" },
