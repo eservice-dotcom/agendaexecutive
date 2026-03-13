@@ -436,6 +436,12 @@ const Vendas = () => {
     const items = vendaItems || [];
     const logoUrl = new URL(logo, window.location.origin).href;
 
+    const { data: extrasData } = await supabase
+      .from("venda_extras")
+      .select("descricao, valor")
+      .eq("venda_id", venda.id);
+    const vendaExtras = extrasData || [];
+
     const rows = items.map((item: any, idx: number) => {
       const ai = item.agenda_items;
       return `<tr>
@@ -448,6 +454,12 @@ const Vendas = () => {
         <td class="r">${formatCurrency(item.valor)}</td>
       </tr>`;
     }).join("");
+
+    const extrasRows = vendaExtras.map((ex: any, idx: number) => `<tr>
+      <td class="c">${items.length + idx + 1}</td>
+      <td colspan="5"><em>Extra: ${ex.descricao}</em></td>
+      <td class="r">${formatCurrency(Number(ex.valor))}</td>
+    </tr>`).join("");
 
     return `<!DOCTYPE html><html><head><title>Fatura - ${venda.cliente}</title>
 <style>
@@ -496,6 +508,7 @@ th{background:#2d3748;color:#fff;font-weight:600;font-size:10px;text-transform:u
   </tr></thead>
   <tbody>
     ${rows}
+    ${extrasRows}
     <tr class="total-row">
       <td colspan="6" class="r">TOTAL</td>
       <td class="r">${formatCurrency(venda.valor_total)}</td>
