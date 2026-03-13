@@ -87,6 +87,8 @@ interface ContaReceberDB {
 const formatCurrency = (v: number) =>
   new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(v);
 
+const FORMAS_PAGAMENTO = ["PIX", "Boleto", "Transferência Bancária", "Cartão de Crédito", "Cartão de Débito", "Dinheiro", "Cheque"];
+
 const formatDate = (d: string) => {
   const [y, m, day] = d.split("-");
   return `${day}/${m}/${y}`;
