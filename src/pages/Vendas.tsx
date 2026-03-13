@@ -95,6 +95,16 @@ const Vendas = () => {
     }
   }, []);
 
+  const loadFornecedores = useCallback(async () => {
+    const { data } = await supabase
+      .from("fornecedores")
+      .select("razao_social")
+      .order("razao_social");
+    if (data) {
+      setFornecedores(data.map((f) => f.razao_social).filter(Boolean));
+    }
+  }, []);
+
   useEffect(() => {
     loadVendas();
     loadClientes();
