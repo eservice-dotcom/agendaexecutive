@@ -586,6 +586,58 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
                 </>
               )}
 
+              {/* Contas a Pagar */}
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <Label className="text-base font-semibold">Contas a Pagar</Label>
+                  <Button variant="outline" size="sm" onClick={addContaPagar} type="button">
+                    <Plus className="h-4 w-4 mr-1" /> Adicionar
+                  </Button>
+                </div>
+
+                {contasPagar.length > 0 && (
+                  <div className="space-y-3">
+                    {contasPagar.map((cp, idx) => (
+                      <div key={idx} className="grid grid-cols-1 sm:grid-cols-6 gap-2 items-end rounded-md border border-border p-3 bg-muted/30">
+                        <div className="sm:col-span-2 space-y-1">
+                          <Label className="text-xs">Fornecedor</Label>
+                          <Select value={cp.fornecedor} onValueChange={(v) => updateContaPagar(idx, "fornecedor", v)}>
+                            <SelectTrigger className="h-9">
+                              <SelectValue placeholder="Selecione" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {fornecedores.map((f) => (
+                                <SelectItem key={f} value={f}>{f}</SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        <div className="space-y-1">
+                          <Label className="text-xs">Descritivo</Label>
+                          <Input className="h-9" value={cp.descritivo} onChange={(e) => updateContaPagar(idx, "descritivo", e.target.value)} placeholder="Descrição" />
+                        </div>
+                        <div className="space-y-1">
+                          <Label className="text-xs">Valor</Label>
+                          <Input className="h-9" type="number" step="0.01" value={cp.valor || ""} onChange={(e) => updateContaPagar(idx, "valor", parseFloat(e.target.value) || 0)} />
+                        </div>
+                        <div className="space-y-1">
+                          <Label className="text-xs">Vencimento</Label>
+                          <Input className="h-9" type="date" value={cp.data_vencimento} onChange={(e) => updateContaPagar(idx, "data_vencimento", e.target.value)} />
+                        </div>
+                        <div className="flex items-end">
+                          <Button variant="ghost" size="icon" className="h-9 w-9" onClick={() => removeContaPagar(idx)}>
+                            <Trash2 className="h-4 w-4 text-destructive" />
+                          </Button>
+                        </div>
+                      </div>
+                    ))}
+                    <p className="text-xs text-muted-foreground">
+                      Total contas: {formatCurrency(contasPagar.reduce((s, cp) => s + cp.valor, 0))}
+                    </p>
+                  </div>
+                )}
+              </div>
+
               <div className="space-y-2">
                 <Label>Observações</Label>
                 <Textarea value={observacoes} onChange={(e) => setObservacoes(e.target.value)} rows={2} />
