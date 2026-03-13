@@ -1,5 +1,5 @@
 import { useState, useMemo, useCallback, useEffect } from "react";
-import { CalendarDays, ListChecks, Truck, Building2, Plus, BarChart3, Printer, EyeOff, Eye, ShoppingCart } from "lucide-react";
+import { CalendarDays, ListChecks, Truck, Building2, Plus, BarChart3, Printer, EyeOff, Eye, ShoppingCart, FileText } from "lucide-react";
 import logo from "@/assets/logo-executive-service.png";
 import { Link } from "react-router-dom";
 import { ClipboardList } from "lucide-react";
@@ -14,6 +14,7 @@ import DashboardOcupacao from "@/components/DashboardOcupacao";
 import NovoServicoDialog from "@/components/NovoServicoDialog";
 import { getAgendaItems } from "@/data/cadastroStorage";
 import { printAgenda } from "@/lib/printUtils";
+import { generateClosingReport } from "@/lib/closingReport";
 
 
 interface FiltersState {
@@ -202,6 +203,23 @@ const Index = () => {
                 <Button variant="outline" size="sm" onClick={() => printAgenda(filteredData, printWithFinancials)} className="gap-2">
                   <Printer className="h-4 w-4" />
                   Imprimir
+                </Button>
+                <Button variant="outline" size="sm" onClick={() => generateClosingReport(
+                  filteredData.map(i => ({
+                    cot: i.cot, data: i.data, hora: i.hora, tipo: i.tipo,
+                    origem: i.origem, destino: i.destino, pax: i.pax,
+                    motorista: i.motorista, veiculo: i.veiculo, placa: i.placa,
+                    fornecedor: i.fornecedor, valor: i.valor, custo: i.custo,
+                    km_in: i.kmIn, km_fim: i.kmFim, km_extra: i.kmExtra,
+                    hora_in: i.horaIn, hora_fim: i.horaFim, hora_extra: i.horaExtra,
+                    estacionamento: i.estacionamento,
+                    outros_despesas: i.outrosDespesas, cliente: i.cliente,
+                  })),
+                  "Relatório de Fechamento",
+                  `${filteredData.length} serviço(s) filtrado(s)`
+                )} className="gap-2">
+                  <FileText className="h-4 w-4" />
+                  Fechamento
                 </Button>
                 <Button onClick={() => setNovoDialogOpen(true)} className="gap-2">
                   <Plus className="h-4 w-4" />
