@@ -964,6 +964,9 @@ th{background:#2d3748;color:#fff;font-weight:600;font-size:8px;text-transform:up
                             <Button variant="ghost" size="icon" onClick={() => handleSalvarFatura(v)} title="Salvar Fatura">
                               <Download className="h-4 w-4 text-primary" />
                             </Button>
+                            <Button variant="ghost" size="icon" onClick={() => handleRelatorioFechamento(v)} title="Relatório de Fechamento">
+                              <ClipboardList className="h-4 w-4 text-primary" />
+                            </Button>
                             {v.status !== "cancelado" && (
                               <Button variant="ghost" size="icon" onClick={() => handleCancelar(v)} title="Cancelar Venda">
                                 <XCircle className="h-4 w-4 text-destructive" />
