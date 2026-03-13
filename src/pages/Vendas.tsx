@@ -116,6 +116,10 @@ const Vendas = () => {
   // Edit venda dialog
   const [editVendaDialog, setEditVendaDialog] = useState<Venda | null>(null);
   const [editVendaForm, setEditVendaForm] = useState({ data_venda: "", data_vencimento: "", observacoes: "", status: "" });
+  const [editVendaItems, setEditVendaItems] = useState<AgendaItem[]>([]);
+  const [editVendaSelectedIds, setEditVendaSelectedIds] = useState<Set<string>>(new Set());
+  const [editVendaAvailableItems, setEditVendaAvailableItems] = useState<AgendaItem[]>([]);
+  const [editVendaSearch, setEditVendaSearch] = useState("");
 
   const loadVendas = useCallback(async () => {
     const { data, error } = await supabase
