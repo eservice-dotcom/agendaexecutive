@@ -446,6 +446,7 @@ const AgendaTable = ({ items, onEdited, hideFinancials, onClone }: AgendaTablePr
                     title="Relatório de Fechamento"
                   >
                     <FileText className="h-2.5 w-2.5" />
+                  </Button>
                   <Button
                     variant="ghost"
                     size="sm"
