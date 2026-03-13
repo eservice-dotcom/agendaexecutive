@@ -126,6 +126,7 @@ const Vendas = () => {
   const [editVendaSelectedIds, setEditVendaSelectedIds] = useState<Set<string>>(new Set());
   const [editVendaAvailableItems, setEditVendaAvailableItems] = useState<AgendaItem[]>([]);
   const [editVendaSearch, setEditVendaSearch] = useState("");
+  const [editVendaExtras, setEditVendaExtras] = useState<ExtraItem[]>([]);
 
   const loadVendas = useCallback(async () => {
     const { data, error } = await supabase
