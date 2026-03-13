@@ -428,6 +428,27 @@ const AgendaTable = ({ items, onEdited, hideFinancials, onClone }: AgendaTablePr
                   <Button
                     variant="ghost"
                     size="sm"
+                    className="h-4 w-4 p-0 text-muted-foreground hover:text-primary"
+                    onClick={() => generateClosingReport(
+                      [{
+                        cot: item.cot, data: item.data, hora: item.hora, tipo: item.tipo,
+                        origem: item.origem, destino: item.destino, pax: item.pax,
+                        motorista: item.motorista, veiculo: item.veiculo, placa: item.placa,
+                        fornecedor: item.fornecedor, valor: item.valor, custo: item.custo,
+                        km_in: item.kmIn, km_fim: item.kmFim, km_extra: item.kmExtra,
+                        hora_in: item.horaIn, hora_fim: item.horaFim, hora_extra: item.horaExtra,
+                        estacionamento: item.estacionamento, outros: item.outros,
+                        outros_despesas: item.outrosDespesas, cliente: item.cliente,
+                      }],
+                      `Fechamento - ${item.cot}`,
+                      `O.S. ${item.cot} — ${item.cliente}`
+                    )}
+                    title="Relatório de Fechamento"
+                  >
+                    <FileText className="h-2.5 w-2.5" />
+                  <Button
+                    variant="ghost"
+                    size="sm"
                     className="h-4 w-4 p-0 text-muted-foreground hover:text-destructive"
                     onClick={() => setDeleteItemId(item.id)}
                     title="Excluir serviço"
