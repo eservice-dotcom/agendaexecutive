@@ -1,0 +1,426 @@
+import { useState, useEffect, useMemo, useCallback } from "react";
+import { Link } from "react-router-dom";
+import { ArrowLeft, Plus, Trash2, ShoppingCart, Search, Check } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Badge } from "@/components/ui/badge";
+import { Checkbox } from "@/components/ui/checkbox";
+import { toast } from "@/hooks/use-toast";
+import logo from "@/assets/logo-executive-service.png";
+
+interface Venda {
+  id: string;
+  cliente: string;
+  data_venda: string;
+  valor_total: number;
+  status: string;
+  observacoes: string;
+  created_at: string;
+  items?: VendaItem[];
+}
+
+interface VendaItem {
+  id: string;
+  venda_id: string;
+  agenda_item_id: string;
+  valor: number;
+}
+
+interface AgendaItem {
+  id: string;
+  cliente: string;
+  data: string;
+  hora: string;
+  tipo: string;
+  origem: string;
+  destino: string;
+  valor: number;
+  motorista: string;
+  veiculo: string;
+  pax: number;
+  cot: string;
+  status_faturamento: string | null;
+}
+
+const Vendas = () => {
+  const { session, signOut } = useAuth();
+  const [vendas, setVendas] = useState<Venda[]>([]);
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
+
+  // Form state
+  const [cliente, setCliente] = useState("");
+  const [clientes, setClientes] = useState<string[]>([]);
+  const [agendaItems, setAgendaItems] = useState<AgendaItem[]>([]);
+  const [selectedItems, setSelectedItems] = useState<Set<string>>(new Set());
+  const [observacoes, setObservacoes] = useState("");
+  const [dataVenda, setDataVenda] = useState(new Date().toISOString().split("T")[0]);
+  const [searchAgenda, setSearchAgenda] = useState("");
+
+  const loadVendas = useCallback(async () => {
+    const { data, error } = await supabase
+      .from("vendas")
+      .select("*")
+      .order("created_at", { ascending: false });
+    if (!error && data) setVendas(data);
+  }, []);
+
+  const loadClientes = useCallback(async () => {
+    const { data } = await supabase
+      .from("agenda_items")
+      .select("cliente")
+      .order("cliente");
+    if (data) {
+      const unique = [...new Set(data.map((d) => d.cliente))].filter(Boolean).sort();
+      setClientes(unique);
+    }
+  }, []);
+
+  useEffect(() => {
+    loadVendas();
+    loadClientes();
+  }, [loadVendas, loadClientes]);
+
+  // Load agenda items for selected client
+  useEffect(() => {
+    if (!cliente) {
+      setAgendaItems([]);
+      return;
+    }
+    const load = async () => {
+      const { data } = await supabase
+        .from("agenda_items")
+        .select("id, cliente, data, hora, tipo, origem, destino, valor, motorista, veiculo, pax, cot, status_faturamento")
+        .eq("cliente", cliente)
+        .order("data", { ascending: true });
+      if (data) setAgendaItems(data as AgendaItem[]);
+    };
+    load();
+  }, [cliente]);
+
+  const filteredAgendaItems = useMemo(() => {
+    if (!searchAgenda) return agendaItems;
+    const s = searchAgenda.toLowerCase();
+    return agendaItems.filter(
+      (i) =>
+        i.cot.toLowerCase().includes(s) ||
+        i.origem.toLowerCase().includes(s) ||
+        i.destino.toLowerCase().includes(s) ||
+        i.motorista.toLowerCase().includes(s) ||
+        i.data.includes(s)
+    );
+  }, [agendaItems, searchAgenda]);
+
+  const totalSelected = useMemo(() => {
+    return agendaItems
+      .filter((i) => selectedItems.has(i.id))
+      .reduce((sum, i) => sum + i.valor, 0);
+  }, [agendaItems, selectedItems]);
+
+  const toggleItem = (id: string) => {
+    setSelectedItems((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  };
+
+  const selectAll = () => {
+    if (selectedItems.size === filteredAgendaItems.length) {
+      setSelectedItems(new Set());
+    } else {
+      setSelectedItems(new Set(filteredAgendaItems.map((i) => i.id)));
+    }
+  };
+
+  const handleSave = async () => {
+    if (!cliente || selectedItems.size === 0) {
+      toast({ title: "Selecione um cliente e pelo menos um serviço", variant: "destructive" });
+      return;
+    }
+    setLoading(true);
+    try {
+      const { data: venda, error: vendaError } = await supabase
+        .from("vendas")
+        .insert({
+          user_id: session!.user.id,
+          cliente,
+          data_venda: dataVenda,
+          valor_total: totalSelected,
+          status: "pendente",
+          observacoes,
+        })
+        .select()
+        .single();
+
+      if (vendaError) throw vendaError;
+
+      const items = Array.from(selectedItems).map((agenda_item_id) => ({
+        venda_id: venda.id,
+        agenda_item_id,
+        valor: agendaItems.find((i) => i.id === agenda_item_id)?.valor || 0,
+      }));
+
+      const { error: itemsError } = await supabase.from("venda_items").insert(items);
+      if (itemsError) throw itemsError;
+
+      // Update status_faturamento on agenda items
+      await supabase
+        .from("agenda_items")
+        .update({ status_faturamento: "faturado" })
+        .in("id", Array.from(selectedItems));
+
+      toast({ title: "Venda criada com sucesso!" });
+      setDialogOpen(false);
+      resetForm();
+      loadVendas();
+    } catch (err: any) {
+      toast({ title: "Erro ao salvar venda", description: err.message, variant: "destructive" });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const resetForm = () => {
+    setCliente("");
+    setSelectedItems(new Set());
+    setObservacoes("");
+    setDataVenda(new Date().toISOString().split("T")[0]);
+    setSearchAgenda("");
+  };
+
+  const handleDelete = async (id: string) => {
+    if (!confirm("Excluir esta venda?")) return;
+    await supabase.from("vendas").delete().eq("id", id);
+    loadVendas();
+    toast({ title: "Venda excluída" });
+  };
+
+  const formatCurrency = (v: number) =>
+    new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(v);
+
+  const formatDate = (d: string) => {
+    const [y, m, day] = d.split("-");
+    return `${day}/${m}/${y}`;
+  };
+
+  const statusColor = (s: string) => {
+    switch (s) {
+      case "pago": return "default";
+      case "pendente": return "secondary";
+      case "cancelado": return "destructive";
+      default: return "outline";
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-background">
+      <header className="border-b border-border bg-foreground px-4 py-3 shadow-sm sm:px-6 lg:px-8">
+        <div className="mx-auto flex max-w-[1600px] items-center justify-between">
+          <img src={logo} alt="Executive Service" className="h-10" />
+          <div className="flex items-center gap-4">
+            <Link to="/">
+              <span className="flex items-center gap-1 text-sm text-primary-foreground/80 hover:text-primary-foreground">
+                <ArrowLeft className="h-4 w-4" /> Agenda
+              </span>
+            </Link>
+            <button onClick={signOut} className="text-sm text-primary-foreground/80 hover:text-primary-foreground">
+              Sair
+            </button>
+          </div>
+        </div>
+      </header>
+
+      <main className="mx-auto max-w-[1600px] space-y-4 px-4 py-6 sm:px-6 lg:px-8">
+        <div className="flex items-center justify-between">
+          <h1 className="text-2xl font-bold text-foreground flex items-center gap-2">
+            <ShoppingCart className="h-6 w-6" /> Vendas
+          </h1>
+          <Button onClick={() => { resetForm(); setDialogOpen(true); }} className="gap-2">
+            <Plus className="h-4 w-4" /> Nova Venda
+          </Button>
+        </div>
+
+        {/* Lista de vendas */}
+        <div className="rounded-lg border border-border bg-card shadow-sm">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Data</TableHead>
+                <TableHead>Cliente</TableHead>
+                <TableHead className="text-right">Valor Total</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead>Observações</TableHead>
+                <TableHead className="w-[60px]" />
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {vendas.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={6} className="text-center text-muted-foreground py-8">
+                    Nenhuma venda registrada
+                  </TableCell>
+                </TableRow>
+              ) : (
+                vendas.map((v) => (
+                  <TableRow key={v.id}>
+                    <TableCell className="font-mono text-sm">{formatDate(v.data_venda)}</TableCell>
+                    <TableCell className="font-medium">{v.cliente}</TableCell>
+                    <TableCell className="text-right font-mono">{formatCurrency(v.valor_total)}</TableCell>
+                    <TableCell>
+                      <Badge variant={statusColor(v.status) as any}>{v.status}</Badge>
+                    </TableCell>
+                    <TableCell className="text-sm text-muted-foreground max-w-[200px] truncate">
+                      {v.observacoes}
+                    </TableCell>
+                    <TableCell>
+                      <Button variant="ghost" size="icon" onClick={() => handleDelete(v.id)}>
+                        <Trash2 className="h-4 w-4 text-destructive" />
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                ))
+              )}
+            </TableBody>
+          </Table>
+        </div>
+
+        {/* Dialog Nova Venda */}
+        <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+          <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle>Nova Venda</DialogTitle>
+            </DialogHeader>
+
+            <div className="space-y-4">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div className="space-y-2">
+                  <Label>Cliente</Label>
+                  <Select value={cliente} onValueChange={setCliente}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Selecione o cliente" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {clientes.map((c) => (
+                        <SelectItem key={c} value={c}>{c}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2">
+                  <Label>Data da Venda</Label>
+                  <Input type="date" value={dataVenda} onChange={(e) => setDataVenda(e.target.value)} />
+                </div>
+                <div className="space-y-2">
+                  <Label>Total Selecionado</Label>
+                  <div className="h-10 flex items-center rounded-md border border-input bg-muted px-3 font-bold text-foreground">
+                    {formatCurrency(totalSelected)}
+                  </div>
+                </div>
+              </div>
+
+              {cliente && (
+                <>
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between">
+                      <Label>Serviços da Agenda</Label>
+                      <div className="flex items-center gap-2">
+                        <div className="relative">
+                          <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+                          <Input
+                            placeholder="Buscar..."
+                            value={searchAgenda}
+                            onChange={(e) => setSearchAgenda(e.target.value)}
+                            className="pl-8 h-9 w-48"
+                          />
+                        </div>
+                        <Button variant="outline" size="sm" onClick={selectAll}>
+                          <Check className="h-4 w-4 mr-1" />
+                          {selectedItems.size === filteredAgendaItems.length ? "Desmarcar" : "Selecionar"} Todos
+                        </Button>
+                      </div>
+                    </div>
+
+                    <div className="rounded-md border border-border max-h-[300px] overflow-y-auto">
+                      <Table>
+                        <TableHeader>
+                          <TableRow>
+                            <TableHead className="w-[40px]" />
+                            <TableHead>COT</TableHead>
+                            <TableHead>Data</TableHead>
+                            <TableHead>Tipo</TableHead>
+                            <TableHead>Origem → Destino</TableHead>
+                            <TableHead>PAX</TableHead>
+                            <TableHead className="text-right">Valor</TableHead>
+                            <TableHead>Status</TableHead>
+                          </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                          {filteredAgendaItems.length === 0 ? (
+                            <TableRow>
+                              <TableCell colSpan={8} className="text-center text-muted-foreground py-4">
+                                Nenhum serviço encontrado para este cliente
+                              </TableCell>
+                            </TableRow>
+                          ) : (
+                            filteredAgendaItems.map((item) => (
+                              <TableRow
+                                key={item.id}
+                                className={`cursor-pointer ${selectedItems.has(item.id) ? "bg-accent/50" : ""}`}
+                                onClick={() => toggleItem(item.id)}
+                              >
+                                <TableCell>
+                                  <Checkbox checked={selectedItems.has(item.id)} />
+                                </TableCell>
+                                <TableCell className="font-mono text-xs">{item.cot}</TableCell>
+                                <TableCell className="font-mono text-xs">{formatDate(item.data)}</TableCell>
+                                <TableCell className="text-xs">{item.tipo}</TableCell>
+                                <TableCell className="text-xs">{item.origem} → {item.destino}</TableCell>
+                                <TableCell className="text-center">{item.pax}</TableCell>
+                                <TableCell className="text-right font-mono text-xs">{formatCurrency(item.valor)}</TableCell>
+                                <TableCell>
+                                  {item.status_faturamento && (
+                                    <Badge variant="outline" className="text-xs">{item.status_faturamento}</Badge>
+                                  )}
+                                </TableCell>
+                              </TableRow>
+                            ))
+                          )}
+                        </TableBody>
+                      </Table>
+                    </div>
+                    <p className="text-xs text-muted-foreground">
+                      {selectedItems.size} serviço(s) selecionado(s)
+                    </p>
+                  </div>
+                </>
+              )}
+
+              <div className="space-y-2">
+                <Label>Observações</Label>
+                <Textarea value={observacoes} onChange={(e) => setObservacoes(e.target.value)} rows={2} />
+              </div>
+            </div>
+
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setDialogOpen(false)}>Cancelar</Button>
+              <Button onClick={handleSave} disabled={loading || selectedItems.size === 0}>
+                {loading ? "Salvando..." : "Criar Venda"}
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+      </main>
+    </div>
+  );
+};
+
+export default Vendas;
