@@ -1017,6 +1017,19 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
                   <Input type="date" value={dataVencimento} onChange={(e) => setDataVencimento(e.target.value)} />
                 </div>
                 <div className="space-y-2">
+                  <Label>Forma de Pagamento</Label>
+                  <Select value={formaPagamento} onValueChange={setFormaPagamento}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Selecione" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {FORMAS_PAGAMENTO.map((f) => (
+                        <SelectItem key={f} value={f}>{f}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2">
                   <Label>Total Selecionado</Label>
                   <div className="h-10 flex items-center rounded-md border border-input bg-muted px-3 font-bold text-foreground">
                     {formatCurrency(totalSelected)}
