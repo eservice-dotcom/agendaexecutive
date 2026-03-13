@@ -635,8 +635,11 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
                         </TableCell>
                         <TableCell>
                           <div className="flex gap-1">
-                            <Button variant="ghost" size="icon" onClick={() => handleGerarFatura(v)} title="Gerar Fatura">
+                            <Button variant="ghost" size="icon" onClick={() => handleGerarFatura(v)} title="Imprimir Fatura">
                               <FileText className="h-4 w-4 text-primary" />
+                            </Button>
+                            <Button variant="ghost" size="icon" onClick={() => handleSalvarFatura(v)} title="Salvar Fatura">
+                              <Download className="h-4 w-4 text-primary" />
                             </Button>
                             {v.status !== "cancelado" && (
                               <Button variant="ghost" size="icon" onClick={() => handleCancelar(v)} title="Cancelar Venda">
