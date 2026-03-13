@@ -14,6 +14,7 @@ import DashboardOcupacao from "@/components/DashboardOcupacao";
 import NovoServicoDialog from "@/components/NovoServicoDialog";
 import { getAgendaItems } from "@/data/cadastroStorage";
 import { printAgenda } from "@/lib/printUtils";
+import { generateClosingReport } from "@/lib/closingReport";
 
 
 interface FiltersState {
