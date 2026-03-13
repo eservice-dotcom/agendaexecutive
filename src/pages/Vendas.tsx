@@ -210,11 +210,14 @@ const Vendas = () => {
     );
   }, [agendaItems, searchAgenda]);
 
+  const extrasTotal = useMemo(() => extras.reduce((s, e) => s + e.valor, 0), [extras]);
+
   const totalSelected = useMemo(() => {
-    return agendaItems
+    const servicos = agendaItems
       .filter((i) => selectedItems.has(i.id))
       .reduce((sum, i) => sum + i.valor, 0);
-  }, [agendaItems, selectedItems]);
+    return servicos + extrasTotal;
+  }, [agendaItems, selectedItems, extrasTotal]);
 
   const toggleItem = (id: string) => {
     setSelectedItems((prev) => {
