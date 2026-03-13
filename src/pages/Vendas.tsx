@@ -601,7 +601,7 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
         status: venda.status,
         observacoes: venda.observacoes,
         valor_total: venda.valor_total,
-        extras: fechamentoExtras,
+        extras: fechamentoExtras.filter((_, i) => fechamentoExtrasSelected.has(i)),
       }
     );
     setFechamentoDialog(null);
