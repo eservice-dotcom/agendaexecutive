@@ -42,6 +42,14 @@ interface AgendaItem {
   status_faturamento: string | null;
 }
 
+interface ContaPagar {
+  fornecedor: string;
+  descritivo: string;
+  valor: number;
+  data: string;
+  data_vencimento: string;
+}
+
 const formatCurrency = (v: number) =>
   new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(v);
 
