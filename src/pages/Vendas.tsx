@@ -133,6 +133,12 @@ const Vendas = () => {
   const [editVendaSearch, setEditVendaSearch] = useState("");
   const [editVendaExtras, setEditVendaExtras] = useState<ExtraItem[]>([]);
 
+  // Closing report selection
+  const [fechamentoDialog, setFechamentoDialog] = useState<Venda | null>(null);
+  const [fechamentoItems, setFechamentoItems] = useState<any[]>([]);
+  const [fechamentoSelected, setFechamentoSelected] = useState<Set<number>>(new Set());
+  const [fechamentoExtras, setFechamentoExtras] = useState<{ descricao: string; valor: number }[]>([]);
+
   const loadVendas = useCallback(async () => {
     const { data, error } = await supabase
       .from("vendas")
