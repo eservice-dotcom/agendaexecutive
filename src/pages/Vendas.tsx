@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo, useCallback } from "react";
 import { Link } from "react-router-dom";
-import { ArrowLeft, Plus, Trash2, ShoppingCart, Search, Check, FileText, XCircle, DollarSign, CheckCircle } from "lucide-react";
+import { ArrowLeft, Plus, Trash2, ShoppingCart, Search, Check, FileText, XCircle, DollarSign, CheckCircle, Download } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
@@ -386,7 +386,7 @@ const Vendas = () => {
     }
   };
 
-  const handleGerarFatura = async (venda: Venda) => {
+  const buildFaturaHTML = async (venda: Venda) => {
     const { data: vendaItems } = await supabase
       .from("venda_items")
       .select("*, agenda_items:agenda_item_id(cot, data, hora, tipo, origem, destino, pax, motorista, veiculo)")
@@ -408,9 +408,7 @@ const Vendas = () => {
       </tr>`;
     }).join("");
 
-    const w = window.open("", "_blank");
-    if (!w) return;
-    w.document.write(`<!DOCTYPE html><html><head><title>Fatura - ${venda.cliente}</title>
+    return `<!DOCTYPE html><html><head><title>Fatura - ${venda.cliente}</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 body{font-family:Arial,sans-serif;padding:30px;color:#1a1a1a;font-size:12px}
@@ -467,9 +465,30 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
 <div class="footer">
   <p>Executive Service — Fatura gerada automaticamente</p>
 </div>
-</body></html>`);
+</body></html>`;
+  };
+
+  const handleGerarFatura = async (venda: Venda) => {
+    const html = await buildFaturaHTML(venda);
+    const w = window.open("", "_blank");
+    if (!w) return;
+    w.document.write(html);
     w.document.close();
     w.onload = () => w.print();
+  };
+
+  const handleSalvarFatura = async (venda: Venda) => {
+    const html = await buildFaturaHTML(venda);
+    const blob = new Blob([html], { type: "text/html" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `Fatura_${venda.numero_venda}_${venda.cliente.replace(/\s+/g, "_")}.html`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    toast({ title: "Fatura salva", description: "Arquivo HTML baixado com sucesso" });
   };
 
   // Edit conta
@@ -616,8 +635,11 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
                         </TableCell>
                         <TableCell>
                           <div className="flex gap-1">
-                            <Button variant="ghost" size="icon" onClick={() => handleGerarFatura(v)} title="Gerar Fatura">
+                            <Button variant="ghost" size="icon" onClick={() => handleGerarFatura(v)} title="Imprimir Fatura">
                               <FileText className="h-4 w-4 text-primary" />
+                            </Button>
+                            <Button variant="ghost" size="icon" onClick={() => handleSalvarFatura(v)} title="Salvar Fatura">
+                              <Download className="h-4 w-4 text-primary" />
                             </Button>
                             {v.status !== "cancelado" && (
                               <Button variant="ghost" size="icon" onClick={() => handleCancelar(v)} title="Cancelar Venda">
