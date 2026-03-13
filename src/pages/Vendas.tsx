@@ -536,7 +536,7 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
                         <TableHeader>
                           <TableRow>
                             <TableHead className="w-[40px]" />
-                            <TableHead>COT</TableHead>
+                            <TableHead>O.S.</TableHead>
                             <TableHead>Data</TableHead>
                             <TableHead>Tipo</TableHead>
                             <TableHead>Origem → Destino</TableHead>

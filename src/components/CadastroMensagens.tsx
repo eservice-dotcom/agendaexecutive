@@ -49,7 +49,7 @@ const CadastroMensagens = () => {
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <p className="text-sm text-muted-foreground">
-          Edite o título e o texto das mensagens. Use os placeholders: {"{data}"}, {"{hora}"}, {"{cliente}"}, {"{origem}"}, {"{destino}"}, {"{veiculo}"}, {"{placa}"}, {"{motorista}"}, {"{pax}"}, {"{cot}"}, {"{tipo}"}, {"{voos}"}, {"{passageiros}"}
+          Edite o título e o texto das mensagens. Use os placeholders: {"{data}"}, {"{hora}"}, {"{cliente}"}, {"{origem}"}, {"{destino}"}, {"{veiculo}"}, {"{placa}"}, {"{motorista}"}, {"{pax}"}, {"{cot}"} (O.S.), {"{tipo}"}, {"{voos}"}, {"{passageiros}"}
         </p>
         <Button variant="outline" size="sm" onClick={handleReset} className="gap-1 shrink-0">
           <RotateCcw className="h-3.5 w-3.5" />

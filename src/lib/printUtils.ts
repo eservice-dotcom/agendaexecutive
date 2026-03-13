@@ -64,7 +64,7 @@ export const printAgenda = (items: any[], includeFinancials = true) => {
 <p class="sub">${items.length} registro(s)</p>
 <table>
 <thead><tr>
-<th>Data</th><th>Hora</th><th>COT</th><th>Cliente</th><th>Tipo</th>
+<th>Data</th><th>Hora</th><th>O.S.</th><th>Cliente</th><th>Tipo</th>
 <th class="c">PAX</th><th>Origem</th><th>Destino</th><th>Veículo</th>
 <th>Motorista</th><th>Fornecedor</th>${finHeaders}<th>Obs</th>
 </tr></thead>
