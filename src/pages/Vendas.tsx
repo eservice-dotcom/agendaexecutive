@@ -46,6 +46,11 @@ interface AgendaItem {
   status_faturamento: string | null;
 }
 
+interface ExtraItem {
+  descricao: string;
+  valor: number;
+}
+
 interface ContaPagar {
   fornecedor: string;
   descritivo: string;
