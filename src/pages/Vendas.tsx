@@ -402,7 +402,12 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
                         <Button variant="ghost" size="icon" onClick={() => handleGerarFatura(v)} title="Gerar Fatura">
                           <FileText className="h-4 w-4 text-primary" />
                         </Button>
-                        <Button variant="ghost" size="icon" onClick={() => handleDelete(v.id)}>
+                        {v.status !== "cancelado" && (
+                          <Button variant="ghost" size="icon" onClick={() => handleCancelar(v)} title="Cancelar Venda">
+                            <XCircle className="h-4 w-4 text-amber-500" />
+                          </Button>
+                        )}
+                        <Button variant="ghost" size="icon" onClick={() => handleDelete(v.id)} title="Excluir">
                           <Trash2 className="h-4 w-4 text-destructive" />
                         </Button>
                       </div>
