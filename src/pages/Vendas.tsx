@@ -15,6 +15,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "@/hooks/use-toast";
 import logo from "@/assets/logo-executive-service.png";
+import { generateClosingReport } from "@/lib/closingReport";
 
 interface Venda {
   id: string;
