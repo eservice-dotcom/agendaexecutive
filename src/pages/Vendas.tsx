@@ -601,6 +601,7 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
                   ) : (
                     vendas.map((v) => (
                       <TableRow key={v.id}>
+                        <TableCell className="font-mono text-sm font-bold">{v.numero_venda}</TableCell>
                         <TableCell className="font-mono text-sm">{formatDate(v.data_venda)}</TableCell>
                         <TableCell className="font-mono text-sm">
                           {v.data_vencimento ? formatDate(v.data_vencimento) : "—"}
