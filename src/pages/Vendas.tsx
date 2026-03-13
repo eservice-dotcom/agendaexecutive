@@ -364,6 +364,7 @@ const Vendas = () => {
     setSearchAgenda("");
     setContasPagar([]);
     setExtras([]);
+    setFormaPagamento("");
   };
 
   const addExtra = () => setExtras((prev) => [...prev, { descricao: "", valor: 0 }]);
