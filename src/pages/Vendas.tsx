@@ -1080,8 +1080,11 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
               <Table>
                 <TableHeader>
                   <TableRow>
+                    <TableHead>Venda</TableHead>
                     <TableHead>Data</TableHead>
                     <TableHead>Fornecedor</TableHead>
+                    <TableHead>Cliente</TableHead>
+                    <TableHead>O.S.</TableHead>
                     <TableHead>Descritivo</TableHead>
                     <TableHead className="text-right">Valor</TableHead>
                     <TableHead>Vencimento</TableHead>
