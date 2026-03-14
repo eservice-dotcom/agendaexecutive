@@ -205,15 +205,26 @@ const Index = () => {
     setFechamentoCliente(cli);
     setFechamentoExtras([]);
     setFechamentoExtrasSelected(new Set());
-    if (!cli) { setFechamentoItems([]); setFechamentoSelected(new Set()); return; }
+
+    if (!cli) {
+      setFechamentoItems([]);
+      setFechamentoSelected(new Set());
+      return;
+    }
+
     const { data } = await supabase
       .from("agenda_items")
       .select("cot, data, hora, tipo, origem, destino, pax, motorista, veiculo, placa, fornecedor, valor, custo, km_in, km_fim, km_extra, hora_in, hora_fim, hora_extra, estacionamento, outros, outros_despesas, cliente")
       .eq("cliente", cli)
       .order("data", { ascending: true });
+
     const items = data || [];
     setFechamentoItems(items);
     setFechamentoSelected(new Set(items.map((_: any, i: number) => i)));
+
+    const agendaExtras = buildAgendaExtrasFromItems(items);
+    setFechamentoExtras(agendaExtras);
+    setFechamentoExtrasSelected(new Set(agendaExtras.map((_: any, i: number) => i)));
   };
 
   const fechamentoFilteredItems = useMemo(() => {
