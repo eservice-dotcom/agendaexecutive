@@ -709,6 +709,22 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
 </body></html>`;
   };
 
+  const markVendaAsFaturado = async (venda: Venda) => {
+    await supabase.from("vendas").update({ status: "faturado" }).eq("id", venda.id);
+
+    const { data: vendaItems } = await supabase
+      .from("venda_items")
+      .select("agenda_item_id")
+      .eq("venda_id", venda.id);
+
+    if (vendaItems && vendaItems.length > 0) {
+      const ids = vendaItems.map((vi) => vi.agenda_item_id);
+      await supabase.from("agenda_items").update({ status_faturamento: "faturado" }).in("id", ids);
+    }
+
+    await loadVendas();
+  };
+
   const handleGerarFatura = async (venda: Venda) => {
     const html = await buildFaturaHTML(venda);
     const w = window.open("", "_blank");
@@ -716,6 +732,7 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
     w.document.write(html);
     w.document.close();
     w.onload = () => w.print();
+    await markVendaAsFaturado(venda);
   };
 
   const handleSalvarFatura = async (venda: Venda) => {
@@ -729,6 +746,7 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
+    await markVendaAsFaturado(venda);
     toast({ title: "Fatura salva", description: "Arquivo HTML baixado com sucesso" });
   };
 
