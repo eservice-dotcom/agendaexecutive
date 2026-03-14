@@ -772,7 +772,7 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
 
     const { data } = await supabase
       .from("agenda_items")
-      .select("cot, data, hora, tipo, origem, destino, pax, motorista, veiculo, placa, fornecedor, valor, custo, km_in, km_fim, km_extra, hora_in, hora_fim, hora_extra, estacionamento, outros, outros_despesas, cliente")
+      .select("id, cot, data, hora, tipo, origem, destino, pax, motorista, veiculo, placa, fornecedor, valor, custo, km_in, km_fim, km_extra, hora_in, hora_fim, hora_extra, estacionamento, outros, outros_despesas, cliente")
       .eq("cliente", cli)
       .order("data", { ascending: true });
 
@@ -845,9 +845,15 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
     );
   }, [fechamentoItems, fechamentoSearch]);
 
-  const handleGerarFechamento = () => {
+  const handleGerarFechamento = async () => {
     if (!fechamentoCliente) return;
     const selectedItems = fechamentoItems.filter((_: any, i: number) => fechamentoSelected.has(i));
+
+    // Update status_faturamento to "enviado" for selected items
+    const ids = selectedItems.map((item: any) => item.id).filter(Boolean);
+    if (ids.length > 0) {
+      await supabase.from("agenda_items").update({ status_faturamento: "enviado" }).in("id", ids);
+    }
 
     generateClosingReport(
       selectedItems,
