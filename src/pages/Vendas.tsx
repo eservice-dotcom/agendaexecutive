@@ -1015,6 +1015,7 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
                     <TableHead>Data</TableHead>
                     <TableHead>Vencimento</TableHead>
                     <TableHead>Cliente</TableHead>
+                    <TableHead>O.S.</TableHead>
                     <TableHead className="text-right">Valor Total</TableHead>
                     <TableHead>Status</TableHead>
                     <TableHead>Observações</TableHead>
@@ -1024,7 +1025,7 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
                 <TableBody>
                   {vendas.length === 0 ? (
                     <TableRow>
-                      <TableCell colSpan={8} className="text-center text-muted-foreground py-8">
+                      <TableCell colSpan={9} className="text-center text-muted-foreground py-8">
                         Nenhuma venda registrada
                       </TableCell>
                     </TableRow>
@@ -1036,7 +1037,8 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
                         <TableCell className="font-mono text-sm">
                           {v.data_vencimento ? formatDate(v.data_vencimento) : "—"}
                         </TableCell>
-                        <TableCell className="font-medium">{v.cliente}</TableCell>
+                        <TableCell className="font-medium">{vendaOsMap[v.id]?.cliente || v.cliente || "—"}</TableCell>
+                        <TableCell className="font-mono text-xs">{vendaOsMap[v.id]?.cots?.join(", ") || "—"}</TableCell>
                         <TableCell className="text-right font-mono">{formatCurrency(v.valor_total)}</TableCell>
                         <TableCell>
                           <Badge variant={statusColor(v.status) as any}>{v.status}</Badge>
