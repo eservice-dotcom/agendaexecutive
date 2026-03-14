@@ -97,10 +97,12 @@ export const generateClosingReport = (
     </div>`;
   }).join("");
 
-  const totalValor = items.reduce((s, ai) => s + (Number(ai.valor) || 0), 0);
+  const totalServicos = items.reduce((s, ai) => s + (Number(ai.valor) || 0), 0);
   const totalEstac = items.reduce((s, ai) => s + (Number(ai.estacionamento) || 0), 0);
   const totalKm = items.reduce((s, ai) => s + ((Number(ai.km_fim) || 0) - (Number(ai.km_in) || 0)), 0);
   const totalKmExtra = items.reduce((s, ai) => s + (Number(ai.km_extra) || 0), 0);
+  const extrasTotal = (vendaInfo?.extras || []).reduce((s, e) => s + (Number(e.valor) || 0), 0);
+  const totalValor = totalServicos + extrasTotal;
 
   let vendaInfoHTML = "";
   if (vendaInfo) {
