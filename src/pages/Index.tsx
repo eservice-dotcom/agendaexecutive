@@ -54,6 +54,17 @@ const Index = () => {
   const [agendaData, setAgendaData] = useState<any[]>([]);
   const [printWithFinancials, setPrintWithFinancials] = useState(true);
 
+  // Fechamento dialog state
+  const [fechamentoDialogOpen, setFechamentoDialogOpen] = useState(false);
+  const [fechamentoCliente, setFechamentoCliente] = useState("");
+  const [fechamentoAllClientes, setFechamentoAllClientes] = useState<string[]>([]);
+  const [fechamentoItems, setFechamentoItems] = useState<any[]>([]);
+  const [fechamentoSelected, setFechamentoSelected] = useState<Set<number>>(new Set());
+  const [fechamentoExtras, setFechamentoExtras] = useState<{ descricao: string; valor: number }[]>([]);
+  const [fechamentoExtrasSelected, setFechamentoExtrasSelected] = useState<Set<number>>(new Set());
+  const [fechamentoNovoExtra, setFechamentoNovoExtra] = useState({ descricao: "", valor: "" });
+  const [fechamentoSearch, setFechamentoSearch] = useState("");
+
   const reloadData = useCallback(async () => {
     const data = await getAgendaItems();
     setAgendaData(data);
