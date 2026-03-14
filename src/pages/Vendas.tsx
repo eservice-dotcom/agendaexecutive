@@ -436,6 +436,7 @@ const Vendas = () => {
     loadVendas();
     loadContasPagar();
     loadContasReceber();
+    loadVendaOsMap();
     toast({ title: "Venda excluída" });
   };
 
