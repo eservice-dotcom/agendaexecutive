@@ -8,11 +8,18 @@ import { Plus, Trash2, Users, Pencil } from "lucide-react";
 import { Cliente, getClientes, saveCliente, updateCliente, deleteCliente } from "@/data/cadastroStorage";
 import { toast } from "sonner";
 
+const UF_LIST = [
+  "AC","AL","AM","AP","BA","CE","DF","ES","GO","MA","MG","MS","MT",
+  "PA","PB","PE","PI","PR","RJ","RN","RO","RR","RS","SC","SE","SP","TO"
+];
+
+const emptyForm = { nome: "", cnpjCpf: "", email: "", telefone: "", endereco: "", cep: "", cidade: "", uf: "" };
+
 const CadastroClientes = () => {
   const [items, setItems] = useState<Cliente[]>([]);
   const [open, setOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
-  const [form, setForm] = useState({ nome: "", cnpjCpf: "", email: "", telefone: "", endereco: "" });
+  const [form, setForm] = useState(emptyForm);
 
   const refresh = async () => {
     const data = await getClientes();
@@ -33,7 +40,7 @@ const CadastroClientes = () => {
         await saveCliente(form);
         toast.success("Cliente cadastrado!");
       }
-      setForm({ nome: "", cnpjCpf: "", email: "", telefone: "", endereco: "" });
+      setForm(emptyForm);
       setEditingId(null);
       setOpen(false);
       await refresh();
@@ -44,7 +51,16 @@ const CadastroClientes = () => {
 
   const handleEdit = (item: Cliente) => {
     setEditingId(item.id);
-    setForm({ nome: item.nome, cnpjCpf: item.cnpjCpf, email: item.email, telefone: item.telefone, endereco: item.endereco });
+    setForm({
+      nome: item.nome,
+      cnpjCpf: item.cnpjCpf,
+      email: item.email,
+      telefone: item.telefone,
+      endereco: item.endereco,
+      cep: item.cep || "",
+      cidade: item.cidade || "",
+      uf: item.uf || "",
+    });
     setOpen(true);
   };
 
@@ -60,7 +76,7 @@ const CadastroClientes = () => {
 
   const handleOpenNew = () => {
     setEditingId(null);
-    setForm({ nome: "", cnpjCpf: "", email: "", telefone: "", endereco: "" });
+    setForm(emptyForm);
     setOpen(true);
   };
 
@@ -90,6 +106,23 @@ const CadastroClientes = () => {
               <div><Label>Telefone</Label><Input value={form.telefone} onChange={(e) => setForm({ ...form, telefone: e.target.value })} /></div>
             </div>
             <div><Label>Endereço</Label><Input value={form.endereco} onChange={(e) => setForm({ ...form, endereco: e.target.value })} /></div>
+            <div className="grid grid-cols-3 gap-3">
+              <div><Label>CEP</Label><Input value={form.cep} onChange={(e) => setForm({ ...form, cep: e.target.value })} placeholder="00000-000" /></div>
+              <div><Label>Cidade</Label><Input value={form.cidade} onChange={(e) => setForm({ ...form, cidade: e.target.value })} /></div>
+              <div>
+                <Label>UF</Label>
+                <select
+                  value={form.uf}
+                  onChange={(e) => setForm({ ...form, uf: e.target.value })}
+                  className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                >
+                  <option value="">—</option>
+                  {UF_LIST.map((uf) => (
+                    <option key={uf} value={uf}>{uf}</option>
+                  ))}
+                </select>
+              </div>
+            </div>
             <Button onClick={handleSave}>{editingId ? "Atualizar" : "Salvar"}</Button>
           </div>
         </DialogContent>
@@ -107,6 +140,8 @@ const CadastroClientes = () => {
                 <TableHead className="font-semibold">Email</TableHead>
                 <TableHead className="font-semibold">Telefone</TableHead>
                 <TableHead className="font-semibold">Endereço</TableHead>
+                <TableHead className="font-semibold">CEP</TableHead>
+                <TableHead className="font-semibold">Cidade/UF</TableHead>
                 <TableHead className="w-20"></TableHead>
               </TableRow>
             </TableHeader>
@@ -118,6 +153,8 @@ const CadastroClientes = () => {
                   <TableCell className="text-sm">{item.email}</TableCell>
                   <TableCell className="text-sm">{item.telefone}</TableCell>
                   <TableCell className="text-sm">{item.endereco}</TableCell>
+                  <TableCell className="text-sm">{item.cep}</TableCell>
+                  <TableCell className="text-sm">{[item.cidade, item.uf].filter(Boolean).join("/") || "—"}</TableCell>
                   <TableCell>
                     <div className="flex gap-1">
                       <Button variant="ghost" size="sm" className="h-7 w-7 p-0 text-muted-foreground hover:text-foreground" onClick={() => handleEdit(item)}>

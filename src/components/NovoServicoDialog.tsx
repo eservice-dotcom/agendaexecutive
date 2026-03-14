@@ -67,7 +67,7 @@ const NovoServicoDialog = ({ open, onOpenChange, onSaved, initialData }: NovoSer
 
   // Quick-add cliente
   const [showNewCliente, setShowNewCliente] = useState(false);
-  const [newCliente, setNewCliente] = useState({ nome: "", cnpjCpf: "", telefone: "", email: "", endereco: "" });
+  const [newCliente, setNewCliente] = useState({ nome: "", cnpjCpf: "", telefone: "", email: "", endereco: "", cep: "", cidade: "", uf: "" });
 
   const handleSaveNewVeiculo = async () => {
     if (!newVeiculo.placa || !newVeiculo.modelo) { toast.error("Placa e modelo são obrigatórios"); return; }
@@ -119,7 +119,7 @@ const NovoServicoDialog = ({ open, onOpenChange, onSaved, initialData }: NovoSer
       setClientes(updated);
       const created = updated.find((c) => c.nome === newCliente.nome);
       if (created) update("clienteId", created.id);
-      setNewCliente({ nome: "", cnpjCpf: "", telefone: "", email: "", endereco: "" });
+      setNewCliente({ nome: "", cnpjCpf: "", telefone: "", email: "", endereco: "", cep: "", cidade: "", uf: "" });
       setShowNewCliente(false);
       toast.success("Cliente cadastrado!");
     } catch { toast.error("Erro ao cadastrar cliente"); }

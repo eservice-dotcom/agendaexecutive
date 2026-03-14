@@ -127,6 +127,8 @@ export type Database = {
       }
       clientes: {
         Row: {
+          cep: string
+          cidade: string
           cnpj_cpf: string
           created_at: string
           email: string
@@ -134,10 +136,13 @@ export type Database = {
           id: string
           nome: string
           telefone: string
+          uf: string
           updated_at: string
           user_id: string
         }
         Insert: {
+          cep?: string
+          cidade?: string
           cnpj_cpf: string
           created_at?: string
           email: string
@@ -145,10 +150,13 @@ export type Database = {
           id?: string
           nome: string
           telefone: string
+          uf?: string
           updated_at?: string
           user_id: string
         }
         Update: {
+          cep?: string
+          cidade?: string
           cnpj_cpf?: string
           created_at?: string
           email?: string
@@ -156,6 +164,7 @@ export type Database = {
           id?: string
           nome?: string
           telefone?: string
+          uf?: string
           updated_at?: string
           user_id?: string
         }

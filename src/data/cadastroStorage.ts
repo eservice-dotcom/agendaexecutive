@@ -8,6 +8,9 @@ export interface Cliente {
   email: string;
   telefone: string;
   endereco: string;
+  cep: string;
+  cidade: string;
+  uf: string;
 }
 
 export interface Veiculo {
@@ -57,6 +60,9 @@ export const getClientes = async (): Promise<Cliente[]> => {
     email: item.email,
     telefone: item.telefone,
     endereco: item.endereco,
+    cep: (item as any).cep || "",
+    cidade: (item as any).cidade || "",
+    uf: (item as any).uf || "",
   }));
 };
 
@@ -71,6 +77,9 @@ export const saveCliente = async (item: Omit<Cliente, "id">) => {
     email: item.email,
     telefone: item.telefone,
     endereco: item.endereco,
+    cep: item.cep || "",
+    cidade: item.cidade || "",
+    uf: item.uf || "",
   });
   
   if (error) throw error;
@@ -83,6 +92,9 @@ export const updateCliente = async (id: string, item: Omit<Cliente, "id">) => {
     email: item.email,
     telefone: item.telefone,
     endereco: item.endereco,
+    cep: item.cep || "",
+    cidade: item.cidade || "",
+    uf: item.uf || "",
   }).eq("id", id);
   if (error) throw error;
 };
