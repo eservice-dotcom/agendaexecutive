@@ -134,12 +134,15 @@ const Vendas = () => {
   const [editVendaExtras, setEditVendaExtras] = useState<ExtraItem[]>([]);
 
   // Closing report selection
-  const [fechamentoDialog, setFechamentoDialog] = useState<Venda | null>(null);
+  const [fechamentoDialogOpen, setFechamentoDialogOpen] = useState(false);
+  const [fechamentoCliente, setFechamentoCliente] = useState("");
+  const [fechamentoAllClientes, setFechamentoAllClientes] = useState<string[]>([]);
   const [fechamentoItems, setFechamentoItems] = useState<any[]>([]);
   const [fechamentoSelected, setFechamentoSelected] = useState<Set<number>>(new Set());
   const [fechamentoExtras, setFechamentoExtras] = useState<{ descricao: string; valor: number }[]>([]);
   const [fechamentoExtrasSelected, setFechamentoExtrasSelected] = useState<Set<number>>(new Set());
   const [fechamentoNovoExtra, setFechamentoNovoExtra] = useState({ descricao: "", valor: "" });
+  const [fechamentoSearch, setFechamentoSearch] = useState("");
 
   const loadVendas = useCallback(async () => {
     const { data, error } = await supabase
