@@ -465,6 +465,7 @@ const Vendas = () => {
       loadVendas();
       loadContasPagar();
       loadContasReceber();
+      loadVendaOsMap();
     } catch (err: any) {
       toast({ title: "Erro ao cancelar", description: err.message, variant: "destructive" });
     }
