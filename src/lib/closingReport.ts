@@ -54,7 +54,7 @@ export const generateClosingReport = (
 ) => {
   const logoUrl = new URL(logo, window.location.origin).href;
 
-  const rows = items.map((ai, idx) => {
+  const cards = items.map((ai, idx) => {
     const kmTotal = (Number(ai.km_fim) || 0) - (Number(ai.km_in) || 0);
     const outrosDespesas = ai.outros_despesas
       ? Array.isArray(ai.outros_despesas)
@@ -65,26 +65,37 @@ export const generateClosingReport = (
       outrosDespesas.reduce((s: number, d: any) => s + (Number(d.valor) || 0), 0) +
       (Number(ai.outros) || 0);
 
-    return `<tr>
-      <td class="c">${idx + 1}</td>
-      <td>${ai.cot || ""}</td>
-      <td>${ai.data ? formatDate(ai.data) : ""}</td>
-      <td>${ai.tipo || ""}</td>
-      <td>${ai.origem || ""} → ${ai.destino || ""}</td>
-      <td>${ai.motorista || ""}</td>
-      <td>${ai.veiculo || ""} (${ai.placa || ""})</td>
-      <td class="c">${ai.hora_in || "—"}</td>
-      <td class="c">${ai.hora_fim || "—"}</td>
-      <td class="c">${ai.hora_extra || "—"}</td>
-      <td class="r">${Number(ai.km_in) || 0}</td>
-      <td class="r">${Number(ai.km_fim) || 0}</td>
-      <td class="r">${kmTotal}</td>
-      <td class="r">${Number(ai.km_extra) || 0}</td>
-      <td class="r">${formatCurrency(Number(ai.estacionamento) || 0)}</td>
-      <td class="r">${formatCurrency(outrosTotal)}</td>
-      <td class="r">${formatCurrency(Number(ai.custo) || 0)}</td>
-      <td class="r">${formatCurrency(Number(ai.valor) || 0)}</td>
-    </tr>`;
+    const despesasDetail = outrosDespesas.length > 0
+      ? outrosDespesas.map((d: any) => `${d.descricao || "Outros"}: ${formatCurrency(Number(d.valor) || 0)}`).join(" · ")
+      : "";
+
+    return `<div class="card">
+      <div class="card-header">
+        <span class="card-num">${idx + 1}</span>
+        <span class="card-os">O.S. ${ai.cot || "—"}</span>
+        <span class="card-date">${ai.data ? formatDate(ai.data) : ""}</span>
+        <span class="card-type">${ai.tipo || ""}</span>
+      </div>
+      <div class="card-body">
+        <div class="card-row">
+          <div class="card-field"><span class="lbl">Trajeto</span><span class="val">${ai.origem || ""} → ${ai.destino || ""}</span></div>
+          <div class="card-field"><span class="lbl">Motorista</span><span class="val">${ai.motorista || "—"}</span></div>
+          <div class="card-field"><span class="lbl">Veículo</span><span class="val">${ai.veiculo || ""} ${ai.placa ? `(${ai.placa})` : ""}</span></div>
+        </div>
+        <div class="card-row">
+          <div class="card-field"><span class="lbl">Horário</span><span class="val">${ai.hora_in || "—"} → ${ai.hora_fim || "—"}</span></div>
+          <div class="card-field"><span class="lbl">H. Extra</span><span class="val">${ai.hora_extra || "—"}</span></div>
+          <div class="card-field"><span class="lbl">KM</span><span class="val">${Number(ai.km_in) || 0} → ${Number(ai.km_fim) || 0} (${kmTotal})</span></div>
+          <div class="card-field"><span class="lbl">KM Extra</span><span class="val">${Number(ai.km_extra) || 0}</span></div>
+        </div>
+        <div class="card-row">
+          <div class="card-field"><span class="lbl">Estacionamento</span><span class="val">${formatCurrency(Number(ai.estacionamento) || 0)}</span></div>
+          <div class="card-field"><span class="lbl">Outros</span><span class="val">${formatCurrency(outrosTotal)}${despesasDetail ? ` (${despesasDetail})` : ""}</span></div>
+          <div class="card-field"><span class="lbl">Custo</span><span class="val money">${formatCurrency(Number(ai.custo) || 0)}</span></div>
+          <div class="card-field"><span class="lbl">Valor</span><span class="val money">${formatCurrency(Number(ai.valor) || 0)}</span></div>
+        </div>
+      </div>
+    </div>`;
   }).join("");
 
   const totalCusto = items.reduce((s, ai) => s + (Number(ai.custo) || 0), 0);
@@ -93,11 +104,9 @@ export const generateClosingReport = (
   const totalKm = items.reduce((s, ai) => s + ((Number(ai.km_fim) || 0) - (Number(ai.km_in) || 0)), 0);
   const totalKmExtra = items.reduce((s, ai) => s + (Number(ai.km_extra) || 0), 0);
 
-  // Venda info section
   let vendaInfoHTML = "";
   if (vendaInfo) {
     const extras = vendaInfo.extras || [];
-    const extrasTotal = extras.reduce((s, e) => s + (Number(e.valor) || 0), 0);
     const extrasHTML = extras.length > 0
       ? `<p><strong>Extras:</strong> ${extras.map(e => `${e.descricao} (${formatCurrency(Number(e.valor))})`).join(", ")}</p>`
       : "";
@@ -117,7 +126,6 @@ export const generateClosingReport = (
     </div>`;
   }
 
-  // Observações
   let obsHTML = "";
   if (vendaInfo?.observacoes) {
     obsHTML = `<div style="margin-top:16px;padding:10px;background:#fffbeb;border:1px solid #f0d68a;border-radius:4px"><strong>Observações:</strong> ${vendaInfo.observacoes}</div>`;
@@ -126,7 +134,7 @@ export const generateClosingReport = (
   const html = `<!DOCTYPE html><html><head><title>${title}</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-body{font-family:Arial,sans-serif;padding:20px;color:#1a1a1a;font-size:10px}
+body{font-family:Arial,sans-serif;padding:20px;color:#1a1a1a;font-size:11px}
 .header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px;border-bottom:3px solid #b8860b;padding-bottom:12px}
 .header img{height:50px}
 .header-info{text-align:right}
@@ -140,13 +148,21 @@ body{font-family:Arial,sans-serif;padding:20px;color:#1a1a1a;font-size:10px}
 .summary-box{background:#f9f9f9;border:1px solid #e0e0e0;border-radius:4px;padding:8px;text-align:center}
 .summary-box .label{font-size:9px;text-transform:uppercase;color:#888;margin-bottom:2px}
 .summary-box .value{font-size:13px;font-weight:bold;color:#1a1a1a}
-table{width:100%;border-collapse:collapse;margin-top:8px}
-th,td{border:1px solid #ddd;padding:3px 5px;text-align:left;font-size:9px}
-th{background:#2d3748;color:#fff;font-weight:600;font-size:8px;text-transform:uppercase}
-.r{text-align:right}.c{text-align:center}.b{font-weight:700}
-.total-row{background:#f7f7f7;font-weight:bold;font-size:10px}
+.card{border:1px solid #ddd;border-radius:6px;margin-bottom:10px;overflow:hidden;page-break-inside:avoid}
+.card-header{background:#2d3748;color:#fff;padding:6px 10px;display:flex;align-items:center;gap:10px;font-size:11px}
+.card-num{background:#b8860b;color:#fff;border-radius:50%;width:22px;height:22px;display:flex;align-items:center;justify-content:center;font-weight:bold;font-size:10px;flex-shrink:0}
+.card-os{font-weight:bold;font-family:monospace;font-size:11px}
+.card-date{color:#cbd5e0}
+.card-type{margin-left:auto;background:rgba(255,255,255,0.15);padding:2px 8px;border-radius:3px;font-size:10px}
+.card-body{padding:8px 10px}
+.card-row{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:4px}
+.card-row:last-child{margin-bottom:0}
+.card-field{flex:1;min-width:120px;display:flex;flex-direction:column}
+.lbl{font-size:8px;text-transform:uppercase;color:#888;letter-spacing:0.3px}
+.val{font-size:10px;font-weight:500}
+.val.money{font-weight:bold;font-family:monospace}
 .footer{margin-top:16px;padding-top:8px;border-top:2px solid #b8860b;text-align:center;font-size:9px;color:#888}
-@media print{body{padding:10px}@page{size:landscape;margin:8mm}}
+@media print{body{padding:10px}@page{size:portrait;margin:10mm}.card{break-inside:avoid}}
 </style></head><body>
 <div class="header">
   <img src="${logoUrl}" alt="Executive Service" />
@@ -164,28 +180,21 @@ ${vendaInfoHTML}
   <div class="summary-box"><div class="label">Estacionamento</div><div class="value">${formatCurrency(totalEstac)}</div></div>
   <div class="summary-box"><div class="label">Margem</div><div class="value">${formatCurrency(totalValor - totalCusto)}</div></div>
 </div>
-<table>
-  <thead><tr>
-    <th class="c">#</th><th>O.S.</th><th>Data</th><th>Tipo</th><th>Trajeto</th>
-    <th>Motorista</th><th>Veículo</th>
-    <th class="c">H.In</th><th class="c">H.Fim</th><th class="c">H.Extra</th>
-    <th class="r">KM In</th><th class="r">KM Fim</th><th class="r">KM</th><th class="r">KM Extra</th>
-    <th class="r">Estac.</th><th class="r">Outros</th>
-    <th class="r">Custo</th><th class="r">Valor</th>
-  </tr></thead>
-  <tbody>
-    ${rows}
-    <tr class="total-row">
-      <td colspan="12" class="r">TOTAIS</td>
-      <td class="r">${totalKm}</td>
-      <td class="r">${totalKmExtra}</td>
-      <td class="r">${formatCurrency(totalEstac)}</td>
-      <td class="r">—</td>
-      <td class="r">${formatCurrency(totalCusto)}</td>
-      <td class="r">${formatCurrency(totalValor)}</td>
-    </tr>
-  </tbody>
-</table>
+${cards}
+<div class="card" style="border-color:#b8860b;background:#fdf8ef">
+  <div class="card-header" style="background:#b8860b">
+    <span style="font-weight:bold;font-size:12px">TOTAIS</span>
+  </div>
+  <div class="card-body">
+    <div class="card-row">
+      <div class="card-field"><span class="lbl">KM Total</span><span class="val money">${totalKm}</span></div>
+      <div class="card-field"><span class="lbl">KM Extra</span><span class="val money">${totalKmExtra}</span></div>
+      <div class="card-field"><span class="lbl">Estacionamento</span><span class="val money">${formatCurrency(totalEstac)}</span></div>
+      <div class="card-field"><span class="lbl">Custo Total</span><span class="val money">${formatCurrency(totalCusto)}</span></div>
+      <div class="card-field"><span class="lbl">Valor Total</span><span class="val money">${formatCurrency(totalValor)}</span></div>
+    </div>
+  </div>
+</div>
 ${obsHTML}
 <div class="footer">
   <p>Executive Service — Relatório de Fechamento gerado automaticamente</p>
