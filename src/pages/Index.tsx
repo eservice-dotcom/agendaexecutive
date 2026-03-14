@@ -266,7 +266,7 @@ const Index = () => {
       quantidade_servicos: selectedItems.length,
       items: selectedItems,
       extras: selectedExtras,
-    }).select("numero_fechamento").single();
+    } as any).select("id, numero_fechamento").single();
 
     if (error) {
       toast.error("Erro ao salvar fechamento: " + error.message);
