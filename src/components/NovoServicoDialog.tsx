@@ -67,7 +67,7 @@ const NovoServicoDialog = ({ open, onOpenChange, onSaved, initialData }: NovoSer
 
   // Quick-add cliente
   const [showNewCliente, setShowNewCliente] = useState(false);
-  const [newCliente, setNewCliente] = useState({ nome: "", cnpjCpf: "", telefone: "", email: "", endereco: "" });
+  const [newCliente, setNewCliente] = useState({ nome: "", cnpjCpf: "", telefone: "", email: "", endereco: "", cep: "", cidade: "", uf: "" });
 
   const handleSaveNewVeiculo = async () => {
     if (!newVeiculo.placa || !newVeiculo.modelo) { toast.error("Placa e modelo são obrigatórios"); return; }
