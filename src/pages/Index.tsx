@@ -129,6 +129,30 @@ const Index = () => {
 
   const formatCurrencyLocal = (v: number) =>
     new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(v);
+
+  const parseMoneyValue = (value: string | number | null | undefined): number => {
+    if (typeof value === "number") return Number.isFinite(value) ? value : 0;
+    if (!value) return 0;
+
+    const raw = String(value).trim();
+    if (!raw) return 0;
+
+    const hasComma = raw.includes(",");
+    const hasDot = raw.includes(".");
+    let normalized = raw;
+
+    if (hasComma && hasDot) {
+      normalized = raw.lastIndexOf(",") > raw.lastIndexOf(".")
+        ? raw.replace(/\./g, "").replace(",", ".")
+        : raw.replace(/,/g, "");
+    } else if (hasComma) {
+      normalized = raw.replace(",", ".");
+    }
+
+    const parsed = Number(normalized);
+    return Number.isFinite(parsed) ? parsed : 0;
+  };
+
   const formatDateLocal = (d: string) => { const [y, m, day] = d.split("-"); return `${day}/${m}/${y}`; };
 
   const handleOpenFechamento = async () => {
