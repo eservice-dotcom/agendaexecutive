@@ -1490,7 +1490,31 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
               <div className="grid grid-cols-1 sm:grid-cols-5 gap-4">
                 <div className="space-y-2">
                   <Label>Cliente</Label>
-                  <Input value={editVendaDialog?.cliente || ""} disabled className="bg-muted" />
+                  <Select value={editVendaForm.cliente} onValueChange={async (v) => {
+                    setEditVendaForm({ ...editVendaForm, cliente: v });
+                    // Reload agenda items for new client
+                    const { data: allItems } = await supabase
+                      .from("agenda_items")
+                      .select("id, cliente, data, hora, tipo, origem, destino, valor, custo, motorista, veiculo, pax, cot, fornecedor, status_faturamento")
+                      .eq("cliente", v)
+                      .order("data", { ascending: true });
+                    const items = (allItems || []) as AgendaItem[];
+                    const currentIds = editVendaSelectedIds;
+                    const relevant = items.filter((i) => currentIds.has(i.id) || !i.status_faturamento || i.status_faturamento === "");
+                    setEditVendaAvailableItems(relevant);
+                    // Keep only items that still exist in new client's list
+                    const validIds = new Set(relevant.map(i => i.id));
+                    setEditVendaSelectedIds(new Set([...currentIds].filter(id => validIds.has(id))));
+                  }}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Selecione" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {clientes.map((c) => (
+                        <SelectItem key={c} value={c}>{c}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
                 <div className="space-y-2">
                   <Label>Data da Venda</Label>
