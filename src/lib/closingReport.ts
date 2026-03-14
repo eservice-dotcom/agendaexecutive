@@ -73,7 +73,8 @@ export const generateClosingReport = (
   items: ClosingReportItem[],
   title: string,
   subtitle: string,
-  vendaInfo?: ClosingReportVendaInfo
+  vendaInfo?: ClosingReportVendaInfo,
+  numeroFechamento?: number
 ) => {
   const logoUrl = new URL(logo, window.location.origin).href;
 
