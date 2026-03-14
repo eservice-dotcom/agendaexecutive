@@ -120,11 +120,29 @@ export const generateClosingReport = (
     </div>`;
   }).join("");
 
+  const selectedExtras = vendaInfo?.extras || [];
+
+  const extrasCards = selectedExtras.map((extra, idx) => {
+    return `<div class="card" style="border-color:#d4a017">
+      <div class="card-header" style="background:#d4a017">
+        <span class="card-num">${items.length + idx + 1}</span>
+        <span class="card-os">EXTRA</span>
+        <span class="card-type">Extra</span>
+      </div>
+      <div class="card-body">
+        <div class="card-row">
+          <div class="card-field"><span class="lbl">Descrição</span><span class="val">${extra.descricao}</span></div>
+          <div class="card-field"><span class="lbl">Valor</span><span class="val money">${formatCurrency(parseAmount(extra.valor))}</span></div>
+        </div>
+      </div>
+    </div>`;
+  }).join("");
+
   const totalServicos = items.reduce((s, ai) => s + parseAmount(ai.valor), 0);
   const totalEstac = items.reduce((s, ai) => s + parseAmount(ai.estacionamento), 0);
   const totalKm = items.reduce((s, ai) => s + (parseAmount(ai.km_fim) - parseAmount(ai.km_in)), 0);
   const totalKmExtra = items.reduce((s, ai) => s + parseAmount(ai.km_extra), 0);
-  const extrasTotal = (vendaInfo?.extras || []).reduce((s, e) => s + parseAmount(e.valor), 0);
+  const extrasTotal = selectedExtras.reduce((s, e) => s + parseAmount(e.valor), 0);
   const totalValor = totalServicos + extrasTotal;
 
   let vendaInfoHTML = "";
