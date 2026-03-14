@@ -129,7 +129,7 @@ const Vendas = () => {
 
   // Edit venda dialog
   const [editVendaDialog, setEditVendaDialog] = useState<Venda | null>(null);
-  const [editVendaForm, setEditVendaForm] = useState({ data_venda: "", data_vencimento: "", observacoes: "", status: "", forma_pagamento: "" });
+  const [editVendaForm, setEditVendaForm] = useState({ cliente: "", data_venda: "", data_vencimento: "", observacoes: "", status: "", forma_pagamento: "" });
   const [editVendaItems, setEditVendaItems] = useState<AgendaItem[]>([]);
   const [editVendaSelectedIds, setEditVendaSelectedIds] = useState<Set<string>>(new Set());
   const [editVendaAvailableItems, setEditVendaAvailableItems] = useState<AgendaItem[]>([]);
