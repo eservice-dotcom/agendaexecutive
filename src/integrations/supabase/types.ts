@@ -300,6 +300,90 @@ export type Database = {
         }
         Relationships: []
       }
+      fechamento_items: {
+        Row: {
+          agenda_item_id: string
+          created_at: string
+          fechamento_id: string
+          id: string
+        }
+        Insert: {
+          agenda_item_id: string
+          created_at?: string
+          fechamento_id: string
+          id?: string
+        }
+        Update: {
+          agenda_item_id?: string
+          created_at?: string
+          fechamento_id?: string
+          id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fechamento_items_agenda_item_id_fkey"
+            columns: ["agenda_item_id"]
+            isOneToOne: false
+            referencedRelation: "agenda_items"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fechamento_items_fechamento_id_fkey"
+            columns: ["fechamento_id"]
+            isOneToOne: false
+            referencedRelation: "fechamentos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      fechamentos: {
+        Row: {
+          cliente: string
+          created_at: string
+          data_emissao: string
+          extras: Json
+          extras_total: number
+          id: string
+          items: Json
+          numero_fechamento: number
+          observacoes: string | null
+          quantidade_servicos: number
+          updated_at: string
+          user_id: string
+          valor_total: number
+        }
+        Insert: {
+          cliente: string
+          created_at?: string
+          data_emissao?: string
+          extras?: Json
+          extras_total?: number
+          id?: string
+          items?: Json
+          numero_fechamento?: number
+          observacoes?: string | null
+          quantidade_servicos?: number
+          updated_at?: string
+          user_id: string
+          valor_total?: number
+        }
+        Update: {
+          cliente?: string
+          created_at?: string
+          data_emissao?: string
+          extras?: Json
+          extras_total?: number
+          id?: string
+          items?: Json
+          numero_fechamento?: number
+          observacoes?: string | null
+          quantidade_servicos?: number
+          updated_at?: string
+          user_id?: string
+          valor_total?: number
+        }
+        Relationships: []
+      }
       fornecedores: {
         Row: {
           cnpj: string
