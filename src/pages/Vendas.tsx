@@ -937,7 +937,7 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
       if (error) throw error;
 
       // Update conta a receber value
-      await supabase.from("contas_receber").update({ valor: newTotal }).eq("venda_id", vendaId).eq("status", "pendente");
+      await supabase.from("contas_receber").update({ valor: newTotal, cliente: editVendaForm.cliente }).eq("venda_id", vendaId).eq("status", "pendente");
 
       // Replace extras
       await supabase.from("venda_extras").delete().eq("venda_id", vendaId);
