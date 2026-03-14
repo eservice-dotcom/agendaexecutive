@@ -60,6 +60,9 @@ export const getClientes = async (): Promise<Cliente[]> => {
     email: item.email,
     telefone: item.telefone,
     endereco: item.endereco,
+    cep: (item as any).cep || "",
+    cidade: (item as any).cidade || "",
+    uf: (item as any).uf || "",
   }));
 };
 
