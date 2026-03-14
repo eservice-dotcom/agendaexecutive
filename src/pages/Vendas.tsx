@@ -564,10 +564,38 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
     toast({ title: "Fatura salva", description: "Arquivo HTML baixado com sucesso" });
   };
 
+  const loadFechamentoClientes = useCallback(async () => {
+    const { data } = await supabase
+      .from("agenda_items")
+      .select("cliente")
+      .order("cliente");
+    if (data) {
+      const unique = [...new Set(data.map((d) => d.cliente))].filter(Boolean).sort();
+      setFechamentoAllClientes(unique);
+    }
+  }, []);
+
+  const loadFechamentoItemsByCliente = useCallback(async (cli: string) => {
+    if (!cli) {
+      setFechamentoItems([]);
+      setFechamentoSelected(new Set());
+      return;
+    }
+    const { data } = await supabase
+      .from("agenda_items")
+      .select("cot, data, hora, tipo, origem, destino, pax, motorista, veiculo, placa, fornecedor, valor, custo, km_in, km_fim, km_extra, hora_in, hora_fim, hora_extra, estacionamento, outros, outros_despesas, cliente")
+      .eq("cliente", cli)
+      .order("data", { ascending: true });
+    const items = data || [];
+    setFechamentoItems(items);
+    setFechamentoSelected(new Set(items.map((_: any, i: number) => i)));
+  }, []);
+
   const handleRelatorioFechamento = async (venda: Venda) => {
+    await loadFechamentoClientes();
     const { data: vendaItems } = await supabase
       .from("venda_items")
-      .select("*, agenda_items:agenda_item_id(cot, data, hora, tipo, origem, destino, pax, motorista, veiculo, placa, fornecedor, valor, custo, km_in, km_fim, km_extra, hora_in, hora_fim, hora_extra, estacionamento, outros, outros_despesas)")
+      .select("*, agenda_items:agenda_item_id(cot, data, hora, tipo, origem, destino, pax, motorista, veiculo, placa, fornecedor, valor, custo, km_in, km_fim, km_extra, hora_in, hora_fim, hora_extra, estacionamento, outros, outros_despesas, cliente)")
       .eq("venda_id", venda.id);
 
     const items = (vendaItems || []).map((vi: any) => vi.agenda_items).filter(Boolean);
@@ -577,37 +605,62 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
       .select("descricao, valor")
       .eq("venda_id", venda.id);
 
+    setFechamentoCliente(venda.cliente);
     setFechamentoItems(items);
     setFechamentoSelected(new Set(items.map((_: any, i: number) => i)));
     const extras = (extrasData || []).map((e: any) => ({ descricao: e.descricao, valor: Number(e.valor) }));
     setFechamentoExtras(extras);
     setFechamentoExtrasSelected(new Set(extras.map((_: any, i: number) => i)));
     setFechamentoNovoExtra({ descricao: "", valor: "" });
-    setFechamentoDialog(venda);
+    setFechamentoSearch("");
+    setFechamentoDialogOpen(true);
   };
 
+  const handleOpenFechamentoAvulso = async () => {
+    await loadFechamentoClientes();
+    setFechamentoCliente("");
+    setFechamentoItems([]);
+    setFechamentoSelected(new Set());
+    setFechamentoExtras([]);
+    setFechamentoExtrasSelected(new Set());
+    setFechamentoNovoExtra({ descricao: "", valor: "" });
+    setFechamentoSearch("");
+    setFechamentoDialogOpen(true);
+  };
+
+  const handleFechamentoClienteChange = async (cli: string) => {
+    setFechamentoCliente(cli);
+    setFechamentoExtras([]);
+    setFechamentoExtrasSelected(new Set());
+    await loadFechamentoItemsByCliente(cli);
+  };
+
+  const fechamentoFilteredItems = useMemo(() => {
+    if (!fechamentoSearch) return fechamentoItems;
+    const s = fechamentoSearch.toLowerCase();
+    return fechamentoItems.map((item: any, idx: number) => ({ item, idx })).filter(({ item }) =>
+      (item.cot || "").toLowerCase().includes(s) ||
+      (item.origem || "").toLowerCase().includes(s) ||
+      (item.destino || "").toLowerCase().includes(s) ||
+      (item.data || "").includes(s) ||
+      (item.tipo || "").toLowerCase().includes(s)
+    );
+  }, [fechamentoItems, fechamentoSearch]);
+
   const handleGerarFechamento = () => {
-    if (!fechamentoDialog) return;
-    const venda = fechamentoDialog;
+    if (!fechamentoCliente) return;
     const selectedItems = fechamentoItems.filter((_: any, i: number) => fechamentoSelected.has(i));
 
     generateClosingReport(
       selectedItems,
-      `Fechamento - ${venda.cliente}`,
-      `Venda Nº ${venda.numero_venda} — ${venda.cliente}`,
+      `Fechamento - ${fechamentoCliente}`,
+      fechamentoCliente,
       {
-        numero_venda: venda.numero_venda,
-        cliente: venda.cliente,
-        data_venda: venda.data_venda,
-        data_vencimento: venda.data_vencimento,
-        forma_pagamento: venda.forma_pagamento,
-        status: venda.status,
-        observacoes: venda.observacoes,
-        valor_total: venda.valor_total,
+        cliente: fechamentoCliente,
         extras: fechamentoExtras.filter((_, i) => fechamentoExtrasSelected.has(i)),
       }
     );
-    setFechamentoDialog(null);
+    setFechamentoDialogOpen(false);
   };
 
   const openEditDialog = (type: "pagar" | "receber", item: any) => {
