@@ -576,7 +576,7 @@ const Vendas = () => {
       .select("nome, cnpj_cpf, email, telefone, endereco, cep, cidade, uf")
       .ilike("nome", venda.cliente)
       .maybeSingle();
-    
+
     if (clienteExact) {
       clienteData = clienteExact;
     } else {
@@ -589,6 +589,8 @@ const Vendas = () => {
         .maybeSingle();
       clienteData = clientePartial;
     }
+
+    const clienteNomeCompleto = (clienteData?.nome || venda.cliente || "").trim();
 
     const rows = items.map((item: any, idx: number) => {
       const ai = item.agenda_items;
