@@ -85,11 +85,11 @@ export const generateClosingReport = (
         : JSON.parse(ai.outros_despesas)
       : [];
     const outrosTotal =
-      outrosDespesas.reduce((s: number, d: any) => s + (Number(d.valor) || 0), 0) +
-      (Number(ai.outros) || 0);
+      outrosDespesas.reduce((s: number, d: any) => s + parseAmount(d.valor), 0) +
+      parseAmount(ai.outros);
 
     const despesasDetail = outrosDespesas.length > 0
-      ? outrosDespesas.map((d: any) => `${d.descricao || "Outros"}: ${formatCurrency(Number(d.valor) || 0)}`).join(" · ")
+      ? outrosDespesas.map((d: any) => `${d.descricao || "Outros"}: ${formatCurrency(parseAmount(d.valor))}`).join(" · ")
       : "";
 
     return `<div class="card">
