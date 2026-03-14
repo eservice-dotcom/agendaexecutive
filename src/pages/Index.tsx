@@ -153,6 +153,37 @@ const Index = () => {
     return Number.isFinite(parsed) ? parsed : 0;
   };
 
+  const buildAgendaExtrasFromItems = (items: any[]) => {
+    return items.flatMap((item: any) => {
+      const osLabel = item?.cot ? `O.S. ${item.cot}` : "Serviço";
+      const rawDespesas = item?.outros_despesas;
+      let despesas: any[] = [];
+
+      if (Array.isArray(rawDespesas)) {
+        despesas = rawDespesas;
+      } else if (typeof rawDespesas === "string" && rawDespesas.trim()) {
+        try {
+          const parsed = JSON.parse(rawDespesas);
+          despesas = Array.isArray(parsed) ? parsed : [];
+        } catch {
+          despesas = [];
+        }
+      }
+
+      const despesasExtras = despesas
+        .map((d: any) => ({
+          descricao: (d?.descricao || "").trim() || `Outros ${osLabel}`,
+          valor: parseMoneyValue(d?.valor),
+        }))
+        .filter((d) => d.valor > 0);
+
+      const outrosValor = parseMoneyValue(item?.outros);
+      const outrosExtra = outrosValor > 0 ? [{ descricao: `Outros ${osLabel}`, valor: outrosValor }] : [];
+
+      return [...despesasExtras, ...outrosExtra];
+    });
+  };
+
   const formatDateLocal = (d: string) => { const [y, m, day] = d.split("-"); return `${day}/${m}/${y}`; };
 
   const handleOpenFechamento = async () => {
