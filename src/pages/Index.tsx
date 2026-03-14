@@ -404,7 +404,10 @@ const Index = () => {
             <NovoServicoDialog open={novoDialogOpen} onOpenChange={(v) => { setNovoDialogOpen(v); if (!v) setCloneData(null); }} onSaved={reloadData} initialData={cloneData} />
           </TabsContent>
 
-          {canViewFinancials && (
+          <TabsContent value="fechamentos" className="space-y-4">
+            <FechamentosConsulta />
+          </TabsContent>
+
             <>
               <TabsContent value="fat-veiculo">
                 <FaturamentoVeiculo />
