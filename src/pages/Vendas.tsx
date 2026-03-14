@@ -1103,8 +1103,11 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
                   ) : (
                     contasPagarList.map((cp) => (
                       <TableRow key={cp.id}>
+                        <TableCell className="font-mono text-xs font-bold">{vendaOsMap[cp.venda_id]?.numero_venda || "—"}</TableCell>
                         <TableCell className="font-mono text-xs">{formatDate(cp.data)}</TableCell>
                         <TableCell className="font-medium text-sm">{cp.fornecedor}</TableCell>
+                        <TableCell className="font-medium text-sm">{vendaOsMap[cp.venda_id]?.cliente || "—"}</TableCell>
+                        <TableCell className="font-mono text-xs">{vendaOsMap[cp.venda_id]?.cots?.join(", ") || "—"}</TableCell>
                         <TableCell className="text-sm">{cp.descritivo}</TableCell>
                         <TableCell className="text-right font-mono">{formatCurrency(cp.valor)}</TableCell>
                         <TableCell className="font-mono text-xs">{cp.data_vencimento ? formatDate(cp.data_vencimento) : "—"}</TableCell>
