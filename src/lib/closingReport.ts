@@ -131,7 +131,7 @@ export const generateClosingReport = (
   if (vendaInfo) {
     const extras = vendaInfo.extras || [];
     const extrasHTML = extras.length > 0
-      ? `<p><strong>Extras:</strong> ${extras.map(e => `${e.descricao} (${formatCurrency(Number(e.valor))})`).join(", ")}</p>`
+      ? `<p><strong>Extras:</strong> ${extras.map(e => `${e.descricao} (${formatCurrency(parseAmount(e.valor))})`).join(", ")}</p>`
       : "";
 
     vendaInfoHTML = `
