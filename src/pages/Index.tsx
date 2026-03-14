@@ -1,11 +1,15 @@
 import { useState, useMemo, useCallback, useEffect } from "react";
-import { CalendarDays, ListChecks, Truck, Building2, Plus, BarChart3, Printer, EyeOff, Eye, ShoppingCart, FileText } from "lucide-react";
+import { CalendarDays, ListChecks, Truck, Building2, Plus, BarChart3, Printer, EyeOff, Eye, ShoppingCart, FileText, Search, Trash2, ClipboardList } from "lucide-react";
 import logo from "@/assets/logo-executive-service.png";
 import { Link } from "react-router-dom";
-import { ClipboardList } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Checkbox } from "@/components/ui/checkbox";
 import AgendaFilters from "@/components/AgendaFilters";
 import AgendaTable from "@/components/AgendaTable";
 import FaturamentoVeiculo from "@/components/FaturamentoVeiculo";
@@ -15,6 +19,7 @@ import NovoServicoDialog from "@/components/NovoServicoDialog";
 import { getAgendaItems } from "@/data/cadastroStorage";
 import { printAgenda } from "@/lib/printUtils";
 import { generateClosingReport } from "@/lib/closingReport";
+import { supabase } from "@/integrations/supabase/client";
 
 
 interface FiltersState {
