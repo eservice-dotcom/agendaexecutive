@@ -97,7 +97,6 @@ export const generateClosingReport = (
     </div>`;
   }).join("");
 
-  const totalCusto = items.reduce((s, ai) => s + (Number(ai.custo) || 0), 0);
   const totalValor = items.reduce((s, ai) => s + (Number(ai.valor) || 0), 0);
   const totalEstac = items.reduce((s, ai) => s + (Number(ai.estacionamento) || 0), 0);
   const totalKm = items.reduce((s, ai) => s + ((Number(ai.km_fim) || 0) - (Number(ai.km_in) || 0)), 0);
