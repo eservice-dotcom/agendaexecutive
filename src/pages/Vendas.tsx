@@ -120,6 +120,9 @@ const Vendas = () => {
   const [contasPagarList, setContasPagarList] = useState<ContaPagarDB[]>([]);
   const [contasReceberList, setContasReceberList] = useState<ContaReceberDB[]>([]);
 
+  // Mapa venda_id -> { numero_venda, cliente, cots }
+  const [vendaOsMap, setVendaOsMap] = useState<Record<string, { numero_venda: number; cliente: string; cots: string[] }>>({});
+
   // Edit conta dialog
   const [editDialog, setEditDialog] = useState<{ type: "pagar" | "receber"; item: any } | null>(null);
   const [editForm, setEditForm] = useState({ descritivo: "", valor: "", data_vencimento: "", data_pagamento: "" });
@@ -189,13 +192,33 @@ const Vendas = () => {
     if (data) setContasReceberList(data as ContaReceberDB[]);
   }, []);
 
+  const loadVendaOsMap = useCallback(async () => {
+    const { data: vendasData } = await supabase.from("vendas").select("id, numero_venda, cliente");
+    const { data: vendaItemsData } = await supabase.from("venda_items").select("venda_id, agenda_item_id");
+    const agendaIds = (vendaItemsData || []).map(vi => vi.agenda_item_id);
+    let agendaCots: Record<string, string> = {};
+    if (agendaIds.length > 0) {
+      const { data: agendaData } = await supabase.from("agenda_items").select("id, cot").in("id", agendaIds);
+      (agendaData || []).forEach(a => { agendaCots[a.id] = a.cot; });
+    }
+    const map: Record<string, { numero_venda: number; cliente: string; cots: string[] }> = {};
+    (vendasData || []).forEach(v => { map[v.id] = { numero_venda: v.numero_venda, cliente: v.cliente, cots: [] }; });
+    (vendaItemsData || []).forEach(vi => {
+      if (map[vi.venda_id] && agendaCots[vi.agenda_item_id]) {
+        map[vi.venda_id].cots.push(agendaCots[vi.agenda_item_id]);
+      }
+    });
+    setVendaOsMap(map);
+  }, []);
+
   useEffect(() => {
     loadVendas();
     loadClientes();
     loadFornecedores();
     loadContasPagar();
     loadContasReceber();
-  }, [loadVendas, loadClientes, loadFornecedores, loadContasPagar, loadContasReceber]);
+    loadVendaOsMap();
+  }, [loadVendas, loadClientes, loadFornecedores, loadContasPagar, loadContasReceber, loadVendaOsMap]);
 
   useEffect(() => {
     if (!cliente) {
@@ -362,6 +385,7 @@ const Vendas = () => {
       loadVendas();
       loadContasPagar();
       loadContasReceber();
+      loadVendaOsMap();
     } catch (err: any) {
       toast({ title: "Erro ao salvar venda", description: err.message, variant: "destructive" });
     } finally {
@@ -412,6 +436,7 @@ const Vendas = () => {
     loadVendas();
     loadContasPagar();
     loadContasReceber();
+    loadVendaOsMap();
     toast({ title: "Venda excluída" });
   };
 
@@ -440,6 +465,7 @@ const Vendas = () => {
       loadVendas();
       loadContasPagar();
       loadContasReceber();
+      loadVendaOsMap();
     } catch (err: any) {
       toast({ title: "Erro ao cancelar", description: err.message, variant: "destructive" });
     }
@@ -855,6 +881,7 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
       loadVendas();
       loadContasPagar();
       loadContasReceber();
+      loadVendaOsMap();
     } catch (err: any) {
       toast({ title: "Erro ao salvar", description: err.message, variant: "destructive" });
     } finally {
@@ -995,8 +1022,10 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
               <Table>
                 <TableHeader>
                   <TableRow>
+                    <TableHead>Venda</TableHead>
                     <TableHead>Data</TableHead>
                     <TableHead>Cliente</TableHead>
+                    <TableHead>O.S.</TableHead>
                     <TableHead>Descritivo</TableHead>
                     <TableHead className="text-right">Valor</TableHead>
                     <TableHead>Vencimento</TableHead>
@@ -1008,15 +1037,17 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
                 <TableBody>
                   {contasReceberList.length === 0 ? (
                     <TableRow>
-                      <TableCell colSpan={8} className="text-center text-muted-foreground py-8">
+                       <TableCell colSpan={10} className="text-center text-muted-foreground py-8">
                         Nenhuma conta a receber
                       </TableCell>
                     </TableRow>
                   ) : (
                     contasReceberList.map((cr) => (
                       <TableRow key={cr.id}>
+                        <TableCell className="font-mono text-xs font-bold">{vendaOsMap[cr.venda_id]?.numero_venda || "—"}</TableCell>
                         <TableCell className="font-mono text-xs">{formatDate(cr.data)}</TableCell>
                         <TableCell className="font-medium text-sm">{cr.cliente}</TableCell>
+                        <TableCell className="font-mono text-xs">{vendaOsMap[cr.venda_id]?.cots?.join(", ") || "—"}</TableCell>
                         <TableCell className="text-sm">{cr.descritivo}</TableCell>
                         <TableCell className="text-right font-mono">{formatCurrency(cr.valor)}</TableCell>
                         <TableCell className="font-mono text-xs">{cr.data_vencimento ? formatDate(cr.data_vencimento) : "—"}</TableCell>
@@ -1053,8 +1084,11 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
               <Table>
                 <TableHeader>
                   <TableRow>
+                    <TableHead>Venda</TableHead>
                     <TableHead>Data</TableHead>
                     <TableHead>Fornecedor</TableHead>
+                    <TableHead>Cliente</TableHead>
+                    <TableHead>O.S.</TableHead>
                     <TableHead>Descritivo</TableHead>
                     <TableHead className="text-right">Valor</TableHead>
                     <TableHead>Vencimento</TableHead>
@@ -1066,15 +1100,18 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
                 <TableBody>
                   {contasPagarList.length === 0 ? (
                     <TableRow>
-                      <TableCell colSpan={8} className="text-center text-muted-foreground py-8">
+                       <TableCell colSpan={11} className="text-center text-muted-foreground py-8">
                         Nenhuma conta a pagar
                       </TableCell>
                     </TableRow>
                   ) : (
                     contasPagarList.map((cp) => (
                       <TableRow key={cp.id}>
+                        <TableCell className="font-mono text-xs font-bold">{vendaOsMap[cp.venda_id]?.numero_venda || "—"}</TableCell>
                         <TableCell className="font-mono text-xs">{formatDate(cp.data)}</TableCell>
                         <TableCell className="font-medium text-sm">{cp.fornecedor}</TableCell>
+                        <TableCell className="font-medium text-sm">{vendaOsMap[cp.venda_id]?.cliente || "—"}</TableCell>
+                        <TableCell className="font-mono text-xs">{vendaOsMap[cp.venda_id]?.cots?.join(", ") || "—"}</TableCell>
                         <TableCell className="text-sm">{cp.descritivo}</TableCell>
                         <TableCell className="text-right font-mono">{formatCurrency(cp.valor)}</TableCell>
                         <TableCell className="font-mono text-xs">{cp.data_vencimento ? formatDate(cp.data_vencimento) : "—"}</TableCell>
