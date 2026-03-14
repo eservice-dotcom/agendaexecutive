@@ -408,6 +408,7 @@ const Index = () => {
             <FechamentosConsulta />
           </TabsContent>
 
+          {canViewFinancials && (
             <>
               <TabsContent value="fat-veiculo">
                 <FaturamentoVeiculo />
