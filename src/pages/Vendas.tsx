@@ -546,6 +546,13 @@ const Vendas = () => {
       .eq("venda_id", venda.id);
     const vendaExtras = extrasData || [];
 
+    // Fetch full client data
+    const { data: clienteData } = await supabase
+      .from("clientes")
+      .select("nome, cnpj_cpf, email, telefone, endereco, cep, cidade, uf")
+      .eq("nome", venda.cliente)
+      .maybeSingle();
+
     const rows = items.map((item: any, idx: number) => {
       const ai = item.agenda_items;
       return `<tr>
@@ -597,6 +604,11 @@ th{background:#2d3748;color:#fff;font-weight:600;font-size:10px;text-transform:u
   <div class="info-box">
     <h3>Cliente</h3>
     <p><strong>${venda.cliente}</strong></p>
+    ${clienteData?.cnpj_cpf ? `<p><strong>CNPJ/CPF:</strong> ${clienteData.cnpj_cpf}</p>` : ""}
+    ${clienteData?.telefone ? `<p><strong>Telefone:</strong> ${clienteData.telefone}</p>` : ""}
+    ${clienteData?.email ? `<p><strong>Email:</strong> ${clienteData.email}</p>` : ""}
+    ${clienteData?.endereco ? `<p><strong>Endereço:</strong> ${clienteData.endereco}</p>` : ""}
+    ${clienteData?.cep || clienteData?.cidade || clienteData?.uf ? `<p>${[clienteData.cep, clienteData.cidade, clienteData.uf].filter(Boolean).join(" - ")}</p>` : ""}
   </div>
   <div class="info-box">
     <h3>Detalhes</h3>
