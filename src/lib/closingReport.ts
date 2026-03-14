@@ -91,7 +91,6 @@ export const generateClosingReport = (
         <div class="card-row">
           <div class="card-field"><span class="lbl">Estacionamento</span><span class="val">${formatCurrency(Number(ai.estacionamento) || 0)}</span></div>
           <div class="card-field"><span class="lbl">Outros</span><span class="val">${formatCurrency(outrosTotal)}${despesasDetail ? ` (${despesasDetail})` : ""}</span></div>
-          <div class="card-field"><span class="lbl">Custo</span><span class="val money">${formatCurrency(Number(ai.custo) || 0)}</span></div>
           <div class="card-field"><span class="lbl">Valor</span><span class="val money">${formatCurrency(Number(ai.valor) || 0)}</span></div>
         </div>
       </div>
