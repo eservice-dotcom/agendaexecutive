@@ -92,6 +92,9 @@ export const updateCliente = async (id: string, item: Omit<Cliente, "id">) => {
     email: item.email,
     telefone: item.telefone,
     endereco: item.endereco,
+    cep: item.cep || "",
+    cidade: item.cidade || "",
+    uf: item.uf || "",
   }).eq("id", id);
   if (error) throw error;
 };
