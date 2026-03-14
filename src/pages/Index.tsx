@@ -16,6 +16,7 @@ import FaturamentoVeiculo from "@/components/FaturamentoVeiculo";
 import FaturamentoFornecedor from "@/components/FaturamentoFornecedor";
 import DashboardOcupacao from "@/components/DashboardOcupacao";
 import NovoServicoDialog from "@/components/NovoServicoDialog";
+import FechamentosConsulta from "@/components/FechamentosConsulta";
 import { getAgendaItems } from "@/data/cadastroStorage";
 import { printAgenda } from "@/lib/printUtils";
 import { generateClosingReport } from "@/lib/closingReport";
