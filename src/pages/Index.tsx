@@ -456,7 +456,8 @@ const Index = () => {
                       </div>
                       <div className="w-28">
                         <Input
-                          type="number"
+                          type="text"
+                          inputMode="decimal"
                           placeholder="Valor"
                           value={fechamentoNovoExtra.valor}
                           onChange={(e) => setFechamentoNovoExtra(prev => ({ ...prev, valor: e.target.value }))}

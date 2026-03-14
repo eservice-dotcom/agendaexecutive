@@ -1830,7 +1830,8 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
                       </div>
                       <div className="w-28">
                         <Input
-                          type="number"
+                          type="text"
+                          inputMode="decimal"
                           placeholder="Valor"
                           value={fechamentoNovoExtra.valor}
                           onChange={(e) => setFechamentoNovoExtra(prev => ({ ...prev, valor: e.target.value }))}
