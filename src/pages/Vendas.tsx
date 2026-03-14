@@ -385,6 +385,7 @@ const Vendas = () => {
       loadVendas();
       loadContasPagar();
       loadContasReceber();
+      loadVendaOsMap();
     } catch (err: any) {
       toast({ title: "Erro ao salvar venda", description: err.message, variant: "destructive" });
     } finally {
