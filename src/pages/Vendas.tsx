@@ -576,7 +576,7 @@ const Vendas = () => {
       .select("nome, cnpj_cpf, email, telefone, endereco, cep, cidade, uf")
       .ilike("nome", venda.cliente)
       .maybeSingle();
-    
+
     if (clienteExact) {
       clienteData = clienteExact;
     } else {
@@ -589,6 +589,8 @@ const Vendas = () => {
         .maybeSingle();
       clienteData = clientePartial;
     }
+
+    const clienteNomeCompleto = (clienteData?.nome || venda.cliente || "").trim();
 
     const rows = items.map((item: any, idx: number) => {
       const ai = item.agenda_items;
@@ -609,7 +611,7 @@ const Vendas = () => {
       <td class="r">${formatCurrency(Number(ex.valor))}</td>
     </tr>`).join("");
 
-    return `<!DOCTYPE html><html><head><title>Fatura - ${venda.cliente}</title>
+    return `<!DOCTYPE html><html><head><title>Fatura - ${clienteNomeCompleto}</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 body{font-family:Arial,sans-serif;padding:30px;color:#1a1a1a;font-size:12px}
@@ -640,7 +642,7 @@ th{background:#2d3748;color:#fff;font-weight:600;font-size:10px;text-transform:u
 <div class="info-grid">
   <div class="info-box">
     <h3>Cliente</h3>
-    <p><strong>${venda.cliente}</strong></p>
+    <p><strong>${clienteNomeCompleto}</strong></p>
     ${clienteData?.cnpj_cpf ? `<p><strong>CNPJ/CPF:</strong> ${clienteData.cnpj_cpf}</p>` : ""}
     ${clienteData?.telefone ? `<p><strong>Telefone:</strong> ${clienteData.telefone}</p>` : ""}
     ${clienteData?.email ? `<p><strong>Email:</strong> ${clienteData.email}</p>` : ""}
