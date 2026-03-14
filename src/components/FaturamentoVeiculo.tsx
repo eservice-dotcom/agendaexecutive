@@ -8,6 +8,13 @@ import { printFatVeiculo } from "@/lib/printUtils";
 const formatCurrency = (value: number) =>
   new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(value);
 
+const formatCompactList = (values: string[], max = 2) => {
+  const unique = [...new Set(values.filter(Boolean))];
+  if (unique.length === 0) return "—";
+  if (unique.length <= max) return unique.join(", ");
+  return `${unique.slice(0, max).join(", ")} +${unique.length - max}`;
+};
+
 const FaturamentoVeiculo = () => {
   const [items, setItems] = useState<any[]>([]);
   const [printWithFinancials, setPrintWithFinancials] = useState(true);
@@ -18,7 +25,10 @@ const FaturamentoVeiculo = () => {
       let from = 0;
       const pageSize = 1000;
       while (true) {
-        const { data } = await supabase.from("agenda_items").select("placa, veiculo, valor, custo").range(from, from + pageSize - 1);
+        const { data } = await supabase
+          .from("agenda_items")
+          .select("placa, veiculo, valor, custo, cliente, cot")
+          .range(from, from + pageSize - 1);
         if (!data || data.length === 0) break;
         all = all.concat(data);
         if (data.length < pageSize) break;
@@ -30,15 +40,38 @@ const FaturamentoVeiculo = () => {
   }, []);
 
   const dados = useMemo(() => {
-    const map = new Map<string, { veiculo: string; placa: string; viagens: number; receita: number; custo: number }>();
+    const map = new Map<string, {
+      key: string;
+      veiculo: string;
+      placa: string;
+      viagens: number;
+      receita: number;
+      custo: number;
+      clientes: string[];
+      cots: string[];
+    }>();
+
     items.forEach((item) => {
-      const key = item.placa;
-      const existing = map.get(key) || { veiculo: item.veiculo, placa: item.placa, viagens: 0, receita: 0, custo: 0 };
+      const key = item.placa || `sem-placa-${item.veiculo || "veiculo"}`;
+      const existing = map.get(key) || {
+        key,
+        veiculo: item.veiculo || "—",
+        placa: item.placa || "—",
+        viagens: 0,
+        receita: 0,
+        custo: 0,
+        clientes: [],
+        cots: [],
+      };
+
       existing.viagens += 1;
-      existing.receita += Number(item.valor);
-      existing.custo += Number(item.custo);
+      existing.receita += Number(item.valor) || 0;
+      existing.custo += Number(item.custo) || 0;
+      if (item.cliente) existing.clientes.push(item.cliente);
+      if (item.cot) existing.cots.push(item.cot);
       map.set(key, existing);
     });
+
     return Array.from(map.values()).sort((a, b) => b.receita - a.receita);
   }, [items]);
 
@@ -72,6 +105,8 @@ const FaturamentoVeiculo = () => {
             <TableRow className="bg-muted/50 hover:bg-muted/50">
               <TableHead className="font-semibold">Veículo</TableHead>
               <TableHead className="font-semibold">Placa</TableHead>
+              <TableHead className="font-semibold">Cliente(s)</TableHead>
+              <TableHead className="font-semibold">O.S.</TableHead>
               <TableHead className="font-semibold text-center">Viagens</TableHead>
               <TableHead className="font-semibold text-right">Receita</TableHead>
               <TableHead className="font-semibold text-right">Custo</TableHead>
@@ -81,7 +116,7 @@ const FaturamentoVeiculo = () => {
           </TableHeader>
           <TableBody>
             {dados.map((d) => (
-              <TableRow key={d.placa} className="transition-colors hover:bg-primary/5">
+              <TableRow key={d.key} className="transition-colors hover:bg-primary/5">
                 <TableCell className="font-medium">
                   <span className="flex items-center gap-2">
                     <Truck className="h-4 w-4 text-muted-foreground" />
@@ -89,6 +124,8 @@ const FaturamentoVeiculo = () => {
                   </span>
                 </TableCell>
                 <TableCell className="font-mono text-sm">{d.placa}</TableCell>
+                <TableCell className="max-w-[220px] text-xs text-muted-foreground">{formatCompactList(d.clientes)}</TableCell>
+                <TableCell className="max-w-[220px] font-mono text-xs text-muted-foreground">{formatCompactList(d.cots, 3)}</TableCell>
                 <TableCell className="text-center">
                   <span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-primary/10 text-xs font-bold text-primary">
                     {d.viagens}
@@ -104,7 +141,7 @@ const FaturamentoVeiculo = () => {
             ))}
             {dados.length > 0 && (
               <TableRow className="bg-muted/50 font-bold hover:bg-muted/50">
-                <TableCell colSpan={2} className="font-semibold">TOTAL</TableCell>
+                <TableCell colSpan={4} className="font-semibold">TOTAL</TableCell>
                 <TableCell className="text-center">{dados.reduce((s, d) => s + d.viagens, 0)}</TableCell>
                 <TableCell className="text-right font-mono text-sm">{formatCurrency(totalReceita)}</TableCell>
                 <TableCell className="text-right font-mono text-sm">{formatCurrency(totalCusto)}</TableCell>

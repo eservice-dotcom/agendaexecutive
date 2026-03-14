@@ -193,21 +193,81 @@ const Vendas = () => {
   }, []);
 
   const loadVendaOsMap = useCallback(async () => {
-    const { data: vendasData } = await supabase.from("vendas").select("id, numero_venda, cliente");
-    const { data: vendaItemsData } = await supabase.from("venda_items").select("venda_id, agenda_item_id");
-    const agendaIds = (vendaItemsData || []).map(vi => vi.agenda_item_id);
-    let agendaCots: Record<string, string> = {};
-    if (agendaIds.length > 0) {
-      const { data: agendaData } = await supabase.from("agenda_items").select("id, cot").in("id", agendaIds);
-      (agendaData || []).forEach(a => { agendaCots[a.id] = a.cot; });
+    const pageSize = 1000;
+
+    const vendasData: Array<{ id: string; numero_venda: number; cliente: string }> = [];
+    let vendasFrom = 0;
+    while (true) {
+      const { data } = await supabase
+        .from("vendas")
+        .select("id, numero_venda, cliente")
+        .range(vendasFrom, vendasFrom + pageSize - 1);
+
+      if (!data || data.length === 0) break;
+      vendasData.push(...data);
+      if (data.length < pageSize) break;
+      vendasFrom += pageSize;
     }
-    const map: Record<string, { numero_venda: number; cliente: string; cots: string[] }> = {};
-    (vendasData || []).forEach(v => { map[v.id] = { numero_venda: v.numero_venda, cliente: v.cliente, cots: [] }; });
-    (vendaItemsData || []).forEach(vi => {
-      if (map[vi.venda_id] && agendaCots[vi.agenda_item_id]) {
-        map[vi.venda_id].cots.push(agendaCots[vi.agenda_item_id]);
+
+    const vendaItemsData: Array<{ venda_id: string; agenda_item_id: string }> = [];
+    let vendaItemsFrom = 0;
+    while (true) {
+      const { data } = await supabase
+        .from("venda_items")
+        .select("venda_id, agenda_item_id")
+        .range(vendaItemsFrom, vendaItemsFrom + pageSize - 1);
+
+      if (!data || data.length === 0) break;
+      vendaItemsData.push(...data);
+      if (data.length < pageSize) break;
+      vendaItemsFrom += pageSize;
+    }
+
+    const agendaIds = Array.from(new Set(vendaItemsData.map((vi) => vi.agenda_item_id)));
+    const agendaCots: Record<string, string> = {};
+
+    if (agendaIds.length > 0) {
+      const chunkSize = 500;
+      const chunks: string[][] = [];
+
+      for (let i = 0; i < agendaIds.length; i += chunkSize) {
+        chunks.push(agendaIds.slice(i, i + chunkSize));
       }
+
+      const responses = await Promise.all(
+        chunks.map((chunk) =>
+          supabase
+            .from("agenda_items")
+            .select("id, cot")
+            .in("id", chunk)
+        )
+      );
+
+      responses.forEach(({ data }) => {
+        (data || []).forEach((a) => {
+          agendaCots[a.id] = a.cot;
+        });
+      });
+    }
+
+    const map: Record<string, { numero_venda: number; cliente: string; cots: string[] }> = {};
+    const cotSetByVenda = new Map<string, Set<string>>();
+
+    vendasData.forEach((v) => {
+      map[v.id] = { numero_venda: v.numero_venda, cliente: v.cliente, cots: [] };
+      cotSetByVenda.set(v.id, new Set());
     });
+
+    vendaItemsData.forEach((vi) => {
+      const cot = agendaCots[vi.agenda_item_id];
+      if (!map[vi.venda_id] || !cot) return;
+      cotSetByVenda.get(vi.venda_id)?.add(cot);
+    });
+
+    Object.keys(map).forEach((vendaId) => {
+      map[vendaId].cots = Array.from(cotSetByVenda.get(vendaId) || []);
+    });
+
     setVendaOsMap(map);
   }, []);
 
