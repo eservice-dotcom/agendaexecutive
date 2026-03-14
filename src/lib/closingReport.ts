@@ -91,14 +91,12 @@ export const generateClosingReport = (
         <div class="card-row">
           <div class="card-field"><span class="lbl">Estacionamento</span><span class="val">${formatCurrency(Number(ai.estacionamento) || 0)}</span></div>
           <div class="card-field"><span class="lbl">Outros</span><span class="val">${formatCurrency(outrosTotal)}${despesasDetail ? ` (${despesasDetail})` : ""}</span></div>
-          <div class="card-field"><span class="lbl">Custo</span><span class="val money">${formatCurrency(Number(ai.custo) || 0)}</span></div>
           <div class="card-field"><span class="lbl">Valor</span><span class="val money">${formatCurrency(Number(ai.valor) || 0)}</span></div>
         </div>
       </div>
     </div>`;
   }).join("");
 
-  const totalCusto = items.reduce((s, ai) => s + (Number(ai.custo) || 0), 0);
   const totalValor = items.reduce((s, ai) => s + (Number(ai.valor) || 0), 0);
   const totalEstac = items.reduce((s, ai) => s + (Number(ai.estacionamento) || 0), 0);
   const totalKm = items.reduce((s, ai) => s + ((Number(ai.km_fim) || 0) - (Number(ai.km_in) || 0)), 0);
@@ -178,7 +176,7 @@ ${vendaInfoHTML}
   <div class="summary-box"><div class="label">KM Total</div><div class="value">${totalKm}</div></div>
   <div class="summary-box"><div class="label">KM Extra</div><div class="value">${totalKmExtra}</div></div>
   <div class="summary-box"><div class="label">Estacionamento</div><div class="value">${formatCurrency(totalEstac)}</div></div>
-  <div class="summary-box"><div class="label">Margem</div><div class="value">${formatCurrency(totalValor - totalCusto)}</div></div>
+  <div class="summary-box"><div class="label">Valor Total</div><div class="value">${formatCurrency(totalValor)}</div></div>
 </div>
 ${cards}
 <div class="card" style="border-color:#b8860b;background:#fdf8ef">
@@ -190,7 +188,6 @@ ${cards}
       <div class="card-field"><span class="lbl">KM Total</span><span class="val money">${totalKm}</span></div>
       <div class="card-field"><span class="lbl">KM Extra</span><span class="val money">${totalKmExtra}</span></div>
       <div class="card-field"><span class="lbl">Estacionamento</span><span class="val money">${formatCurrency(totalEstac)}</span></div>
-      <div class="card-field"><span class="lbl">Custo Total</span><span class="val money">${formatCurrency(totalCusto)}</span></div>
       <div class="card-field"><span class="lbl">Valor Total</span><span class="val money">${formatCurrency(totalValor)}</span></div>
     </div>
   </div>
