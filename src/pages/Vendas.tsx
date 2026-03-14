@@ -743,7 +743,7 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
     setFechamentoCliente(venda.cliente);
     setFechamentoItems(items);
     setFechamentoSelected(new Set(items.map((_: any, i: number) => i)));
-    const extras = (extrasData || []).map((e: any) => ({ descricao: e.descricao, valor: Number(e.valor) }));
+    const extras = (extrasData || []).map((e: any) => ({ descricao: e.descricao, valor: parseMoneyValue(e.valor) }));
     setFechamentoExtras(extras);
     setFechamentoExtrasSelected(new Set(extras.map((_: any, i: number) => i)));
     setFechamentoNovoExtra({ descricao: "", valor: "" });
