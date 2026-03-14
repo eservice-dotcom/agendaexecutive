@@ -8,6 +8,9 @@ export interface Cliente {
   email: string;
   telefone: string;
   endereco: string;
+  cep: string;
+  cidade: string;
+  uf: string;
 }
 
 export interface Veiculo {
