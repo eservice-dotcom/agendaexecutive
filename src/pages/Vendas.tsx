@@ -746,6 +746,7 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
+    await markVendaAsFaturado(venda);
     toast({ title: "Fatura salva", description: "Arquivo HTML baixado com sucesso" });
   };
 
