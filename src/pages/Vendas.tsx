@@ -815,6 +815,7 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
 
   const openEditVenda = async (venda: Venda) => {
     setEditVendaForm({
+      cliente: venda.cliente,
       data_venda: venda.data_venda,
       data_vencimento: venda.data_vencimento || "",
       observacoes: venda.observacoes || "",
