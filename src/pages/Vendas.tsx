@@ -1040,8 +1040,10 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
                   ) : (
                     contasReceberList.map((cr) => (
                       <TableRow key={cr.id}>
+                        <TableCell className="font-mono text-xs font-bold">{vendaOsMap[cr.venda_id]?.numero_venda || "—"}</TableCell>
                         <TableCell className="font-mono text-xs">{formatDate(cr.data)}</TableCell>
                         <TableCell className="font-medium text-sm">{cr.cliente}</TableCell>
+                        <TableCell className="font-mono text-xs">{vendaOsMap[cr.venda_id]?.cots?.join(", ") || "—"}</TableCell>
                         <TableCell className="text-sm">{cr.descritivo}</TableCell>
                         <TableCell className="text-right font-mono">{formatCurrency(cr.valor)}</TableCell>
                         <TableCell className="font-mono text-xs">{cr.data_vencimento ? formatDate(cr.data_vencimento) : "—"}</TableCell>
