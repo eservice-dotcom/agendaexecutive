@@ -129,7 +129,7 @@ const Vendas = () => {
 
   // Edit venda dialog
   const [editVendaDialog, setEditVendaDialog] = useState<Venda | null>(null);
-  const [editVendaForm, setEditVendaForm] = useState({ data_venda: "", data_vencimento: "", observacoes: "", status: "", forma_pagamento: "" });
+  const [editVendaForm, setEditVendaForm] = useState({ cliente: "", data_venda: "", data_vencimento: "", observacoes: "", status: "", forma_pagamento: "" });
   const [editVendaItems, setEditVendaItems] = useState<AgendaItem[]>([]);
   const [editVendaSelectedIds, setEditVendaSelectedIds] = useState<Set<string>>(new Set());
   const [editVendaAvailableItems, setEditVendaAvailableItems] = useState<AgendaItem[]>([]);
@@ -815,6 +815,7 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
 
   const openEditVenda = async (venda: Venda) => {
     setEditVendaForm({
+      cliente: venda.cliente,
       data_venda: venda.data_venda,
       data_vencimento: venda.data_vencimento || "",
       observacoes: venda.observacoes || "",
@@ -925,6 +926,7 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
       // Update venda record
       const newTotal = editVendaTotal;
       const { error } = await supabase.from("vendas").update({
+        cliente: editVendaForm.cliente,
         data_venda: editVendaForm.data_venda,
         data_vencimento: editVendaForm.data_vencimento || null,
         observacoes: editVendaForm.observacoes,
@@ -935,7 +937,7 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
       if (error) throw error;
 
       // Update conta a receber value
-      await supabase.from("contas_receber").update({ valor: newTotal }).eq("venda_id", vendaId).eq("status", "pendente");
+      await supabase.from("contas_receber").update({ valor: newTotal, cliente: editVendaForm.cliente }).eq("venda_id", vendaId).eq("status", "pendente");
 
       // Replace extras
       await supabase.from("venda_extras").delete().eq("venda_id", vendaId);
@@ -1489,7 +1491,31 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
               <div className="grid grid-cols-1 sm:grid-cols-5 gap-4">
                 <div className="space-y-2">
                   <Label>Cliente</Label>
-                  <Input value={editVendaDialog?.cliente || ""} disabled className="bg-muted" />
+                  <Select value={editVendaForm.cliente} onValueChange={async (v) => {
+                    setEditVendaForm({ ...editVendaForm, cliente: v });
+                    // Reload agenda items for new client
+                    const { data: allItems } = await supabase
+                      .from("agenda_items")
+                      .select("id, cliente, data, hora, tipo, origem, destino, valor, custo, motorista, veiculo, pax, cot, fornecedor, status_faturamento")
+                      .eq("cliente", v)
+                      .order("data", { ascending: true });
+                    const items = (allItems || []) as AgendaItem[];
+                    const currentIds = editVendaSelectedIds;
+                    const relevant = items.filter((i) => currentIds.has(i.id) || !i.status_faturamento || i.status_faturamento === "");
+                    setEditVendaAvailableItems(relevant);
+                    // Keep only items that still exist in new client's list
+                    const validIds = new Set(relevant.map(i => i.id));
+                    setEditVendaSelectedIds(new Set([...currentIds].filter(id => validIds.has(id))));
+                  }}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Selecione" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {clientes.map((c) => (
+                        <SelectItem key={c} value={c}>{c}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
                 <div className="space-y-2">
                   <Label>Data da Venda</Label>
