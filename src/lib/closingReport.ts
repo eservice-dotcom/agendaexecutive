@@ -188,7 +188,6 @@ ${cards}
       <div class="card-field"><span class="lbl">KM Total</span><span class="val money">${totalKm}</span></div>
       <div class="card-field"><span class="lbl">KM Extra</span><span class="val money">${totalKmExtra}</span></div>
       <div class="card-field"><span class="lbl">Estacionamento</span><span class="val money">${formatCurrency(totalEstac)}</span></div>
-      <div class="card-field"><span class="lbl">Custo Total</span><span class="val money">${formatCurrency(totalCusto)}</span></div>
       <div class="card-field"><span class="lbl">Valor Total</span><span class="val money">${formatCurrency(totalValor)}</span></div>
     </div>
   </div>
