@@ -242,8 +242,9 @@ const Index = () => {
   }, [fechamentoItems, fechamentoSearch]);
 
   const handleGerarFechamento = async () => {
-    if (!fechamentoCliente) return;
+    if (!fechamentoCliente || !session?.user?.id) return;
     const selectedItems = fechamentoItems.filter((_: any, i: number) => fechamentoSelected.has(i));
+    const selectedExtras = fechamentoExtras.filter((_, i) => fechamentoExtrasSelected.has(i));
 
     // Update status_faturamento to "enviado" for selected items
     const ids = selectedItems.map((item: any) => item.id).filter(Boolean);
@@ -252,15 +253,43 @@ const Index = () => {
       await reloadData();
     }
 
+    // Calculate totals
+    const valorTotal = selectedItems.reduce((s: number, i: any) => s + (Number(i.valor) || 0), 0);
+    const extrasTotal = selectedExtras.reduce((s, e) => s + (e.valor || 0), 0);
+
+    // Save to DB
+    const { data: inserted, error } = await supabase.from("fechamentos").insert({
+      user_id: session.user.id,
+      cliente: fechamentoCliente,
+      valor_total: valorTotal,
+      extras_total: extrasTotal,
+      quantidade_servicos: selectedItems.length,
+      items: selectedItems,
+      extras: selectedExtras,
+    }).select("numero_fechamento").single();
+
+    if (error) {
+      toast.error("Erro ao salvar fechamento: " + error.message);
+      return;
+    }
+
+    const numero = inserted?.numero_fechamento;
+
+    // Save links
+    if (ids.length > 0) {
+      await supabase.from("fechamento_items").insert(
+        ids.map((aid: string) => ({ fechamento_id: inserted.id || "", agenda_item_id: aid }))
+      );
+    }
+
     generateClosingReport(
       selectedItems,
-      `Fechamento - ${fechamentoCliente}`,
+      `Fechamento Nº ${numero} - ${fechamentoCliente}`,
       fechamentoCliente,
-      {
-        cliente: fechamentoCliente,
-        extras: fechamentoExtras.filter((_, i) => fechamentoExtrasSelected.has(i)),
-      }
+      { cliente: fechamentoCliente, extras: selectedExtras },
+      numero
     );
+    toast.success(`Fechamento Nº ${numero} salvo com sucesso!`);
     setFechamentoDialogOpen(false);
   };
 
