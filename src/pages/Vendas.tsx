@@ -192,13 +192,33 @@ const Vendas = () => {
     if (data) setContasReceberList(data as ContaReceberDB[]);
   }, []);
 
+  const loadVendaOsMap = useCallback(async () => {
+    const { data: vendasData } = await supabase.from("vendas").select("id, numero_venda, cliente");
+    const { data: vendaItemsData } = await supabase.from("venda_items").select("venda_id, agenda_item_id");
+    const agendaIds = (vendaItemsData || []).map(vi => vi.agenda_item_id);
+    let agendaCots: Record<string, string> = {};
+    if (agendaIds.length > 0) {
+      const { data: agendaData } = await supabase.from("agenda_items").select("id, cot").in("id", agendaIds);
+      (agendaData || []).forEach(a => { agendaCots[a.id] = a.cot; });
+    }
+    const map: Record<string, { numero_venda: number; cliente: string; cots: string[] }> = {};
+    (vendasData || []).forEach(v => { map[v.id] = { numero_venda: v.numero_venda, cliente: v.cliente, cots: [] }; });
+    (vendaItemsData || []).forEach(vi => {
+      if (map[vi.venda_id] && agendaCots[vi.agenda_item_id]) {
+        map[vi.venda_id].cots.push(agendaCots[vi.agenda_item_id]);
+      }
+    });
+    setVendaOsMap(map);
+  }, []);
+
   useEffect(() => {
     loadVendas();
     loadClientes();
     loadFornecedores();
     loadContasPagar();
     loadContasReceber();
-  }, [loadVendas, loadClientes, loadFornecedores, loadContasPagar, loadContasReceber]);
+    loadVendaOsMap();
+  }, [loadVendas, loadClientes, loadFornecedores, loadContasPagar, loadContasReceber, loadVendaOsMap]);
 
   useEffect(() => {
     if (!cliente) {
