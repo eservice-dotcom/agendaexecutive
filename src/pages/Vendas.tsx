@@ -546,6 +546,13 @@ const Vendas = () => {
       .eq("venda_id", venda.id);
     const vendaExtras = extrasData || [];
 
+    // Fetch full client data
+    const { data: clienteData } = await supabase
+      .from("clientes")
+      .select("nome, cnpj_cpf, email, telefone, endereco, cep, cidade, uf")
+      .eq("nome", venda.cliente)
+      .maybeSingle();
+
     const rows = items.map((item: any, idx: number) => {
       const ai = item.agenda_items;
       return `<tr>
