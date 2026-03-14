@@ -209,7 +209,7 @@ body{font-family:Arial,sans-serif;padding:20px;color:#1a1a1a;font-size:11px}
 <div class="header">
   <img src="${logoUrl}" alt="Executive Service" />
   <div class="header-info">
-    <h1>RELATÓRIO DE FECHAMENTO</h1>
+    <h1>RELATÓRIO DE FECHAMENTO${numeroFechamento ? ` Nº ${numeroFechamento}` : ""}</h1>
     <p>${subtitle}</p>
     <p>Emitido em: ${new Date().toLocaleString("pt-BR")}</p>
   </div>
