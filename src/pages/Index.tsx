@@ -21,7 +21,7 @@ import { getAgendaItems } from "@/data/cadastroStorage";
 import { printAgenda } from "@/lib/printUtils";
 import { generateClosingReport } from "@/lib/closingReport";
 import { supabase } from "@/integrations/supabase/client";
-
+import { toast } from "sonner";
 
 interface FiltersState {
   search: string;
