@@ -120,6 +120,9 @@ const Vendas = () => {
   const [contasPagarList, setContasPagarList] = useState<ContaPagarDB[]>([]);
   const [contasReceberList, setContasReceberList] = useState<ContaReceberDB[]>([]);
 
+  // Mapa venda_id -> { numero_venda, cliente, cots }
+  const [vendaOsMap, setVendaOsMap] = useState<Record<string, { numero_venda: number; cliente: string; cots: string[] }>>({});
+
   // Edit conta dialog
   const [editDialog, setEditDialog] = useState<{ type: "pagar" | "receber"; item: any } | null>(null);
   const [editForm, setEditForm] = useState({ descritivo: "", valor: "", data_vencimento: "", data_pagamento: "" });
