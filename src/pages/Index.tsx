@@ -240,9 +240,17 @@ const Index = () => {
     );
   }, [fechamentoItems, fechamentoSearch]);
 
-  const handleGerarFechamento = () => {
+  const handleGerarFechamento = async () => {
     if (!fechamentoCliente) return;
     const selectedItems = fechamentoItems.filter((_: any, i: number) => fechamentoSelected.has(i));
+
+    // Update status_faturamento to "enviado" for selected items
+    const ids = selectedItems.map((item: any) => item.id).filter(Boolean);
+    if (ids.length > 0) {
+      await supabase.from("agenda_items").update({ status_faturamento: "enviado" }).in("id", ids);
+      await reloadData();
+    }
+
     generateClosingReport(
       selectedItems,
       `Fechamento - ${fechamentoCliente}`,
