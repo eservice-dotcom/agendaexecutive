@@ -127,6 +127,68 @@ const Index = () => {
       });
   }, [filters, agendaData]);
 
+  const formatCurrencyLocal = (v: number) =>
+    new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(v);
+  const formatDateLocal = (d: string) => { const [y, m, day] = d.split("-"); return `${day}/${m}/${y}`; };
+
+  const handleOpenFechamento = async () => {
+    const { data } = await supabase.from("agenda_items").select("cliente").order("cliente");
+    if (data) {
+      setFechamentoAllClientes([...new Set(data.map((d) => d.cliente))].filter(Boolean).sort());
+    }
+    setFechamentoCliente("");
+    setFechamentoItems([]);
+    setFechamentoSelected(new Set());
+    setFechamentoExtras([]);
+    setFechamentoExtrasSelected(new Set());
+    setFechamentoNovoExtra({ descricao: "", valor: "" });
+    setFechamentoSearch("");
+    setFechamentoDialogOpen(true);
+  };
+
+  const handleFechamentoClienteChange = async (cli: string) => {
+    setFechamentoCliente(cli);
+    setFechamentoExtras([]);
+    setFechamentoExtrasSelected(new Set());
+    if (!cli) { setFechamentoItems([]); setFechamentoSelected(new Set()); return; }
+    const { data } = await supabase
+      .from("agenda_items")
+      .select("cot, data, hora, tipo, origem, destino, pax, motorista, veiculo, placa, fornecedor, valor, custo, km_in, km_fim, km_extra, hora_in, hora_fim, hora_extra, estacionamento, outros, outros_despesas, cliente")
+      .eq("cliente", cli)
+      .order("data", { ascending: true });
+    const items = data || [];
+    setFechamentoItems(items);
+    setFechamentoSelected(new Set(items.map((_: any, i: number) => i)));
+  };
+
+  const fechamentoFilteredItems = useMemo(() => {
+    const mapped = fechamentoItems.map((item: any, idx: number) => ({ item, idx }));
+    if (!fechamentoSearch) return mapped;
+    const s = fechamentoSearch.toLowerCase();
+    return mapped.filter(({ item }) =>
+      (item.cot || "").toLowerCase().includes(s) ||
+      (item.origem || "").toLowerCase().includes(s) ||
+      (item.destino || "").toLowerCase().includes(s) ||
+      (item.data || "").includes(s) ||
+      (item.tipo || "").toLowerCase().includes(s)
+    );
+  }, [fechamentoItems, fechamentoSearch]);
+
+  const handleGerarFechamento = () => {
+    if (!fechamentoCliente) return;
+    const selectedItems = fechamentoItems.filter((_: any, i: number) => fechamentoSelected.has(i));
+    generateClosingReport(
+      selectedItems,
+      `Fechamento - ${fechamentoCliente}`,
+      fechamentoCliente,
+      {
+        cliente: fechamentoCliente,
+        extras: fechamentoExtras.filter((_, i) => fechamentoExtrasSelected.has(i)),
+      }
+    );
+    setFechamentoDialogOpen(false);
+  };
+
   const totalValor = filteredData.reduce((s, i) => s + i.valor, 0);
   const totalCusto = filteredData.reduce((s, i) => s + i.custo, 0);
 
