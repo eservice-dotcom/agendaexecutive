@@ -896,9 +896,14 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
           <h1 className="text-2xl font-bold text-foreground flex items-center gap-2">
             <DollarSign className="h-6 w-6" /> Financeiro
           </h1>
-          <Button onClick={() => { resetForm(); setDialogOpen(true); }} className="gap-2">
-            <Plus className="h-4 w-4" /> Nova Venda
-          </Button>
+          <div className="flex gap-2">
+            <Button variant="outline" onClick={handleOpenFechamentoAvulso} className="gap-2">
+              <ClipboardList className="h-4 w-4" /> Relatório de Fechamento
+            </Button>
+            <Button onClick={() => { resetForm(); setDialogOpen(true); }} className="gap-2">
+              <Plus className="h-4 w-4" /> Nova Venda
+            </Button>
+          </div>
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab}>
