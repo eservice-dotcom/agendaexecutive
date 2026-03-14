@@ -636,9 +636,10 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
   };
 
   const fechamentoFilteredItems = useMemo(() => {
-    if (!fechamentoSearch) return fechamentoItems;
+    const mapped = fechamentoItems.map((item: any, idx: number) => ({ item, idx }));
+    if (!fechamentoSearch) return mapped;
     const s = fechamentoSearch.toLowerCase();
-    return fechamentoItems.map((item: any, idx: number) => ({ item, idx })).filter(({ item }) =>
+    return mapped.filter(({ item }) =>
       (item.cot || "").toLowerCase().includes(s) ||
       (item.origem || "").toLowerCase().includes(s) ||
       (item.destino || "").toLowerCase().includes(s) ||
