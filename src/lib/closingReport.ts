@@ -176,7 +176,7 @@ ${vendaInfoHTML}
   <div class="summary-box"><div class="label">KM Total</div><div class="value">${totalKm}</div></div>
   <div class="summary-box"><div class="label">KM Extra</div><div class="value">${totalKmExtra}</div></div>
   <div class="summary-box"><div class="label">Estacionamento</div><div class="value">${formatCurrency(totalEstac)}</div></div>
-  <div class="summary-box"><div class="label">Margem</div><div class="value">${formatCurrency(totalValor - totalCusto)}</div></div>
+  <div class="summary-box"><div class="label">Valor Total</div><div class="value">${formatCurrency(totalValor)}</div></div>
 </div>
 ${cards}
 <div class="card" style="border-color:#b8860b;background:#fdf8ef">
