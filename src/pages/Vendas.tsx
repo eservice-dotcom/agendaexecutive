@@ -926,6 +926,7 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
       // Update venda record
       const newTotal = editVendaTotal;
       const { error } = await supabase.from("vendas").update({
+        cliente: editVendaForm.cliente,
         data_venda: editVendaForm.data_venda,
         data_vencimento: editVendaForm.data_vencimento || null,
         observacoes: editVendaForm.observacoes,
