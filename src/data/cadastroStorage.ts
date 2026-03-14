@@ -77,6 +77,9 @@ export const saveCliente = async (item: Omit<Cliente, "id">) => {
     email: item.email,
     telefone: item.telefone,
     endereco: item.endereco,
+    cep: item.cep || "",
+    cidade: item.cidade || "",
+    uf: item.uf || "",
   });
   
   if (error) throw error;
