@@ -546,12 +546,26 @@ const Vendas = () => {
       .eq("venda_id", venda.id);
     const vendaExtras = extrasData || [];
 
-    // Fetch full client data
-    const { data: clienteData } = await supabase
+    // Fetch full client data (case-insensitive match)
+    let clienteData: any = null;
+    const { data: clienteExact } = await supabase
       .from("clientes")
       .select("nome, cnpj_cpf, email, telefone, endereco, cep, cidade, uf")
-      .eq("nome", venda.cliente)
+      .ilike("nome", venda.cliente)
       .maybeSingle();
+    
+    if (clienteExact) {
+      clienteData = clienteExact;
+    } else {
+      // Fallback: partial match
+      const { data: clientePartial } = await supabase
+        .from("clientes")
+        .select("nome, cnpj_cpf, email, telefone, endereco, cep, cidade, uf")
+        .ilike("nome", `%${venda.cliente}%`)
+        .limit(1)
+        .maybeSingle();
+      clienteData = clientePartial;
+    }
 
     const rows = items.map((item: any, idx: number) => {
       const ai = item.agenda_items;
