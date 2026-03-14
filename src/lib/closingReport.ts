@@ -3,6 +3,29 @@ import logo from "@/assets/logo-executive-service.png";
 const formatCurrency = (value: number) =>
   new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(value);
 
+const parseAmount = (value: unknown): number => {
+  if (typeof value === "number") return Number.isFinite(value) ? value : 0;
+  if (typeof value !== "string") return 0;
+
+  const raw = value.trim();
+  if (!raw) return 0;
+
+  const hasComma = raw.includes(",");
+  const hasDot = raw.includes(".");
+  let normalized = raw;
+
+  if (hasComma && hasDot) {
+    normalized = raw.lastIndexOf(",") > raw.lastIndexOf(".")
+      ? raw.replace(/\./g, "").replace(",", ".")
+      : raw.replace(/,/g, "");
+  } else if (hasComma) {
+    normalized = raw.replace(",", ".");
+  }
+
+  const parsed = Number(normalized);
+  return Number.isFinite(parsed) ? parsed : 0;
+};
+
 const formatDate = (d: string) => {
   const [y, m, day] = d.split("-");
   return `${day}/${m}/${y}`;
@@ -62,11 +85,11 @@ export const generateClosingReport = (
         : JSON.parse(ai.outros_despesas)
       : [];
     const outrosTotal =
-      outrosDespesas.reduce((s: number, d: any) => s + (Number(d.valor) || 0), 0) +
-      (Number(ai.outros) || 0);
+      outrosDespesas.reduce((s: number, d: any) => s + parseAmount(d.valor), 0) +
+      parseAmount(ai.outros);
 
     const despesasDetail = outrosDespesas.length > 0
-      ? outrosDespesas.map((d: any) => `${d.descricao || "Outros"}: ${formatCurrency(Number(d.valor) || 0)}`).join(" · ")
+      ? outrosDespesas.map((d: any) => `${d.descricao || "Outros"}: ${formatCurrency(parseAmount(d.valor))}`).join(" · ")
       : "";
 
     return `<div class="card">
@@ -97,18 +120,18 @@ export const generateClosingReport = (
     </div>`;
   }).join("");
 
-  const totalServicos = items.reduce((s, ai) => s + (Number(ai.valor) || 0), 0);
-  const totalEstac = items.reduce((s, ai) => s + (Number(ai.estacionamento) || 0), 0);
-  const totalKm = items.reduce((s, ai) => s + ((Number(ai.km_fim) || 0) - (Number(ai.km_in) || 0)), 0);
-  const totalKmExtra = items.reduce((s, ai) => s + (Number(ai.km_extra) || 0), 0);
-  const extrasTotal = (vendaInfo?.extras || []).reduce((s, e) => s + (Number(e.valor) || 0), 0);
+  const totalServicos = items.reduce((s, ai) => s + parseAmount(ai.valor), 0);
+  const totalEstac = items.reduce((s, ai) => s + parseAmount(ai.estacionamento), 0);
+  const totalKm = items.reduce((s, ai) => s + (parseAmount(ai.km_fim) - parseAmount(ai.km_in)), 0);
+  const totalKmExtra = items.reduce((s, ai) => s + parseAmount(ai.km_extra), 0);
+  const extrasTotal = (vendaInfo?.extras || []).reduce((s, e) => s + parseAmount(e.valor), 0);
   const totalValor = totalServicos + extrasTotal;
 
   let vendaInfoHTML = "";
   if (vendaInfo) {
     const extras = vendaInfo.extras || [];
     const extrasHTML = extras.length > 0
-      ? `<p><strong>Extras:</strong> ${extras.map(e => `${e.descricao} (${formatCurrency(Number(e.valor))})`).join(", ")}</p>`
+      ? `<p><strong>Extras:</strong> ${extras.map(e => `${e.descricao} (${formatCurrency(parseAmount(e.valor))})`).join(", ")}</p>`
       : "";
 
     vendaInfoHTML = `
@@ -144,7 +167,7 @@ body{font-family:Arial,sans-serif;padding:20px;color:#1a1a1a;font-size:11px}
 .info-box{background:#f9f9f9;border:1px solid #e0e0e0;border-radius:6px;padding:10px}
 .info-box h3{font-size:9px;text-transform:uppercase;color:#888;margin-bottom:4px;letter-spacing:0.5px}
 .info-box p{font-size:10px;margin-bottom:2px}
-.summary{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:16px}
+.summary{display:grid;grid-template-columns:repeat(6,1fr);gap:8px;margin-bottom:16px}
 .summary-box{background:#f9f9f9;border:1px solid #e0e0e0;border-radius:4px;padding:8px;text-align:center}
 .summary-box .label{font-size:9px;text-transform:uppercase;color:#888;margin-bottom:2px}
 .summary-box .value{font-size:13px;font-weight:bold;color:#1a1a1a}
@@ -178,6 +201,7 @@ ${vendaInfoHTML}
   <div class="summary-box"><div class="label">KM Total</div><div class="value">${totalKm}</div></div>
   <div class="summary-box"><div class="label">KM Extra</div><div class="value">${totalKmExtra}</div></div>
   <div class="summary-box"><div class="label">Estacionamento</div><div class="value">${formatCurrency(totalEstac)}</div></div>
+  <div class="summary-box"><div class="label">Extras</div><div class="value">${formatCurrency(extrasTotal)}</div></div>
   <div class="summary-box"><div class="label">Valor Total</div><div class="value">${formatCurrency(totalValor)}</div></div>
 </div>
 ${cards}
@@ -190,6 +214,7 @@ ${cards}
       <div class="card-field"><span class="lbl">KM Total</span><span class="val money">${totalKm}</span></div>
       <div class="card-field"><span class="lbl">KM Extra</span><span class="val money">${totalKmExtra}</span></div>
       <div class="card-field"><span class="lbl">Estacionamento</span><span class="val money">${formatCurrency(totalEstac)}</span></div>
+      <div class="card-field"><span class="lbl">Extras</span><span class="val money">${formatCurrency(extrasTotal)}</span></div>
       <div class="card-field"><span class="lbl">Valor Total</span><span class="val money">${formatCurrency(totalValor)}</span></div>
     </div>
   </div>

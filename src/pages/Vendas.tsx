@@ -88,6 +88,29 @@ interface ContaReceberDB {
 const formatCurrency = (v: number) =>
   new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(v);
 
+const parseMoneyValue = (value: string | number | null | undefined): number => {
+  if (typeof value === "number") return Number.isFinite(value) ? value : 0;
+  if (!value) return 0;
+
+  const raw = String(value).trim();
+  if (!raw) return 0;
+
+  const hasComma = raw.includes(",");
+  const hasDot = raw.includes(".");
+  let normalized = raw;
+
+  if (hasComma && hasDot) {
+    normalized = raw.lastIndexOf(",") > raw.lastIndexOf(".")
+      ? raw.replace(/\./g, "").replace(",", ".")
+      : raw.replace(/,/g, "");
+  } else if (hasComma) {
+    normalized = raw.replace(",", ".");
+  }
+
+  const parsed = Number(normalized);
+  return Number.isFinite(parsed) ? parsed : 0;
+};
+
 const FORMAS_PAGAMENTO = ["PIX", "Boleto", "Transferência Bancária", "Cartão de Crédito", "Cartão de Débito", "Dinheiro", "Cheque"];
 
 const formatDate = (d: string) => {
@@ -720,7 +743,7 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
     setFechamentoCliente(venda.cliente);
     setFechamentoItems(items);
     setFechamentoSelected(new Set(items.map((_: any, i: number) => i)));
-    const extras = (extrasData || []).map((e: any) => ({ descricao: e.descricao, valor: Number(e.valor) }));
+    const extras = (extrasData || []).map((e: any) => ({ descricao: e.descricao, valor: parseMoneyValue(e.valor) }));
     setFechamentoExtras(extras);
     setFechamentoExtrasSelected(new Set(extras.map((_: any, i: number) => i)));
     setFechamentoNovoExtra({ descricao: "", valor: "" });
@@ -1807,7 +1830,8 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
                       </div>
                       <div className="w-28">
                         <Input
-                          type="number"
+                          type="text"
+                          inputMode="decimal"
                           placeholder="Valor"
                           value={fechamentoNovoExtra.valor}
                           onChange={(e) => setFechamentoNovoExtra(prev => ({ ...prev, valor: e.target.value }))}
@@ -1821,7 +1845,7 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
                         disabled={!fechamentoNovoExtra.descricao.trim() || !fechamentoNovoExtra.valor}
                         onClick={() => {
                           const newIdx = fechamentoExtras.length;
-                          setFechamentoExtras(prev => [...prev, { descricao: fechamentoNovoExtra.descricao.trim(), valor: Number(fechamentoNovoExtra.valor) }]);
+                          setFechamentoExtras(prev => [...prev, { descricao: fechamentoNovoExtra.descricao.trim(), valor: parseMoneyValue(fechamentoNovoExtra.valor) }]);
                           setFechamentoExtrasSelected(prev => new Set([...prev, newIdx]));
                           setFechamentoNovoExtra({ descricao: "", valor: "" });
                         }}
