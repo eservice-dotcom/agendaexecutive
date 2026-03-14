@@ -881,6 +881,7 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
       loadVendas();
       loadContasPagar();
       loadContasReceber();
+      loadVendaOsMap();
     } catch (err: any) {
       toast({ title: "Erro ao salvar", description: err.message, variant: "destructive" });
     } finally {
