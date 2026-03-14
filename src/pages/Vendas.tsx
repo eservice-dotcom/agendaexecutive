@@ -772,7 +772,7 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
 
     const { data } = await supabase
       .from("agenda_items")
-      .select("cot, data, hora, tipo, origem, destino, pax, motorista, veiculo, placa, fornecedor, valor, custo, km_in, km_fim, km_extra, hora_in, hora_fim, hora_extra, estacionamento, outros, outros_despesas, cliente")
+      .select("id, cot, data, hora, tipo, origem, destino, pax, motorista, veiculo, placa, fornecedor, valor, custo, km_in, km_fim, km_extra, hora_in, hora_fim, hora_extra, estacionamento, outros, outros_despesas, cliente")
       .eq("cliente", cli)
       .order("data", { ascending: true });
 
