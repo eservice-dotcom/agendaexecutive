@@ -507,28 +507,21 @@ const Vendas = () => {
       });
       if (crError) throw crError;
 
-      // Auto-generate contas a pagar from selected services (supplier costs)
+      // Auto-generate contas a pagar from selected services (one per service, detailed)
       const selectedAgendaItems = agendaItems.filter((i) => selectedItems.has(i.id));
-      const fornecedorMap = new Map<string, { total: number; count: number }>();
-      selectedAgendaItems.forEach((item) => {
-        if (item.fornecedor && item.custo > 0) {
-          const existing = fornecedorMap.get(item.fornecedor) || { total: 0, count: 0 };
-          existing.total += item.custo;
-          existing.count += 1;
-          fornecedorMap.set(item.fornecedor, existing);
-        }
-      });
 
-      const autoContasPagar = Array.from(fornecedorMap.entries()).map(([fornecedor, info]) => ({
-        venda_id: venda.id,
-        user_id: session!.user.id,
-        fornecedor,
-        descritivo: `${info.count} serviço(s) - ${cliente}`,
-        valor: info.total,
-        data: dataVenda,
-        data_vencimento: dataVencimento || null,
-        status: "pendente",
-      }));
+      const autoContasPagar = selectedAgendaItems
+        .filter((item) => item.fornecedor && item.custo > 0)
+        .map((item) => ({
+          venda_id: venda.id,
+          user_id: session!.user.id,
+          fornecedor: item.fornecedor,
+          descritivo: `O.S. ${item.cot} - ${item.tipo} - ${item.origem} → ${item.destino} (${formatDate(item.data)})`,
+          valor: item.custo,
+          data: dataVenda,
+          data_vencimento: dataVencimento || null,
+          status: "pendente",
+        }));
 
       // Also add manually entered contas a pagar
       const manualContas = contasPagar.map((cp) => ({
