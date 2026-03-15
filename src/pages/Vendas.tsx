@@ -1735,19 +1735,46 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
                 <Input type="date" value={editForm.data_pagamento} onChange={(e) => setEditForm({ ...editForm, data_pagamento: e.target.value })} />
                 <p className="text-xs text-muted-foreground">Preencher para dar baixa no registro</p>
               </div>
-              <div className="space-y-2">
-                <Label>{editDialog?.type === "pagar" ? "Centro de Custo" : "Centro de Receita"}</Label>
-                <Select value={editForm.centro} onValueChange={(v) => setEditForm({ ...editForm, centro: v === "none" ? "" : v })}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Selecione (opcional)" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="none">Nenhum</SelectItem>
-                    {(editDialog?.type === "pagar" ? centrosCusto : centrosReceita).map((c) => (
-                      <SelectItem key={c.id} value={c.nome}>{c.nome}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-2">
+                  <Label>{editDialog?.type === "pagar" ? "Centro de Custo" : "Centro de Receita"}</Label>
+                  <Select value={editForm.centro} onValueChange={(v) => setEditForm({ ...editForm, centro: v === "none" ? "" : v, subgrupo: "" })}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Selecione (opcional)" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="none">Nenhum</SelectItem>
+                      {(editDialog?.type === "pagar" ? centrosCusto : centrosReceita).map((c) => (
+                        <SelectItem key={c.id} value={c.nome}>{c.nome}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2">
+                  <Label>Subgrupo</Label>
+                  <Select
+                    value={editForm.subgrupo}
+                    onValueChange={(v) => setEditForm({ ...editForm, subgrupo: v === "none" ? "" : v })}
+                    disabled={!editForm.centro}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder={editForm.centro ? "Selecione (opcional)" : "Selecione um centro primeiro"} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="none">Nenhum</SelectItem>
+                      {(() => {
+                        const centroObj = (editDialog?.type === "pagar" ? centrosCusto : centrosReceita).find((c) => c.nome === editForm.centro);
+                        if (!centroObj) return null;
+                        const subs = editDialog?.type === "pagar"
+                          ? subgruposCusto.filter((s) => s.centro_custo_id === centroObj.id)
+                          : subgruposReceita.filter((s) => s.centro_receita_id === centroObj.id);
+                        return subs.map((s) => (
+                          <SelectItem key={s.id} value={s.nome}>{s.nome}</SelectItem>
+                        ));
+                      })()}
+                    </SelectContent>
+                  </Select>
+                </div>
               </div>
             </div>
             <DialogFooter>
