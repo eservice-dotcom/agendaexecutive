@@ -1066,7 +1066,7 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
     setQuickAddClienteNome("");
   };
 
-
+  const handleSaveNovaConta = async () => {
     if (!novaContaDialog || !session) return;
     const today = new Date().toISOString().split("T")[0];
 
