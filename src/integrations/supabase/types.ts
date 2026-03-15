@@ -125,6 +125,48 @@ export type Database = {
         }
         Relationships: []
       }
+      centros_custo: {
+        Row: {
+          created_at: string
+          id: string
+          nome: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          nome: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          nome?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      centros_receita: {
+        Row: {
+          created_at: string
+          id: string
+          nome: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          nome: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          nome?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       clientes: {
         Row: {
           cep: string
@@ -172,6 +214,7 @@ export type Database = {
       }
       contas_pagar: {
         Row: {
+          centro_custo: string | null
           created_at: string
           data: string
           data_pagamento: string | null
@@ -186,6 +229,7 @@ export type Database = {
           venda_id: string | null
         }
         Insert: {
+          centro_custo?: string | null
           created_at?: string
           data?: string
           data_pagamento?: string | null
@@ -200,6 +244,7 @@ export type Database = {
           venda_id?: string | null
         }
         Update: {
+          centro_custo?: string | null
           created_at?: string
           data?: string
           data_pagamento?: string | null
@@ -225,6 +270,7 @@ export type Database = {
       }
       contas_receber: {
         Row: {
+          centro_receita: string | null
           cliente: string
           created_at: string
           data: string
@@ -239,6 +285,7 @@ export type Database = {
           venda_id: string | null
         }
         Insert: {
+          centro_receita?: string | null
           cliente?: string
           created_at?: string
           data?: string
@@ -253,6 +300,7 @@ export type Database = {
           venda_id?: string | null
         }
         Update: {
+          centro_receita?: string | null
           cliente?: string
           created_at?: string
           data?: string
