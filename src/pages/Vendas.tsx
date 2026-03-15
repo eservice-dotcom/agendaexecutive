@@ -230,6 +230,9 @@ const Vendas = () => {
   const [editVendaSearch, setEditVendaSearch] = useState("");
   const [editVendaExtras, setEditVendaExtras] = useState<ExtraItem[]>([]);
 
+  // Filtro contas a pagar por OS
+  const [filtroOsPagar, setFiltroOsPagar] = useState("");
+
   // Closing report selection
   const [fechamentoDialogOpen, setFechamentoDialogOpen] = useState(false);
   const [fechamentoCliente, setFechamentoCliente] = useState("");
@@ -1271,6 +1274,15 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
     }
   };
 
+  const filteredContasPagarList = useMemo(() => {
+    if (!filtroOsPagar.trim()) return contasPagarList;
+    const search = filtroOsPagar.trim().toLowerCase();
+    return contasPagarList.filter((cp) => {
+      const cots = vendaOsMap[cp.venda_id]?.cots || [];
+      return cots.some((cot) => cot.toLowerCase().includes(search));
+    });
+  }, [contasPagarList, filtroOsPagar, vendaOsMap]);
+
   const totalPagarPendente = contasPagarList.filter(c => c.status === "pendente").reduce((s, c) => s + Number(c.valor), 0);
   const totalReceberPendente = contasReceberList.filter(c => c.status === "pendente").reduce((s, c) => s + Number(c.valor), 0);
 
@@ -1464,7 +1476,16 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
 
           {/* ===== CONTAS A PAGAR TAB ===== */}
           <TabsContent value="pagar">
-            <div className="flex justify-end mb-2">
+            <div className="flex items-center justify-between mb-2 gap-2">
+              <div className="flex items-center gap-2">
+                <Search className="h-4 w-4 text-muted-foreground" />
+                <Input
+                  placeholder="Filtrar por nº da O.S."
+                  value={filtroOsPagar}
+                  onChange={(e) => setFiltroOsPagar(e.target.value)}
+                  className="w-48 h-8 text-sm"
+                />
+              </div>
               <Button variant="outline" size="sm" onClick={() => openNovaContaDialog("pagar")} className="gap-1">
                 <Plus className="h-4 w-4" /> Nova Conta a Pagar
               </Button>
@@ -1489,14 +1510,14 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {contasPagarList.length === 0 ? (
+                  {filteredContasPagarList.length === 0 ? (
                     <TableRow>
                        <TableCell colSpan={13} className="text-center text-muted-foreground py-8">
                         Nenhuma conta a pagar
                       </TableCell>
                     </TableRow>
                   ) : (
-                    contasPagarList.map((cp) => (
+                    filteredContasPagarList.map((cp) => (
                       <TableRow key={cp.id}>
                         <TableCell className="font-mono text-xs font-bold">{vendaOsMap[cp.venda_id]?.numero_venda || "—"}</TableCell>
                         <TableCell className="font-mono text-xs">{formatDate(cp.data)}</TableCell>
