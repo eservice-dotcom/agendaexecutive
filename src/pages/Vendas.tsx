@@ -2109,6 +2109,37 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
                   <Input type="date" value={novaContaForm.data_vencimento} onChange={(e) => setNovaContaForm({ ...novaContaForm, data_vencimento: e.target.value })} />
                 </div>
               </div>
+              {novaContaDialog === "pagar" ? (
+                <div className="space-y-2">
+                  <Label>Centro de Custo</Label>
+                  <Select value={novaContaForm.centro_custo} onValueChange={(v) => setNovaContaForm({ ...novaContaForm, centro_custo: v === "none" ? "" : v })}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Selecione (opcional)" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="none">Nenhum</SelectItem>
+                      {centrosCusto.map((c) => (
+                        <SelectItem key={c} value={c}>{c}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              ) : (
+                <div className="space-y-2">
+                  <Label>Centro de Receita</Label>
+                  <Select value={novaContaForm.centro_receita} onValueChange={(v) => setNovaContaForm({ ...novaContaForm, centro_receita: v === "none" ? "" : v })}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Selecione (opcional)" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="none">Nenhum</SelectItem>
+                      {centrosReceita.map((c) => (
+                        <SelectItem key={c} value={c}>{c}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              )}
             </div>
             <DialogFooter>
               <Button variant="outline" onClick={() => setNovaContaDialog(null)}>Cancelar</Button>
