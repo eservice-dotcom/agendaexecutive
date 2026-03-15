@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo, useCallback } from "react";
 import { Link } from "react-router-dom";
-import { ArrowLeft, Plus, Trash2, ShoppingCart, Search, Check, FileText, XCircle, DollarSign, CheckCircle, Download, Pencil, ClipboardList } from "lucide-react";
+import { ArrowLeft, Plus, Trash2, ShoppingCart, Search, Check, FileText, XCircle, DollarSign, CheckCircle, Download, Pencil, ClipboardList, X } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
@@ -210,6 +210,10 @@ const Vendas = () => {
     subgrupo_custo: "",
     subgrupo_receita: "",
   });
+  const [quickAddFornecedor, setQuickAddFornecedor] = useState(false);
+  const [quickAddFornecedorNome, setQuickAddFornecedorNome] = useState("");
+  const [quickAddCliente, setQuickAddCliente] = useState(false);
+  const [quickAddClienteNome, setQuickAddClienteNome] = useState("");
 
   // Centros de custo/receita and subgrupos
   const [centrosCusto, setCentrosCusto] = useState<{ id: string; nome: string }[]>([]);
@@ -1012,7 +1016,54 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
 
   const openNovaContaDialog = (type: "pagar" | "receber") => {
     setNovaContaForm({ descritivo: "", valor: "", data_vencimento: "", fornecedor: "", cliente: "", centro_custo: "", centro_receita: "", subgrupo_custo: "", subgrupo_receita: "" });
+    setQuickAddFornecedor(false);
+    setQuickAddFornecedorNome("");
+    setQuickAddCliente(false);
+    setQuickAddClienteNome("");
     setNovaContaDialog(type);
+  };
+  const handleQuickAddFornecedor = async () => {
+    const nome = quickAddFornecedorNome.trim();
+    if (!nome || !session) return;
+    const { error } = await supabase.from("fornecedores").insert({
+      user_id: session.user.id,
+      razao_social: nome,
+      cnpj: "",
+      contato: "",
+      email: "",
+      telefone: "",
+    });
+    if (error) {
+      toast({ title: "Erro ao cadastrar fornecedor", description: error.message, variant: "destructive" });
+      return;
+    }
+    toast({ title: `Fornecedor "${nome}" cadastrado!` });
+    await loadFornecedores();
+    setNovaContaForm({ ...novaContaForm, fornecedor: nome });
+    setQuickAddFornecedor(false);
+    setQuickAddFornecedorNome("");
+  };
+
+  const handleQuickAddCliente = async () => {
+    const nome = quickAddClienteNome.trim();
+    if (!nome || !session) return;
+    const { error } = await supabase.from("clientes").insert({
+      user_id: session.user.id,
+      nome,
+      cnpj_cpf: "",
+      email: "",
+      telefone: "",
+      endereco: "",
+    });
+    if (error) {
+      toast({ title: "Erro ao cadastrar cliente", description: error.message, variant: "destructive" });
+      return;
+    }
+    toast({ title: `Cliente "${nome}" cadastrado!` });
+    await loadClientes();
+    setNovaContaForm({ ...novaContaForm, cliente: nome });
+    setQuickAddCliente(false);
+    setQuickAddClienteNome("");
   };
 
   const handleSaveNovaConta = async () => {
@@ -2149,30 +2200,76 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
               {novaContaDialog === "pagar" ? (
                 <div className="space-y-2">
                   <Label>Fornecedor</Label>
-                  <Select value={novaContaForm.fornecedor} onValueChange={(v) => setNovaContaForm({ ...novaContaForm, fornecedor: v })}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Selecione o fornecedor" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {fornecedores.map((f) => (
-                        <SelectItem key={f} value={f}>{f}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                  {quickAddFornecedor ? (
+                    <div className="flex gap-2">
+                      <Input
+                        placeholder="Nome do novo fornecedor"
+                        value={quickAddFornecedorNome}
+                        onChange={(e) => setQuickAddFornecedorNome(e.target.value)}
+                        onKeyDown={(e) => e.key === "Enter" && handleQuickAddFornecedor()}
+                        autoFocus
+                      />
+                      <Button size="sm" onClick={handleQuickAddFornecedor} disabled={!quickAddFornecedorNome.trim()}>
+                        <Check className="h-4 w-4" />
+                      </Button>
+                      <Button size="sm" variant="ghost" onClick={() => { setQuickAddFornecedor(false); setQuickAddFornecedorNome(""); }}>
+                        <X className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  ) : (
+                    <div className="flex gap-2">
+                      <Select value={novaContaForm.fornecedor} onValueChange={(v) => setNovaContaForm({ ...novaContaForm, fornecedor: v })}>
+                        <SelectTrigger className="flex-1">
+                          <SelectValue placeholder="Selecione o fornecedor" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {fornecedores.map((f) => (
+                            <SelectItem key={f} value={f}>{f}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <Button size="icon" variant="outline" onClick={() => setQuickAddFornecedor(true)} title="Cadastrar novo fornecedor">
+                        <Plus className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  )}
                 </div>
               ) : (
                 <div className="space-y-2">
                   <Label>Cliente</Label>
-                  <Select value={novaContaForm.cliente} onValueChange={(v) => setNovaContaForm({ ...novaContaForm, cliente: v })}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Selecione o cliente" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {clientes.map((c) => (
-                        <SelectItem key={c} value={c}>{c}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                  {quickAddCliente ? (
+                    <div className="flex gap-2">
+                      <Input
+                        placeholder="Nome do novo cliente"
+                        value={quickAddClienteNome}
+                        onChange={(e) => setQuickAddClienteNome(e.target.value)}
+                        onKeyDown={(e) => e.key === "Enter" && handleQuickAddCliente()}
+                        autoFocus
+                      />
+                      <Button size="sm" onClick={handleQuickAddCliente} disabled={!quickAddClienteNome.trim()}>
+                        <Check className="h-4 w-4" />
+                      </Button>
+                      <Button size="sm" variant="ghost" onClick={() => { setQuickAddCliente(false); setQuickAddClienteNome(""); }}>
+                        <X className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  ) : (
+                    <div className="flex gap-2">
+                      <Select value={novaContaForm.cliente} onValueChange={(v) => setNovaContaForm({ ...novaContaForm, cliente: v })}>
+                        <SelectTrigger className="flex-1">
+                          <SelectValue placeholder="Selecione o cliente" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {clientes.map((c) => (
+                            <SelectItem key={c} value={c}>{c}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <Button size="icon" variant="outline" onClick={() => setQuickAddCliente(true)} title="Cadastrar novo cliente">
+                        <Plus className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  )}
                 </div>
               )}
               <div className="space-y-2">
