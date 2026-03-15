@@ -1356,6 +1356,7 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
                     <TableHead>Cliente</TableHead>
                     <TableHead>O.S.</TableHead>
                     <TableHead>Centro Receita</TableHead>
+                    <TableHead>Subgrupo</TableHead>
                     <TableHead>Descritivo</TableHead>
                     <TableHead className="text-right">Valor</TableHead>
                     <TableHead>Vencimento</TableHead>
@@ -1367,7 +1368,7 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
                 <TableBody>
                   {contasReceberList.length === 0 ? (
                     <TableRow>
-                       <TableCell colSpan={11} className="text-center text-muted-foreground py-8">
+                       <TableCell colSpan={12} className="text-center text-muted-foreground py-8">
                         Nenhuma conta a receber
                       </TableCell>
                     </TableRow>
@@ -1379,6 +1380,7 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
                         <TableCell className="font-medium text-sm">{cr.cliente}</TableCell>
                         <TableCell className="font-mono text-xs">{vendaOsMap[cr.venda_id]?.cots?.join(", ") || "—"}</TableCell>
                         <TableCell className="text-sm">{cr.centro_receita || "—"}</TableCell>
+                        <TableCell className="text-sm">{cr.subgrupo_receita || "—"}</TableCell>
                         <TableCell className="text-sm">{cr.descritivo}</TableCell>
                         <TableCell className="text-right font-mono">{formatCurrency(cr.valor)}</TableCell>
                         <TableCell className="font-mono text-xs">{cr.data_vencimento ? formatDate(cr.data_vencimento) : "—"}</TableCell>
