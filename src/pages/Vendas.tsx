@@ -267,13 +267,23 @@ const Vendas = () => {
   }, []);
 
   const loadCentrosCusto = useCallback(async () => {
-    const { data } = await supabase.from("centros_custo").select("nome").order("nome");
-    if (data) setCentrosCusto(data.map((d) => d.nome));
+    const { data } = await supabase.from("centros_custo").select("id, nome").order("nome");
+    if (data) setCentrosCusto(data);
   }, []);
 
   const loadCentrosReceita = useCallback(async () => {
-    const { data } = await supabase.from("centros_receita").select("nome").order("nome");
-    if (data) setCentrosReceita(data.map((d) => d.nome));
+    const { data } = await supabase.from("centros_receita").select("id, nome").order("nome");
+    if (data) setCentrosReceita(data);
+  }, []);
+
+  const loadSubgruposCusto = useCallback(async () => {
+    const { data } = await supabase.from("subgrupos_custo").select("id, nome, centro_custo_id").order("nome");
+    if (data) setSubgruposCusto(data);
+  }, []);
+
+  const loadSubgruposReceita = useCallback(async () => {
+    const { data } = await supabase.from("subgrupos_receita").select("id, nome, centro_receita_id").order("nome");
+    if (data) setSubgruposReceita(data);
   }, []);
 
   const loadContasPagar = useCallback(async () => {
