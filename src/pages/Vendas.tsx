@@ -2030,6 +2030,66 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
             </DialogFooter>
           </DialogContent>
         </Dialog>
+
+        {/* ===== NOVA CONTA MANUAL DIALOG ===== */}
+        <Dialog open={!!novaContaDialog} onOpenChange={(v) => !v && setNovaContaDialog(null)}>
+          <DialogContent className="max-w-md">
+            <DialogHeader>
+              <DialogTitle>
+                {novaContaDialog === "pagar" ? "Nova Conta a Pagar" : "Nova Conta a Receber"}
+              </DialogTitle>
+            </DialogHeader>
+            <div className="space-y-4">
+              {novaContaDialog === "pagar" ? (
+                <div className="space-y-2">
+                  <Label>Fornecedor</Label>
+                  <Select value={novaContaForm.fornecedor} onValueChange={(v) => setNovaContaForm({ ...novaContaForm, fornecedor: v })}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Selecione o fornecedor" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {fornecedores.map((f) => (
+                        <SelectItem key={f} value={f}>{f}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              ) : (
+                <div className="space-y-2">
+                  <Label>Cliente</Label>
+                  <Select value={novaContaForm.cliente} onValueChange={(v) => setNovaContaForm({ ...novaContaForm, cliente: v })}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Selecione o cliente" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {clientes.map((c) => (
+                        <SelectItem key={c} value={c}>{c}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              )}
+              <div className="space-y-2">
+                <Label>Descritivo</Label>
+                <Input value={novaContaForm.descritivo} onChange={(e) => setNovaContaForm({ ...novaContaForm, descritivo: e.target.value })} placeholder="Descrição da conta" />
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-2">
+                  <Label>Valor (R$)</Label>
+                  <Input type="number" step="0.01" value={novaContaForm.valor} onChange={(e) => setNovaContaForm({ ...novaContaForm, valor: e.target.value })} />
+                </div>
+                <div className="space-y-2">
+                  <Label>Data de Vencimento</Label>
+                  <Input type="date" value={novaContaForm.data_vencimento} onChange={(e) => setNovaContaForm({ ...novaContaForm, data_vencimento: e.target.value })} />
+                </div>
+              </div>
+            </div>
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setNovaContaDialog(null)}>Cancelar</Button>
+              <Button onClick={handleSaveNovaConta}>Salvar</Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
       </main>
     </div>
   );
