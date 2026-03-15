@@ -507,21 +507,33 @@ const Vendas = () => {
       });
       if (crError) throw crError;
 
-      // Auto-generate contas a pagar from selected services (one per service, detailed)
+      // Auto-generate contas a pagar grouped by fornecedor with detailed descritivo
       const selectedAgendaItems = agendaItems.filter((i) => selectedItems.has(i.id));
+      const fornecedorMap = new Map<string, { total: number; items: typeof selectedAgendaItems }>();
+      selectedAgendaItems.forEach((item) => {
+        if (item.fornecedor && item.custo > 0) {
+          const existing = fornecedorMap.get(item.fornecedor) || { total: 0, items: [] };
+          existing.total += item.custo;
+          existing.items.push(item);
+          fornecedorMap.set(item.fornecedor, existing);
+        }
+      });
 
-      const autoContasPagar = selectedAgendaItems
-        .filter((item) => item.fornecedor && item.custo > 0)
-        .map((item) => ({
+      const autoContasPagar = Array.from(fornecedorMap.entries()).map(([fornecedor, info]) => {
+        const descLines = info.items.map((item) =>
+          `O.S. ${item.cot} - ${item.tipo} - ${item.origem} → ${item.destino} (${formatDate(item.data)}) - ${formatCurrency(item.custo)}`
+        );
+        return {
           venda_id: venda.id,
           user_id: session!.user.id,
-          fornecedor: item.fornecedor,
-          descritivo: `O.S. ${item.cot} - ${item.tipo} - ${item.origem} → ${item.destino} (${formatDate(item.data)})`,
-          valor: item.custo,
+          fornecedor,
+          descritivo: descLines.join(" | "),
+          valor: info.total,
           data: dataVenda,
           data_vencimento: dataVencimento || null,
           status: "pendente",
-        }));
+        };
+      });
 
       // Also add manually entered contas a pagar
       const manualContas = contasPagar.map((cp) => ({
