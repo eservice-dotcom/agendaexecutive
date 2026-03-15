@@ -207,11 +207,15 @@ const Vendas = () => {
     cliente: "",
     centro_custo: "",
     centro_receita: "",
+    subgrupo_custo: "",
+    subgrupo_receita: "",
   });
 
-  // Centros de custo/receita
-  const [centrosCusto, setCentrosCusto] = useState<string[]>([]);
-  const [centrosReceita, setCentrosReceita] = useState<string[]>([]);
+  // Centros de custo/receita and subgrupos
+  const [centrosCusto, setCentrosCusto] = useState<{ id: string; nome: string }[]>([]);
+  const [centrosReceita, setCentrosReceita] = useState<{ id: string; nome: string }[]>([]);
+  const [subgruposCusto, setSubgruposCusto] = useState<SubgrupoCusto[]>([]);
+  const [subgruposReceita, setSubgruposReceita] = useState<SubgrupoReceita[]>([]);
 
   // Edit venda dialog
   const [editVendaDialog, setEditVendaDialog] = useState<Venda | null>(null);
