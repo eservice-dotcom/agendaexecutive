@@ -1702,6 +1702,20 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
                 <Input type="date" value={editForm.data_pagamento} onChange={(e) => setEditForm({ ...editForm, data_pagamento: e.target.value })} />
                 <p className="text-xs text-muted-foreground">Preencher para dar baixa no registro</p>
               </div>
+              <div className="space-y-2">
+                <Label>{editDialog?.type === "pagar" ? "Centro de Custo" : "Centro de Receita"}</Label>
+                <Select value={editForm.centro} onValueChange={(v) => setEditForm({ ...editForm, centro: v === "none" ? "" : v })}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Selecione (opcional)" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="none">Nenhum</SelectItem>
+                    {(editDialog?.type === "pagar" ? centrosCusto : centrosReceita).map((c) => (
+                      <SelectItem key={c} value={c}>{c}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
             <DialogFooter>
               <Button variant="outline" onClick={() => setEditDialog(null)}>Cancelar</Button>
