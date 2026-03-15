@@ -1476,11 +1476,16 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
 
           {/* ===== CONTAS A PAGAR TAB ===== */}
           <TabsContent value="pagar">
-            <div className="flex justify-end mb-2">
-              <Button variant="outline" size="sm" onClick={() => openNovaContaDialog("pagar")} className="gap-1">
-                <Plus className="h-4 w-4" /> Nova Conta a Pagar
-              </Button>
-            </div>
+            <div className="flex items-center justify-between mb-2 gap-2">
+              <div className="flex items-center gap-2">
+                <Search className="h-4 w-4 text-muted-foreground" />
+                <Input
+                  placeholder="Filtrar por nº da O.S."
+                  value={filtroOsPagar}
+                  onChange={(e) => setFiltroOsPagar(e.target.value)}
+                  className="w-48 h-8 text-sm"
+                />
+              </div>
             <div className="rounded-lg border border-border bg-card shadow-sm">
               <Table>
                 <TableHeader>
