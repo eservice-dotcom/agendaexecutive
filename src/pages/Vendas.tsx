@@ -390,7 +390,9 @@ const Vendas = () => {
     loadVendaOsMap();
     loadCentrosCusto();
     loadCentrosReceita();
-  }, [loadVendas, loadClientes, loadFornecedores, loadContasPagar, loadContasReceber, loadVendaOsMap, loadCentrosCusto, loadCentrosReceita]);
+    loadSubgruposCusto();
+    loadSubgruposReceita();
+  }, [loadVendas, loadClientes, loadFornecedores, loadContasPagar, loadContasReceber, loadVendaOsMap, loadCentrosCusto, loadCentrosReceita, loadSubgruposCusto, loadSubgruposReceita]);
 
   useEffect(() => {
     if (!cliente) {
