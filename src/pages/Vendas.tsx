@@ -1022,8 +1022,51 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
     setQuickAddClienteNome("");
     setNovaContaDialog(type);
   };
+  const handleQuickAddFornecedor = async () => {
+    const nome = quickAddFornecedorNome.trim();
+    if (!nome || !session) return;
+    const { error } = await supabase.from("fornecedores").insert({
+      user_id: session.user.id,
+      razao_social: nome,
+      cnpj: "",
+      contato: "",
+      email: "",
+      telefone: "",
+    });
+    if (error) {
+      toast({ title: "Erro ao cadastrar fornecedor", description: error.message, variant: "destructive" });
+      return;
+    }
+    toast({ title: `Fornecedor "${nome}" cadastrado!` });
+    await loadFornecedores();
+    setNovaContaForm({ ...novaContaForm, fornecedor: nome });
+    setQuickAddFornecedor(false);
+    setQuickAddFornecedorNome("");
+  };
 
-  const handleSaveNovaConta = async () => {
+  const handleQuickAddCliente = async () => {
+    const nome = quickAddClienteNome.trim();
+    if (!nome || !session) return;
+    const { error } = await supabase.from("clientes").insert({
+      user_id: session.user.id,
+      nome,
+      cnpj_cpf: "",
+      email: "",
+      telefone: "",
+      endereco: "",
+    });
+    if (error) {
+      toast({ title: "Erro ao cadastrar cliente", description: error.message, variant: "destructive" });
+      return;
+    }
+    toast({ title: `Cliente "${nome}" cadastrado!` });
+    await loadClientes();
+    setNovaContaForm({ ...novaContaForm, cliente: nome });
+    setQuickAddCliente(false);
+    setQuickAddClienteNome("");
+  };
+
+
     if (!novaContaDialog || !session) return;
     const today = new Date().toISOString().split("T")[0];
 
