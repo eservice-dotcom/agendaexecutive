@@ -966,7 +966,7 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
   };
 
   const openNovaContaDialog = (type: "pagar" | "receber") => {
-    setNovaContaForm({ descritivo: "", valor: "", data_vencimento: "", fornecedor: "", cliente: "" });
+    setNovaContaForm({ descritivo: "", valor: "", data_vencimento: "", fornecedor: "", cliente: "", centro_custo: "", centro_receita: "" });
     setNovaContaDialog(type);
   };
 
