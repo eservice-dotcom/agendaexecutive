@@ -1274,6 +1274,15 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
     }
   };
 
+  const filteredContasPagarList = useMemo(() => {
+    if (!filtroOsPagar.trim()) return contasPagarList;
+    const search = filtroOsPagar.trim().toLowerCase();
+    return contasPagarList.filter((cp) => {
+      const cots = vendaOsMap[cp.venda_id]?.cots || [];
+      return cots.some((cot) => cot.toLowerCase().includes(search));
+    });
+  }, [contasPagarList, filtroOsPagar, vendaOsMap]);
+
   const totalPagarPendente = contasPagarList.filter(c => c.status === "pendente").reduce((s, c) => s + Number(c.valor), 0);
   const totalReceberPendente = contasReceberList.filter(c => c.status === "pendente").reduce((s, c) => s + Number(c.valor), 0);
 
