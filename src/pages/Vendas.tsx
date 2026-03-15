@@ -181,6 +181,16 @@ const Vendas = () => {
   const [editDialog, setEditDialog] = useState<{ type: "pagar" | "receber"; item: any } | null>(null);
   const [editForm, setEditForm] = useState({ descritivo: "", valor: "", data_vencimento: "", data_pagamento: "" });
 
+  // New manual conta dialogs
+  const [novaContaDialog, setNovaContaDialog] = useState<"pagar" | "receber" | null>(null);
+  const [novaContaForm, setNovaContaForm] = useState({
+    descritivo: "",
+    valor: "",
+    data_vencimento: "",
+    fornecedor: "",
+    cliente: "",
+  });
+
   // Edit venda dialog
   const [editVendaDialog, setEditVendaDialog] = useState<Venda | null>(null);
   const [editVendaForm, setEditVendaForm] = useState({ cliente: "", data_venda: "", data_vencimento: "", observacoes: "", status: "", forma_pagamento: "" });
