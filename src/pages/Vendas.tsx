@@ -978,7 +978,7 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
       data_vencimento: editForm.data_vencimento || null,
       data_pagamento: editForm.data_pagamento || null,
       status: editForm.data_pagamento ? "pago" : "pendente",
-      ...(type === "pagar" ? { centro_custo: editForm.centro } : { centro_receita: editForm.centro }),
+      ...(type === "pagar" ? { centro_custo: editForm.centro, subgrupo_custo: editForm.subgrupo } : { centro_receita: editForm.centro, subgrupo_receita: editForm.subgrupo }),
     };
     
     const { error } = await supabase.from(table).update(updates).eq("id", item.id);
