@@ -957,7 +957,53 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
     else loadContasReceber();
   };
 
-  const openEditVenda = async (venda: Venda) => {
+  const openNovaContaDialog = (type: "pagar" | "receber") => {
+    setNovaContaForm({ descritivo: "", valor: "", data_vencimento: "", fornecedor: "", cliente: "" });
+    setNovaContaDialog(type);
+  };
+
+  const handleSaveNovaConta = async () => {
+    if (!novaContaDialog || !session) return;
+    const today = new Date().toISOString().split("T")[0];
+
+    if (novaContaDialog === "pagar") {
+      const { error } = await supabase.from("contas_pagar").insert({
+        user_id: session.user.id,
+        venda_id: null as any,
+        fornecedor: novaContaForm.fornecedor,
+        descritivo: novaContaForm.descritivo,
+        valor: parseFloat(novaContaForm.valor) || 0,
+        data: today,
+        data_vencimento: novaContaForm.data_vencimento || null,
+        status: "pendente",
+      });
+      if (error) {
+        toast({ title: "Erro ao salvar", description: error.message, variant: "destructive" });
+        return;
+      }
+      toast({ title: "Conta a pagar criada!" });
+      loadContasPagar();
+    } else {
+      const { error } = await supabase.from("contas_receber").insert({
+        user_id: session.user.id,
+        venda_id: null as any,
+        cliente: novaContaForm.cliente,
+        descritivo: novaContaForm.descritivo,
+        valor: parseFloat(novaContaForm.valor) || 0,
+        data: today,
+        data_vencimento: novaContaForm.data_vencimento || null,
+        status: "pendente",
+      });
+      if (error) {
+        toast({ title: "Erro ao salvar", description: error.message, variant: "destructive" });
+        return;
+      }
+      toast({ title: "Conta a receber criada!" });
+      loadContasReceber();
+    }
+    setNovaContaDialog(null);
+  };
+
     setEditVendaForm({
       cliente: venda.cliente,
       data_venda: venda.data_venda,
