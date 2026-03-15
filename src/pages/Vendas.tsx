@@ -360,7 +360,9 @@ const Vendas = () => {
     loadContasPagar();
     loadContasReceber();
     loadVendaOsMap();
-  }, [loadVendas, loadClientes, loadFornecedores, loadContasPagar, loadContasReceber, loadVendaOsMap]);
+    loadCentrosCusto();
+    loadCentrosReceita();
+  }, [loadVendas, loadClientes, loadFornecedores, loadContasPagar, loadContasReceber, loadVendaOsMap, loadCentrosCusto, loadCentrosReceita]);
 
   useEffect(() => {
     if (!cliente) {
