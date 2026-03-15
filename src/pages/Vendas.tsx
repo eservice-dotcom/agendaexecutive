@@ -1486,6 +1486,10 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
                   className="w-48 h-8 text-sm"
                 />
               </div>
+              <Button variant="outline" size="sm" onClick={() => openNovaContaDialog("pagar")} className="gap-1">
+                <Plus className="h-4 w-4" /> Nova Conta a Pagar
+              </Button>
+            </div>
             <div className="rounded-lg border border-border bg-card shadow-sm">
               <Table>
                 <TableHeader>
@@ -1506,14 +1510,14 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {contasPagarList.length === 0 ? (
+                  {filteredContasPagarList.length === 0 ? (
                     <TableRow>
                        <TableCell colSpan={13} className="text-center text-muted-foreground py-8">
                         Nenhuma conta a pagar
                       </TableCell>
                     </TableRow>
                   ) : (
-                    contasPagarList.map((cp) => (
+                    filteredContasPagarList.map((cp) => (
                       <TableRow key={cp.id}>
                         <TableCell className="font-mono text-xs font-bold">{vendaOsMap[cp.venda_id]?.numero_venda || "—"}</TableCell>
                         <TableCell className="font-mono text-xs">{formatDate(cp.data)}</TableCell>
