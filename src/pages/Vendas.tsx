@@ -71,6 +71,7 @@ interface ContaPagarDB {
   data_vencimento: string | null;
   data_pagamento: string | null;
   status: string;
+  centro_custo: string;
 }
 
 interface ContaReceberDB {
@@ -83,6 +84,7 @@ interface ContaReceberDB {
   data_vencimento: string | null;
   data_pagamento: string | null;
   status: string;
+  centro_receita: string;
 }
 
 const formatCurrency = (v: number) =>
