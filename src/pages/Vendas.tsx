@@ -1014,6 +1014,7 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
         data: today,
         data_vencimento: novaContaForm.data_vencimento || null,
         status: "pendente",
+        centro_receita: novaContaForm.centro_receita,
       });
       if (error) {
         toast({ title: "Erro ao salvar", description: error.message, variant: "destructive" });
