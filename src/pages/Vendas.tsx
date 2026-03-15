@@ -2181,7 +2181,7 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
                     <SelectContent>
                       <SelectItem value="none">Nenhum</SelectItem>
                       {centrosReceita.map((c) => (
-                        <SelectItem key={c} value={c}>{c}</SelectItem>
+                        <SelectItem key={c.id} value={c.nome}>{c.nome}</SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
