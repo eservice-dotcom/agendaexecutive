@@ -72,6 +72,7 @@ interface ContaPagarDB {
   data_pagamento: string | null;
   status: string;
   centro_custo: string;
+  subgrupo_custo: string;
 }
 
 interface ContaReceberDB {
@@ -85,6 +86,19 @@ interface ContaReceberDB {
   data_pagamento: string | null;
   status: string;
   centro_receita: string;
+  subgrupo_receita: string;
+}
+
+interface SubgrupoCusto {
+  id: string;
+  nome: string;
+  centro_custo_id: string;
+}
+
+interface SubgrupoReceita {
+  id: string;
+  nome: string;
+  centro_receita_id: string;
 }
 
 const formatCurrency = (v: number) =>
