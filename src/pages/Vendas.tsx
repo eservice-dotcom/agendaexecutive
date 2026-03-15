@@ -72,6 +72,7 @@ interface ContaPagarDB {
   data_pagamento: string | null;
   status: string;
   centro_custo: string;
+  subgrupo_custo: string;
 }
 
 interface ContaReceberDB {
@@ -85,6 +86,19 @@ interface ContaReceberDB {
   data_pagamento: string | null;
   status: string;
   centro_receita: string;
+  subgrupo_receita: string;
+}
+
+interface SubgrupoCusto {
+  id: string;
+  nome: string;
+  centro_custo_id: string;
+}
+
+interface SubgrupoReceita {
+  id: string;
+  nome: string;
+  centro_receita_id: string;
 }
 
 const formatCurrency = (v: number) =>
@@ -181,7 +195,7 @@ const Vendas = () => {
 
   // Edit conta dialog
   const [editDialog, setEditDialog] = useState<{ type: "pagar" | "receber"; item: any } | null>(null);
-  const [editForm, setEditForm] = useState({ descritivo: "", valor: "", data_vencimento: "", data_pagamento: "", centro: "" });
+  const [editForm, setEditForm] = useState({ descritivo: "", valor: "", data_vencimento: "", data_pagamento: "", centro: "", subgrupo: "" });
 
   // New manual conta dialogs
   const [novaContaDialog, setNovaContaDialog] = useState<"pagar" | "receber" | null>(null);
@@ -193,11 +207,15 @@ const Vendas = () => {
     cliente: "",
     centro_custo: "",
     centro_receita: "",
+    subgrupo_custo: "",
+    subgrupo_receita: "",
   });
 
-  // Centros de custo/receita
-  const [centrosCusto, setCentrosCusto] = useState<string[]>([]);
-  const [centrosReceita, setCentrosReceita] = useState<string[]>([]);
+  // Centros de custo/receita and subgrupos
+  const [centrosCusto, setCentrosCusto] = useState<{ id: string; nome: string }[]>([]);
+  const [centrosReceita, setCentrosReceita] = useState<{ id: string; nome: string }[]>([]);
+  const [subgruposCusto, setSubgruposCusto] = useState<SubgrupoCusto[]>([]);
+  const [subgruposReceita, setSubgruposReceita] = useState<SubgrupoReceita[]>([]);
 
   // Edit venda dialog
   const [editVendaDialog, setEditVendaDialog] = useState<Venda | null>(null);
@@ -249,13 +267,23 @@ const Vendas = () => {
   }, []);
 
   const loadCentrosCusto = useCallback(async () => {
-    const { data } = await supabase.from("centros_custo").select("nome").order("nome");
-    if (data) setCentrosCusto(data.map((d) => d.nome));
+    const { data } = await supabase.from("centros_custo").select("id, nome").order("nome");
+    if (data) setCentrosCusto(data);
   }, []);
 
   const loadCentrosReceita = useCallback(async () => {
-    const { data } = await supabase.from("centros_receita").select("nome").order("nome");
-    if (data) setCentrosReceita(data.map((d) => d.nome));
+    const { data } = await supabase.from("centros_receita").select("id, nome").order("nome");
+    if (data) setCentrosReceita(data);
+  }, []);
+
+  const loadSubgruposCusto = useCallback(async () => {
+    const { data } = await supabase.from("subgrupos_custo").select("id, nome, centro_custo_id").order("nome");
+    if (data) setSubgruposCusto(data);
+  }, []);
+
+  const loadSubgruposReceita = useCallback(async () => {
+    const { data } = await supabase.from("subgrupos_receita").select("id, nome, centro_receita_id").order("nome");
+    if (data) setSubgruposReceita(data);
   }, []);
 
   const loadContasPagar = useCallback(async () => {
@@ -362,7 +390,9 @@ const Vendas = () => {
     loadVendaOsMap();
     loadCentrosCusto();
     loadCentrosReceita();
-  }, [loadVendas, loadClientes, loadFornecedores, loadContasPagar, loadContasReceber, loadVendaOsMap, loadCentrosCusto, loadCentrosReceita]);
+    loadSubgruposCusto();
+    loadSubgruposReceita();
+  }, [loadVendas, loadClientes, loadFornecedores, loadContasPagar, loadContasReceber, loadVendaOsMap, loadCentrosCusto, loadCentrosReceita, loadSubgruposCusto, loadSubgruposReceita]);
 
   useEffect(() => {
     if (!cliente) {
@@ -933,6 +963,7 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
       data_vencimento: item.data_vencimento || "",
       data_pagamento: item.data_pagamento || "",
       centro: (type === "pagar" ? item.centro_custo : item.centro_receita) || "",
+      subgrupo: (type === "pagar" ? item.subgrupo_custo : item.subgrupo_receita) || "",
     });
     setEditDialog({ type, item });
   };
@@ -947,7 +978,7 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
       data_vencimento: editForm.data_vencimento || null,
       data_pagamento: editForm.data_pagamento || null,
       status: editForm.data_pagamento ? "pago" : "pendente",
-      ...(type === "pagar" ? { centro_custo: editForm.centro } : { centro_receita: editForm.centro }),
+      ...(type === "pagar" ? { centro_custo: editForm.centro, subgrupo_custo: editForm.subgrupo } : { centro_receita: editForm.centro, subgrupo_receita: editForm.subgrupo }),
     };
     
     const { error } = await supabase.from(table).update(updates).eq("id", item.id);
@@ -980,7 +1011,7 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
   };
 
   const openNovaContaDialog = (type: "pagar" | "receber") => {
-    setNovaContaForm({ descritivo: "", valor: "", data_vencimento: "", fornecedor: "", cliente: "", centro_custo: "", centro_receita: "" });
+    setNovaContaForm({ descritivo: "", valor: "", data_vencimento: "", fornecedor: "", cliente: "", centro_custo: "", centro_receita: "", subgrupo_custo: "", subgrupo_receita: "" });
     setNovaContaDialog(type);
   };
 
@@ -999,6 +1030,7 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
         data_vencimento: novaContaForm.data_vencimento || null,
         status: "pendente",
         centro_custo: novaContaForm.centro_custo,
+        subgrupo_custo: novaContaForm.subgrupo_custo,
       });
       if (error) {
         toast({ title: "Erro ao salvar", description: error.message, variant: "destructive" });
@@ -1017,6 +1049,7 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
         data_vencimento: novaContaForm.data_vencimento || null,
         status: "pendente",
         centro_receita: novaContaForm.centro_receita,
+        subgrupo_receita: novaContaForm.subgrupo_receita,
       });
       if (error) {
         toast({ title: "Erro ao salvar", description: error.message, variant: "destructive" });
@@ -1323,6 +1356,7 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
                     <TableHead>Cliente</TableHead>
                     <TableHead>O.S.</TableHead>
                     <TableHead>Centro Receita</TableHead>
+                    <TableHead>Subgrupo</TableHead>
                     <TableHead>Descritivo</TableHead>
                     <TableHead className="text-right">Valor</TableHead>
                     <TableHead>Vencimento</TableHead>
@@ -1334,7 +1368,7 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
                 <TableBody>
                   {contasReceberList.length === 0 ? (
                     <TableRow>
-                       <TableCell colSpan={11} className="text-center text-muted-foreground py-8">
+                       <TableCell colSpan={12} className="text-center text-muted-foreground py-8">
                         Nenhuma conta a receber
                       </TableCell>
                     </TableRow>
@@ -1346,6 +1380,7 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
                         <TableCell className="font-medium text-sm">{cr.cliente}</TableCell>
                         <TableCell className="font-mono text-xs">{vendaOsMap[cr.venda_id]?.cots?.join(", ") || "—"}</TableCell>
                         <TableCell className="text-sm">{cr.centro_receita || "—"}</TableCell>
+                        <TableCell className="text-sm">{cr.subgrupo_receita || "—"}</TableCell>
                         <TableCell className="text-sm">{cr.descritivo}</TableCell>
                         <TableCell className="text-right font-mono">{formatCurrency(cr.valor)}</TableCell>
                         <TableCell className="font-mono text-xs">{cr.data_vencimento ? formatDate(cr.data_vencimento) : "—"}</TableCell>
@@ -1393,6 +1428,7 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
                     <TableHead>Cliente</TableHead>
                     <TableHead>O.S.</TableHead>
                     <TableHead>Centro Custo</TableHead>
+                    <TableHead>Subgrupo</TableHead>
                     <TableHead>Descritivo</TableHead>
                     <TableHead className="text-right">Valor</TableHead>
                     <TableHead>Vencimento</TableHead>
@@ -1404,7 +1440,7 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
                 <TableBody>
                   {contasPagarList.length === 0 ? (
                     <TableRow>
-                       <TableCell colSpan={12} className="text-center text-muted-foreground py-8">
+                       <TableCell colSpan={13} className="text-center text-muted-foreground py-8">
                         Nenhuma conta a pagar
                       </TableCell>
                     </TableRow>
@@ -1417,6 +1453,7 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
                         <TableCell className="font-medium text-sm">{vendaOsMap[cp.venda_id]?.cliente || "—"}</TableCell>
                         <TableCell className="font-mono text-xs">{vendaOsMap[cp.venda_id]?.cots?.join(", ") || "—"}</TableCell>
                         <TableCell className="text-sm">{cp.centro_custo || "—"}</TableCell>
+                        <TableCell className="text-sm">{cp.subgrupo_custo || "—"}</TableCell>
                         <TableCell className="text-sm">{cp.descritivo}</TableCell>
                         <TableCell className="text-right font-mono">{formatCurrency(cp.valor)}</TableCell>
                         <TableCell className="font-mono text-xs">{cp.data_vencimento ? formatDate(cp.data_vencimento) : "—"}</TableCell>
@@ -1702,19 +1739,46 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
                 <Input type="date" value={editForm.data_pagamento} onChange={(e) => setEditForm({ ...editForm, data_pagamento: e.target.value })} />
                 <p className="text-xs text-muted-foreground">Preencher para dar baixa no registro</p>
               </div>
-              <div className="space-y-2">
-                <Label>{editDialog?.type === "pagar" ? "Centro de Custo" : "Centro de Receita"}</Label>
-                <Select value={editForm.centro} onValueChange={(v) => setEditForm({ ...editForm, centro: v === "none" ? "" : v })}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Selecione (opcional)" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="none">Nenhum</SelectItem>
-                    {(editDialog?.type === "pagar" ? centrosCusto : centrosReceita).map((c) => (
-                      <SelectItem key={c} value={c}>{c}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-2">
+                  <Label>{editDialog?.type === "pagar" ? "Centro de Custo" : "Centro de Receita"}</Label>
+                  <Select value={editForm.centro} onValueChange={(v) => setEditForm({ ...editForm, centro: v === "none" ? "" : v, subgrupo: "" })}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Selecione (opcional)" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="none">Nenhum</SelectItem>
+                      {(editDialog?.type === "pagar" ? centrosCusto : centrosReceita).map((c) => (
+                        <SelectItem key={c.id} value={c.nome}>{c.nome}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2">
+                  <Label>Subgrupo</Label>
+                  <Select
+                    value={editForm.subgrupo}
+                    onValueChange={(v) => setEditForm({ ...editForm, subgrupo: v === "none" ? "" : v })}
+                    disabled={!editForm.centro}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder={editForm.centro ? "Selecione (opcional)" : "Selecione um centro primeiro"} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="none">Nenhum</SelectItem>
+                      {(() => {
+                        const centroObj = (editDialog?.type === "pagar" ? centrosCusto : centrosReceita).find((c) => c.nome === editForm.centro);
+                        if (!centroObj) return null;
+                        const subs = editDialog?.type === "pagar"
+                          ? subgruposCusto.filter((s) => s.centro_custo_id === centroObj.id)
+                          : subgruposReceita.filter((s) => s.centro_receita_id === centroObj.id);
+                        return subs.map((s) => (
+                          <SelectItem key={s.id} value={s.nome}>{s.nome}</SelectItem>
+                        ));
+                      })()}
+                    </SelectContent>
+                  </Select>
+                </div>
               </div>
             </div>
             <DialogFooter>
@@ -2126,34 +2190,82 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
                 </div>
               </div>
               {novaContaDialog === "pagar" ? (
-                <div className="space-y-2">
-                  <Label>Centro de Custo</Label>
-                  <Select value={novaContaForm.centro_custo} onValueChange={(v) => setNovaContaForm({ ...novaContaForm, centro_custo: v === "none" ? "" : v })}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Selecione (opcional)" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="none">Nenhum</SelectItem>
-                      {centrosCusto.map((c) => (
-                        <SelectItem key={c} value={c}>{c}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="space-y-2">
+                    <Label>Centro de Custo</Label>
+                    <Select value={novaContaForm.centro_custo} onValueChange={(v) => setNovaContaForm({ ...novaContaForm, centro_custo: v === "none" ? "" : v, subgrupo_custo: "" })}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Selecione (opcional)" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="none">Nenhum</SelectItem>
+                        {centrosCusto.map((c) => (
+                          <SelectItem key={c.id} value={c.nome}>{c.nome}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Subgrupo</Label>
+                    <Select
+                      value={novaContaForm.subgrupo_custo}
+                      onValueChange={(v) => setNovaContaForm({ ...novaContaForm, subgrupo_custo: v === "none" ? "" : v })}
+                      disabled={!novaContaForm.centro_custo}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder={novaContaForm.centro_custo ? "Selecione (opcional)" : "Selecione centro"} />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="none">Nenhum</SelectItem>
+                        {(() => {
+                          const centroObj = centrosCusto.find((c) => c.nome === novaContaForm.centro_custo);
+                          if (!centroObj) return null;
+                          return subgruposCusto.filter((s) => s.centro_custo_id === centroObj.id).map((s) => (
+                            <SelectItem key={s.id} value={s.nome}>{s.nome}</SelectItem>
+                          ));
+                        })()}
+                      </SelectContent>
+                    </Select>
+                  </div>
                 </div>
               ) : (
-                <div className="space-y-2">
-                  <Label>Centro de Receita</Label>
-                  <Select value={novaContaForm.centro_receita} onValueChange={(v) => setNovaContaForm({ ...novaContaForm, centro_receita: v === "none" ? "" : v })}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Selecione (opcional)" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="none">Nenhum</SelectItem>
-                      {centrosReceita.map((c) => (
-                        <SelectItem key={c} value={c}>{c}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="space-y-2">
+                    <Label>Centro de Receita</Label>
+                    <Select value={novaContaForm.centro_receita} onValueChange={(v) => setNovaContaForm({ ...novaContaForm, centro_receita: v === "none" ? "" : v, subgrupo_receita: "" })}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Selecione (opcional)" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="none">Nenhum</SelectItem>
+                        {centrosReceita.map((c) => (
+                          <SelectItem key={c.id} value={c.nome}>{c.nome}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Subgrupo</Label>
+                    <Select
+                      value={novaContaForm.subgrupo_receita}
+                      onValueChange={(v) => setNovaContaForm({ ...novaContaForm, subgrupo_receita: v === "none" ? "" : v })}
+                      disabled={!novaContaForm.centro_receita}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder={novaContaForm.centro_receita ? "Selecione (opcional)" : "Selecione centro"} />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="none">Nenhum</SelectItem>
+                        {(() => {
+                          const centroObj = centrosReceita.find((c) => c.nome === novaContaForm.centro_receita);
+                          if (!centroObj) return null;
+                          return subgruposReceita.filter((s) => s.centro_receita_id === centroObj.id).map((s) => (
+                            <SelectItem key={s.id} value={s.nome}>{s.nome}</SelectItem>
+                          ));
+                        })()}
+                      </SelectContent>
+                    </Select>
+                  </div>
                 </div>
               )}
             </div>

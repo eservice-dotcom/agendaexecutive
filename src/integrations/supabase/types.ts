@@ -223,6 +223,7 @@ export type Database = {
           fornecedor: string
           id: string
           status: string
+          subgrupo_custo: string | null
           updated_at: string
           user_id: string
           valor: number
@@ -238,6 +239,7 @@ export type Database = {
           fornecedor?: string
           id?: string
           status?: string
+          subgrupo_custo?: string | null
           updated_at?: string
           user_id: string
           valor?: number
@@ -253,6 +255,7 @@ export type Database = {
           fornecedor?: string
           id?: string
           status?: string
+          subgrupo_custo?: string | null
           updated_at?: string
           user_id?: string
           valor?: number
@@ -279,6 +282,7 @@ export type Database = {
           descritivo: string
           id: string
           status: string
+          subgrupo_receita: string | null
           updated_at: string
           user_id: string
           valor: number
@@ -294,6 +298,7 @@ export type Database = {
           descritivo?: string
           id?: string
           status?: string
+          subgrupo_receita?: string | null
           updated_at?: string
           user_id: string
           valor?: number
@@ -309,6 +314,7 @@ export type Database = {
           descritivo?: string
           id?: string
           status?: string
+          subgrupo_receita?: string | null
           updated_at?: string
           user_id?: string
           valor?: number
@@ -506,6 +512,70 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      subgrupos_custo: {
+        Row: {
+          centro_custo_id: string
+          created_at: string
+          id: string
+          nome: string
+          user_id: string
+        }
+        Insert: {
+          centro_custo_id: string
+          created_at?: string
+          id?: string
+          nome: string
+          user_id: string
+        }
+        Update: {
+          centro_custo_id?: string
+          created_at?: string
+          id?: string
+          nome?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "subgrupos_custo_centro_custo_id_fkey"
+            columns: ["centro_custo_id"]
+            isOneToOne: false
+            referencedRelation: "centros_custo"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      subgrupos_receita: {
+        Row: {
+          centro_receita_id: string
+          created_at: string
+          id: string
+          nome: string
+          user_id: string
+        }
+        Insert: {
+          centro_receita_id: string
+          created_at?: string
+          id?: string
+          nome: string
+          user_id: string
+        }
+        Update: {
+          centro_receita_id?: string
+          created_at?: string
+          id?: string
+          nome?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "subgrupos_receita_centro_receita_id_fkey"
+            columns: ["centro_receita_id"]
+            isOneToOne: false
+            referencedRelation: "centros_receita"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       tipos_servico: {
         Row: {
