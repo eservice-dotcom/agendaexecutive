@@ -1285,6 +1285,11 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
 
           {/* ===== CONTAS A RECEBER TAB ===== */}
           <TabsContent value="receber">
+            <div className="flex justify-end mb-2">
+              <Button variant="outline" size="sm" onClick={() => openNovaContaDialog("receber")} className="gap-1">
+                <Plus className="h-4 w-4" /> Nova Conta a Receber
+              </Button>
+            </div>
             <div className="rounded-lg border border-border bg-card shadow-sm">
               <Table>
                 <TableHeader>
