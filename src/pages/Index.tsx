@@ -391,9 +391,9 @@ const Index = () => {
                   <Printer className="h-4 w-4" />
                   Imprimir
                 </Button>
-                <Button variant="outline" size="sm" onClick={handleOpenFechamento} className="gap-2">
+                <Button variant="outline" size="sm" onClick={() => setActiveTab("fechamentos")} className="gap-2">
                   <FileText className="h-4 w-4" />
-                  Fechamento
+                  Fechamentos
                 </Button>
                 <Button onClick={() => setNovoDialogOpen(true)} className="gap-2">
                   <Plus className="h-4 w-4" />
