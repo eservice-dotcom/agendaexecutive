@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -124,56 +124,52 @@ const CadastroCentrosCusto = () => {
                 const subs = subgrupos.filter((s) => s.centro_custo_id === item.id);
                 const isOpen = openCentros.has(item.id);
                 return (
-                  <Collapsible key={item.id} open={isOpen} onOpenChange={() => toggleOpen(item.id)} asChild>
-                    <>
-                      <TableRow className="cursor-pointer">
-                        <TableCell>
-                          <CollapsibleTrigger asChild>
-                            <div className="flex items-center gap-2 font-medium">
-                              {isOpen ? <ChevronDown className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
-                              {item.nome}
-                              <span className="text-xs text-muted-foreground">({subs.length} subgrupo{subs.length !== 1 ? "s" : ""})</span>
-                            </div>
-                          </CollapsibleTrigger>
-                        </TableCell>
-                        <TableCell className="text-center">
-                          <Button variant="ghost" size="icon" onClick={(e) => { e.stopPropagation(); handleDelete(item.id); }}>
-                            <Trash2 className="h-4 w-4 text-destructive" />
-                          </Button>
-                        </TableCell>
-                      </TableRow>
-                      <CollapsibleContent asChild>
-                        <>
-                          {subs.map((sub) => (
-                            <TableRow key={sub.id} className="bg-muted/30">
-                              <TableCell className="pl-10 text-sm">{sub.nome}</TableCell>
-                              <TableCell className="text-center">
-                                <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => handleDeleteSub(sub.id)}>
-                                  <Trash2 className="h-3 w-3 text-destructive" />
-                                </Button>
-                              </TableCell>
-                            </TableRow>
-                          ))}
-                          <TableRow className="bg-muted/30">
-                            <TableCell colSpan={2} className="pl-10">
-                              <div className="flex gap-2">
-                                <Input
-                                  placeholder="Novo subgrupo..."
-                                  value={novoSub[item.id] || ""}
-                                  onChange={(e) => setNovoSub((prev) => ({ ...prev, [item.id]: e.target.value }))}
-                                  onKeyDown={(e) => e.key === "Enter" && handleAddSub(item.id)}
-                                  className="max-w-xs h-8 text-sm"
-                                />
-                                <Button onClick={() => handleAddSub(item.id)} size="sm" variant="outline" className="h-8 gap-1 text-xs">
-                                  <Plus className="h-3 w-3" /> Subgrupo
-                                </Button>
-                              </div>
+                  <React.Fragment key={item.id}>
+                    <TableRow className="cursor-pointer" onClick={() => toggleOpen(item.id)}>
+                      <TableCell>
+                        <div className="flex items-center gap-2 font-medium">
+                          {isOpen ? <ChevronDown className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
+                          {item.nome}
+                          <span className="text-xs text-muted-foreground">({subs.length} subgrupo{subs.length !== 1 ? "s" : ""})</span>
+                        </div>
+                      </TableCell>
+                      <TableCell className="text-center">
+                        <Button variant="ghost" size="icon" onClick={(e) => { e.stopPropagation(); handleDelete(item.id); }}>
+                          <Trash2 className="h-4 w-4 text-destructive" />
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                    {isOpen && (
+                      <>
+                        {subs.map((sub) => (
+                          <TableRow key={sub.id} className="bg-muted/30">
+                            <TableCell className="pl-10 text-sm">{sub.nome}</TableCell>
+                            <TableCell className="text-center">
+                              <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => handleDeleteSub(sub.id)}>
+                                <Trash2 className="h-3 w-3 text-destructive" />
+                              </Button>
                             </TableCell>
                           </TableRow>
-                        </>
-                      </CollapsibleContent>
-                    </>
-                  </Collapsible>
+                        ))}
+                        <TableRow className="bg-muted/30">
+                          <TableCell colSpan={2} className="pl-10">
+                            <div className="flex gap-2">
+                              <Input
+                                placeholder="Novo subgrupo..."
+                                value={novoSub[item.id] || ""}
+                                onChange={(e) => setNovoSub((prev) => ({ ...prev, [item.id]: e.target.value }))}
+                                onKeyDown={(e) => e.key === "Enter" && handleAddSub(item.id)}
+                                className="max-w-xs h-8 text-sm"
+                              />
+                              <Button onClick={() => handleAddSub(item.id)} size="sm" variant="outline" className="h-8 gap-1 text-xs">
+                                <Plus className="h-3 w-3" /> Subgrupo
+                              </Button>
+                            </div>
+                          </TableCell>
+                        </TableRow>
+                      </>
+                    )}
+                  </React.Fragment>
                 );
               })
             )}
