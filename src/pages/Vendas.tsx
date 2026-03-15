@@ -2190,34 +2190,82 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
                 </div>
               </div>
               {novaContaDialog === "pagar" ? (
-                <div className="space-y-2">
-                  <Label>Centro de Custo</Label>
-                  <Select value={novaContaForm.centro_custo} onValueChange={(v) => setNovaContaForm({ ...novaContaForm, centro_custo: v === "none" ? "" : v })}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Selecione (opcional)" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="none">Nenhum</SelectItem>
-                      {centrosCusto.map((c) => (
-                        <SelectItem key={c.id} value={c.nome}>{c.nome}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="space-y-2">
+                    <Label>Centro de Custo</Label>
+                    <Select value={novaContaForm.centro_custo} onValueChange={(v) => setNovaContaForm({ ...novaContaForm, centro_custo: v === "none" ? "" : v, subgrupo_custo: "" })}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Selecione (opcional)" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="none">Nenhum</SelectItem>
+                        {centrosCusto.map((c) => (
+                          <SelectItem key={c.id} value={c.nome}>{c.nome}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Subgrupo</Label>
+                    <Select
+                      value={novaContaForm.subgrupo_custo}
+                      onValueChange={(v) => setNovaContaForm({ ...novaContaForm, subgrupo_custo: v === "none" ? "" : v })}
+                      disabled={!novaContaForm.centro_custo}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder={novaContaForm.centro_custo ? "Selecione (opcional)" : "Selecione centro"} />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="none">Nenhum</SelectItem>
+                        {(() => {
+                          const centroObj = centrosCusto.find((c) => c.nome === novaContaForm.centro_custo);
+                          if (!centroObj) return null;
+                          return subgruposCusto.filter((s) => s.centro_custo_id === centroObj.id).map((s) => (
+                            <SelectItem key={s.id} value={s.nome}>{s.nome}</SelectItem>
+                          ));
+                        })()}
+                      </SelectContent>
+                    </Select>
+                  </div>
                 </div>
               ) : (
-                <div className="space-y-2">
-                  <Label>Centro de Receita</Label>
-                  <Select value={novaContaForm.centro_receita} onValueChange={(v) => setNovaContaForm({ ...novaContaForm, centro_receita: v === "none" ? "" : v })}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Selecione (opcional)" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="none">Nenhum</SelectItem>
-                      {centrosReceita.map((c) => (
-                        <SelectItem key={c.id} value={c.nome}>{c.nome}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="space-y-2">
+                    <Label>Centro de Receita</Label>
+                    <Select value={novaContaForm.centro_receita} onValueChange={(v) => setNovaContaForm({ ...novaContaForm, centro_receita: v === "none" ? "" : v, subgrupo_receita: "" })}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Selecione (opcional)" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="none">Nenhum</SelectItem>
+                        {centrosReceita.map((c) => (
+                          <SelectItem key={c.id} value={c.nome}>{c.nome}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Subgrupo</Label>
+                    <Select
+                      value={novaContaForm.subgrupo_receita}
+                      onValueChange={(v) => setNovaContaForm({ ...novaContaForm, subgrupo_receita: v === "none" ? "" : v })}
+                      disabled={!novaContaForm.centro_receita}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder={novaContaForm.centro_receita ? "Selecione (opcional)" : "Selecione centro"} />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="none">Nenhum</SelectItem>
+                        {(() => {
+                          const centroObj = centrosReceita.find((c) => c.nome === novaContaForm.centro_receita);
+                          if (!centroObj) return null;
+                          return subgruposReceita.filter((s) => s.centro_receita_id === centroObj.id).map((s) => (
+                            <SelectItem key={s.id} value={s.nome}>{s.nome}</SelectItem>
+                          ));
+                        })()}
+                      </SelectContent>
+                    </Select>
+                  </div>
                 </div>
               )}
             </div>
