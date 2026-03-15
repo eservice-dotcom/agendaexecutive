@@ -1016,6 +1016,10 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
 
   const openNovaContaDialog = (type: "pagar" | "receber") => {
     setNovaContaForm({ descritivo: "", valor: "", data_vencimento: "", fornecedor: "", cliente: "", centro_custo: "", centro_receita: "", subgrupo_custo: "", subgrupo_receita: "" });
+    setQuickAddFornecedor(false);
+    setQuickAddFornecedorNome("");
+    setQuickAddCliente(false);
+    setQuickAddClienteNome("");
     setNovaContaDialog(type);
   };
 
