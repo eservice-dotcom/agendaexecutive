@@ -1,5 +1,5 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Users, Truck, User, Building2, ListChecks, UserCog, MessageCircle } from "lucide-react";
+import { Users, Truck, User, Building2, ListChecks, UserCog, MessageCircle, Wallet } from "lucide-react";
 import CadastroClientes from "@/components/CadastroClientes";
 import CadastroVeiculos from "@/components/CadastroVeiculos";
 import CadastroMotoristas from "@/components/CadastroMotoristas";
@@ -7,6 +7,8 @@ import CadastroFornecedores from "@/components/CadastroFornecedores";
 import CadastroTiposServico from "@/components/CadastroTiposServico";
 import CadastroUsuarios from "@/components/CadastroUsuarios";
 import CadastroMensagens from "@/components/CadastroMensagens";
+import CadastroCentrosCusto from "@/components/CadastroCentrosCusto";
+import CadastroCentrosReceita from "@/components/CadastroCentrosReceita";
 import logo from "@/assets/logo-executive-service.png";
 import { Link } from "react-router-dom";
 import { CalendarDays } from "lucide-react";
@@ -33,7 +35,7 @@ const Cadastros = () => {
         </div>
 
         <Tabs defaultValue="clientes" className="space-y-4">
-          <TabsList className="grid w-full grid-cols-7 sm:w-auto sm:inline-grid">
+          <TabsList className="grid w-full grid-cols-4 sm:w-auto sm:inline-grid sm:grid-cols-8">
             <TabsTrigger value="clientes" className="gap-2">
               <Users className="h-4 w-4" />
               Clientes
@@ -54,6 +56,10 @@ const Cadastros = () => {
               <ListChecks className="h-4 w-4" />
               Tipos
             </TabsTrigger>
+            <TabsTrigger value="centros" className="gap-2">
+              <Wallet className="h-4 w-4" />
+              Centros
+            </TabsTrigger>
             <TabsTrigger value="mensagens" className="gap-2">
               <MessageCircle className="h-4 w-4" />
               Mensagens
@@ -69,6 +75,12 @@ const Cadastros = () => {
           <TabsContent value="motoristas"><CadastroMotoristas /></TabsContent>
           <TabsContent value="fornecedores"><CadastroFornecedores /></TabsContent>
           <TabsContent value="tipos"><CadastroTiposServico /></TabsContent>
+          <TabsContent value="centros">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <CadastroCentrosCusto />
+              <CadastroCentrosReceita />
+            </div>
+          </TabsContent>
           <TabsContent value="mensagens"><CadastroMensagens /></TabsContent>
           <TabsContent value="usuarios"><CadastroUsuarios /></TabsContent>
         </Tabs>

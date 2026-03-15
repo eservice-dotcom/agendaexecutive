@@ -71,6 +71,7 @@ interface ContaPagarDB {
   data_vencimento: string | null;
   data_pagamento: string | null;
   status: string;
+  centro_custo: string;
 }
 
 interface ContaReceberDB {
@@ -83,6 +84,7 @@ interface ContaReceberDB {
   data_vencimento: string | null;
   data_pagamento: string | null;
   status: string;
+  centro_receita: string;
 }
 
 const formatCurrency = (v: number) =>
@@ -179,7 +181,7 @@ const Vendas = () => {
 
   // Edit conta dialog
   const [editDialog, setEditDialog] = useState<{ type: "pagar" | "receber"; item: any } | null>(null);
-  const [editForm, setEditForm] = useState({ descritivo: "", valor: "", data_vencimento: "", data_pagamento: "" });
+  const [editForm, setEditForm] = useState({ descritivo: "", valor: "", data_vencimento: "", data_pagamento: "", centro: "" });
 
   // New manual conta dialogs
   const [novaContaDialog, setNovaContaDialog] = useState<"pagar" | "receber" | null>(null);
@@ -189,7 +191,13 @@ const Vendas = () => {
     data_vencimento: "",
     fornecedor: "",
     cliente: "",
+    centro_custo: "",
+    centro_receita: "",
   });
+
+  // Centros de custo/receita
+  const [centrosCusto, setCentrosCusto] = useState<string[]>([]);
+  const [centrosReceita, setCentrosReceita] = useState<string[]>([]);
 
   // Edit venda dialog
   const [editVendaDialog, setEditVendaDialog] = useState<Venda | null>(null);
@@ -238,6 +246,16 @@ const Vendas = () => {
     if (data) {
       setFornecedores(data.map((f) => f.razao_social).filter(Boolean));
     }
+  }, []);
+
+  const loadCentrosCusto = useCallback(async () => {
+    const { data } = await supabase.from("centros_custo").select("nome").order("nome");
+    if (data) setCentrosCusto(data.map((d) => d.nome));
+  }, []);
+
+  const loadCentrosReceita = useCallback(async () => {
+    const { data } = await supabase.from("centros_receita").select("nome").order("nome");
+    if (data) setCentrosReceita(data.map((d) => d.nome));
   }, []);
 
   const loadContasPagar = useCallback(async () => {
@@ -342,7 +360,9 @@ const Vendas = () => {
     loadContasPagar();
     loadContasReceber();
     loadVendaOsMap();
-  }, [loadVendas, loadClientes, loadFornecedores, loadContasPagar, loadContasReceber, loadVendaOsMap]);
+    loadCentrosCusto();
+    loadCentrosReceita();
+  }, [loadVendas, loadClientes, loadFornecedores, loadContasPagar, loadContasReceber, loadVendaOsMap, loadCentrosCusto, loadCentrosReceita]);
 
   useEffect(() => {
     if (!cliente) {
@@ -912,6 +932,7 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
       valor: String(item.valor),
       data_vencimento: item.data_vencimento || "",
       data_pagamento: item.data_pagamento || "",
+      centro: (type === "pagar" ? item.centro_custo : item.centro_receita) || "",
     });
     setEditDialog({ type, item });
   };
@@ -926,6 +947,7 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
       data_vencimento: editForm.data_vencimento || null,
       data_pagamento: editForm.data_pagamento || null,
       status: editForm.data_pagamento ? "pago" : "pendente",
+      ...(type === "pagar" ? { centro_custo: editForm.centro } : { centro_receita: editForm.centro }),
     };
     
     const { error } = await supabase.from(table).update(updates).eq("id", item.id);
@@ -958,7 +980,7 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
   };
 
   const openNovaContaDialog = (type: "pagar" | "receber") => {
-    setNovaContaForm({ descritivo: "", valor: "", data_vencimento: "", fornecedor: "", cliente: "" });
+    setNovaContaForm({ descritivo: "", valor: "", data_vencimento: "", fornecedor: "", cliente: "", centro_custo: "", centro_receita: "" });
     setNovaContaDialog(type);
   };
 
@@ -976,6 +998,7 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
         data: today,
         data_vencimento: novaContaForm.data_vencimento || null,
         status: "pendente",
+        centro_custo: novaContaForm.centro_custo,
       });
       if (error) {
         toast({ title: "Erro ao salvar", description: error.message, variant: "destructive" });
@@ -993,6 +1016,7 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
         data: today,
         data_vencimento: novaContaForm.data_vencimento || null,
         status: "pendente",
+        centro_receita: novaContaForm.centro_receita,
       });
       if (error) {
         toast({ title: "Erro ao salvar", description: error.message, variant: "destructive" });
@@ -1298,6 +1322,7 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
                     <TableHead>Data</TableHead>
                     <TableHead>Cliente</TableHead>
                     <TableHead>O.S.</TableHead>
+                    <TableHead>Centro Receita</TableHead>
                     <TableHead>Descritivo</TableHead>
                     <TableHead className="text-right">Valor</TableHead>
                     <TableHead>Vencimento</TableHead>
@@ -1309,7 +1334,7 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
                 <TableBody>
                   {contasReceberList.length === 0 ? (
                     <TableRow>
-                       <TableCell colSpan={10} className="text-center text-muted-foreground py-8">
+                       <TableCell colSpan={11} className="text-center text-muted-foreground py-8">
                         Nenhuma conta a receber
                       </TableCell>
                     </TableRow>
@@ -1320,6 +1345,7 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
                         <TableCell className="font-mono text-xs">{formatDate(cr.data)}</TableCell>
                         <TableCell className="font-medium text-sm">{cr.cliente}</TableCell>
                         <TableCell className="font-mono text-xs">{vendaOsMap[cr.venda_id]?.cots?.join(", ") || "—"}</TableCell>
+                        <TableCell className="text-sm">{cr.centro_receita || "—"}</TableCell>
                         <TableCell className="text-sm">{cr.descritivo}</TableCell>
                         <TableCell className="text-right font-mono">{formatCurrency(cr.valor)}</TableCell>
                         <TableCell className="font-mono text-xs">{cr.data_vencimento ? formatDate(cr.data_vencimento) : "—"}</TableCell>
@@ -1366,6 +1392,7 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
                     <TableHead>Fornecedor</TableHead>
                     <TableHead>Cliente</TableHead>
                     <TableHead>O.S.</TableHead>
+                    <TableHead>Centro Custo</TableHead>
                     <TableHead>Descritivo</TableHead>
                     <TableHead className="text-right">Valor</TableHead>
                     <TableHead>Vencimento</TableHead>
@@ -1377,7 +1404,7 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
                 <TableBody>
                   {contasPagarList.length === 0 ? (
                     <TableRow>
-                       <TableCell colSpan={11} className="text-center text-muted-foreground py-8">
+                       <TableCell colSpan={12} className="text-center text-muted-foreground py-8">
                         Nenhuma conta a pagar
                       </TableCell>
                     </TableRow>
@@ -1389,6 +1416,7 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
                         <TableCell className="font-medium text-sm">{cp.fornecedor}</TableCell>
                         <TableCell className="font-medium text-sm">{vendaOsMap[cp.venda_id]?.cliente || "—"}</TableCell>
                         <TableCell className="font-mono text-xs">{vendaOsMap[cp.venda_id]?.cots?.join(", ") || "—"}</TableCell>
+                        <TableCell className="text-sm">{cp.centro_custo || "—"}</TableCell>
                         <TableCell className="text-sm">{cp.descritivo}</TableCell>
                         <TableCell className="text-right font-mono">{formatCurrency(cp.valor)}</TableCell>
                         <TableCell className="font-mono text-xs">{cp.data_vencimento ? formatDate(cp.data_vencimento) : "—"}</TableCell>
@@ -1673,6 +1701,20 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
                 <Label>Data de Pagamento (baixa)</Label>
                 <Input type="date" value={editForm.data_pagamento} onChange={(e) => setEditForm({ ...editForm, data_pagamento: e.target.value })} />
                 <p className="text-xs text-muted-foreground">Preencher para dar baixa no registro</p>
+              </div>
+              <div className="space-y-2">
+                <Label>{editDialog?.type === "pagar" ? "Centro de Custo" : "Centro de Receita"}</Label>
+                <Select value={editForm.centro} onValueChange={(v) => setEditForm({ ...editForm, centro: v === "none" ? "" : v })}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Selecione (opcional)" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="none">Nenhum</SelectItem>
+                    {(editDialog?.type === "pagar" ? centrosCusto : centrosReceita).map((c) => (
+                      <SelectItem key={c} value={c}>{c}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
             </div>
             <DialogFooter>
@@ -2083,6 +2125,37 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
                   <Input type="date" value={novaContaForm.data_vencimento} onChange={(e) => setNovaContaForm({ ...novaContaForm, data_vencimento: e.target.value })} />
                 </div>
               </div>
+              {novaContaDialog === "pagar" ? (
+                <div className="space-y-2">
+                  <Label>Centro de Custo</Label>
+                  <Select value={novaContaForm.centro_custo} onValueChange={(v) => setNovaContaForm({ ...novaContaForm, centro_custo: v === "none" ? "" : v })}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Selecione (opcional)" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="none">Nenhum</SelectItem>
+                      {centrosCusto.map((c) => (
+                        <SelectItem key={c} value={c}>{c}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              ) : (
+                <div className="space-y-2">
+                  <Label>Centro de Receita</Label>
+                  <Select value={novaContaForm.centro_receita} onValueChange={(v) => setNovaContaForm({ ...novaContaForm, centro_receita: v === "none" ? "" : v })}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Selecione (opcional)" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="none">Nenhum</SelectItem>
+                      {centrosReceita.map((c) => (
+                        <SelectItem key={c} value={c}>{c}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              )}
             </div>
             <DialogFooter>
               <Button variant="outline" onClick={() => setNovaContaDialog(null)}>Cancelar</Button>
