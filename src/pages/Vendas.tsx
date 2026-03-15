@@ -181,6 +181,16 @@ const Vendas = () => {
   const [editDialog, setEditDialog] = useState<{ type: "pagar" | "receber"; item: any } | null>(null);
   const [editForm, setEditForm] = useState({ descritivo: "", valor: "", data_vencimento: "", data_pagamento: "" });
 
+  // New manual conta dialogs
+  const [novaContaDialog, setNovaContaDialog] = useState<"pagar" | "receber" | null>(null);
+  const [novaContaForm, setNovaContaForm] = useState({
+    descritivo: "",
+    valor: "",
+    data_vencimento: "",
+    fornecedor: "",
+    cliente: "",
+  });
+
   // Edit venda dialog
   const [editVendaDialog, setEditVendaDialog] = useState<Venda | null>(null);
   const [editVendaForm, setEditVendaForm] = useState({ cliente: "", data_venda: "", data_vencimento: "", observacoes: "", status: "", forma_pagamento: "" });
@@ -947,6 +957,53 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
     else loadContasReceber();
   };
 
+  const openNovaContaDialog = (type: "pagar" | "receber") => {
+    setNovaContaForm({ descritivo: "", valor: "", data_vencimento: "", fornecedor: "", cliente: "" });
+    setNovaContaDialog(type);
+  };
+
+  const handleSaveNovaConta = async () => {
+    if (!novaContaDialog || !session) return;
+    const today = new Date().toISOString().split("T")[0];
+
+    if (novaContaDialog === "pagar") {
+      const { error } = await supabase.from("contas_pagar").insert({
+        user_id: session.user.id,
+        venda_id: null as any,
+        fornecedor: novaContaForm.fornecedor,
+        descritivo: novaContaForm.descritivo,
+        valor: parseFloat(novaContaForm.valor) || 0,
+        data: today,
+        data_vencimento: novaContaForm.data_vencimento || null,
+        status: "pendente",
+      });
+      if (error) {
+        toast({ title: "Erro ao salvar", description: error.message, variant: "destructive" });
+        return;
+      }
+      toast({ title: "Conta a pagar criada!" });
+      loadContasPagar();
+    } else {
+      const { error } = await supabase.from("contas_receber").insert({
+        user_id: session.user.id,
+        venda_id: null as any,
+        cliente: novaContaForm.cliente,
+        descritivo: novaContaForm.descritivo,
+        valor: parseFloat(novaContaForm.valor) || 0,
+        data: today,
+        data_vencimento: novaContaForm.data_vencimento || null,
+        status: "pendente",
+      });
+      if (error) {
+        toast({ title: "Erro ao salvar", description: error.message, variant: "destructive" });
+        return;
+      }
+      toast({ title: "Conta a receber criada!" });
+      loadContasReceber();
+    }
+    setNovaContaDialog(null);
+  };
+
   const openEditVenda = async (venda: Venda) => {
     setEditVendaForm({
       cliente: venda.cliente,
@@ -1228,6 +1285,11 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
 
           {/* ===== CONTAS A RECEBER TAB ===== */}
           <TabsContent value="receber">
+            <div className="flex justify-end mb-2">
+              <Button variant="outline" size="sm" onClick={() => openNovaContaDialog("receber")} className="gap-1">
+                <Plus className="h-4 w-4" /> Nova Conta a Receber
+              </Button>
+            </div>
             <div className="rounded-lg border border-border bg-card shadow-sm">
               <Table>
                 <TableHeader>
@@ -1290,6 +1352,11 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
 
           {/* ===== CONTAS A PAGAR TAB ===== */}
           <TabsContent value="pagar">
+            <div className="flex justify-end mb-2">
+              <Button variant="outline" size="sm" onClick={() => openNovaContaDialog("pagar")} className="gap-1">
+                <Plus className="h-4 w-4" /> Nova Conta a Pagar
+              </Button>
+            </div>
             <div className="rounded-lg border border-border bg-card shadow-sm">
               <Table>
                 <TableHeader>
@@ -1960,6 +2027,66 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
                 <ClipboardList className="h-4 w-4" />
                 Gerar Relatório
               </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
+        {/* ===== NOVA CONTA MANUAL DIALOG ===== */}
+        <Dialog open={!!novaContaDialog} onOpenChange={(v) => !v && setNovaContaDialog(null)}>
+          <DialogContent className="max-w-md">
+            <DialogHeader>
+              <DialogTitle>
+                {novaContaDialog === "pagar" ? "Nova Conta a Pagar" : "Nova Conta a Receber"}
+              </DialogTitle>
+            </DialogHeader>
+            <div className="space-y-4">
+              {novaContaDialog === "pagar" ? (
+                <div className="space-y-2">
+                  <Label>Fornecedor</Label>
+                  <Select value={novaContaForm.fornecedor} onValueChange={(v) => setNovaContaForm({ ...novaContaForm, fornecedor: v })}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Selecione o fornecedor" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {fornecedores.map((f) => (
+                        <SelectItem key={f} value={f}>{f}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              ) : (
+                <div className="space-y-2">
+                  <Label>Cliente</Label>
+                  <Select value={novaContaForm.cliente} onValueChange={(v) => setNovaContaForm({ ...novaContaForm, cliente: v })}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Selecione o cliente" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {clientes.map((c) => (
+                        <SelectItem key={c} value={c}>{c}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              )}
+              <div className="space-y-2">
+                <Label>Descritivo</Label>
+                <Input value={novaContaForm.descritivo} onChange={(e) => setNovaContaForm({ ...novaContaForm, descritivo: e.target.value })} placeholder="Descrição da conta" />
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-2">
+                  <Label>Valor (R$)</Label>
+                  <Input type="number" step="0.01" value={novaContaForm.valor} onChange={(e) => setNovaContaForm({ ...novaContaForm, valor: e.target.value })} />
+                </div>
+                <div className="space-y-2">
+                  <Label>Data de Vencimento</Label>
+                  <Input type="date" value={novaContaForm.data_vencimento} onChange={(e) => setNovaContaForm({ ...novaContaForm, data_vencimento: e.target.value })} />
+                </div>
+              </div>
+            </div>
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setNovaContaDialog(null)}>Cancelar</Button>
+              <Button onClick={handleSaveNovaConta}>Salvar</Button>
             </DialogFooter>
           </DialogContent>
         </Dialog>

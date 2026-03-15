@@ -183,7 +183,7 @@ export type Database = {
           updated_at: string
           user_id: string
           valor: number
-          venda_id: string
+          venda_id: string | null
         }
         Insert: {
           created_at?: string
@@ -197,7 +197,7 @@ export type Database = {
           updated_at?: string
           user_id: string
           valor?: number
-          venda_id: string
+          venda_id?: string | null
         }
         Update: {
           created_at?: string
@@ -211,7 +211,7 @@ export type Database = {
           updated_at?: string
           user_id?: string
           valor?: number
-          venda_id?: string
+          venda_id?: string | null
         }
         Relationships: [
           {
@@ -236,7 +236,7 @@ export type Database = {
           updated_at: string
           user_id: string
           valor: number
-          venda_id: string
+          venda_id: string | null
         }
         Insert: {
           cliente?: string
@@ -250,7 +250,7 @@ export type Database = {
           updated_at?: string
           user_id: string
           valor?: number
-          venda_id: string
+          venda_id?: string | null
         }
         Update: {
           cliente?: string
@@ -264,7 +264,7 @@ export type Database = {
           updated_at?: string
           user_id?: string
           valor?: number
-          venda_id?: string
+          venda_id?: string | null
         }
         Relationships: [
           {
