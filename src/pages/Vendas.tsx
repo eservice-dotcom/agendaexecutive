@@ -1002,6 +1002,7 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
       loadContasReceber();
     }
     setNovaContaDialog(null);
+  };
 
   const openEditVenda = async (venda: Venda) => {
     setEditVendaForm({
