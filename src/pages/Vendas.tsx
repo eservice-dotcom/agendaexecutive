@@ -521,7 +521,7 @@ const Vendas = () => {
 
       const autoContasPagar = Array.from(fornecedorMap.entries()).map(([fornecedor, info]) => {
         const descLines = info.items.map((item) =>
-          `O.S. ${item.cot} - ${item.tipo} - ${item.origem} → ${item.destino} (${formatDate(item.data)}) - ${formatCurrency(item.custo)}`
+          `O.S. ${item.cot} - ${item.tipo} - ${item.origem} → ${item.destino} - ${item.motorista} (${formatDate(item.data)}) - ${formatCurrency(item.custo)}`
         );
         return {
           venda_id: venda.id,
