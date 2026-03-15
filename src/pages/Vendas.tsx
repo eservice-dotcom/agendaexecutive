@@ -248,6 +248,16 @@ const Vendas = () => {
     }
   }, []);
 
+  const loadCentrosCusto = useCallback(async () => {
+    const { data } = await supabase.from("centros_custo").select("nome").order("nome");
+    if (data) setCentrosCusto(data.map((d) => d.nome));
+  }, []);
+
+  const loadCentrosReceita = useCallback(async () => {
+    const { data } = await supabase.from("centros_receita").select("nome").order("nome");
+    if (data) setCentrosReceita(data.map((d) => d.nome));
+  }, []);
+
   const loadContasPagar = useCallback(async () => {
     const { data } = await supabase
       .from("contas_pagar")
