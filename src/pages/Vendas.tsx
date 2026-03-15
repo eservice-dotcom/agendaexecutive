@@ -210,6 +210,10 @@ const Vendas = () => {
     subgrupo_custo: "",
     subgrupo_receita: "",
   });
+  const [quickAddFornecedor, setQuickAddFornecedor] = useState(false);
+  const [quickAddFornecedorNome, setQuickAddFornecedorNome] = useState("");
+  const [quickAddCliente, setQuickAddCliente] = useState(false);
+  const [quickAddClienteNome, setQuickAddClienteNome] = useState("");
 
   // Centros de custo/receita and subgrupos
   const [centrosCusto, setCentrosCusto] = useState<{ id: string; nome: string }[]>([]);
