@@ -932,6 +932,7 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
       valor: String(item.valor),
       data_vencimento: item.data_vencimento || "",
       data_pagamento: item.data_pagamento || "",
+      centro: (type === "pagar" ? item.centro_custo : item.centro_receita) || "",
     });
     setEditDialog({ type, item });
   };
