@@ -191,7 +191,13 @@ const Vendas = () => {
     data_vencimento: "",
     fornecedor: "",
     cliente: "",
+    centro_custo: "",
+    centro_receita: "",
   });
+
+  // Centros de custo/receita
+  const [centrosCusto, setCentrosCusto] = useState<string[]>([]);
+  const [centrosReceita, setCentrosReceita] = useState<string[]>([]);
 
   // Edit venda dialog
   const [editVendaDialog, setEditVendaDialog] = useState<Venda | null>(null);
