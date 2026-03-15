@@ -54,6 +54,7 @@ const Index = () => {
   const [cloneData, setCloneData] = useState<any | null>(null);
   const [agendaData, setAgendaData] = useState<any[]>([]);
   const [printWithFinancials, setPrintWithFinancials] = useState(true);
+  const [activeTab, setActiveTab] = useState("agenda");
 
   // Fechamento dialog state
   const [fechamentoDialogOpen, setFechamentoDialogOpen] = useState(false);
@@ -336,7 +337,7 @@ const Index = () => {
       </header>
 
       <main className="mx-auto max-w-[1600px] space-y-4 px-4 py-6 sm:px-6 lg:px-8">
-        <Tabs defaultValue="agenda" className="space-y-4">
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
           <TabsList className={`grid w-full sm:w-auto sm:inline-grid ${canViewFinancials ? 'grid-cols-5' : 'grid-cols-2'}`}>
             <TabsTrigger value="agenda" className="gap-2">
               <CalendarDays className="h-4 w-4" />
@@ -390,9 +391,9 @@ const Index = () => {
                   <Printer className="h-4 w-4" />
                   Imprimir
                 </Button>
-                <Button variant="outline" size="sm" onClick={handleOpenFechamento} className="gap-2">
+                <Button variant="outline" size="sm" onClick={() => setActiveTab("fechamentos")} className="gap-2">
                   <FileText className="h-4 w-4" />
-                  Fechamento
+                  Fechamentos
                 </Button>
                 <Button onClick={() => setNovoDialogOpen(true)} className="gap-2">
                   <Plus className="h-4 w-4" />
@@ -405,6 +406,12 @@ const Index = () => {
           </TabsContent>
 
           <TabsContent value="fechamentos" className="space-y-4">
+            <div className="flex justify-end">
+              <Button onClick={handleOpenFechamento} className="gap-2">
+                <Plus className="h-4 w-4" />
+                Novo Fechamento
+              </Button>
+            </div>
             <FechamentosConsulta />
           </TabsContent>
 
