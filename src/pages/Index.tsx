@@ -587,7 +587,11 @@ const Index = () => {
             </div>
             <DialogFooter>
               <Button variant="outline" onClick={() => setFechamentoDialogOpen(false)}>Cancelar</Button>
-              <Button onClick={handleGerarFechamento} disabled={fechamentoSelected.size === 0 || !fechamentoCliente} className="gap-2">
+              <Button onClick={() => handleGerarFechamento("excel")} disabled={fechamentoSelected.size === 0 || !fechamentoCliente} variant="outline" className="gap-2">
+                <FileSpreadsheet className="h-4 w-4" />
+                Excel
+              </Button>
+              <Button onClick={() => handleGerarFechamento("print")} disabled={fechamentoSelected.size === 0 || !fechamentoCliente} className="gap-2">
                 <ClipboardList className="h-4 w-4" />
                 Gerar Relatório
               </Button>
