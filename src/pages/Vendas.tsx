@@ -18,6 +18,7 @@ import logo from "@/assets/logo-executive-service.png";
 import { generateClosingReport } from "@/lib/closingReport";
 import { printContasPagar, printContasReceber } from "@/lib/printUtils";
 import DashboardFinanceiro from "@/components/DashboardFinanceiro";
+import WhatsAppPagamentoDialog from "@/components/WhatsAppPagamentoDialog";
 
 interface Venda {
   id: string;
