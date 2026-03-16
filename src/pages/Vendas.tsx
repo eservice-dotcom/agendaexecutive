@@ -1588,10 +1588,14 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
                   </SelectContent>
                 </Select>
               </div>
-              <Button variant="outline" size="sm" onClick={() => openNovaContaDialog("pagar")} className="gap-1">
-                <Plus className="h-4 w-4" /> Nova Conta a Pagar
-              </Button>
-            </div>
+              <div className="flex gap-2">
+                <Button variant="outline" size="sm" onClick={() => printContasPagar(filteredContasPagarList, vendaOsMap)} className="gap-1">
+                  <Printer className="h-4 w-4" /> Imprimir
+                </Button>
+                <Button variant="outline" size="sm" onClick={() => openNovaContaDialog("pagar")} className="gap-1">
+                  <Plus className="h-4 w-4" /> Nova Conta a Pagar
+                </Button>
+              </div>
             <div className="rounded-lg border border-border bg-card shadow-sm">
               <Table>
                 <TableHeader>
