@@ -37,7 +37,6 @@ const buildPagamentoMessage = (conta: ContaPagarInfo, vendaInfo?: { numero_venda
 
   if (vendaInfo) {
     msg += `📋 *Venda Nº ${vendaInfo.numero_venda}*\n`;
-    msg += `👤 Cliente: ${vendaInfo.cliente}\n`;
     if (vendaInfo.cots.length > 0) {
       msg += `🔢 O.S.: ${vendaInfo.cots.join(", ")}\n`;
     }
