@@ -108,6 +108,85 @@ export const printFatVeiculo = (items: any[], includeFinancials = true) => {
 ${totals}`);
 };
 
+export const printContasPagar = (items: any[], vendaOsMap: Record<string, any> = {}) => {
+  const rows = items.map(cp => {
+    const venda = vendaOsMap[cp.venda_id];
+    return `<tr>
+<td class="c">${venda?.numero_venda || "—"}</td>
+<td>${formatDate(cp.data)}</td>
+<td>${cp.fornecedor}</td>
+<td>${venda?.cliente || "—"}</td>
+<td>${venda?.cots?.join(", ") || "—"}</td>
+<td>${cp.centro_custo || "—"}</td>
+<td>${cp.subgrupo_custo || "—"}</td>
+<td>${cp.descritivo}</td>
+<td class="r">${formatCurrency(Number(cp.valor))}</td>
+<td>${cp.data_vencimento ? formatDate(cp.data_vencimento) : "—"}</td>
+<td>${cp.data_pagamento ? formatDate(cp.data_pagamento) : "—"}</td>
+<td class="c">${cp.status}</td>
+</tr>`;
+  }).join("");
+
+  const total = items.reduce((s, cp) => s + Number(cp.valor), 0);
+  const totalPendente = items.filter(c => c.status === "pendente").reduce((s, c) => s + Number(c.valor), 0);
+  const totalPago = items.filter(c => c.status === "pago").reduce((s, c) => s + Number(c.valor), 0);
+
+  openPrint("Relatório de Contas a Pagar", `
+<p class="sub">${items.length} registro(s)</p>
+<table>
+<thead><tr>
+<th class="c">Venda</th><th>Data</th><th>Fornecedor</th><th>Cliente</th><th>O.S.</th>
+<th>Centro Custo</th><th>Subgrupo</th><th>Descritivo</th>
+<th class="r">Valor</th><th>Vencimento</th><th>Pagamento</th><th class="c">Status</th>
+</tr></thead>
+<tbody>${rows}</tbody>
+</table>
+<div class="totals">
+<b>Total:</b> ${formatCurrency(total)} &nbsp;|&nbsp;
+<b>Pendente:</b> ${formatCurrency(totalPendente)} &nbsp;|&nbsp;
+<b>Pago:</b> ${formatCurrency(totalPago)}
+</div>`);
+};
+
+export const printContasReceber = (items: any[], vendaOsMap: Record<string, any> = {}) => {
+  const rows = items.map(cr => {
+    const venda = vendaOsMap[cr.venda_id];
+    return `<tr>
+<td class="c">${venda?.numero_venda || "—"}</td>
+<td>${formatDate(cr.data)}</td>
+<td>${cr.cliente}</td>
+<td>${venda?.cots?.join(", ") || "—"}</td>
+<td>${cr.centro_receita || "—"}</td>
+<td>${cr.subgrupo_receita || "—"}</td>
+<td>${cr.descritivo}</td>
+<td class="r">${formatCurrency(Number(cr.valor))}</td>
+<td>${cr.data_vencimento ? formatDate(cr.data_vencimento) : "—"}</td>
+<td>${cr.data_pagamento ? formatDate(cr.data_pagamento) : "—"}</td>
+<td class="c">${cr.status}</td>
+</tr>`;
+  }).join("");
+
+  const total = items.reduce((s, cr) => s + Number(cr.valor), 0);
+  const totalPendente = items.filter(c => c.status === "pendente").reduce((s, c) => s + Number(c.valor), 0);
+  const totalPago = items.filter(c => c.status === "pago").reduce((s, c) => s + Number(c.valor), 0);
+
+  openPrint("Relatório de Contas a Receber", `
+<p class="sub">${items.length} registro(s)</p>
+<table>
+<thead><tr>
+<th class="c">Venda</th><th>Data</th><th>Cliente</th><th>O.S.</th>
+<th>Centro Receita</th><th>Subgrupo</th><th>Descritivo</th>
+<th class="r">Valor</th><th>Vencimento</th><th>Pagamento</th><th class="c">Status</th>
+</tr></thead>
+<tbody>${rows}</tbody>
+</table>
+<div class="totals">
+<b>Total:</b> ${formatCurrency(total)} &nbsp;|&nbsp;
+<b>Pendente:</b> ${formatCurrency(totalPendente)} &nbsp;|&nbsp;
+<b>Pago:</b> ${formatCurrency(totalPago)}
+</div>`);
+};
+
 export const printFatFornecedor = (items: any[], includeFinancials = true) => {
   const map = new Map<string, { fornecedor: string; viagens: number; receita: number; custo: number; pax: number }>();
   items.forEach(i => {
