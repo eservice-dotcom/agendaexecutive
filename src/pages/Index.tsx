@@ -20,6 +20,7 @@ import FechamentosConsulta from "@/components/FechamentosConsulta";
 import { getAgendaItems } from "@/data/cadastroStorage";
 import { printAgenda } from "@/lib/printUtils";
 import { generateClosingReport } from "@/lib/closingReport";
+import { generateClosingReportExcel } from "@/lib/closingReportExcel";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
