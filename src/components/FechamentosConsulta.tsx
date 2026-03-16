@@ -306,10 +306,10 @@ const FechamentosConsulta = () => {
                     </div>
                   </TableCell>
                 </TableRow>
-              );
+                );
               })
-            )
             )}
+          </TableBody>
           </TableBody>
         </Table>
       </div>
