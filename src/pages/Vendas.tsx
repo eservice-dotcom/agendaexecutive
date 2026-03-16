@@ -230,8 +230,9 @@ const Vendas = () => {
   const [editVendaSearch, setEditVendaSearch] = useState("");
   const [editVendaExtras, setEditVendaExtras] = useState<ExtraItem[]>([]);
 
-  // Filtro contas a pagar por OS
+  // Filtro contas a pagar por OS e fornecedor
   const [filtroOsPagar, setFiltroOsPagar] = useState("");
+  const [filtroFornecedorPagar, setFiltroFornecedorPagar] = useState("");
 
   // Closing report selection
   const [fechamentoDialogOpen, setFechamentoDialogOpen] = useState(false);
