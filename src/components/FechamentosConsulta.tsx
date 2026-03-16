@@ -109,6 +109,22 @@ const FechamentosConsulta = () => {
     );
   };
 
+  const handleExportExcel = (f: Fechamento) => {
+    const items = Array.isArray(f.items) ? f.items : [];
+    const extras = Array.isArray(f.extras) ? f.extras : [];
+
+    generateClosingReportExcel(
+      items,
+      `Fechamento Nº ${f.numero_fechamento} - ${f.cliente}`,
+      f.cliente,
+      {
+        cliente: f.cliente,
+        extras,
+      },
+      f.numero_fechamento
+    );
+  };
+
   const openEdit = (f: Fechamento) => {
     setEditItem(f);
     setEditCliente(f.cliente);
