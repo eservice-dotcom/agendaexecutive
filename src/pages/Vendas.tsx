@@ -234,10 +234,12 @@ const Vendas = () => {
   // Filtro contas a pagar por OS e fornecedor
   const [filtroOsPagar, setFiltroOsPagar] = useState("");
   const [filtroFornecedorPagar, setFiltroFornecedorPagar] = useState("");
+  const [filtroStatusPagar, setFiltroStatusPagar] = useState("");
 
   // Filtro contas a receber por OS e cliente
   const [filtroOsReceber, setFiltroOsReceber] = useState("");
   const [filtroClienteReceber, setFiltroClienteReceber] = useState("");
+  const [filtroStatusReceber, setFiltroStatusReceber] = useState("");
 
   // Closing report selection
   const [fechamentoDialogOpen, setFechamentoDialogOpen] = useState(false);
@@ -1307,8 +1309,11 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
     if (fornSearch) {
       filtered = filtered.filter((cp) => cp.fornecedor.toLowerCase().includes(fornSearch));
     }
+    if (filtroStatusPagar) {
+      filtered = filtered.filter((cp) => cp.status === filtroStatusPagar);
+    }
     return filtered;
-  }, [contasPagarList, filtroOsPagar, filtroFornecedorPagar, vendaOsMap]);
+  }, [contasPagarList, filtroOsPagar, filtroFornecedorPagar, filtroStatusPagar, vendaOsMap]);
 
   const filteredContasReceberList = useMemo(() => {
     let filtered = contasReceberList;
@@ -1323,8 +1328,11 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
     if (clienteSearch) {
       filtered = filtered.filter((cr) => cr.cliente.toLowerCase().includes(clienteSearch));
     }
+    if (filtroStatusReceber) {
+      filtered = filtered.filter((cr) => cr.status === filtroStatusReceber);
+    }
     return filtered;
-  }, [contasReceberList, filtroOsReceber, filtroClienteReceber, vendaOsMap]);
+  }, [contasReceberList, filtroOsReceber, filtroClienteReceber, filtroStatusReceber, vendaOsMap]);
 
   const totalPagarPendente = contasPagarList.filter(c => c.status === "pendente").reduce((s, c) => s + Number(c.valor), 0);
   const totalReceberPendente = contasReceberList.filter(c => c.status === "pendente").reduce((s, c) => s + Number(c.valor), 0);
@@ -1466,6 +1474,17 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
                   onChange={(e) => setFiltroClienteReceber(e.target.value)}
                   className="w-48 h-8 text-sm"
                 />
+                <Select value={filtroStatusReceber || "all"} onValueChange={(v) => setFiltroStatusReceber(v === "all" ? "" : v)}>
+                  <SelectTrigger className="w-40 h-8 text-sm">
+                    <SelectValue placeholder="Status" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">Todos os status</SelectItem>
+                    <SelectItem value="pendente">Pendente</SelectItem>
+                    <SelectItem value="pago">Pago</SelectItem>
+                    <SelectItem value="cancelado">Cancelado</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
               <Button variant="outline" size="sm" onClick={() => openNovaContaDialog("receber")} className="gap-1">
                 <Plus className="h-4 w-4" /> Nova Conta a Receber
@@ -1552,6 +1571,17 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
                   onChange={(e) => setFiltroFornecedorPagar(e.target.value)}
                   className="w-48 h-8 text-sm"
                 />
+                <Select value={filtroStatusPagar || "all"} onValueChange={(v) => setFiltroStatusPagar(v === "all" ? "" : v)}>
+                  <SelectTrigger className="w-40 h-8 text-sm">
+                    <SelectValue placeholder="Status" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">Todos os status</SelectItem>
+                    <SelectItem value="pendente">Pendente</SelectItem>
+                    <SelectItem value="pago">Pago</SelectItem>
+                    <SelectItem value="cancelado">Cancelado</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
               <Button variant="outline" size="sm" onClick={() => openNovaContaDialog("pagar")} className="gap-1">
                 <Plus className="h-4 w-4" /> Nova Conta a Pagar
