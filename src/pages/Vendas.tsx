@@ -1652,6 +1652,9 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
                                 <CheckCircle className="h-4 w-4 text-green-600" />
                               </Button>
                             )}
+                            <Button variant="ghost" size="icon" onClick={() => setWhatsappPagamento({ conta: cp, vendaInfo: vendaOsMap[cp.venda_id] || null })} title="Enviar via WhatsApp">
+                              <MessageCircle className="h-4 w-4 text-accent" />
+                            </Button>
                             <Button variant="ghost" size="icon" onClick={() => openEditDialog("pagar", cp)} title="Editar">
                               <FileText className="h-4 w-4 text-primary" />
                             </Button>
