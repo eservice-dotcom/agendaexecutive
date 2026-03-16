@@ -105,6 +105,32 @@ const DashboardFinanceiro = () => {
     return { totalReceitas, totalDespesas, resultado, margem, centros, centrosRec };
   }, [cpYear, crYear]);
 
+  // ========== Resultado Projetado vs Efetivado ==========
+  const projetadoEfetivado = useMemo(() => {
+    const recPago = crYear.filter((c) => c.status === "pago").reduce((s, c) => s + Number(c.valor), 0);
+    const recPendente = crYear.filter((c) => c.status !== "pago").reduce((s, c) => s + Number(c.valor), 0);
+    const despPago = cpYear.filter((c) => c.status === "pago").reduce((s, c) => s + Number(c.valor), 0);
+    const despPendente = cpYear.filter((c) => c.status !== "pago").reduce((s, c) => s + Number(c.valor), 0);
+
+    const resultadoEfetivado = recPago - despPago;
+    const resultadoProjetado = (recPago + recPendente) - (despPago + despPendente);
+
+    // Monthly breakdown
+    const monthly = MONTHS.map((label, i) => {
+      const m = String(i + 1).padStart(2, "0");
+      const prefix = `${year}-${m}`;
+      const mCr = crYear.filter((c) => c.data?.startsWith(prefix));
+      const mCp = cpYear.filter((c) => c.data?.startsWith(prefix));
+      const efetivado = mCr.filter((c) => c.status === "pago").reduce((s, c) => s + Number(c.valor), 0)
+        - mCp.filter((c) => c.status === "pago").reduce((s, c) => s + Number(c.valor), 0);
+      const projetado = mCr.reduce((s, c) => s + Number(c.valor), 0)
+        - mCp.reduce((s, c) => s + Number(c.valor), 0);
+      return { mes: label, Efetivado: efetivado, Projetado: projetado };
+    });
+
+    return { recPago, recPendente, despPago, despPendente, resultadoEfetivado, resultadoProjetado, monthly };
+  }, [cpYear, crYear, year]);
+
   // ========== Faturamento por Cliente ==========
   const faturamentoClientes = useMemo(() => {
     const map = new Map<string, number>();
