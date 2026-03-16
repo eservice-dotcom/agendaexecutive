@@ -257,6 +257,8 @@ const Vendas = () => {
   const [fechamentoExtrasSelected, setFechamentoExtrasSelected] = useState<Set<number>>(new Set());
   const [fechamentoNovoExtra, setFechamentoNovoExtra] = useState({ descricao: "", valor: "" });
   const [fechamentoSearch, setFechamentoSearch] = useState("");
+  const [fechamentoDataInicio, setFechamentoDataInicio] = useState("");
+  const [fechamentoDataFim, setFechamentoDataFim] = useState("");
 
   const loadVendas = useCallback(async () => {
     const { data, error } = await supabase
@@ -905,6 +907,8 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
     setFechamentoExtrasSelected(new Set(extras.map((_: any, i: number) => i)));
     setFechamentoNovoExtra({ descricao: "", valor: "" });
     setFechamentoSearch("");
+    setFechamentoDataInicio("");
+    setFechamentoDataFim("");
     setFechamentoDialogOpen(true);
   };
 
@@ -917,6 +921,8 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
     setFechamentoExtrasSelected(new Set());
     setFechamentoNovoExtra({ descricao: "", valor: "" });
     setFechamentoSearch("");
+    setFechamentoDataInicio("");
+    setFechamentoDataFim("");
     setFechamentoDialogOpen(true);
   };
 
@@ -929,16 +935,21 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
 
   const fechamentoFilteredItems = useMemo(() => {
     const mapped = fechamentoItems.map((item: any, idx: number) => ({ item, idx }));
-    if (!fechamentoSearch) return mapped;
-    const s = fechamentoSearch.toLowerCase();
-    return mapped.filter(({ item }) =>
-      (item.cot || "").toLowerCase().includes(s) ||
-      (item.origem || "").toLowerCase().includes(s) ||
-      (item.destino || "").toLowerCase().includes(s) ||
-      (item.data || "").includes(s) ||
-      (item.tipo || "").toLowerCase().includes(s)
-    );
-  }, [fechamentoItems, fechamentoSearch]);
+    return mapped.filter(({ item }) => {
+      if (fechamentoSearch) {
+        const s = fechamentoSearch.toLowerCase();
+        const matchText = (item.cot || "").toLowerCase().includes(s) ||
+          (item.origem || "").toLowerCase().includes(s) ||
+          (item.destino || "").toLowerCase().includes(s) ||
+          (item.data || "").includes(s) ||
+          (item.tipo || "").toLowerCase().includes(s);
+        if (!matchText) return false;
+      }
+      if (fechamentoDataInicio && item.data < fechamentoDataInicio) return false;
+      if (fechamentoDataFim && item.data > fechamentoDataFim) return false;
+      return true;
+    });
+  }, [fechamentoItems, fechamentoSearch, fechamentoDataInicio, fechamentoDataFim]);
 
   const handleGerarFechamento = async (format: "print" | "excel" = "print") => {
     if (!fechamentoCliente || !session?.user?.id) return;
@@ -2204,17 +2215,30 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
 
               {fechamentoCliente && (
                 <>
-                  {/* Search */}
-                  <div className="flex items-center gap-2">
-                    <div className="relative flex-1">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <div className="relative flex-1 min-w-[180px]">
                       <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
                       <Input
-                        placeholder="Buscar O.S., origem, destino, data..."
+                        placeholder="Buscar O.S., origem, destino..."
                         value={fechamentoSearch}
                         onChange={(e) => setFechamentoSearch(e.target.value)}
                         className="pl-8 h-9"
                       />
                     </div>
+                    <Input
+                      type="date"
+                      value={fechamentoDataInicio}
+                      onChange={(e) => setFechamentoDataInicio(e.target.value)}
+                      placeholder="Data início"
+                      className="h-9 w-[140px]"
+                    />
+                    <Input
+                      type="date"
+                      value={fechamentoDataFim}
+                      onChange={(e) => setFechamentoDataFim(e.target.value)}
+                      placeholder="Data fim"
+                      className="h-9 w-[140px]"
+                    />
                     <div className="flex items-center gap-2">
                       <Checkbox
                         checked={fechamentoSelected.size === fechamentoItems.length && fechamentoItems.length > 0}
