@@ -243,7 +243,7 @@ const Index = () => {
     );
   }, [fechamentoItems, fechamentoSearch]);
 
-  const handleGerarFechamento = async () => {
+  const handleGerarFechamento = async (format: "print" | "excel" = "print") => {
     if (!fechamentoCliente || !session?.user?.id) return;
     const selectedItems = fechamentoItems.filter((_: any, i: number) => fechamentoSelected.has(i));
     const selectedExtras = fechamentoExtras.filter((_, i) => fechamentoExtrasSelected.has(i));
@@ -284,13 +284,19 @@ const Index = () => {
       );
     }
 
-    generateClosingReport(
+    const reportArgs = [
       selectedItems,
       `Fechamento Nº ${numero} - ${fechamentoCliente}`,
       fechamentoCliente,
       { cliente: fechamentoCliente, extras: selectedExtras },
       numero
-    );
+    ] as const;
+
+    if (format === "excel") {
+      generateClosingReportExcel(...reportArgs);
+    } else {
+      generateClosingReport(...reportArgs);
+    }
     toast.success(`Fechamento Nº ${numero} salvo com sucesso!`);
     setFechamentoDialogOpen(false);
   };
