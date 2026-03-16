@@ -276,6 +276,14 @@ const FechamentosConsulta = () => {
                         variant="ghost"
                         size="icon"
                         className="h-8 w-8"
+                        onClick={() => handleExportExcel(f)}
+                        title="Exportar Excel"
+                      >
+                        <FileSpreadsheet className="h-4 w-4 text-green-600" />
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-8 w-8"
                         onClick={() => openEdit(f)}
                         title="Editar fechamento"
                       >
