@@ -230,8 +230,9 @@ const Vendas = () => {
   const [editVendaSearch, setEditVendaSearch] = useState("");
   const [editVendaExtras, setEditVendaExtras] = useState<ExtraItem[]>([]);
 
-  // Filtro contas a pagar por OS
+  // Filtro contas a pagar por OS e fornecedor
   const [filtroOsPagar, setFiltroOsPagar] = useState("");
+  const [filtroFornecedorPagar, setFiltroFornecedorPagar] = useState("");
 
   // Closing report selection
   const [fechamentoDialogOpen, setFechamentoDialogOpen] = useState(false);
@@ -1280,13 +1281,20 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
   };
 
   const filteredContasPagarList = useMemo(() => {
-    if (!filtroOsPagar.trim()) return contasPagarList;
-    const search = filtroOsPagar.trim().toLowerCase();
-    return contasPagarList.filter((cp) => {
-      const cots = vendaOsMap[cp.venda_id]?.cots || [];
-      return cots.some((cot) => cot.toLowerCase().includes(search));
-    });
-  }, [contasPagarList, filtroOsPagar, vendaOsMap]);
+    let filtered = contasPagarList;
+    const osSearch = filtroOsPagar.trim().toLowerCase();
+    const fornSearch = filtroFornecedorPagar.trim().toLowerCase();
+    if (osSearch) {
+      filtered = filtered.filter((cp) => {
+        const cots = vendaOsMap[cp.venda_id]?.cots || [];
+        return cots.some((cot) => cot.toLowerCase().includes(osSearch));
+      });
+    }
+    if (fornSearch) {
+      filtered = filtered.filter((cp) => cp.fornecedor.toLowerCase().includes(fornSearch));
+    }
+    return filtered;
+  }, [contasPagarList, filtroOsPagar, filtroFornecedorPagar, vendaOsMap]);
 
   const totalPagarPendente = contasPagarList.filter(c => c.status === "pendente").reduce((s, c) => s + Number(c.valor), 0);
   const totalReceberPendente = contasReceberList.filter(c => c.status === "pendente").reduce((s, c) => s + Number(c.valor), 0);
@@ -1488,6 +1496,12 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
                   placeholder="Filtrar por nº da O.S."
                   value={filtroOsPagar}
                   onChange={(e) => setFiltroOsPagar(e.target.value)}
+                  className="w-48 h-8 text-sm"
+                />
+                <Input
+                  placeholder="Filtrar por fornecedor"
+                  value={filtroFornecedorPagar}
+                  onChange={(e) => setFiltroFornecedorPagar(e.target.value)}
                   className="w-48 h-8 text-sm"
                 />
               </div>
