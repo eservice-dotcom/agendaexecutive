@@ -243,6 +243,9 @@ const Vendas = () => {
   const [filtroClienteReceber, setFiltroClienteReceber] = useState("");
   const [filtroStatusReceber, setFiltroStatusReceber] = useState("");
 
+  // WhatsApp pagamento
+  const [whatsappPagamento, setWhatsappPagamento] = useState<{ conta: any; vendaInfo: any } | null>(null);
+
   // Closing report selection
   const [fechamentoDialogOpen, setFechamentoDialogOpen] = useState(false);
   const [fechamentoCliente, setFechamentoCliente] = useState("");
