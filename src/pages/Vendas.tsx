@@ -1481,14 +1481,14 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {contasReceberList.length === 0 ? (
+                  {filteredContasReceberList.length === 0 ? (
                     <TableRow>
                        <TableCell colSpan={12} className="text-center text-muted-foreground py-8">
                         Nenhuma conta a receber
                       </TableCell>
                     </TableRow>
                   ) : (
-                    contasReceberList.map((cr) => (
+                    filteredContasReceberList.map((cr) => (
                       <TableRow key={cr.id}>
                         <TableCell className="font-mono text-xs font-bold">{vendaOsMap[cr.venda_id]?.numero_venda || "—"}</TableCell>
                         <TableCell className="font-mono text-xs">{formatDate(cr.data)}</TableCell>
