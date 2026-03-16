@@ -1301,6 +1301,22 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
     return filtered;
   }, [contasPagarList, filtroOsPagar, filtroFornecedorPagar, vendaOsMap]);
 
+  const filteredContasReceberList = useMemo(() => {
+    let filtered = contasReceberList;
+    const osSearch = filtroOsReceber.trim().toLowerCase();
+    const clienteSearch = filtroClienteReceber.trim().toLowerCase();
+    if (osSearch) {
+      filtered = filtered.filter((cr) => {
+        const cots = vendaOsMap[cr.venda_id]?.cots || [];
+        return cots.some((cot) => cot.toLowerCase().includes(osSearch));
+      });
+    }
+    if (clienteSearch) {
+      filtered = filtered.filter((cr) => cr.cliente.toLowerCase().includes(clienteSearch));
+    }
+    return filtered;
+  }, [contasReceberList, filtroOsReceber, filtroClienteReceber, vendaOsMap]);
+
   const totalPagarPendente = contasPagarList.filter(c => c.status === "pendente").reduce((s, c) => s + Number(c.valor), 0);
   const totalReceberPendente = contasReceberList.filter(c => c.status === "pendente").reduce((s, c) => s + Number(c.valor), 0);
 
