@@ -192,6 +192,10 @@ const Index = () => {
   const formatDateLocal = (d: string) => { const [y, m, day] = d.split("-"); return `${day}/${m}/${y}`; };
 
   const handleOpenFechamento = async () => {
+    if (fechamentoDialogOpen) {
+      setFechamentoDialogOpen(false);
+      return;
+    }
     const { data } = await supabase.from("agenda_items").select("cliente").order("cliente");
     if (data) {
       setFechamentoAllClientes([...new Set(data.map((d) => d.cliente))].filter(Boolean).sort());
