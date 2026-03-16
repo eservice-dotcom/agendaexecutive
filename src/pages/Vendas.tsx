@@ -235,6 +235,10 @@ const Vendas = () => {
   const [filtroOsPagar, setFiltroOsPagar] = useState("");
   const [filtroFornecedorPagar, setFiltroFornecedorPagar] = useState("");
 
+  // Filtro contas a receber por OS e cliente
+  const [filtroOsReceber, setFiltroOsReceber] = useState("");
+  const [filtroClienteReceber, setFiltroClienteReceber] = useState("");
+
   // Closing report selection
   const [fechamentoDialogOpen, setFechamentoDialogOpen] = useState(false);
   const [fechamentoCliente, setFechamentoCliente] = useState("");
@@ -1297,6 +1301,22 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
     return filtered;
   }, [contasPagarList, filtroOsPagar, filtroFornecedorPagar, vendaOsMap]);
 
+  const filteredContasReceberList = useMemo(() => {
+    let filtered = contasReceberList;
+    const osSearch = filtroOsReceber.trim().toLowerCase();
+    const clienteSearch = filtroClienteReceber.trim().toLowerCase();
+    if (osSearch) {
+      filtered = filtered.filter((cr) => {
+        const cots = vendaOsMap[cr.venda_id]?.cots || [];
+        return cots.some((cot) => cot.toLowerCase().includes(osSearch));
+      });
+    }
+    if (clienteSearch) {
+      filtered = filtered.filter((cr) => cr.cliente.toLowerCase().includes(clienteSearch));
+    }
+    return filtered;
+  }, [contasReceberList, filtroOsReceber, filtroClienteReceber, vendaOsMap]);
+
   const totalPagarPendente = contasPagarList.filter(c => c.status === "pendente").reduce((s, c) => s + Number(c.valor), 0);
   const totalReceberPendente = contasReceberList.filter(c => c.status === "pendente").reduce((s, c) => s + Number(c.valor), 0);
 
@@ -1422,7 +1442,22 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
 
           {/* ===== CONTAS A RECEBER TAB ===== */}
           <TabsContent value="receber">
-            <div className="flex justify-end mb-2">
+            <div className="flex items-center justify-between mb-2 gap-2">
+              <div className="flex items-center gap-2">
+                <Search className="h-4 w-4 text-muted-foreground" />
+                <Input
+                  placeholder="Filtrar por nº da O.S."
+                  value={filtroOsReceber}
+                  onChange={(e) => setFiltroOsReceber(e.target.value)}
+                  className="w-48 h-8 text-sm"
+                />
+                <Input
+                  placeholder="Filtrar por cliente"
+                  value={filtroClienteReceber}
+                  onChange={(e) => setFiltroClienteReceber(e.target.value)}
+                  className="w-48 h-8 text-sm"
+                />
+              </div>
               <Button variant="outline" size="sm" onClick={() => openNovaContaDialog("receber")} className="gap-1">
                 <Plus className="h-4 w-4" /> Nova Conta a Receber
               </Button>
@@ -1446,14 +1481,14 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {contasReceberList.length === 0 ? (
+                  {filteredContasReceberList.length === 0 ? (
                     <TableRow>
                        <TableCell colSpan={12} className="text-center text-muted-foreground py-8">
                         Nenhuma conta a receber
                       </TableCell>
                     </TableRow>
                   ) : (
-                    contasReceberList.map((cr) => (
+                    filteredContasReceberList.map((cr) => (
                       <TableRow key={cr.id}>
                         <TableCell className="font-mono text-xs font-bold">{vendaOsMap[cr.venda_id]?.numero_venda || "—"}</TableCell>
                         <TableCell className="font-mono text-xs">{formatDate(cr.data)}</TableCell>
