@@ -1309,8 +1309,11 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
     if (fornSearch) {
       filtered = filtered.filter((cp) => cp.fornecedor.toLowerCase().includes(fornSearch));
     }
+    if (filtroStatusPagar) {
+      filtered = filtered.filter((cp) => cp.status === filtroStatusPagar);
+    }
     return filtered;
-  }, [contasPagarList, filtroOsPagar, filtroFornecedorPagar, vendaOsMap]);
+  }, [contasPagarList, filtroOsPagar, filtroFornecedorPagar, filtroStatusPagar, vendaOsMap]);
 
   const filteredContasReceberList = useMemo(() => {
     let filtered = contasReceberList;
