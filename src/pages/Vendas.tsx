@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo, useCallback } from "react";
 import { Link } from "react-router-dom";
-import { ArrowLeft, Plus, Trash2, ShoppingCart, Search, Check, FileText, XCircle, DollarSign, CheckCircle, Download, Pencil, ClipboardList, X, Printer } from "lucide-react";
+import { ArrowLeft, Plus, Trash2, ShoppingCart, Search, Check, FileText, XCircle, DollarSign, CheckCircle, Download, Pencil, ClipboardList, X, Printer, MessageCircle } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
@@ -18,6 +18,7 @@ import logo from "@/assets/logo-executive-service.png";
 import { generateClosingReport } from "@/lib/closingReport";
 import { printContasPagar, printContasReceber } from "@/lib/printUtils";
 import DashboardFinanceiro from "@/components/DashboardFinanceiro";
+import WhatsAppPagamentoDialog from "@/components/WhatsAppPagamentoDialog";
 
 interface Venda {
   id: string;
@@ -241,6 +242,9 @@ const Vendas = () => {
   const [filtroOsReceber, setFiltroOsReceber] = useState("");
   const [filtroClienteReceber, setFiltroClienteReceber] = useState("");
   const [filtroStatusReceber, setFiltroStatusReceber] = useState("");
+
+  // WhatsApp pagamento
+  const [whatsappPagamento, setWhatsappPagamento] = useState<{ conta: any; vendaInfo: any } | null>(null);
 
   // Closing report selection
   const [fechamentoDialogOpen, setFechamentoDialogOpen] = useState(false);
@@ -1648,6 +1652,9 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
                                 <CheckCircle className="h-4 w-4 text-green-600" />
                               </Button>
                             )}
+                            <Button variant="ghost" size="icon" onClick={() => setWhatsappPagamento({ conta: cp, vendaInfo: vendaOsMap[cp.venda_id] || null })} title="Enviar via WhatsApp">
+                              <MessageCircle className="h-4 w-4 text-accent" />
+                            </Button>
                             <Button variant="ghost" size="icon" onClick={() => openEditDialog("pagar", cp)} title="Editar">
                               <FileText className="h-4 w-4 text-primary" />
                             </Button>
@@ -2512,6 +2519,13 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
             </DialogFooter>
           </DialogContent>
         </Dialog>
+
+        <WhatsAppPagamentoDialog
+          open={!!whatsappPagamento}
+          onOpenChange={(v) => !v && setWhatsappPagamento(null)}
+          conta={whatsappPagamento?.conta || null}
+          vendaInfo={whatsappPagamento?.vendaInfo || null}
+        />
       </main>
     </div>
   );
