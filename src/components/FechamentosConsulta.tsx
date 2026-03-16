@@ -306,7 +306,9 @@ const FechamentosConsulta = () => {
                     </div>
                   </TableCell>
                 </TableRow>
-              ))
+              );
+              })
+            )
             )}
           </TableBody>
         </Table>
