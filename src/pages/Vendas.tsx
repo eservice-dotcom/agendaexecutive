@@ -1281,13 +1281,20 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
   };
 
   const filteredContasPagarList = useMemo(() => {
-    if (!filtroOsPagar.trim()) return contasPagarList;
-    const search = filtroOsPagar.trim().toLowerCase();
-    return contasPagarList.filter((cp) => {
-      const cots = vendaOsMap[cp.venda_id]?.cots || [];
-      return cots.some((cot) => cot.toLowerCase().includes(search));
-    });
-  }, [contasPagarList, filtroOsPagar, vendaOsMap]);
+    let filtered = contasPagarList;
+    const osSearch = filtroOsPagar.trim().toLowerCase();
+    const fornSearch = filtroFornecedorPagar.trim().toLowerCase();
+    if (osSearch) {
+      filtered = filtered.filter((cp) => {
+        const cots = vendaOsMap[cp.venda_id]?.cots || [];
+        return cots.some((cot) => cot.toLowerCase().includes(osSearch));
+      });
+    }
+    if (fornSearch) {
+      filtered = filtered.filter((cp) => cp.fornecedor.toLowerCase().includes(fornSearch));
+    }
+    return filtered;
+  }, [contasPagarList, filtroOsPagar, filtroFornecedorPagar, vendaOsMap]);
 
   const totalPagarPendente = contasPagarList.filter(c => c.status === "pendente").reduce((s, c) => s + Number(c.valor), 0);
   const totalReceberPendente = contasReceberList.filter(c => c.status === "pendente").reduce((s, c) => s + Number(c.valor), 0);
