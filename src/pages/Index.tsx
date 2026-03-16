@@ -424,204 +424,185 @@ const Index = () => {
 
           <TabsContent value="fechamentos" className="space-y-4">
             <div className="flex justify-end">
-              <Button onClick={handleOpenFechamento} className="gap-2">
-                <Plus className="h-4 w-4" />
-                Novo Fechamento
+              <Button onClick={handleOpenFechamento} variant={fechamentoDialogOpen ? "secondary" : "default"} className="gap-2">
+                {fechamentoDialogOpen ? <X className="h-4 w-4" /> : <Plus className="h-4 w-4" />}
+                {fechamentoDialogOpen ? "Fechar" : "Novo Fechamento"}
               </Button>
             </div>
-            <FechamentosConsulta />
-          </TabsContent>
 
-          {canViewFinancials && (
-            <>
-              <TabsContent value="fat-veiculo">
-                <FaturamentoVeiculo />
-              </TabsContent>
-              <TabsContent value="fat-fornecedor">
-                <FaturamentoFornecedor />
-              </TabsContent>
-              <TabsContent value="ocupacao">
-                <DashboardOcupacao />
-              </TabsContent>
-            </>
-          )}
-        </Tabs>
+            {fechamentoDialogOpen && (
+              <div className="rounded-lg border border-border bg-card p-4 space-y-3">
+                <h3 className="text-sm font-semibold">Novo Relatório de Fechamento</h3>
 
-        {/* Fechamento Selection Dialog */}
-        <Dialog open={fechamentoDialogOpen} onOpenChange={(v) => { if (!v) setFechamentoDialogOpen(false); }}>
-          <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
-            <DialogHeader>
-              <DialogTitle>Relatório de Fechamento</DialogTitle>
-            </DialogHeader>
-            <div className="space-y-3">
-              <div className="space-y-2">
-                <Label>Cliente</Label>
-                <Select value={fechamentoCliente} onValueChange={handleFechamentoClienteChange}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Selecione o cliente" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {fechamentoAllClientes.map((c) => (
-                      <SelectItem key={c} value={c}>{c}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-
-              {fechamentoCliente && (
-                <>
-                  <div className="flex items-center gap-2 flex-wrap">
-                    <div className="relative flex-1 min-w-[180px]">
-                      <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
-                      <Input
-                        placeholder="Buscar O.S., origem, destino..."
-                        value={fechamentoSearch}
-                        onChange={(e) => setFechamentoSearch(e.target.value)}
-                        className="pl-8 h-9"
-                      />
-                    </div>
+                <div className="grid grid-cols-1 sm:grid-cols-4 gap-3">
+                  <Select value={fechamentoCliente} onValueChange={handleFechamentoClienteChange}>
+                    <SelectTrigger className="h-9">
+                      <SelectValue placeholder="Selecione o cliente" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {fechamentoAllClientes.map((c) => (
+                        <SelectItem key={c} value={c}>{c}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <div className="relative">
+                    <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
                     <Input
-                      type="date"
-                      value={fechamentoDataInicio}
-                      onChange={(e) => setFechamentoDataInicio(e.target.value)}
-                      placeholder="Data início"
-                      className="h-9 w-[140px]"
+                      placeholder="Buscar O.S., origem, destino..."
+                      value={fechamentoSearch}
+                      onChange={(e) => setFechamentoSearch(e.target.value)}
+                      className="pl-8 h-9"
                     />
-                    <Input
-                      type="date"
-                      value={fechamentoDataFim}
-                      onChange={(e) => setFechamentoDataFim(e.target.value)}
-                      placeholder="Data fim"
-                      className="h-9 w-[140px]"
-                    />
-                    <div className="flex items-center gap-2">
-                      <Checkbox
-                        checked={fechamentoSelected.size === fechamentoItems.length && fechamentoItems.length > 0}
-                        onCheckedChange={(checked) => {
-                          setFechamentoSelected(checked ? new Set(fechamentoItems.map((_: any, i: number) => i)) : new Set());
-                        }}
-                      />
-                      <span className="text-xs text-muted-foreground whitespace-nowrap">Todos</span>
+                  </div>
+                  <Input
+                    type="date"
+                    value={fechamentoDataInicio}
+                    onChange={(e) => setFechamentoDataInicio(e.target.value)}
+                    placeholder="Data início"
+                    className="h-9"
+                  />
+                  <Input
+                    type="date"
+                    value={fechamentoDataFim}
+                    onChange={(e) => setFechamentoDataFim(e.target.value)}
+                    placeholder="Data fim"
+                    className="h-9"
+                  />
+                </div>
+
+                {fechamentoCliente && (
+                  <>
+                    <div className="flex items-center justify-between">
+                      <p className="text-sm text-muted-foreground">{fechamentoSelected.size} de {fechamentoItems.length} serviços selecionados</p>
+                      <div className="flex items-center gap-2">
+                        <Checkbox
+                          checked={fechamentoSelected.size === fechamentoItems.length && fechamentoItems.length > 0}
+                          onCheckedChange={(checked) => {
+                            setFechamentoSelected(checked ? new Set(fechamentoItems.map((_: any, i: number) => i)) : new Set());
+                          }}
+                        />
+                        <span className="text-xs text-muted-foreground whitespace-nowrap">Selecionar todos</span>
+                      </div>
                     </div>
-                  </div>
 
-                  <div className="border rounded-md divide-y max-h-[35vh] overflow-y-auto">
-                    {fechamentoFilteredItems.length === 0 ? (
-                      <div className="px-3 py-4 text-center text-sm text-muted-foreground">Nenhum serviço encontrado</div>
-                    ) : (
-                      fechamentoFilteredItems.map(({ item, idx }: any) => (
-                        <label key={idx} className="flex items-center gap-3 px-3 py-2 hover:bg-muted/50 cursor-pointer">
-                          <Checkbox
-                            checked={fechamentoSelected.has(idx)}
-                            onCheckedChange={(checked) => {
-                              const next = new Set(fechamentoSelected);
-                              checked ? next.add(idx) : next.delete(idx);
-                              setFechamentoSelected(next);
-                            }}
-                          />
-                          <div className="flex-1 text-sm">
-                            <span className="font-mono text-xs text-muted-foreground mr-2">{item.cot}</span>
-                            <span>{item.data ? formatDateLocal(item.data) : ""}</span>
-                            <span className="mx-1">—</span>
-                            <span>{item.tipo}</span>
-                            <span className="mx-1">|</span>
-                            <span className="text-muted-foreground">{item.origem} → {item.destino}</span>
-                          </div>
-                          <span className="text-xs font-mono">{formatCurrencyLocal(Number(item.valor) || 0)}</span>
-                        </label>
-                      ))
-                    )}
-                  </div>
-                  <p className="text-sm text-muted-foreground">{fechamentoSelected.size} de {fechamentoItems.length} serviços selecionados</p>
-
-                  <div className="border-t pt-3 mt-3">
-                    <p className="text-sm font-medium mb-2">Extras</p>
-                    {fechamentoExtras.length > 0 && (
-                      <div className="border rounded-md divide-y mb-2">
-                        {fechamentoExtras.map((extra, idx) => (
+                    <div className="border rounded-md divide-y max-h-[40vh] overflow-y-auto">
+                      {fechamentoFilteredItems.length === 0 ? (
+                        <div className="px-3 py-4 text-center text-sm text-muted-foreground">Nenhum serviço encontrado</div>
+                      ) : (
+                        fechamentoFilteredItems.map(({ item, idx }: any) => (
                           <label key={idx} className="flex items-center gap-3 px-3 py-2 hover:bg-muted/50 cursor-pointer">
                             <Checkbox
-                              checked={fechamentoExtrasSelected.has(idx)}
+                              checked={fechamentoSelected.has(idx)}
                               onCheckedChange={(checked) => {
-                                const next = new Set(fechamentoExtrasSelected);
+                                const next = new Set(fechamentoSelected);
                                 checked ? next.add(idx) : next.delete(idx);
-                                setFechamentoExtrasSelected(next);
+                                setFechamentoSelected(next);
                               }}
                             />
-                            <span className="flex-1 text-sm">{extra.descricao}</span>
-                            <span className="text-xs font-mono">{formatCurrencyLocal(extra.valor)}</span>
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              className="h-6 w-6"
-                              onClick={(e) => {
-                                e.preventDefault();
-                                setFechamentoExtras(prev => prev.filter((_, i) => i !== idx));
-                                const nextSel = new Set<number>();
-                                fechamentoExtrasSelected.forEach((i) => {
-                                  if (i < idx) nextSel.add(i);
-                                  else if (i > idx) nextSel.add(i - 1);
-                                });
-                                setFechamentoExtrasSelected(nextSel);
-                              }}
-                            >
-                              <Trash2 className="h-3 w-3 text-destructive" />
-                            </Button>
+                            <div className="flex-1 text-sm">
+                              <span className="font-mono text-xs text-muted-foreground mr-2">{item.cot}</span>
+                              <span>{item.data ? formatDateLocal(item.data) : ""}</span>
+                              <span className="mx-1">—</span>
+                              <span>{item.tipo}</span>
+                              <span className="mx-1">|</span>
+                              <span className="text-muted-foreground">{item.origem} → {item.destino}</span>
+                            </div>
+                            <span className="text-xs font-mono">{formatCurrencyLocal(Number(item.valor) || 0)}</span>
                           </label>
-                        ))}
+                        ))
+                      )}
+                    </div>
+
+                    <div className="border-t pt-3 mt-3">
+                      <p className="text-sm font-medium mb-2">Extras</p>
+                      {fechamentoExtras.length > 0 && (
+                        <div className="border rounded-md divide-y mb-2">
+                          {fechamentoExtras.map((extra, idx) => (
+                            <label key={idx} className="flex items-center gap-3 px-3 py-2 hover:bg-muted/50 cursor-pointer">
+                              <Checkbox
+                                checked={fechamentoExtrasSelected.has(idx)}
+                                onCheckedChange={(checked) => {
+                                  const next = new Set(fechamentoExtrasSelected);
+                                  checked ? next.add(idx) : next.delete(idx);
+                                  setFechamentoExtrasSelected(next);
+                                }}
+                              />
+                              <span className="flex-1 text-sm">{extra.descricao}</span>
+                              <span className="text-xs font-mono">{formatCurrencyLocal(extra.valor)}</span>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="h-6 w-6"
+                                onClick={(e) => {
+                                  e.preventDefault();
+                                  setFechamentoExtras(prev => prev.filter((_, i) => i !== idx));
+                                  const nextSel = new Set<number>();
+                                  fechamentoExtrasSelected.forEach((i) => {
+                                    if (i < idx) nextSel.add(i);
+                                    else if (i > idx) nextSel.add(i - 1);
+                                  });
+                                  setFechamentoExtrasSelected(nextSel);
+                                }}
+                              >
+                                <Trash2 className="h-3 w-3 text-destructive" />
+                              </Button>
+                            </label>
+                          ))}
+                        </div>
+                      )}
+                      <div className="flex gap-2 items-end">
+                        <div className="flex-1">
+                          <Input
+                            placeholder="Descrição do extra"
+                            value={fechamentoNovoExtra.descricao}
+                            onChange={(e) => setFechamentoNovoExtra(prev => ({ ...prev, descricao: e.target.value }))}
+                            className="h-8 text-sm"
+                          />
+                        </div>
+                        <div className="w-28">
+                          <Input
+                            type="text"
+                            inputMode="decimal"
+                            placeholder="Valor"
+                            value={fechamentoNovoExtra.valor}
+                            onChange={(e) => setFechamentoNovoExtra(prev => ({ ...prev, valor: e.target.value }))}
+                            className="h-8 text-sm"
+                          />
+                        </div>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          className="h-8"
+                          disabled={!fechamentoNovoExtra.descricao.trim() || !fechamentoNovoExtra.valor}
+                          onClick={() => {
+                            const newIdx = fechamentoExtras.length;
+                            setFechamentoExtras(prev => [...prev, { descricao: fechamentoNovoExtra.descricao.trim(), valor: parseMoneyValue(fechamentoNovoExtra.valor) }]);
+                            setFechamentoExtrasSelected(prev => new Set([...prev, newIdx]));
+                            setFechamentoNovoExtra({ descricao: "", valor: "" });
+                          }}
+                        >
+                          <Plus className="h-3 w-3 mr-1" /> Adicionar
+                        </Button>
                       </div>
-                    )}
-                    <div className="flex gap-2 items-end">
-                      <div className="flex-1">
-                        <Input
-                          placeholder="Descrição do extra"
-                          value={fechamentoNovoExtra.descricao}
-                          onChange={(e) => setFechamentoNovoExtra(prev => ({ ...prev, descricao: e.target.value }))}
-                          className="h-8 text-sm"
-                        />
-                      </div>
-                      <div className="w-28">
-                        <Input
-                          type="text"
-                          inputMode="decimal"
-                          placeholder="Valor"
-                          value={fechamentoNovoExtra.valor}
-                          onChange={(e) => setFechamentoNovoExtra(prev => ({ ...prev, valor: e.target.value }))}
-                          className="h-8 text-sm"
-                        />
-                      </div>
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        className="h-8"
-                        disabled={!fechamentoNovoExtra.descricao.trim() || !fechamentoNovoExtra.valor}
-                        onClick={() => {
-                          const newIdx = fechamentoExtras.length;
-                          setFechamentoExtras(prev => [...prev, { descricao: fechamentoNovoExtra.descricao.trim(), valor: parseMoneyValue(fechamentoNovoExtra.valor) }]);
-                          setFechamentoExtrasSelected(prev => new Set([...prev, newIdx]));
-                          setFechamentoNovoExtra({ descricao: "", valor: "" });
-                        }}
-                      >
-                        <Plus className="h-3 w-3 mr-1" /> Adicionar
+                    </div>
+
+                    <div className="flex justify-end gap-2 pt-2">
+                      <Button onClick={() => handleGerarFechamento("excel")} disabled={fechamentoSelected.size === 0 || !fechamentoCliente} variant="outline" className="gap-2">
+                        <FileSpreadsheet className="h-4 w-4" />
+                        Excel
+                      </Button>
+                      <Button onClick={() => handleGerarFechamento("print")} disabled={fechamentoSelected.size === 0 || !fechamentoCliente} className="gap-2">
+                        <ClipboardList className="h-4 w-4" />
+                        Gerar Relatório
                       </Button>
                     </div>
-                  </div>
-                </>
-              )}
-            </div>
-            <DialogFooter>
-              <Button variant="outline" onClick={() => setFechamentoDialogOpen(false)}>Cancelar</Button>
-              <Button onClick={() => handleGerarFechamento("excel")} disabled={fechamentoSelected.size === 0 || !fechamentoCliente} variant="outline" className="gap-2">
-                <FileSpreadsheet className="h-4 w-4" />
-                Excel
-              </Button>
-              <Button onClick={() => handleGerarFechamento("print")} disabled={fechamentoSelected.size === 0 || !fechamentoCliente} className="gap-2">
-                <ClipboardList className="h-4 w-4" />
-                Gerar Relatório
-              </Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
+                  </>
+                )}
+              </div>
+            )}
+
+            <FechamentosConsulta />
+          </TabsContent>
       </main>
     </div>
   );
