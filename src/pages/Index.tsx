@@ -1,5 +1,5 @@
 import { useState, useMemo, useCallback, useEffect } from "react";
-import { CalendarDays, ListChecks, Truck, Building2, Plus, BarChart3, Printer, EyeOff, Eye, ShoppingCart, FileText, Search, Trash2, ClipboardList, Archive } from "lucide-react";
+import { CalendarDays, ListChecks, Truck, Building2, Plus, BarChart3, Printer, EyeOff, Eye, ShoppingCart, FileText, Search, Trash2, ClipboardList, Archive, FileSpreadsheet } from "lucide-react";
 import logo from "@/assets/logo-executive-service.png";
 import { Link } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
@@ -20,6 +20,7 @@ import FechamentosConsulta from "@/components/FechamentosConsulta";
 import { getAgendaItems } from "@/data/cadastroStorage";
 import { printAgenda } from "@/lib/printUtils";
 import { generateClosingReport } from "@/lib/closingReport";
+import { generateClosingReportExcel } from "@/lib/closingReportExcel";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
@@ -242,7 +243,7 @@ const Index = () => {
     );
   }, [fechamentoItems, fechamentoSearch]);
 
-  const handleGerarFechamento = async () => {
+  const handleGerarFechamento = async (format: "print" | "excel" = "print") => {
     if (!fechamentoCliente || !session?.user?.id) return;
     const selectedItems = fechamentoItems.filter((_: any, i: number) => fechamentoSelected.has(i));
     const selectedExtras = fechamentoExtras.filter((_, i) => fechamentoExtrasSelected.has(i));
@@ -283,13 +284,19 @@ const Index = () => {
       );
     }
 
-    generateClosingReport(
+    const reportArgs = [
       selectedItems,
       `Fechamento Nº ${numero} - ${fechamentoCliente}`,
       fechamentoCliente,
       { cliente: fechamentoCliente, extras: selectedExtras },
       numero
-    );
+    ] as const;
+
+    if (format === "excel") {
+      generateClosingReportExcel(...reportArgs);
+    } else {
+      generateClosingReport(...reportArgs);
+    }
     toast.success(`Fechamento Nº ${numero} salvo com sucesso!`);
     setFechamentoDialogOpen(false);
   };
@@ -580,7 +587,11 @@ const Index = () => {
             </div>
             <DialogFooter>
               <Button variant="outline" onClick={() => setFechamentoDialogOpen(false)}>Cancelar</Button>
-              <Button onClick={handleGerarFechamento} disabled={fechamentoSelected.size === 0 || !fechamentoCliente} className="gap-2">
+              <Button onClick={() => handleGerarFechamento("excel")} disabled={fechamentoSelected.size === 0 || !fechamentoCliente} variant="outline" className="gap-2">
+                <FileSpreadsheet className="h-4 w-4" />
+                Excel
+              </Button>
+              <Button onClick={() => handleGerarFechamento("print")} disabled={fechamentoSelected.size === 0 || !fechamentoCliente} className="gap-2">
                 <ClipboardList className="h-4 w-4" />
                 Gerar Relatório
               </Button>

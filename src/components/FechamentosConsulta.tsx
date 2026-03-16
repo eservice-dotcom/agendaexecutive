@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback, useMemo } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { generateClosingReport } from "@/lib/closingReport";
+import { generateClosingReportExcel } from "@/lib/closingReportExcel";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -9,7 +10,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
-import { Printer, Search, Pencil, Trash2, Save, X } from "lucide-react";
+import { Printer, Search, Pencil, Trash2, Save, X, FileSpreadsheet } from "lucide-react";
 import { toast } from "sonner";
 
 interface Fechamento {
@@ -97,6 +98,22 @@ const FechamentosConsulta = () => {
     const extras = Array.isArray(f.extras) ? f.extras : [];
 
     generateClosingReport(
+      items,
+      `Fechamento Nº ${f.numero_fechamento} - ${f.cliente}`,
+      f.cliente,
+      {
+        cliente: f.cliente,
+        extras,
+      },
+      f.numero_fechamento
+    );
+  };
+
+  const handleExportExcel = (f: Fechamento) => {
+    const items = Array.isArray(f.items) ? f.items : [];
+    const extras = Array.isArray(f.extras) ? f.extras : [];
+
+    generateClosingReportExcel(
       items,
       `Fechamento Nº ${f.numero_fechamento} - ${f.cliente}`,
       f.cliente,
@@ -254,6 +271,15 @@ const FechamentosConsulta = () => {
                         title="Reimprimir fechamento"
                       >
                         <Printer className="h-4 w-4 text-primary" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-8 w-8"
+                        onClick={() => handleExportExcel(f)}
+                        title="Exportar Excel"
+                      >
+                        <FileSpreadsheet className="h-4 w-4 text-green-600" />
                       </Button>
                       <Button
                         variant="ghost"

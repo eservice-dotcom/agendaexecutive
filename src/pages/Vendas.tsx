@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo, useCallback } from "react";
 import { Link } from "react-router-dom";
-import { ArrowLeft, Plus, Trash2, ShoppingCart, Search, Check, FileText, XCircle, DollarSign, CheckCircle, Download, Pencil, ClipboardList, X, Printer, MessageCircle } from "lucide-react";
+import { ArrowLeft, Plus, Trash2, ShoppingCart, Search, Check, FileText, XCircle, DollarSign, CheckCircle, Download, Pencil, ClipboardList, X, Printer, MessageCircle, FileSpreadsheet } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
@@ -16,6 +16,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "@/hooks/use-toast";
 import logo from "@/assets/logo-executive-service.png";
 import { generateClosingReport } from "@/lib/closingReport";
+import { generateClosingReportExcel } from "@/lib/closingReportExcel";
 import { printContasPagar, printContasReceber } from "@/lib/printUtils";
 import DashboardFinanceiro from "@/components/DashboardFinanceiro";
 import WhatsAppPagamentoDialog from "@/components/WhatsAppPagamentoDialog";
@@ -939,7 +940,7 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
     );
   }, [fechamentoItems, fechamentoSearch]);
 
-  const handleGerarFechamento = async () => {
+  const handleGerarFechamento = async (format: "print" | "excel" = "print") => {
     if (!fechamentoCliente || !session?.user?.id) return;
     const selectedItems = fechamentoItems.filter((_: any, i: number) => fechamentoSelected.has(i));
     const selectedExtras = fechamentoExtras.filter((_, i) => fechamentoExtrasSelected.has(i));
@@ -979,13 +980,19 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
       );
     }
 
-    generateClosingReport(
+    const reportArgs = [
       selectedItems,
       `Fechamento Nº ${numero} - ${fechamentoCliente}`,
       fechamentoCliente,
       { cliente: fechamentoCliente, extras: selectedExtras },
       numero
-    );
+    ] as const;
+
+    if (format === "excel") {
+      generateClosingReportExcel(...reportArgs);
+    } else {
+      generateClosingReport(...reportArgs);
+    }
     toast({ title: `Fechamento Nº ${numero} salvo com sucesso!` });
     setFechamentoDialogOpen(false);
   };
@@ -2327,7 +2334,11 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
             </div>
             <DialogFooter>
               <Button variant="outline" onClick={() => setFechamentoDialogOpen(false)}>Cancelar</Button>
-              <Button onClick={handleGerarFechamento} disabled={fechamentoSelected.size === 0 || !fechamentoCliente} className="gap-2">
+              <Button onClick={() => handleGerarFechamento("excel")} disabled={fechamentoSelected.size === 0 || !fechamentoCliente} variant="outline" className="gap-2">
+                <FileSpreadsheet className="h-4 w-4" />
+                Excel
+              </Button>
+              <Button onClick={() => handleGerarFechamento("print")} disabled={fechamentoSelected.size === 0 || !fechamentoCliente} className="gap-2">
                 <ClipboardList className="h-4 w-4" />
                 Gerar Relatório
               </Button>
