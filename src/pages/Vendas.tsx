@@ -1597,6 +1597,7 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
                   <Plus className="h-4 w-4" /> Nova Conta a Pagar
                 </Button>
               </div>
+            </div>
             <div className="rounded-lg border border-border bg-card shadow-sm">
               <Table>
                 <TableHeader>
