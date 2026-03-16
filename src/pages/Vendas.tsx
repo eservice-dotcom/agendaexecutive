@@ -1328,8 +1328,11 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
     if (clienteSearch) {
       filtered = filtered.filter((cr) => cr.cliente.toLowerCase().includes(clienteSearch));
     }
+    if (filtroStatusReceber) {
+      filtered = filtered.filter((cr) => cr.status === filtroStatusReceber);
+    }
     return filtered;
-  }, [contasReceberList, filtroOsReceber, filtroClienteReceber, vendaOsMap]);
+  }, [contasReceberList, filtroOsReceber, filtroClienteReceber, filtroStatusReceber, vendaOsMap]);
 
   const totalPagarPendente = contasPagarList.filter(c => c.status === "pendente").reduce((s, c) => s + Number(c.valor), 0);
   const totalReceberPendente = contasReceberList.filter(c => c.status === "pendente").reduce((s, c) => s + Number(c.valor), 0);
