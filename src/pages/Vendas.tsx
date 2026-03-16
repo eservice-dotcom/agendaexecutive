@@ -931,16 +931,21 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
 
   const fechamentoFilteredItems = useMemo(() => {
     const mapped = fechamentoItems.map((item: any, idx: number) => ({ item, idx }));
-    if (!fechamentoSearch) return mapped;
-    const s = fechamentoSearch.toLowerCase();
-    return mapped.filter(({ item }) =>
-      (item.cot || "").toLowerCase().includes(s) ||
-      (item.origem || "").toLowerCase().includes(s) ||
-      (item.destino || "").toLowerCase().includes(s) ||
-      (item.data || "").includes(s) ||
-      (item.tipo || "").toLowerCase().includes(s)
-    );
-  }, [fechamentoItems, fechamentoSearch]);
+    return mapped.filter(({ item }) => {
+      if (fechamentoSearch) {
+        const s = fechamentoSearch.toLowerCase();
+        const matchText = (item.cot || "").toLowerCase().includes(s) ||
+          (item.origem || "").toLowerCase().includes(s) ||
+          (item.destino || "").toLowerCase().includes(s) ||
+          (item.data || "").includes(s) ||
+          (item.tipo || "").toLowerCase().includes(s);
+        if (!matchText) return false;
+      }
+      if (fechamentoDataInicio && item.data < fechamentoDataInicio) return false;
+      if (fechamentoDataFim && item.data > fechamentoDataFim) return false;
+      return true;
+    });
+  }, [fechamentoItems, fechamentoSearch, fechamentoDataInicio, fechamentoDataFim]);
 
   const handleGerarFechamento = async (format: "print" | "excel" = "print") => {
     if (!fechamentoCliente || !session?.user?.id) return;
