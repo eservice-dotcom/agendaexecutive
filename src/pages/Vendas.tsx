@@ -1342,6 +1342,9 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
             <TabsTrigger value="pagar" className="gap-1">
               A Pagar <Badge variant="secondary" className="ml-1 text-xs">{formatCurrency(totalPagarPendente)}</Badge>
             </TabsTrigger>
+            <TabsTrigger value="dashboard" className="gap-1">
+              Dashboard
+            </TabsTrigger>
           </TabsList>
 
           {/* ===== VENDAS TAB ===== */}
