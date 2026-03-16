@@ -16,6 +16,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "@/hooks/use-toast";
 import logo from "@/assets/logo-executive-service.png";
 import { generateClosingReport } from "@/lib/closingReport";
+import DashboardFinanceiro from "@/components/DashboardFinanceiro";
 
 interface Venda {
   id: string;
@@ -1341,6 +1342,9 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
             <TabsTrigger value="pagar" className="gap-1">
               A Pagar <Badge variant="secondary" className="ml-1 text-xs">{formatCurrency(totalPagarPendente)}</Badge>
             </TabsTrigger>
+            <TabsTrigger value="dashboard" className="gap-1">
+              Dashboard
+            </TabsTrigger>
           </TabsList>
 
           {/* ===== VENDAS TAB ===== */}
@@ -1573,6 +1577,11 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
                 </TableBody>
               </Table>
             </div>
+          </TabsContent>
+
+          {/* ===== DASHBOARD TAB ===== */}
+          <TabsContent value="dashboard">
+            <DashboardFinanceiro />
           </TabsContent>
         </Tabs>
 
