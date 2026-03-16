@@ -206,6 +206,7 @@ const Index = () => {
     setFechamentoDataInicio("");
     setFechamentoDataFim("");
     setFechamentoDialogOpen(true);
+    setActiveTab("fechamentos");
   };
 
   const handleFechamentoClienteChange = async (cli: string) => {
