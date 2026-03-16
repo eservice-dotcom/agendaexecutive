@@ -250,7 +250,7 @@ const FechamentosConsulta = () => {
               </TableRow>
             ) : (
               filtered.map((f) => {
-                const osList = Array.isArray(f.items) ? f.items.map((i: any) => i.cot).filter(Boolean).join(", ") : "";
+                const osList = Array.isArray(f.items) ? [...new Set(f.items.map((i: any) => i.cot).filter(Boolean))].join(", ") : "";
                 return (
                 <TableRow key={f.id}>
                   <TableCell>
