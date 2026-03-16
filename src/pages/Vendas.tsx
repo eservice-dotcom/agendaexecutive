@@ -1578,6 +1578,11 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
               </Table>
             </div>
           </TabsContent>
+
+          {/* ===== DASHBOARD TAB ===== */}
+          <TabsContent value="dashboard">
+            <DashboardFinanceiro />
+          </TabsContent>
         </Tabs>
 
         {/* ===== NOVA VENDA DIALOG ===== */}
