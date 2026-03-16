@@ -921,6 +921,8 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
     setFechamentoExtrasSelected(new Set());
     setFechamentoNovoExtra({ descricao: "", valor: "" });
     setFechamentoSearch("");
+    setFechamentoDataInicio("");
+    setFechamentoDataFim("");
     setFechamentoDialogOpen(true);
   };
 
