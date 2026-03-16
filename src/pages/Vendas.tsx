@@ -1442,7 +1442,22 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
 
           {/* ===== CONTAS A RECEBER TAB ===== */}
           <TabsContent value="receber">
-            <div className="flex justify-end mb-2">
+            <div className="flex items-center justify-between mb-2 gap-2">
+              <div className="flex items-center gap-2">
+                <Search className="h-4 w-4 text-muted-foreground" />
+                <Input
+                  placeholder="Filtrar por nº da O.S."
+                  value={filtroOsReceber}
+                  onChange={(e) => setFiltroOsReceber(e.target.value)}
+                  className="w-48 h-8 text-sm"
+                />
+                <Input
+                  placeholder="Filtrar por cliente"
+                  value={filtroClienteReceber}
+                  onChange={(e) => setFiltroClienteReceber(e.target.value)}
+                  className="w-48 h-8 text-sm"
+                />
+              </div>
               <Button variant="outline" size="sm" onClick={() => openNovaContaDialog("receber")} className="gap-1">
                 <Plus className="h-4 w-4" /> Nova Conta a Receber
               </Button>
