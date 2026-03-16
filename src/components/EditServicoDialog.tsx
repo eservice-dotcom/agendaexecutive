@@ -124,6 +124,11 @@ const EditServicoDialog = ({ open, onOpenChange, item, onSaved }: EditServicoDia
   };
 
   const handleMotoristaChange = (motoristaId: string) => {
+    if (motoristaId === "_empty") {
+      update("motorista", "");
+      update("telefone", "");
+      return;
+    }
     if (motoristaId === "_manual") {
       update("motorista", "");
       update("telefone", "");
