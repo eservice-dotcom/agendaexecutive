@@ -438,12 +438,20 @@ const Vendas = () => {
 
   const extrasTotal = useMemo(() => extras.reduce((s, e) => s + e.valor, 0), [extras]);
 
-  const totalSelected = useMemo(() => {
+  const totalSelectedCalc = useMemo(() => {
     const servicos = agendaItems
       .filter((i) => selectedItems.has(i.id))
       .reduce((sum, i) => sum + i.valor, 0);
     return servicos + extrasTotal;
   }, [agendaItems, selectedItems, extrasTotal]);
+
+  const [totalSelectedManual, setTotalSelectedManual] = useState<number | null>(null);
+  const totalSelected = totalSelectedManual !== null ? totalSelectedManual : totalSelectedCalc;
+
+  // Reset manual override when selection or extras change
+  useEffect(() => {
+    setTotalSelectedManual(null);
+  }, [totalSelectedCalc]);
 
   const toggleItem = (id: string) => {
     setSelectedItems((prev) => {
@@ -595,6 +603,7 @@ const Vendas = () => {
     setContasPagar([]);
     setExtras([]);
     setFormaPagamento("");
+    setTotalSelectedManual(null);
   };
 
   const addExtra = () => setExtras((prev) => [...prev, { descricao: "", valor: 0 }]);
@@ -1665,9 +1674,15 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
                 </div>
                 <div className="space-y-2">
                   <Label>Total Selecionado</Label>
-                  <div className="h-10 flex items-center rounded-md border border-input bg-muted px-3 font-bold text-foreground">
-                    {formatCurrency(totalSelected)}
-                  </div>
+                  <Input
+                    type="text"
+                    value={totalSelectedManual !== null ? String(totalSelectedManual) : String(totalSelectedCalc)}
+                    onChange={(e) => {
+                      const val = parseMoneyValue(e.target.value);
+                      setTotalSelectedManual(val);
+                    }}
+                    className="font-bold"
+                  />
                 </div>
               </div>
 
