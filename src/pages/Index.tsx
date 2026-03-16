@@ -203,6 +203,8 @@ const Index = () => {
     setFechamentoExtrasSelected(new Set());
     setFechamentoNovoExtra({ descricao: "", valor: "" });
     setFechamentoSearch("");
+    setFechamentoDataInicio("");
+    setFechamentoDataFim("");
     setFechamentoDialogOpen(true);
   };
 
