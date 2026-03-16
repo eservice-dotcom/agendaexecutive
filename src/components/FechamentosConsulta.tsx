@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback, useMemo } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { generateClosingReport } from "@/lib/closingReport";
+import { generateClosingReportExcel } from "@/lib/closingReportExcel";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -9,7 +10,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
-import { Printer, Search, Pencil, Trash2, Save, X } from "lucide-react";
+import { Printer, Search, Pencil, Trash2, Save, X, FileSpreadsheet } from "lucide-react";
 import { toast } from "sonner";
 
 interface Fechamento {
