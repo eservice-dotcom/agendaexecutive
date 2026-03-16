@@ -230,6 +230,7 @@ const FechamentosConsulta = () => {
             <TableRow>
               <TableHead className="w-[80px]">Nº</TableHead>
               <TableHead>Cliente</TableHead>
+              <TableHead>O.S.</TableHead>
               <TableHead className="w-[110px]">Data</TableHead>
               <TableHead className="w-[60px] text-center">Serv.</TableHead>
               <TableHead className="w-[120px] text-right">Valor</TableHead>
@@ -241,14 +242,16 @@ const FechamentosConsulta = () => {
           <TableBody>
             {loading ? (
               <TableRow>
-                <TableCell colSpan={8} className="text-center py-8 text-muted-foreground">Carregando...</TableCell>
+                <TableCell colSpan={9} className="text-center py-8 text-muted-foreground">Carregando...</TableCell>
               </TableRow>
             ) : filtered.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={8} className="text-center py-8 text-muted-foreground">Nenhum fechamento encontrado</TableCell>
+                <TableCell colSpan={9} className="text-center py-8 text-muted-foreground">Nenhum fechamento encontrado</TableCell>
               </TableRow>
             ) : (
-              filtered.map((f) => (
+              filtered.map((f) => {
+                const osList = Array.isArray(f.items) ? f.items.map((i: any) => i.cot).filter(Boolean).join(", ") : "";
+                return (
                 <TableRow key={f.id}>
                   <TableCell>
                     <Badge variant="outline" className="font-mono text-xs">
@@ -256,6 +259,7 @@ const FechamentosConsulta = () => {
                     </Badge>
                   </TableCell>
                   <TableCell className="font-medium text-sm">{f.cliente}</TableCell>
+                  <TableCell className="text-xs text-muted-foreground font-mono max-w-[200px] truncate" title={osList}>{osList || "—"}</TableCell>
                   <TableCell className="text-sm">{formatDate(f.data_emissao)}</TableCell>
                   <TableCell className="text-center text-sm">{f.quantidade_servicos}</TableCell>
                   <TableCell className="text-right font-mono text-sm">{formatCurrency(f.valor_total)}</TableCell>
@@ -302,7 +306,8 @@ const FechamentosConsulta = () => {
                     </div>
                   </TableCell>
                 </TableRow>
-              ))
+                );
+              })
             )}
           </TableBody>
         </Table>
