@@ -603,7 +603,23 @@ const Index = () => {
 
             <FechamentosConsulta />
           </TabsContent>
+
+          {canViewFinancials && (
+            <>
+              <TabsContent value="fat-veiculo">
+                <FaturamentoVeiculo />
+              </TabsContent>
+              <TabsContent value="fat-fornecedor">
+                <FaturamentoFornecedor />
+              </TabsContent>
+              <TabsContent value="ocupacao">
+                <DashboardOcupacao />
+              </TabsContent>
+            </>
+          )}
+        </Tabs>
       </main>
+    </div>
     </div>
   );
 };
