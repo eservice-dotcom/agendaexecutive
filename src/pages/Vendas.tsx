@@ -235,6 +235,10 @@ const Vendas = () => {
   const [filtroOsPagar, setFiltroOsPagar] = useState("");
   const [filtroFornecedorPagar, setFiltroFornecedorPagar] = useState("");
 
+  // Filtro contas a receber por OS e cliente
+  const [filtroOsReceber, setFiltroOsReceber] = useState("");
+  const [filtroClienteReceber, setFiltroClienteReceber] = useState("");
+
   // Closing report selection
   const [fechamentoDialogOpen, setFechamentoDialogOpen] = useState(false);
   const [fechamentoCliente, setFechamentoCliente] = useState("");
