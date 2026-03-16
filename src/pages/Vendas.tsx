@@ -1498,6 +1498,12 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
                   onChange={(e) => setFiltroOsPagar(e.target.value)}
                   className="w-48 h-8 text-sm"
                 />
+                <Input
+                  placeholder="Filtrar por fornecedor"
+                  value={filtroFornecedorPagar}
+                  onChange={(e) => setFiltroFornecedorPagar(e.target.value)}
+                  className="w-48 h-8 text-sm"
+                />
               </div>
               <Button variant="outline" size="sm" onClick={() => openNovaContaDialog("pagar")} className="gap-1">
                 <Plus className="h-4 w-4" /> Nova Conta a Pagar
