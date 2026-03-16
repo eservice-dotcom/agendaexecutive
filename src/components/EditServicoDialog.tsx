@@ -303,16 +303,17 @@ const EditServicoDialog = ({ open, onOpenChange, item, onSaved }: EditServicoDia
 
           <div className="space-y-1.5">
             <Label>Motorista</Label>
-            <Select value={currentMotoristaId || "_manual"} onValueChange={handleMotoristaChange}>
+            <Select value={currentMotoristaId || (form.motorista ? "_manual" : "_empty")} onValueChange={handleMotoristaChange}>
               <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
               <SelectContent>
+                <SelectItem value="_empty">-- Sem motorista --</SelectItem>
                 <SelectItem value="_manual">-- Digitar manualmente --</SelectItem>
                 {motoristas.map((m) => (
                   <SelectItem key={m.id} value={m.id}>{m.nome}</SelectItem>
                 ))}
               </SelectContent>
             </Select>
-            {(!currentMotoristaId) && (
+            {(!currentMotoristaId && form.motorista) && (
               <div className="mt-1 grid grid-cols-2 gap-2">
                 <Input value={form.motorista} onChange={(e) => update("motorista", e.target.value)} placeholder="Nome" />
                 <Input value={form.telefone} onChange={(e) => update("telefone", e.target.value)} placeholder="Telefone" />
