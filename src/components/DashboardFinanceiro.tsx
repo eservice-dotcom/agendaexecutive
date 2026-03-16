@@ -35,7 +35,7 @@ const DashboardFinanceiro = () => {
   const [year, setYear] = useState(new Date().getFullYear().toString());
 
   useEffect(() => {
-    const fetchAll = async (table: string) => {
+    const fetchAll = async (table: "contas_pagar" | "contas_receber") => {
       let all: any[] = [];
       let from = 0;
       const ps = 1000;
