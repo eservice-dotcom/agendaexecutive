@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo, useCallback } from "react";
 import { Link } from "react-router-dom";
-import { ArrowLeft, Plus, Trash2, ShoppingCart, Search, Check, FileText, XCircle, DollarSign, CheckCircle, Download, Pencil, ClipboardList, X } from "lucide-react";
+import { ArrowLeft, Plus, Trash2, ShoppingCart, Search, Check, FileText, XCircle, DollarSign, CheckCircle, Download, Pencil, ClipboardList, X, Printer } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
@@ -16,6 +16,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "@/hooks/use-toast";
 import logo from "@/assets/logo-executive-service.png";
 import { generateClosingReport } from "@/lib/closingReport";
+import { printContasPagar, printContasReceber } from "@/lib/printUtils";
 import DashboardFinanceiro from "@/components/DashboardFinanceiro";
 
 interface Venda {
@@ -1486,9 +1487,14 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
                   </SelectContent>
                 </Select>
               </div>
-              <Button variant="outline" size="sm" onClick={() => openNovaContaDialog("receber")} className="gap-1">
-                <Plus className="h-4 w-4" /> Nova Conta a Receber
-              </Button>
+              <div className="flex gap-2">
+                <Button variant="outline" size="sm" onClick={() => printContasReceber(filteredContasReceberList, vendaOsMap)} className="gap-1">
+                  <Printer className="h-4 w-4" /> Imprimir
+                </Button>
+                <Button variant="outline" size="sm" onClick={() => openNovaContaDialog("receber")} className="gap-1">
+                  <Plus className="h-4 w-4" /> Nova Conta a Receber
+                </Button>
+              </div>
             </div>
             <div className="rounded-lg border border-border bg-card shadow-sm">
               <Table>
@@ -1583,9 +1589,14 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
                   </SelectContent>
                 </Select>
               </div>
-              <Button variant="outline" size="sm" onClick={() => openNovaContaDialog("pagar")} className="gap-1">
-                <Plus className="h-4 w-4" /> Nova Conta a Pagar
-              </Button>
+              <div className="flex gap-2">
+                <Button variant="outline" size="sm" onClick={() => printContasPagar(filteredContasPagarList, vendaOsMap)} className="gap-1">
+                  <Printer className="h-4 w-4" /> Imprimir
+                </Button>
+                <Button variant="outline" size="sm" onClick={() => openNovaContaDialog("pagar")} className="gap-1">
+                  <Plus className="h-4 w-4" /> Nova Conta a Pagar
+                </Button>
+              </div>
             </div>
             <div className="rounded-lg border border-border bg-card shadow-sm">
               <Table>
