@@ -254,14 +254,14 @@ const Vendas = () => {
   }, []);
 
   const loadClientes = useCallback(async () => {
-    const { data } = await supabase
-      .from("agenda_items")
-      .select("cliente")
-      .order("cliente");
-    if (data) {
-      const unique = [...new Set(data.map((d) => d.cliente))].filter(Boolean).sort();
-      setClientes(unique);
-    }
+    const [agendaRes, clientesRes] = await Promise.all([
+      supabase.from("agenda_items").select("cliente").order("cliente"),
+      supabase.from("clientes").select("nome").order("nome"),
+    ]);
+    const fromAgenda = (agendaRes.data || []).map((d) => d.cliente);
+    const fromCadastro = (clientesRes.data || []).map((d) => d.nome);
+    const unique = [...new Set([...fromAgenda, ...fromCadastro])].filter(Boolean).sort();
+    setClientes(unique);
   }, []);
 
   const loadFornecedores = useCallback(async () => {
