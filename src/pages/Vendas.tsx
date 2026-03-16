@@ -603,6 +603,7 @@ const Vendas = () => {
     setContasPagar([]);
     setExtras([]);
     setFormaPagamento("");
+    setTotalSelectedManual(null);
   };
 
   const addExtra = () => setExtras((prev) => [...prev, { descricao: "", valor: 0 }]);
