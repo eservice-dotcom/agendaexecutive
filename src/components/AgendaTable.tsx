@@ -354,11 +354,7 @@ const AgendaTable = ({ items, onEdited, hideFinancials, onClone }: AgendaTablePr
               </TableCell>
               {canViewFinancials && (
                 <TableCell className="px-0.5 py-0 text-right font-mono text-[9px] text-muted-foreground truncate">
-                  {formatCurrency(
-                    item.custo +
-                    (item.estacionamento || 0) +
-                    (item.outrosDespesas || []).reduce((sum, d) => sum + (d.valor || 0), 0)
-                  )}
+                  {formatCurrency(item.custo)}
                 </TableCell>
               )}
               <TableCell className="px-0.5 py-0 text-[9px] truncate">{item.receptivo || "—"}</TableCell>
