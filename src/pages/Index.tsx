@@ -67,6 +67,8 @@ const Index = () => {
   const [fechamentoExtrasSelected, setFechamentoExtrasSelected] = useState<Set<number>>(new Set());
   const [fechamentoNovoExtra, setFechamentoNovoExtra] = useState({ descricao: "", valor: "" });
   const [fechamentoSearch, setFechamentoSearch] = useState("");
+  const [fechamentoDataInicio, setFechamentoDataInicio] = useState("");
+  const [fechamentoDataFim, setFechamentoDataFim] = useState("");
 
   const reloadData = useCallback(async () => {
     const data = await getAgendaItems();

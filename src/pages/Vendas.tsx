@@ -257,6 +257,8 @@ const Vendas = () => {
   const [fechamentoExtrasSelected, setFechamentoExtrasSelected] = useState<Set<number>>(new Set());
   const [fechamentoNovoExtra, setFechamentoNovoExtra] = useState({ descricao: "", valor: "" });
   const [fechamentoSearch, setFechamentoSearch] = useState("");
+  const [fechamentoDataInicio, setFechamentoDataInicio] = useState("");
+  const [fechamentoDataFim, setFechamentoDataFim] = useState("");
 
   const loadVendas = useCallback(async () => {
     const { data, error } = await supabase
