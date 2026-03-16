@@ -292,8 +292,66 @@ const DashboardFinanceiro = () => {
                     ))}
                   </TableBody>
                 </Table>
-              </div>
+      </div>
+
+      {/* Resultado Projetado vs Efetivado */}
+      <Card>
+        <CardHeader className="pb-2">
+          <CardTitle className="text-base">Resultado Financeiro: Projetado vs Efetivado — {year}</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+            <div className="rounded-lg border border-border bg-card p-3">
+              <p className="text-xs font-medium text-muted-foreground">Receitas Efetivadas</p>
+              <p className="mt-1 text-lg font-bold text-emerald-600">{formatCurrency(projetadoEfetivado.recPago)}</p>
             </div>
+            <div className="rounded-lg border border-border bg-card p-3">
+              <p className="text-xs font-medium text-muted-foreground">Receitas Pendentes</p>
+              <p className="mt-1 text-lg font-bold text-amber-600">{formatCurrency(projetadoEfetivado.recPendente)}</p>
+            </div>
+            <div className="rounded-lg border border-border bg-card p-3">
+              <p className="text-xs font-medium text-muted-foreground">Despesas Efetivadas</p>
+              <p className="mt-1 text-lg font-bold text-destructive">{formatCurrency(projetadoEfetivado.despPago)}</p>
+            </div>
+            <div className="rounded-lg border border-border bg-card p-3">
+              <p className="text-xs font-medium text-muted-foreground">Despesas Pendentes</p>
+              <p className="mt-1 text-lg font-bold text-amber-600">{formatCurrency(projetadoEfetivado.despPendente)}</p>
+            </div>
+          </div>
+
+          <div className="grid gap-3 sm:grid-cols-2">
+            <div className={`rounded-lg border-2 p-4 ${projetadoEfetivado.resultadoEfetivado >= 0 ? "border-emerald-500 bg-emerald-50/50" : "border-destructive bg-destructive/5"}`}>
+              <p className="text-sm font-medium text-muted-foreground">Resultado Efetivado</p>
+              <p className={`text-2xl font-bold ${projetadoEfetivado.resultadoEfetivado >= 0 ? "text-emerald-600" : "text-destructive"}`}>
+                {formatCurrency(projetadoEfetivado.resultadoEfetivado)}
+              </p>
+              <p className="text-xs text-muted-foreground mt-1">Somente contas pagas</p>
+            </div>
+            <div className={`rounded-lg border-2 p-4 ${projetadoEfetivado.resultadoProjetado >= 0 ? "border-blue-500 bg-blue-50/50" : "border-destructive bg-destructive/5"}`}>
+              <p className="text-sm font-medium text-muted-foreground">Resultado Projetado</p>
+              <p className={`text-2xl font-bold ${projetadoEfetivado.resultadoProjetado >= 0 ? "text-blue-600" : "text-destructive"}`}>
+                {formatCurrency(projetadoEfetivado.resultadoProjetado)}
+              </p>
+              <p className="text-xs text-muted-foreground mt-1">Inclui contas pendentes</p>
+            </div>
+          </div>
+
+          <div className="h-[320px]">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={projetadoEfetivado.monthly} barGap={4}>
+                <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                <XAxis dataKey="mes" tick={{ fontSize: 12 }} />
+                <YAxis tickFormatter={(v) => `R$${(v / 1000).toFixed(0)}k`} tick={{ fontSize: 11 }} />
+                <Tooltip formatter={(v: number) => formatCurrency(v)} />
+                <Legend />
+                <Bar dataKey="Efetivado" fill="hsl(150, 60%, 40%)" radius={[4, 4, 0, 0]} />
+                <Bar dataKey="Projetado" fill="hsl(200, 70%, 50%)" radius={[4, 4, 0, 0]} />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+        </CardContent>
+      </Card>
+    </div>
           </CardContent>
         </Card>
       </div>
