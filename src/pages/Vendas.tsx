@@ -438,12 +438,20 @@ const Vendas = () => {
 
   const extrasTotal = useMemo(() => extras.reduce((s, e) => s + e.valor, 0), [extras]);
 
-  const totalSelected = useMemo(() => {
+  const totalSelectedCalc = useMemo(() => {
     const servicos = agendaItems
       .filter((i) => selectedItems.has(i.id))
       .reduce((sum, i) => sum + i.valor, 0);
     return servicos + extrasTotal;
   }, [agendaItems, selectedItems, extrasTotal]);
+
+  const [totalSelectedManual, setTotalSelectedManual] = useState<number | null>(null);
+  const totalSelected = totalSelectedManual !== null ? totalSelectedManual : totalSelectedCalc;
+
+  // Reset manual override when selection or extras change
+  useEffect(() => {
+    setTotalSelectedManual(null);
+  }, [totalSelectedCalc]);
 
   const toggleItem = (id: string) => {
     setSelectedItems((prev) => {
