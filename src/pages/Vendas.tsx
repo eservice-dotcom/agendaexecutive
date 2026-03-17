@@ -1971,6 +1971,25 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
             </DialogHeader>
             <div className="space-y-4">
               <div className="space-y-2">
+                <Label>{editDialog?.type === "receber" ? "Cliente" : "Fornecedor"}</Label>
+                <Select
+                  value={editDialog?.type === "receber" ? editForm.cliente : editForm.fornecedor}
+                  onValueChange={(v) => editDialog?.type === "receber"
+                    ? setEditForm({ ...editForm, cliente: v })
+                    : setEditForm({ ...editForm, fornecedor: v })
+                  }
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Selecione" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {(editDialog?.type === "receber" ? clientes : fornecedores).map((item) => (
+                      <SelectItem key={item} value={item}>{item}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-2">
                 <Label>Descritivo</Label>
                 <Textarea value={editForm.descritivo} onChange={(e) => setEditForm({ ...editForm, descritivo: e.target.value })} rows={3} />
               </div>
