@@ -1336,8 +1336,11 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
     if (filtroStatusPagar) {
       filtered = filtered.filter((cp) => cp.status === filtroStatusPagar);
     }
+    if (filtroCentroCustoPagar) {
+      filtered = filtered.filter((cp) => (cp as any).centro_custo === filtroCentroCustoPagar);
+    }
     return filtered;
-  }, [contasPagarList, filtroOsPagar, filtroFornecedorPagar, filtroStatusPagar, vendaOsMap]);
+  }, [contasPagarList, filtroOsPagar, filtroFornecedorPagar, filtroStatusPagar, filtroCentroCustoPagar, vendaOsMap]);
 
   const filteredContasReceberList = useMemo(() => {
     let filtered = contasReceberList;
