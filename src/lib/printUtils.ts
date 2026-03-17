@@ -220,7 +220,7 @@ body{font-family:'Segoe UI',Arial,sans-serif;color:#1a1a1a;font-size:12px;paddin
 .page{max-width:210mm;margin:0 auto;padding:15mm 20mm}
 .header{display:flex;align-items:center;justify-content:space-between;border-bottom:3px solid #1a3a5c;padding-bottom:12px;margin-bottom:20px}
 .header-left{display:flex;align-items:center;gap:12px}
-.header-left img{height:60px;width:60px;object-fit:contain}
+.header-left img{height:100px;width:100px;object-fit:contain}
 .header-left .company{font-size:18px;font-weight:700;color:#1a3a5c}
 .header-right{text-align:right}
 .header-right .cotacao-num{font-size:22px;font-weight:700;color:#1a3a5c}
