@@ -495,7 +495,7 @@ const Vendas = () => {
           data_venda: dataVenda,
           data_vencimento: dataVencimento || null,
           valor_total: totalSelected,
-          status: "pendente",
+          status: "faturado",
           observacoes,
           forma_pagamento: formaPagamento,
         })
