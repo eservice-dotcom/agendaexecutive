@@ -362,6 +362,12 @@ const Cotacoes = () => {
                         <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => openEdit(c)}>
                           <Pencil className="h-4 w-4" />
                         </Button>
+                        <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => {
+                          const logoUrl = new URL(logo, window.location.origin).href;
+                          printCotacao(c, logoUrl);
+                        }}>
+                          <Printer className="h-4 w-4" />
+                        </Button>
                         <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive" onClick={() => handleDelete(c.id)}>
                           <Trash2 className="h-4 w-4" />
                         </Button>
