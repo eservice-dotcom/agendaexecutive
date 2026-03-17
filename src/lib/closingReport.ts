@@ -78,7 +78,16 @@ export const generateClosingReport = (
 ) => {
   const logoUrl = new URL(logo, window.location.origin).href;
 
-  const cards = items.map((ai, idx) => {
+  const sortedItems = [...items].sort((a, b) => {
+    const dateA = a.data || "";
+    const dateB = b.data || "";
+    if (dateA !== dateB) return dateA.localeCompare(dateB);
+    const horaA = a.hora || "";
+    const horaB = b.hora || "";
+    return horaA.localeCompare(horaB);
+  });
+
+  const cards = sortedItems.map((ai, idx) => {
     const kmTotal = (Number(ai.km_fim) || 0) - (Number(ai.km_in) || 0);
     const outrosDespesas = ai.outros_despesas
       ? Array.isArray(ai.outros_despesas)
