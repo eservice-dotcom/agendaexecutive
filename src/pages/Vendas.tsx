@@ -1905,7 +1905,7 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
                         </div>
                         <div className="space-y-1">
                           <Label className="text-xs">Descritivo</Label>
-                          <Input className="h-9" value={cp.descritivo} onChange={(e) => updateContaPagar(idx, "descritivo", e.target.value)} placeholder="Descrição" />
+                          <Textarea className="min-h-[36px] resize-y" value={cp.descritivo} onChange={(e) => updateContaPagar(idx, "descritivo", e.target.value)} placeholder="Descrição" rows={2} />
                         </div>
                         <div className="space-y-1">
                           <Label className="text-xs">Valor</Label>
