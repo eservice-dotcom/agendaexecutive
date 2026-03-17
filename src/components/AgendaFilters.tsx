@@ -5,6 +5,9 @@ import { Calendar, Filter, RotateCcw, Search } from "lucide-react";
 
 interface FiltersState {
   search: string;
+  cliente: string;
+  os: string;
+  placa: string;
   dataInicio: string;
   dataFim: string;
   tipo: string;
