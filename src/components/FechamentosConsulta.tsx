@@ -52,7 +52,7 @@ const FechamentosConsulta = () => {
   const [editCliente, setEditCliente] = useState("");
   const [editDataEmissao, setEditDataEmissao] = useState("");
   const [editValorTotal, setEditValorTotal] = useState("");
-  const [editExtrasTotal, setEditExtrasTotal] = useState("");
+  const [editExtras, setEditExtras] = useState<{ descricao: string; valor: string }[]>([]);
   const [editObservacoes, setEditObservacoes] = useState("");
   const [saving, setSaving] = useState(false);
 
