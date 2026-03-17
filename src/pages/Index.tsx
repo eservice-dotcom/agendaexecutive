@@ -37,6 +37,9 @@ interface FiltersState {
 
 const initialFilters: FiltersState = {
   search: "",
+  cliente: "",
+  os: "",
+  placa: "",
   dataInicio: "",
   dataFim: "",
   tipo: "",
