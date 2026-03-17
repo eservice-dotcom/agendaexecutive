@@ -81,9 +81,10 @@ export const generateClosingReportExcel = (
   const selectedExtras = vendaInfo?.extras || [];
   selectedExtras.forEach((extra, idx) => {
     rows.push({
-      "#": items.length + idx + 1,
+      "#": sortedItems.length + idx + 1,
       "O.S.": "EXTRA",
       "Data": "",
+      "Hora": "",
       "Tipo": "Extra",
       "Origem": extra.descricao,
       "Destino": "",
