@@ -9,6 +9,7 @@ import Cadastros from "./pages/Cadastros";
 import Login from "./pages/Login";
 import NotFound from "./pages/NotFound";
 import Vendas from "./pages/Vendas";
+import Cotacoes from "./pages/Cotacoes";
 
 const queryClient = new QueryClient();
 
