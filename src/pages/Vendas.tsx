@@ -234,10 +234,11 @@ const Vendas = () => {
   const [editVendaSearch, setEditVendaSearch] = useState("");
   const [editVendaExtras, setEditVendaExtras] = useState<ExtraItem[]>([]);
 
-  // Filtro contas a pagar por OS e fornecedor
+  // Filtro contas a pagar por OS, fornecedor e centro de custo
   const [filtroOsPagar, setFiltroOsPagar] = useState("");
   const [filtroFornecedorPagar, setFiltroFornecedorPagar] = useState("");
   const [filtroStatusPagar, setFiltroStatusPagar] = useState("");
+  const [filtroCentroCustoPagar, setFiltroCentroCustoPagar] = useState("");
 
   // Filtro contas a receber por OS e cliente
   const [filtroOsReceber, setFiltroOsReceber] = useState("");
@@ -1335,8 +1336,11 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
     if (filtroStatusPagar) {
       filtered = filtered.filter((cp) => cp.status === filtroStatusPagar);
     }
+    if (filtroCentroCustoPagar) {
+      filtered = filtered.filter((cp) => (cp as any).centro_custo === filtroCentroCustoPagar);
+    }
     return filtered;
-  }, [contasPagarList, filtroOsPagar, filtroFornecedorPagar, filtroStatusPagar, vendaOsMap]);
+  }, [contasPagarList, filtroOsPagar, filtroFornecedorPagar, filtroStatusPagar, filtroCentroCustoPagar, vendaOsMap]);
 
   const filteredContasReceberList = useMemo(() => {
     let filtered = contasReceberList;
@@ -1608,6 +1612,17 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
                     <SelectItem value="pendente">Pendente</SelectItem>
                     <SelectItem value="pago">Pago</SelectItem>
                     <SelectItem value="cancelado">Cancelado</SelectItem>
+                  </SelectContent>
+                </Select>
+                <Select value={filtroCentroCustoPagar || "all"} onValueChange={(v) => setFiltroCentroCustoPagar(v === "all" ? "" : v)}>
+                  <SelectTrigger className="w-48 h-8 text-sm">
+                    <SelectValue placeholder="Centro de Custo" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">Todos os centros</SelectItem>
+                    {centrosCusto.map((c) => (
+                      <SelectItem key={c.id} value={c.nome}>{c.nome}</SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
               </div>
