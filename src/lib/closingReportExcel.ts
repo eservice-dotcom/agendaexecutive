@@ -145,7 +145,24 @@ export const generateClosingReportExcel = (
 
   XLSX.utils.book_append_sheet(wb, ws, "Serviços");
 
-  // --- Sheet 2: Resumo ---
+  // --- Sheet 2: Extras ---
+  if (selectedExtras.length > 0) {
+    const extrasRows = selectedExtras.map((extra, idx) => ({
+      "#": idx + 1,
+      "Descrição": extra.descricao,
+      "Valor": parseAmount(extra.valor),
+    }));
+    extrasRows.push({
+      "#": 0,
+      "Descrição": "TOTAL EXTRAS",
+      "Valor": extrasTotal,
+    });
+    const wsExtras = XLSX.utils.json_to_sheet(extrasRows);
+    wsExtras["!cols"] = [{ wch: 5 }, { wch: 40 }, { wch: 15 }];
+    XLSX.utils.book_append_sheet(wb, wsExtras, "Extras");
+  }
+
+  // --- Sheet 3: Resumo ---
   const resumo = [
     { Campo: "Fechamento Nº", Valor: numeroFechamento || "" },
     { Campo: "Cliente", Valor: vendaInfo?.cliente || "" },
@@ -156,12 +173,18 @@ export const generateClosingReportExcel = (
     { Campo: "Extras", Valor: extrasTotal },
     { Campo: "Valor Total", Valor: totalServicos + extrasTotal },
   ];
+
+  // Detail extras in resumo
+  selectedExtras.forEach((extra, idx) => {
+    resumo.push({ Campo: `  Extra ${idx + 1}: ${extra.descricao}`, Valor: parseAmount(extra.valor) as any });
+  });
+
   if (vendaInfo?.observacoes) {
     resumo.push({ Campo: "Observações", Valor: vendaInfo.observacoes });
   }
 
   const wsResumo = XLSX.utils.json_to_sheet(resumo);
-  wsResumo["!cols"] = [{ wch: 25 }, { wch: 30 }];
+  wsResumo["!cols"] = [{ wch: 40 }, { wch: 30 }];
   XLSX.utils.book_append_sheet(wb, wsResumo, "Resumo");
 
   const fileName = `fechamento${numeroFechamento ? `-${numeroFechamento}` : ""}.xlsx`;
