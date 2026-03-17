@@ -330,6 +330,89 @@ export type Database = {
           },
         ]
       }
+      cotacao_items: {
+        Row: {
+          cotacao_id: string
+          created_at: string
+          descritivo: string
+          hora_extra: string | null
+          id: string
+          km_extra: number | null
+          valor: number
+        }
+        Insert: {
+          cotacao_id: string
+          created_at?: string
+          descritivo?: string
+          hora_extra?: string | null
+          id?: string
+          km_extra?: number | null
+          valor?: number
+        }
+        Update: {
+          cotacao_id?: string
+          created_at?: string
+          descritivo?: string
+          hora_extra?: string | null
+          id?: string
+          km_extra?: number | null
+          valor?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "cotacao_items_cotacao_id_fkey"
+            columns: ["cotacao_id"]
+            isOneToOne: false
+            referencedRelation: "cotacoes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      cotacoes: {
+        Row: {
+          created_at: string
+          data: string
+          forma_pagamento: string
+          id: string
+          nome: string
+          numero_cotacao: number
+          observacoes: string | null
+          status: string
+          updated_at: string
+          user_id: string
+          validade_proposta: string | null
+          valor_total: number
+        }
+        Insert: {
+          created_at?: string
+          data?: string
+          forma_pagamento?: string
+          id?: string
+          nome: string
+          numero_cotacao?: number
+          observacoes?: string | null
+          status?: string
+          updated_at?: string
+          user_id: string
+          validade_proposta?: string | null
+          valor_total?: number
+        }
+        Update: {
+          created_at?: string
+          data?: string
+          forma_pagamento?: string
+          id?: string
+          nome?: string
+          numero_cotacao?: number
+          observacoes?: string | null
+          status?: string
+          updated_at?: string
+          user_id?: string
+          validade_proposta?: string | null
+          valor_total?: number
+        }
+        Relationships: []
+      }
       editing_locks: {
         Row: {
           id: string
