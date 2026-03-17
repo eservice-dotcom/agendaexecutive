@@ -1033,7 +1033,9 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
       data_vencimento: editForm.data_vencimento || null,
       data_pagamento: editForm.data_pagamento || null,
       status: editForm.data_pagamento ? "pago" : "pendente",
-      ...(type === "pagar" ? { centro_custo: editForm.centro, subgrupo_custo: editForm.subgrupo } : { centro_receita: editForm.centro, subgrupo_receita: editForm.subgrupo }),
+      ...(type === "pagar"
+        ? { centro_custo: editForm.centro, subgrupo_custo: editForm.subgrupo, fornecedor: editForm.fornecedor }
+        : { centro_receita: editForm.centro, subgrupo_receita: editForm.subgrupo, cliente: editForm.cliente }),
     };
     
     const { error } = await supabase.from(table).update(updates).eq("id", item.id);
