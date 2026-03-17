@@ -103,15 +103,15 @@ const Index = () => {
         const search = filters.search.toLowerCase();
         if (
           search &&
-          !item.cliente.toLowerCase().includes(search) &&
-          item.cot.toLowerCase() !== search &&
-          !item.placa.toLowerCase().includes(search) &&
           !item.motorista.toLowerCase().includes(search) &&
           !item.origem.toLowerCase().includes(search) &&
           !item.destino.toLowerCase().includes(search)
         ) {
           return false;
         }
+        if (filters.cliente && !item.cliente.toLowerCase().includes(filters.cliente.toLowerCase())) return false;
+        if (filters.os && item.cot.toLowerCase() !== filters.os.toLowerCase()) return false;
+        if (filters.placa && !item.placa.toLowerCase().includes(filters.placa.toLowerCase())) return false;
         if (filters.dataInicio && item.data < filters.dataInicio) return false;
         if (filters.dataFim && item.data > filters.dataFim) return false;
         if (filters.tipo && item.tipo !== filters.tipo) return false;
