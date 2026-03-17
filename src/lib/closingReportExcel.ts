@@ -35,7 +35,16 @@ export const generateClosingReportExcel = (
   const wb = XLSX.utils.book_new();
 
   // --- Sheet 1: Serviços ---
-  const rows = items.map((ai, idx) => {
+  const sortedItems = [...items].sort((a, b) => {
+    const dateA = a.data || "";
+    const dateB = b.data || "";
+    if (dateA !== dateB) return dateA.localeCompare(dateB);
+    const horaA = a.hora || "";
+    const horaB = b.hora || "";
+    return horaA.localeCompare(horaB);
+  });
+
+  const rows = sortedItems.map((ai, idx) => {
     const kmTotal = (Number(ai.km_fim) || 0) - (Number(ai.km_in) || 0);
     const outrosDespesas = ai.outros_despesas
       ? Array.isArray(ai.outros_despesas) ? ai.outros_despesas : JSON.parse(ai.outros_despesas)
