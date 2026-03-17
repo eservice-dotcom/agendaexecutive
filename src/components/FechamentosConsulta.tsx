@@ -119,7 +119,7 @@ const FechamentosConsulta = () => {
 
   const handleExportExcel = (f: Fechamento) => {
     const items = Array.isArray(f.items) ? f.items : [];
-    const extras = Array.isArray(f.extras) ? f.extras : [];
+    const extras = resolveExtras(f);
 
     generateClosingReportExcel(
       items,
