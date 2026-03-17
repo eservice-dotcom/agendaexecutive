@@ -148,10 +148,10 @@ export const generateClosingReport = (
     </div>`;
   }).join("");
 
-  const totalServicos = items.reduce((s, ai) => s + parseAmount(ai.valor), 0);
-  const totalEstac = items.reduce((s, ai) => s + parseAmount(ai.estacionamento), 0);
-  const totalKm = items.reduce((s, ai) => s + (parseAmount(ai.km_fim) - parseAmount(ai.km_in)), 0);
-  const totalKmExtra = items.reduce((s, ai) => s + parseAmount(ai.km_extra), 0);
+  const totalServicos = sortedItems.reduce((s, ai) => s + parseAmount(ai.valor), 0);
+  const totalEstac = sortedItems.reduce((s, ai) => s + parseAmount(ai.estacionamento), 0);
+  const totalKm = sortedItems.reduce((s, ai) => s + (parseAmount(ai.km_fim) - parseAmount(ai.km_in)), 0);
+  const totalKmExtra = sortedItems.reduce((s, ai) => s + parseAmount(ai.km_extra), 0);
   const extrasTotal = selectedExtras.reduce((s, e) => s + parseAmount(e.valor), 0);
   const totalValor = totalServicos + extrasTotal;
 
