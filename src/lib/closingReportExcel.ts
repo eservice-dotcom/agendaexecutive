@@ -57,6 +57,7 @@ export const generateClosingReportExcel = (
       "#": idx + 1,
       "O.S.": ai.cot || "",
       "Data": ai.data ? formatDate(ai.data) : "",
+      "Hora": ai.hora || "",
       "Tipo": ai.tipo || "",
       "Origem": ai.origem || "",
       "Destino": ai.destino || "",
