@@ -199,7 +199,7 @@ const Vendas = () => {
 
   // Edit conta dialog
   const [editDialog, setEditDialog] = useState<{ type: "pagar" | "receber"; item: any } | null>(null);
-  const [editForm, setEditForm] = useState({ descritivo: "", valor: "", data_vencimento: "", data_pagamento: "", centro: "", subgrupo: "" });
+  const [editForm, setEditForm] = useState({ descritivo: "", valor: "", data_vencimento: "", data_pagamento: "", centro: "", subgrupo: "", cliente: "", fornecedor: "" });
 
   // New manual conta dialogs
   const [novaContaDialog, setNovaContaDialog] = useState<"pagar" | "receber" | null>(null);
@@ -1017,6 +1017,8 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
       data_pagamento: item.data_pagamento || "",
       centro: (type === "pagar" ? item.centro_custo : item.centro_receita) || "",
       subgrupo: (type === "pagar" ? item.subgrupo_custo : item.subgrupo_receita) || "",
+      cliente: item.cliente || "",
+      fornecedor: item.fornecedor || "",
     });
     setEditDialog({ type, item });
   };
@@ -1031,7 +1033,9 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
       data_vencimento: editForm.data_vencimento || null,
       data_pagamento: editForm.data_pagamento || null,
       status: editForm.data_pagamento ? "pago" : "pendente",
-      ...(type === "pagar" ? { centro_custo: editForm.centro, subgrupo_custo: editForm.subgrupo } : { centro_receita: editForm.centro, subgrupo_receita: editForm.subgrupo }),
+      ...(type === "pagar"
+        ? { centro_custo: editForm.centro, subgrupo_custo: editForm.subgrupo, fornecedor: editForm.fornecedor }
+        : { centro_receita: editForm.centro, subgrupo_receita: editForm.subgrupo, cliente: editForm.cliente }),
     };
     
     const { error } = await supabase.from(table).update(updates).eq("id", item.id);
@@ -1966,6 +1970,25 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
               </DialogTitle>
             </DialogHeader>
             <div className="space-y-4">
+              <div className="space-y-2">
+                <Label>{editDialog?.type === "receber" ? "Cliente" : "Fornecedor"}</Label>
+                <Select
+                  value={editDialog?.type === "receber" ? editForm.cliente : editForm.fornecedor}
+                  onValueChange={(v) => editDialog?.type === "receber"
+                    ? setEditForm({ ...editForm, cliente: v })
+                    : setEditForm({ ...editForm, fornecedor: v })
+                  }
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Selecione" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {(editDialog?.type === "receber" ? clientes : fornecedores).map((item) => (
+                      <SelectItem key={item} value={item}>{item}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
               <div className="space-y-2">
                 <Label>Descritivo</Label>
                 <Textarea value={editForm.descritivo} onChange={(e) => setEditForm({ ...editForm, descritivo: e.target.value })} rows={3} />
