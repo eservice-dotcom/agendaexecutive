@@ -106,7 +106,7 @@ export const generateClosingReport = (
       <div class="card-header">
         <span class="card-num">${idx + 1}</span>
         <span class="card-os">O.S. ${ai.cot || "—"}</span>
-        <span class="card-date">${ai.data ? formatDate(ai.data) : ""}</span>
+        <span class="card-date">${ai.data ? formatDate(ai.data) : ""} ${ai.hora || ""}</span>
         <span class="card-type">${ai.tipo || ""}</span>
       </div>
       <div class="card-body">
