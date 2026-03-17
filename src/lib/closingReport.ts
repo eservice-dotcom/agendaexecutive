@@ -132,21 +132,33 @@ export const generateClosingReport = (
 
   const selectedExtras = vendaInfo?.extras || [];
 
-  const extrasCards = selectedExtras.map((extra, idx) => {
-    return `<div class="card" style="border-color:#d4a017">
-      <div class="card-header" style="background:#d4a017">
-        <span class="card-num">${sortedItems.length + idx + 1}</span>
-        <span class="card-os">EXTRA</span>
-        <span class="card-type">Extra</span>
-      </div>
-      <div class="card-body">
-        <div class="card-row">
-          <div class="card-field"><span class="lbl">Descrição</span><span class="val">${extra.descricao}</span></div>
-          <div class="card-field"><span class="lbl">Valor</span><span class="val money">${formatCurrency(parseAmount(extra.valor))}</span></div>
-        </div>
-      </div>
-    </div>`;
-  }).join("");
+  const extrasTableHTML = selectedExtras.length > 0
+    ? `<div style="margin-top:12px;margin-bottom:12px">
+        <h3 style="font-size:12px;font-weight:bold;margin-bottom:6px;color:#b8860b;text-transform:uppercase;letter-spacing:0.5px">Detalhamento de Extras</h3>
+        <table style="width:100%;border-collapse:collapse;font-size:10px">
+          <thead>
+            <tr style="background:#fdf8ef;border-bottom:2px solid #d4a017">
+              <th style="text-align:left;padding:6px 8px;font-size:9px;text-transform:uppercase;color:#666">#</th>
+              <th style="text-align:left;padding:6px 8px;font-size:9px;text-transform:uppercase;color:#666">Descrição</th>
+              <th style="text-align:right;padding:6px 8px;font-size:9px;text-transform:uppercase;color:#666">Valor</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${selectedExtras.map((extra, idx) => `
+              <tr style="border-bottom:1px solid #e0e0e0">
+                <td style="padding:5px 8px;color:#888">${idx + 1}</td>
+                <td style="padding:5px 8px;font-weight:500">${extra.descricao}</td>
+                <td style="padding:5px 8px;text-align:right;font-family:monospace;font-weight:bold">${formatCurrency(parseAmount(extra.valor))}</td>
+              </tr>
+            `).join("")}
+            <tr style="border-top:2px solid #d4a017;background:#fdf8ef">
+              <td colspan="2" style="padding:6px 8px;font-weight:bold;text-align:right">Total Extras</td>
+              <td style="padding:6px 8px;text-align:right;font-family:monospace;font-weight:bold;color:#b8860b">${formatCurrency(selectedExtras.reduce((s, e) => s + parseAmount(e.valor), 0))}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>`
+    : "";
 
   const totalServicos = sortedItems.reduce((s, ai) => s + parseAmount(ai.valor), 0);
   const totalEstac = sortedItems.reduce((s, ai) => s + parseAmount(ai.estacionamento), 0);
@@ -233,7 +245,7 @@ ${vendaInfoHTML}
   <div class="summary-box"><div class="label">Valor Total</div><div class="value">${formatCurrency(totalValor)}</div></div>
 </div>
 ${cards}
-${extrasCards}
+${extrasTableHTML}
 <div class="card" style="border-color:#b8860b;background:#fdf8ef">
   <div class="card-header" style="background:#b8860b">
     <span style="font-weight:bold;font-size:12px">TOTAIS</span>
