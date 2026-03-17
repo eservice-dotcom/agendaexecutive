@@ -10,7 +10,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
-import { Printer, Search, Pencil, Trash2, Save, X, FileSpreadsheet } from "lucide-react";
+import { Printer, Search, Pencil, Trash2, Save, X, FileSpreadsheet, Plus } from "lucide-react";
 import { toast } from "sonner";
 
 interface Fechamento {
@@ -52,7 +52,7 @@ const FechamentosConsulta = () => {
   const [editCliente, setEditCliente] = useState("");
   const [editDataEmissao, setEditDataEmissao] = useState("");
   const [editValorTotal, setEditValorTotal] = useState("");
-  const [editExtrasTotal, setEditExtrasTotal] = useState("");
+  const [editExtras, setEditExtras] = useState<{ descricao: string; valor: string }[]>([]);
   const [editObservacoes, setEditObservacoes] = useState("");
   const [saving, setSaving] = useState(false);
 
@@ -138,7 +138,12 @@ const FechamentosConsulta = () => {
     setEditCliente(f.cliente);
     setEditDataEmissao(f.data_emissao);
     setEditValorTotal(String(f.valor_total));
-    setEditExtrasTotal(String(f.extras_total));
+    const extras = Array.isArray(f.extras) && f.extras.length > 0
+      ? f.extras.map((e: any) => ({ descricao: e.descricao || "", valor: String(e.valor || 0) }))
+      : f.extras_total > 0
+        ? [{ descricao: "Extras", valor: String(f.extras_total) }]
+        : [];
+    setEditExtras(extras);
     setEditObservacoes(f.observacoes || "");
     setEditOpen(true);
   };
@@ -146,15 +151,20 @@ const FechamentosConsulta = () => {
   const handleSaveEdit = async () => {
     if (!editItem) return;
     setSaving(true);
+    const extrasArray = editExtras
+      .filter((e) => e.descricao.trim())
+      .map((e) => ({ descricao: e.descricao.trim(), valor: parseFloat(e.valor) || 0 }));
+    const extrasTotal = extrasArray.reduce((s, e) => s + e.valor, 0);
     const { error } = await supabase
       .from("fechamentos")
       .update({
         cliente: editCliente,
         data_emissao: editDataEmissao,
         valor_total: parseFloat(editValorTotal) || 0,
-        extras_total: parseFloat(editExtrasTotal) || 0,
+        extras_total: extrasTotal,
+        extras: extrasArray,
         observacoes: editObservacoes,
-      })
+      } as any)
       .eq("id", editItem.id);
 
     if (error) {
@@ -323,7 +333,7 @@ const FechamentosConsulta = () => {
 
       {/* Edit Dialog */}
       <Dialog open={editOpen} onOpenChange={setEditOpen}>
-        <DialogContent className="max-w-md">
+        <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>
               Editar Fechamento Nº {editItem?.numero_fechamento}
@@ -338,24 +348,67 @@ const FechamentosConsulta = () => {
               <Label>Data de Emissão</Label>
               <Input type="date" value={editDataEmissao} onChange={(e) => setEditDataEmissao(e.target.value)} />
             </div>
-            <div className="grid grid-cols-2 gap-3">
-              <div>
-                <Label>Valor Total (R$)</Label>
-                <Input
-                  type="number"
-                  step="0.01"
-                  value={editValorTotal}
-                  onChange={(e) => setEditValorTotal(e.target.value)}
-                />
-              </div>
-              <div>
-                <Label>Extras Total (R$)</Label>
-                <Input
-                  type="number"
-                  step="0.01"
-                  value={editExtrasTotal}
-                  onChange={(e) => setEditExtrasTotal(e.target.value)}
-                />
+            <div>
+              <Label>Valor Serviços (R$)</Label>
+              <Input
+                type="number"
+                step="0.01"
+                value={editValorTotal}
+                onChange={(e) => setEditValorTotal(e.target.value)}
+              />
+            </div>
+            <div>
+              <Label className="mb-2 block">Extras</Label>
+              <div className="space-y-2">
+                {editExtras.map((extra, idx) => (
+                  <div key={idx} className="flex gap-2 items-center">
+                    <Input
+                      placeholder="Descrição"
+                      value={extra.descricao}
+                      onChange={(e) => {
+                        const next = [...editExtras];
+                        next[idx] = { ...next[idx], descricao: e.target.value };
+                        setEditExtras(next);
+                      }}
+                      className="flex-1"
+                    />
+                    <Input
+                      type="number"
+                      step="0.01"
+                      placeholder="Valor"
+                      value={extra.valor}
+                      onChange={(e) => {
+                        const next = [...editExtras];
+                        next[idx] = { ...next[idx], valor: e.target.value };
+                        setEditExtras(next);
+                      }}
+                      className="w-28"
+                    />
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-8 w-8 shrink-0"
+                      onClick={() => setEditExtras(editExtras.filter((_, i) => i !== idx))}
+                    >
+                      <X className="h-4 w-4 text-destructive" />
+                    </Button>
+                  </div>
+                ))}
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setEditExtras([...editExtras, { descricao: "", valor: "" }])}
+                >
+                  <Plus className="h-4 w-4 mr-1" />
+                  Adicionar Extra
+                </Button>
+                {editExtras.length > 0 && (
+                  <p className="text-xs text-muted-foreground">
+                    Total Extras: {new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(
+                      editExtras.reduce((s, e) => s + (parseFloat(e.valor) || 0), 0)
+                    )}
+                  </p>
+                )}
               </div>
             </div>
             <div>
