@@ -348,6 +348,11 @@ const Index = () => {
                 </span>
               </Link>
             )}
+            <Link to="/cotacoes">
+              <span className="flex items-center gap-1 text-sm text-primary-foreground/80 hover:text-primary-foreground">
+                <FileText className="h-4 w-4" /> Cotações
+              </span>
+            </Link>
             <Link to="/cadastros">
               <span className="flex items-center gap-1 text-sm text-primary-foreground/80 hover:text-primary-foreground">
                 <ClipboardList className="h-4 w-4" /> Cadastros
