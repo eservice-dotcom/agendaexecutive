@@ -138,7 +138,12 @@ const FechamentosConsulta = () => {
     setEditCliente(f.cliente);
     setEditDataEmissao(f.data_emissao);
     setEditValorTotal(String(f.valor_total));
-    setEditExtrasTotal(String(f.extras_total));
+    const extras = Array.isArray(f.extras) && f.extras.length > 0
+      ? f.extras.map((e: any) => ({ descricao: e.descricao || "", valor: String(e.valor || 0) }))
+      : f.extras_total > 0
+        ? [{ descricao: "Extras", valor: String(f.extras_total) }]
+        : [];
+    setEditExtras(extras);
     setEditObservacoes(f.observacoes || "");
     setEditOpen(true);
   };
