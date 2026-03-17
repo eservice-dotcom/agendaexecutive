@@ -1063,6 +1063,14 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
     else loadContasReceber();
   };
 
+  const handleCancelarConta = async (type: "pagar" | "receber", id: string) => {
+    if (!confirm("Cancelar este registro?")) return;
+    const table = type === "pagar" ? "contas_pagar" : "contas_receber";
+    await supabase.from(table).update({ status: "cancelado" }).eq("id", id);
+    toast({ title: "Registro cancelado" });
+    if (type === "pagar") loadContasPagar();
+    else loadContasReceber();
+  };
   const openNovaContaDialog = (type: "pagar" | "receber") => {
     setNovaContaForm({ descritivo: "", valor: "", data_vencimento: "", fornecedor: "", cliente: "", centro_custo: "", centro_receita: "", subgrupo_custo: "", subgrupo_receita: "" });
     setQuickAddFornecedor(false);
