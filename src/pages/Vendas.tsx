@@ -1614,6 +1614,17 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
                     <SelectItem value="cancelado">Cancelado</SelectItem>
                   </SelectContent>
                 </Select>
+                <Select value={filtroCentroCustoPagar || "all"} onValueChange={(v) => setFiltroCentroCustoPagar(v === "all" ? "" : v)}>
+                  <SelectTrigger className="w-48 h-8 text-sm">
+                    <SelectValue placeholder="Centro de Custo" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">Todos os centros</SelectItem>
+                    {centrosCusto.map((c) => (
+                      <SelectItem key={c.id} value={c.nome}>{c.nome}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
               <div className="flex gap-2">
                 <Button variant="outline" size="sm" onClick={() => printContasPagar(filteredContasPagarList, vendaOsMap)} className="gap-1">
