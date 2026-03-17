@@ -35,7 +35,16 @@ export const generateClosingReportExcel = (
   const wb = XLSX.utils.book_new();
 
   // --- Sheet 1: Serviços ---
-  const rows = items.map((ai, idx) => {
+  const sortedItems = [...items].sort((a, b) => {
+    const dateA = a.data || "";
+    const dateB = b.data || "";
+    if (dateA !== dateB) return dateA.localeCompare(dateB);
+    const horaA = a.hora || "";
+    const horaB = b.hora || "";
+    return horaA.localeCompare(horaB);
+  });
+
+  const rows = sortedItems.map((ai, idx) => {
     const kmTotal = (Number(ai.km_fim) || 0) - (Number(ai.km_in) || 0);
     const outrosDespesas = ai.outros_despesas
       ? Array.isArray(ai.outros_despesas) ? ai.outros_despesas : JSON.parse(ai.outros_despesas)
@@ -48,6 +57,7 @@ export const generateClosingReportExcel = (
       "#": idx + 1,
       "O.S.": ai.cot || "",
       "Data": ai.data ? formatDate(ai.data) : "",
+      "Hora": ai.hora || "",
       "Tipo": ai.tipo || "",
       "Origem": ai.origem || "",
       "Destino": ai.destino || "",
@@ -71,9 +81,10 @@ export const generateClosingReportExcel = (
   const selectedExtras = vendaInfo?.extras || [];
   selectedExtras.forEach((extra, idx) => {
     rows.push({
-      "#": items.length + idx + 1,
+      "#": sortedItems.length + idx + 1,
       "O.S.": "EXTRA",
       "Data": "",
+      "Hora": "",
       "Tipo": "Extra",
       "Origem": extra.descricao,
       "Destino": "",
@@ -94,16 +105,17 @@ export const generateClosingReportExcel = (
   });
 
   // Totals row
-  const totalServicos = items.reduce((s, ai) => s + parseAmount(ai.valor), 0);
-  const totalEstac = items.reduce((s, ai) => s + parseAmount(ai.estacionamento), 0);
-  const totalKm = items.reduce((s, ai) => s + (parseAmount(ai.km_fim) - parseAmount(ai.km_in)), 0);
-  const totalKmExtra = items.reduce((s, ai) => s + parseAmount(ai.km_extra), 0);
+  const totalServicos = sortedItems.reduce((s, ai) => s + parseAmount(ai.valor), 0);
+  const totalEstac = sortedItems.reduce((s, ai) => s + parseAmount(ai.estacionamento), 0);
+  const totalKm = sortedItems.reduce((s, ai) => s + (parseAmount(ai.km_fim) - parseAmount(ai.km_in)), 0);
+  const totalKmExtra = sortedItems.reduce((s, ai) => s + parseAmount(ai.km_extra), 0);
   const extrasTotal = selectedExtras.reduce((s, e) => s + parseAmount(e.valor), 0);
 
   rows.push({
     "#": 0,
     "O.S.": "TOTAIS",
     "Data": "",
+    "Hora": "",
     "Tipo": "",
     "Origem": "",
     "Destino": "",

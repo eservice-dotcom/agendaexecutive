@@ -78,7 +78,16 @@ export const generateClosingReport = (
 ) => {
   const logoUrl = new URL(logo, window.location.origin).href;
 
-  const cards = items.map((ai, idx) => {
+  const sortedItems = [...items].sort((a, b) => {
+    const dateA = a.data || "";
+    const dateB = b.data || "";
+    if (dateA !== dateB) return dateA.localeCompare(dateB);
+    const horaA = a.hora || "";
+    const horaB = b.hora || "";
+    return horaA.localeCompare(horaB);
+  });
+
+  const cards = sortedItems.map((ai, idx) => {
     const kmTotal = (Number(ai.km_fim) || 0) - (Number(ai.km_in) || 0);
     const outrosDespesas = ai.outros_despesas
       ? Array.isArray(ai.outros_despesas)
@@ -97,7 +106,7 @@ export const generateClosingReport = (
       <div class="card-header">
         <span class="card-num">${idx + 1}</span>
         <span class="card-os">O.S. ${ai.cot || "—"}</span>
-        <span class="card-date">${ai.data ? formatDate(ai.data) : ""}</span>
+        <span class="card-date">${ai.data ? formatDate(ai.data) : ""} ${ai.hora || ""}</span>
         <span class="card-type">${ai.tipo || ""}</span>
       </div>
       <div class="card-body">
@@ -126,7 +135,7 @@ export const generateClosingReport = (
   const extrasCards = selectedExtras.map((extra, idx) => {
     return `<div class="card" style="border-color:#d4a017">
       <div class="card-header" style="background:#d4a017">
-        <span class="card-num">${items.length + idx + 1}</span>
+        <span class="card-num">${sortedItems.length + idx + 1}</span>
         <span class="card-os">EXTRA</span>
         <span class="card-type">Extra</span>
       </div>
@@ -139,10 +148,10 @@ export const generateClosingReport = (
     </div>`;
   }).join("");
 
-  const totalServicos = items.reduce((s, ai) => s + parseAmount(ai.valor), 0);
-  const totalEstac = items.reduce((s, ai) => s + parseAmount(ai.estacionamento), 0);
-  const totalKm = items.reduce((s, ai) => s + (parseAmount(ai.km_fim) - parseAmount(ai.km_in)), 0);
-  const totalKmExtra = items.reduce((s, ai) => s + parseAmount(ai.km_extra), 0);
+  const totalServicos = sortedItems.reduce((s, ai) => s + parseAmount(ai.valor), 0);
+  const totalEstac = sortedItems.reduce((s, ai) => s + parseAmount(ai.estacionamento), 0);
+  const totalKm = sortedItems.reduce((s, ai) => s + (parseAmount(ai.km_fim) - parseAmount(ai.km_in)), 0);
+  const totalKmExtra = sortedItems.reduce((s, ai) => s + parseAmount(ai.km_extra), 0);
   const extrasTotal = selectedExtras.reduce((s, e) => s + parseAmount(e.valor), 0);
   const totalValor = totalServicos + extrasTotal;
 
