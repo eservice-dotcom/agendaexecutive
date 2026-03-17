@@ -115,6 +115,7 @@ export const generateClosingReportExcel = (
     "#": 0,
     "O.S.": "TOTAIS",
     "Data": "",
+    "Hora": "",
     "Tipo": "",
     "Origem": "",
     "Destino": "",
