@@ -1905,7 +1905,7 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
                         </div>
                         <div className="space-y-1">
                           <Label className="text-xs">Descritivo</Label>
-                          <Input className="h-9" value={cp.descritivo} onChange={(e) => updateContaPagar(idx, "descritivo", e.target.value)} placeholder="Descrição" />
+                          <Textarea className="min-h-[36px] resize-y" value={cp.descritivo} onChange={(e) => updateContaPagar(idx, "descritivo", e.target.value)} placeholder="Descrição" rows={2} />
                         </div>
                         <div className="space-y-1">
                           <Label className="text-xs">Valor</Label>
@@ -1955,7 +1955,7 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
             <div className="space-y-4">
               <div className="space-y-2">
                 <Label>Descritivo</Label>
-                <Input value={editForm.descritivo} onChange={(e) => setEditForm({ ...editForm, descritivo: e.target.value })} />
+                <Textarea value={editForm.descritivo} onChange={(e) => setEditForm({ ...editForm, descritivo: e.target.value })} rows={3} />
               </div>
               <div className="space-y-2">
                 <Label>Valor</Label>
@@ -2471,7 +2471,7 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
               )}
               <div className="space-y-2">
                 <Label>Descritivo</Label>
-                <Input value={novaContaForm.descritivo} onChange={(e) => setNovaContaForm({ ...novaContaForm, descritivo: e.target.value })} placeholder="Descrição da conta" />
+                <Textarea value={novaContaForm.descritivo} onChange={(e) => setNovaContaForm({ ...novaContaForm, descritivo: e.target.value })} placeholder="Descrição da conta" rows={3} />
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-2">
