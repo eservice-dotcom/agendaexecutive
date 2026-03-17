@@ -187,6 +187,122 @@ export const printContasReceber = (items: any[], vendaOsMap: Record<string, any>
 </div>`);
 };
 
+export const printCotacao = (cotacao: {
+  numero_cotacao: number;
+  nome: string;
+  data: string;
+  forma_pagamento: string;
+  validade_proposta: string;
+  observacoes: string;
+  valor_total: number;
+  status: string;
+  items: { descritivo: string; valor: number; hora_extra: string; km_extra: number }[];
+}, logoUrl: string) => {
+  const fc = (v: number) => new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(v);
+  const fd = (d: string) => { if (!d) return ""; const [y, m, day] = d.split("-"); return `${day}/${m}/${y}`; };
+
+  const rows = cotacao.items.map((item, idx) => `<tr>
+    <td class="c">${idx + 1}</td>
+    <td>${item.descritivo}</td>
+    <td class="r">${fc(item.valor)}</td>
+    <td class="c">${item.hora_extra || "—"}</td>
+    <td class="c">${item.km_extra || "—"}</td>
+  </tr>`).join("");
+
+  const statusLabel = cotacao.status === "aprovada" ? "APROVADA" : cotacao.status === "recusada" ? "RECUSADA" : "PENDENTE";
+
+  const w = window.open("", "_blank");
+  if (!w) return;
+  w.document.write(`<!DOCTYPE html><html><head><title>Cotação #${cotacao.numero_cotacao}</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Segoe UI',Arial,sans-serif;color:#1a1a1a;font-size:12px;padding:0}
+.page{max-width:210mm;margin:0 auto;padding:15mm 20mm}
+.header{display:flex;align-items:center;justify-content:space-between;border-bottom:3px solid #1a3a5c;padding-bottom:12px;margin-bottom:20px}
+.header-left{display:flex;align-items:center;gap:12px}
+.header-left img{height:60px;width:60px;object-fit:contain}
+.header-left .company{font-size:18px;font-weight:700;color:#1a3a5c}
+.header-right{text-align:right}
+.header-right .cotacao-num{font-size:22px;font-weight:700;color:#1a3a5c}
+.header-right .cotacao-label{font-size:10px;color:#666;text-transform:uppercase;letter-spacing:1px}
+.info-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px 24px;margin-bottom:20px;font-size:11px}
+.info-grid .label{font-weight:600;color:#555}
+.info-grid .value{color:#1a1a1a}
+table{width:100%;border-collapse:collapse;margin-top:8px;margin-bottom:16px}
+th{background:#1a3a5c;color:#fff;padding:8px 10px;font-size:10px;text-transform:uppercase;letter-spacing:0.5px}
+td{border-bottom:1px solid #ddd;padding:7px 10px;font-size:11px}
+tr:nth-child(even){background:#f8f9fa}
+.r{text-align:right}.c{text-align:center}
+.total-row{background:#1a3a5c !important;color:#fff;font-weight:700;font-size:13px}
+.total-row td{border:none;padding:10px}
+.obs-section{margin-top:16px;padding:12px;background:#f0f4f8;border-radius:6px;font-size:11px}
+.obs-section .obs-title{font-weight:700;color:#1a3a5c;margin-bottom:4px}
+.footer{margin-top:30px;border-top:2px solid #1a3a5c;padding-top:12px;display:flex;justify-content:space-between;font-size:10px;color:#666}
+.validity{margin-top:12px;padding:8px 12px;background:#fff8e1;border-left:4px solid #f9a825;font-size:11px}
+.signature-area{margin-top:40px;display:flex;justify-content:space-between;gap:40px}
+.signature-line{flex:1;text-align:center;padding-top:40px;border-top:1px solid #333;font-size:10px;color:#555}
+@media print{
+  body{padding:0}
+  .page{padding:10mm 15mm}
+  @page{size:A4 portrait;margin:0}
+}
+</style></head><body>
+<div class="page">
+  <div class="header">
+    <div class="header-left">
+      <img src="${logoUrl}" alt="Logo" />
+      <span class="company">Executive Service</span>
+    </div>
+    <div class="header-right">
+      <div class="cotacao-label">Cotação</div>
+      <div class="cotacao-num">#${String(cotacao.numero_cotacao).padStart(4, "0")}</div>
+    </div>
+  </div>
+
+  <div class="info-grid">
+    <div><span class="label">Cliente / Nome:</span> <span class="value">${cotacao.nome}</span></div>
+    <div><span class="label">Data:</span> <span class="value">${fd(cotacao.data)}</span></div>
+    <div><span class="label">Forma de Pagamento:</span> <span class="value">${cotacao.forma_pagamento || "—"}</span></div>
+    <div><span class="label">Status:</span> <span class="value">${statusLabel}</span></div>
+  </div>
+
+  <table>
+    <thead><tr>
+      <th class="c" style="width:40px">Nº</th>
+      <th>Descritivo</th>
+      <th class="r" style="width:110px">Valor</th>
+      <th class="c" style="width:80px">Hora Extra</th>
+      <th class="c" style="width:80px">KM Extra</th>
+    </tr></thead>
+    <tbody>
+      ${rows}
+      <tr class="total-row">
+        <td colspan="2" class="r">VALOR TOTAL</td>
+        <td class="r">${fc(cotacao.valor_total)}</td>
+        <td colspan="2"></td>
+      </tr>
+    </tbody>
+  </table>
+
+  ${cotacao.validade_proposta ? `<div class="validity">⏰ <strong>Validade da Proposta:</strong> ${fd(cotacao.validade_proposta)}</div>` : ""}
+
+  ${cotacao.observacoes ? `<div class="obs-section"><div class="obs-title">Observações</div><div>${cotacao.observacoes}</div></div>` : ""}
+
+  <div class="signature-area">
+    <div class="signature-line">Executive Service</div>
+    <div class="signature-line">${cotacao.nome}</div>
+  </div>
+
+  <div class="footer">
+    <span>Documento gerado em ${new Date().toLocaleString("pt-BR")}</span>
+    <span>Executive Service — Transporte Executivo</span>
+  </div>
+</div>
+</body></html>`);
+  w.document.close();
+  w.onload = () => w.print();
+};
+
 export const printFatFornecedor = (items: any[], includeFinancials = true) => {
   const map = new Map<string, { fornecedor: string; viagens: number; receita: number; custo: number; pax: number }>();
   items.forEach(i => {

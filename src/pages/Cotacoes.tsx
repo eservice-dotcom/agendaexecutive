@@ -4,7 +4,8 @@ import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import logo from "@/assets/logo-executive-service.png";
-import { Plus, Trash2, Save, Pencil, FileText, CalendarDays, ClipboardList, ShoppingCart, Eye, EyeOff, X } from "lucide-react";
+import { Plus, Trash2, Save, Pencil, FileText, CalendarDays, ClipboardList, ShoppingCart, Printer } from "lucide-react";
+import { printCotacao } from "@/lib/printUtils";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -360,6 +361,12 @@ const Cotacoes = () => {
                       <div className="flex gap-1" onClick={(e) => e.stopPropagation()}>
                         <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => openEdit(c)}>
                           <Pencil className="h-4 w-4" />
+                        </Button>
+                        <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => {
+                          const logoUrl = new URL(logo, window.location.origin).href;
+                          printCotacao(c, logoUrl);
+                        }}>
+                          <Printer className="h-4 w-4" />
                         </Button>
                         <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive" onClick={() => handleDelete(c.id)}>
                           <Trash2 className="h-4 w-4" />
