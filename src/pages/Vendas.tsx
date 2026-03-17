@@ -2471,7 +2471,7 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
               )}
               <div className="space-y-2">
                 <Label>Descritivo</Label>
-                <Input value={novaContaForm.descritivo} onChange={(e) => setNovaContaForm({ ...novaContaForm, descritivo: e.target.value })} placeholder="Descrição da conta" />
+                <Textarea value={novaContaForm.descritivo} onChange={(e) => setNovaContaForm({ ...novaContaForm, descritivo: e.target.value })} placeholder="Descrição da conta" rows={3} />
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-2">
