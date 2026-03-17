@@ -199,7 +199,7 @@ const Vendas = () => {
 
   // Edit conta dialog
   const [editDialog, setEditDialog] = useState<{ type: "pagar" | "receber"; item: any } | null>(null);
-  const [editForm, setEditForm] = useState({ descritivo: "", valor: "", data_vencimento: "", data_pagamento: "", centro: "", subgrupo: "" });
+  const [editForm, setEditForm] = useState({ descritivo: "", valor: "", data_vencimento: "", data_pagamento: "", centro: "", subgrupo: "", cliente: "", fornecedor: "" });
 
   // New manual conta dialogs
   const [novaContaDialog, setNovaContaDialog] = useState<"pagar" | "receber" | null>(null);
