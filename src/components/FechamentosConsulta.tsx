@@ -10,7 +10,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
-import { Printer, Search, Pencil, Trash2, Save, X, FileSpreadsheet } from "lucide-react";
+import { Printer, Search, Pencil, Trash2, Save, X, FileSpreadsheet, Plus } from "lucide-react";
 import { toast } from "sonner";
 
 interface Fechamento {
