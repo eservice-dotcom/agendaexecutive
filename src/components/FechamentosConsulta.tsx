@@ -93,9 +93,17 @@ const FechamentosConsulta = () => {
     });
   }, [fechamentos, filterCliente, filterDataInicio, filterDataFim, searchText]);
 
+  const resolveExtras = (f: Fechamento) => {
+    const extras = Array.isArray(f.extras) ? f.extras.filter((e: any) => e && e.descricao) : [];
+    if (extras.length === 0 && f.extras_total > 0) {
+      return [{ descricao: "Extras", valor: f.extras_total }];
+    }
+    return extras;
+  };
+
   const handleReimprimir = (f: Fechamento) => {
     const items = Array.isArray(f.items) ? f.items : [];
-    const extras = Array.isArray(f.extras) ? f.extras : [];
+    const extras = resolveExtras(f);
 
     generateClosingReport(
       items,
