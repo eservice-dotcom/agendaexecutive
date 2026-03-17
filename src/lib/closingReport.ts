@@ -135,7 +135,7 @@ export const generateClosingReport = (
   const extrasCards = selectedExtras.map((extra, idx) => {
     return `<div class="card" style="border-color:#d4a017">
       <div class="card-header" style="background:#d4a017">
-        <span class="card-num">${items.length + idx + 1}</span>
+        <span class="card-num">${sortedItems.length + idx + 1}</span>
         <span class="card-os">EXTRA</span>
         <span class="card-type">Extra</span>
       </div>
