@@ -6,7 +6,6 @@ import { toast } from "sonner";
 import logo from "@/assets/logo-executive-service.png";
 import { Plus, Trash2, Save, Pencil, FileText, CalendarDays, ClipboardList, ShoppingCart, Printer } from "lucide-react";
 import { printCotacao } from "@/lib/printUtils";
-import logo from "@/assets/logo-executive-service.png";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
