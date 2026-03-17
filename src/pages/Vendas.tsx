@@ -1063,6 +1063,14 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
     else loadContasReceber();
   };
 
+  const handleCancelarConta = async (type: "pagar" | "receber", id: string) => {
+    if (!confirm("Cancelar este registro?")) return;
+    const table = type === "pagar" ? "contas_pagar" : "contas_receber";
+    await supabase.from(table).update({ status: "cancelado" }).eq("id", id);
+    toast({ title: "Registro cancelado" });
+    if (type === "pagar") loadContasPagar();
+    else loadContasReceber();
+  };
   const openNovaContaDialog = (type: "pagar" | "receber") => {
     setNovaContaForm({ descritivo: "", valor: "", data_vencimento: "", fornecedor: "", cliente: "", centro_custo: "", centro_receita: "", subgrupo_custo: "", subgrupo_receita: "" });
     setQuickAddFornecedor(false);
@@ -1566,9 +1574,14 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
                         <TableCell>
                           <div className="flex gap-1">
                             {cr.status === "pendente" && (
-                              <Button variant="ghost" size="icon" onClick={() => handleBaixa("receber", cr.id)} title="Dar Baixa">
-                                <CheckCircle className="h-4 w-4 text-green-600" />
-                              </Button>
+                              <>
+                                <Button variant="ghost" size="icon" onClick={() => handleBaixa("receber", cr.id)} title="Dar Baixa">
+                                  <CheckCircle className="h-4 w-4 text-green-600" />
+                                </Button>
+                                <Button variant="ghost" size="icon" onClick={() => handleCancelarConta("receber", cr.id)} title="Cancelar">
+                                  <XCircle className="h-4 w-4 text-orange-500" />
+                                </Button>
+                              </>
                             )}
                             <Button variant="ghost" size="icon" onClick={() => openEditDialog("receber", cr)} title="Editar">
                               <FileText className="h-4 w-4 text-primary" />
