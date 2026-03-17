@@ -151,15 +151,20 @@ const FechamentosConsulta = () => {
   const handleSaveEdit = async () => {
     if (!editItem) return;
     setSaving(true);
+    const extrasArray = editExtras
+      .filter((e) => e.descricao.trim())
+      .map((e) => ({ descricao: e.descricao.trim(), valor: parseFloat(e.valor) || 0 }));
+    const extrasTotal = extrasArray.reduce((s, e) => s + e.valor, 0);
     const { error } = await supabase
       .from("fechamentos")
       .update({
         cliente: editCliente,
         data_emissao: editDataEmissao,
         valor_total: parseFloat(editValorTotal) || 0,
-        extras_total: parseFloat(editExtrasTotal) || 0,
+        extras_total: extrasTotal,
+        extras: extrasArray,
         observacoes: editObservacoes,
-      })
+      } as any)
       .eq("id", editItem.id);
 
     if (error) {
