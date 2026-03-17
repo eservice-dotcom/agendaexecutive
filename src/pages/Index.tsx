@@ -101,7 +101,7 @@ const Index = () => {
         if (
           search &&
           !item.cliente.toLowerCase().includes(search) &&
-          !item.cot.toLowerCase().includes(search) &&
+          item.cot.toLowerCase() !== search &&
           !item.placa.toLowerCase().includes(search) &&
           !item.motorista.toLowerCase().includes(search) &&
           !item.origem.toLowerCase().includes(search) &&
