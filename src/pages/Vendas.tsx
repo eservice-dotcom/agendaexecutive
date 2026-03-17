@@ -1955,7 +1955,7 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
             <div className="space-y-4">
               <div className="space-y-2">
                 <Label>Descritivo</Label>
-                <Input value={editForm.descritivo} onChange={(e) => setEditForm({ ...editForm, descritivo: e.target.value })} />
+                <Textarea value={editForm.descritivo} onChange={(e) => setEditForm({ ...editForm, descritivo: e.target.value })} rows={3} />
               </div>
               <div className="space-y-2">
                 <Label>Valor</Label>
