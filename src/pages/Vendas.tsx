@@ -1566,9 +1566,14 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
                         <TableCell>
                           <div className="flex gap-1">
                             {cr.status === "pendente" && (
-                              <Button variant="ghost" size="icon" onClick={() => handleBaixa("receber", cr.id)} title="Dar Baixa">
-                                <CheckCircle className="h-4 w-4 text-green-600" />
-                              </Button>
+                              <>
+                                <Button variant="ghost" size="icon" onClick={() => handleBaixa("receber", cr.id)} title="Dar Baixa">
+                                  <CheckCircle className="h-4 w-4 text-green-600" />
+                                </Button>
+                                <Button variant="ghost" size="icon" onClick={() => handleCancelarConta("receber", cr.id)} title="Cancelar">
+                                  <XCircle className="h-4 w-4 text-orange-500" />
+                                </Button>
+                              </>
                             )}
                             <Button variant="ghost" size="icon" onClick={() => openEditDialog("receber", cr)} title="Editar">
                               <FileText className="h-4 w-4 text-primary" />
