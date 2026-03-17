@@ -234,10 +234,11 @@ const Vendas = () => {
   const [editVendaSearch, setEditVendaSearch] = useState("");
   const [editVendaExtras, setEditVendaExtras] = useState<ExtraItem[]>([]);
 
-  // Filtro contas a pagar por OS e fornecedor
+  // Filtro contas a pagar por OS, fornecedor e centro de custo
   const [filtroOsPagar, setFiltroOsPagar] = useState("");
   const [filtroFornecedorPagar, setFiltroFornecedorPagar] = useState("");
   const [filtroStatusPagar, setFiltroStatusPagar] = useState("");
+  const [filtroCentroCustoPagar, setFiltroCentroCustoPagar] = useState("");
 
   // Filtro contas a receber por OS e cliente
   const [filtroOsReceber, setFiltroOsReceber] = useState("");
