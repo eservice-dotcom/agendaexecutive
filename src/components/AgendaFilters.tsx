@@ -60,16 +60,31 @@ const AgendaFilters = ({ filters, onFilterChange, motoristas, tipos, fornecedore
           </Button>
         )}
       </div>
-      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-8">
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-10">
         <div className="relative xl:col-span-2">
           <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
           <Input
-            placeholder="Buscar cliente, O.S., placa..."
+            placeholder="Buscar motorista, origem, destino..."
             value={filters.search}
             onChange={(e) => updateFilter("search", e.target.value)}
             className="pl-9"
           />
         </div>
+        <Input
+          placeholder="Cliente"
+          value={filters.cliente}
+          onChange={(e) => updateFilter("cliente", e.target.value)}
+        />
+        <Input
+          placeholder="O.S."
+          value={filters.os}
+          onChange={(e) => updateFilter("os", e.target.value)}
+        />
+        <Input
+          placeholder="Placa"
+          value={filters.placa}
+          onChange={(e) => updateFilter("placa", e.target.value)}
+        />
         <div className="relative">
           <Calendar className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
           <Input
