@@ -33,6 +33,9 @@ const AgendaFilters = ({ filters, onFilterChange, motoristas, tipos, fornecedore
   const clearFilters = () => {
     onFilterChange({
       search: "",
+      cliente: "",
+      os: "",
+      placa: "",
       dataInicio: "",
       dataFim: "",
       tipo: "",
