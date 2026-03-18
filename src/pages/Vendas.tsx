@@ -2481,6 +2481,20 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
                     </div>
                   )}
                 </div>
+                <div className="space-y-2">
+                  <Label>Veículo (Placa)</Label>
+                  <Select value={novaContaForm.placa} onValueChange={(v) => setNovaContaForm({ ...novaContaForm, placa: v === "none" ? "" : v })}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Selecione (opcional)" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="none">Nenhum</SelectItem>
+                      {veiculosList.map((v) => (
+                        <SelectItem key={v.placa} value={v.placa}>{v.placa} - {v.modelo}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
               ) : (
                 <div className="space-y-2">
                   <Label>Cliente</Label>
