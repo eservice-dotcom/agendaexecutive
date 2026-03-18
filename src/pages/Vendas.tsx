@@ -2445,56 +2445,58 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
             </DialogHeader>
             <div className="space-y-4">
               {novaContaDialog === "pagar" ? (
-                <div className="space-y-2">
-                  <Label>Fornecedor</Label>
-                  {quickAddFornecedor ? (
-                    <div className="flex gap-2">
-                      <Input
-                        placeholder="Nome do novo fornecedor"
-                        value={quickAddFornecedorNome}
-                        onChange={(e) => setQuickAddFornecedorNome(e.target.value)}
-                        onKeyDown={(e) => e.key === "Enter" && handleQuickAddFornecedor()}
-                        autoFocus
-                      />
-                      <Button size="sm" onClick={handleQuickAddFornecedor} disabled={!quickAddFornecedorNome.trim()}>
-                        <Check className="h-4 w-4" />
-                      </Button>
-                      <Button size="sm" variant="ghost" onClick={() => { setQuickAddFornecedor(false); setQuickAddFornecedorNome(""); }}>
-                        <X className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  ) : (
-                    <div className="flex gap-2">
-                      <Select value={novaContaForm.fornecedor} onValueChange={(v) => setNovaContaForm({ ...novaContaForm, fornecedor: v })}>
-                        <SelectTrigger className="flex-1">
-                          <SelectValue placeholder="Selecione o fornecedor" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {fornecedores.map((f) => (
-                            <SelectItem key={f} value={f}>{f}</SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      <Button size="icon" variant="outline" onClick={() => setQuickAddFornecedor(true)} title="Cadastrar novo fornecedor">
-                        <Plus className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  )}
-                </div>
-                <div className="space-y-2">
-                  <Label>Veículo (Placa)</Label>
-                  <Select value={novaContaForm.placa} onValueChange={(v) => setNovaContaForm({ ...novaContaForm, placa: v === "none" ? "" : v })}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Selecione (opcional)" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="none">Nenhum</SelectItem>
-                      {veiculosList.map((v) => (
-                        <SelectItem key={v.placa} value={v.placa}>{v.placa} - {v.modelo}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
+                <>
+                  <div className="space-y-2">
+                    <Label>Fornecedor</Label>
+                    {quickAddFornecedor ? (
+                      <div className="flex gap-2">
+                        <Input
+                          placeholder="Nome do novo fornecedor"
+                          value={quickAddFornecedorNome}
+                          onChange={(e) => setQuickAddFornecedorNome(e.target.value)}
+                          onKeyDown={(e) => e.key === "Enter" && handleQuickAddFornecedor()}
+                          autoFocus
+                        />
+                        <Button size="sm" onClick={handleQuickAddFornecedor} disabled={!quickAddFornecedorNome.trim()}>
+                          <Check className="h-4 w-4" />
+                        </Button>
+                        <Button size="sm" variant="ghost" onClick={() => { setQuickAddFornecedor(false); setQuickAddFornecedorNome(""); }}>
+                          <X className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    ) : (
+                      <div className="flex gap-2">
+                        <Select value={novaContaForm.fornecedor} onValueChange={(v) => setNovaContaForm({ ...novaContaForm, fornecedor: v })}>
+                          <SelectTrigger className="flex-1">
+                            <SelectValue placeholder="Selecione o fornecedor" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {fornecedores.map((f) => (
+                              <SelectItem key={f} value={f}>{f}</SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        <Button size="icon" variant="outline" onClick={() => setQuickAddFornecedor(true)} title="Cadastrar novo fornecedor">
+                          <Plus className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    )}
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Veículo (Placa)</Label>
+                    <Select value={novaContaForm.placa} onValueChange={(v) => setNovaContaForm({ ...novaContaForm, placa: v === "none" ? "" : v })}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Selecione (opcional)" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="none">Nenhum</SelectItem>
+                        {veiculosList.map((v) => (
+                          <SelectItem key={v.placa} value={v.placa}>{v.placa} - {v.modelo}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </>
               ) : (
                 <div className="space-y-2">
                   <Label>Cliente</Label>
