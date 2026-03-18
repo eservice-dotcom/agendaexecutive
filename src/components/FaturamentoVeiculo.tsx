@@ -169,7 +169,39 @@ const FaturamentoVeiculo = () => {
           <StatCard label="Resultado Líquido" value={formatCurrency(totalLiquido)} />
         </div>
       </div>
-      <div className="flex items-center justify-end gap-3">
+      <div className="flex flex-wrap items-center gap-3">
+        <div className="flex items-center gap-2">
+          <span className="text-xs font-medium text-muted-foreground">Período:</span>
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button variant="outline" size="sm" className={cn("w-[140px] justify-start text-left font-normal text-xs", !dataInicio && "text-muted-foreground")}>
+                <CalendarIcon className="mr-1.5 h-3.5 w-3.5" />
+                {dataInicio ? format(dataInicio, "dd/MM/yyyy") : "Início"}
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-auto p-0" align="start">
+              <Calendar mode="single" selected={dataInicio} onSelect={setDataInicio} locale={ptBR} initialFocus className={cn("p-3 pointer-events-auto")} />
+            </PopoverContent>
+          </Popover>
+          <span className="text-xs text-muted-foreground">até</span>
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button variant="outline" size="sm" className={cn("w-[140px] justify-start text-left font-normal text-xs", !dataFim && "text-muted-foreground")}>
+                <CalendarIcon className="mr-1.5 h-3.5 w-3.5" />
+                {dataFim ? format(dataFim, "dd/MM/yyyy") : "Fim"}
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-auto p-0" align="start">
+              <Calendar mode="single" selected={dataFim} onSelect={setDataFim} locale={ptBR} initialFocus className={cn("p-3 pointer-events-auto")} />
+            </PopoverContent>
+          </Popover>
+          {(dataInicio || dataFim) && (
+            <Button variant="ghost" size="sm" className="text-xs h-8 px-2" onClick={() => { setDataInicio(undefined); setDataFim(undefined); }}>
+              Limpar
+            </Button>
+          )}
+        </div>
+        <div className="ml-auto flex items-center gap-3">
         <label className="flex items-center gap-1.5 text-xs text-muted-foreground cursor-pointer select-none">
           <input type="checkbox" checked={printWithFinancials} onChange={e => setPrintWithFinancials(e.target.checked)} className="rounded" />
           Incluir financeiro
