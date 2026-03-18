@@ -1029,6 +1029,7 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
       subgrupo: (type === "pagar" ? item.subgrupo_custo : item.subgrupo_receita) || "",
       cliente: item.cliente || "",
       fornecedor: item.fornecedor || "",
+      placa: item.placa || "",
     });
     setEditDialog({ type, item });
   };
