@@ -1141,7 +1141,8 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
         valor: parseFloat(novaContaForm.valor) || 0,
         data: today,
         data_vencimento: novaContaForm.data_vencimento || null,
-        status: "pendente",
+        data_pagamento: novaContaForm.data_pagamento || null,
+        status: novaContaForm.data_pagamento ? "pago" : "pendente",
         centro_custo: novaContaForm.centro_custo,
         subgrupo_custo: novaContaForm.subgrupo_custo,
       });
