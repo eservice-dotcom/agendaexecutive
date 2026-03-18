@@ -176,11 +176,101 @@ const FaturamentoVeiculo = () => {
         </div>
       </div>
       <div className="flex flex-wrap items-center gap-3">
-        <div className="flex items-center gap-2">
-          <span className="text-xs font-medium text-muted-foreground">Período:</span>
+        <div className="flex items-center gap-2 flex-wrap">
+          <span className="text-xs font-medium text-muted-foreground">Filtro:</span>
+          <Select
+            value={(() => {
+              const now = new Date();
+              const years: string[] = [];
+              for (let y = now.getFullYear(); y >= now.getFullYear() - 5; y--) years.push(String(y));
+              // Check if current filter matches a specific month
+              if (dataInicio && dataFim) {
+                const si = format(dataInicio, "yyyy-MM-dd");
+                const sf = format(dataFim, "yyyy-MM-dd");
+                for (const yr of years) {
+                  for (let m = 0; m < 12; m++) {
+                    const ms = startOfMonth(new Date(Number(yr), m));
+                    const me = endOfMonth(new Date(Number(yr), m));
+                    if (si === format(ms, "yyyy-MM-dd") && sf === format(me, "yyyy-MM-dd")) {
+                      return `${yr}-${String(m).padStart(2, "0")}`;
+                    }
+                  }
+                }
+              }
+              return "custom";
+            })()}
+            onValueChange={(v) => {
+              if (v === "custom") return;
+              const [yr, mo] = v.split("-").map(Number);
+              setDataInicio(startOfMonth(new Date(yr, mo)));
+              setDataFim(endOfMonth(new Date(yr, mo)));
+            }}
+          >
+            <SelectTrigger className="w-[150px] h-8 text-xs">
+              <SelectValue placeholder="Mês" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="custom" disabled className="text-muted-foreground text-xs">Selecione o mês</SelectItem>
+              {(() => {
+                const now = new Date();
+                const options: { label: string; value: string }[] = [];
+                for (let y = now.getFullYear(); y >= now.getFullYear() - 2; y--) {
+                  for (let m = 11; m >= 0; m--) {
+                    if (y === now.getFullYear() && m > now.getMonth()) continue;
+                    options.push({
+                      label: `${MESES[m]} ${y}`,
+                      value: `${y}-${String(m).padStart(2, "0")}`,
+                    });
+                  }
+                }
+                return options.map((o) => (
+                  <SelectItem key={o.value} value={o.value} className="text-xs">{o.label}</SelectItem>
+                ));
+              })()}
+            </SelectContent>
+          </Select>
+
+          <Select
+            value={(() => {
+              if (dataInicio && dataFim) {
+                const now = new Date();
+                for (let y = now.getFullYear(); y >= now.getFullYear() - 5; y--) {
+                  const ys = startOfYear(new Date(y, 0));
+                  const ye = endOfYear(new Date(y, 0));
+                  if (format(dataInicio, "yyyy-MM-dd") === format(ys, "yyyy-MM-dd") && format(dataFim, "yyyy-MM-dd") === format(ye, "yyyy-MM-dd")) {
+                    return String(y);
+                  }
+                }
+              }
+              return "custom";
+            })()}
+            onValueChange={(v) => {
+              if (v === "custom") return;
+              const y = Number(v);
+              setDataInicio(startOfYear(new Date(y, 0)));
+              setDataFim(endOfYear(new Date(y, 0)));
+            }}
+          >
+            <SelectTrigger className="w-[100px] h-8 text-xs">
+              <SelectValue placeholder="Ano" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="custom" disabled className="text-muted-foreground text-xs">Ano</SelectItem>
+              {(() => {
+                const now = new Date();
+                const opts = [];
+                for (let y = now.getFullYear(); y >= now.getFullYear() - 5; y--) {
+                  opts.push(<SelectItem key={y} value={String(y)} className="text-xs">{y}</SelectItem>);
+                }
+                return opts;
+              })()}
+            </SelectContent>
+          </Select>
+
+          <span className="text-xs text-muted-foreground mx-1">ou período:</span>
           <Popover>
             <PopoverTrigger asChild>
-              <Button variant="outline" size="sm" className={cn("w-[140px] justify-start text-left font-normal text-xs", !dataInicio && "text-muted-foreground")}>
+              <Button variant="outline" size="sm" className={cn("w-[130px] justify-start text-left font-normal text-xs", !dataInicio && "text-muted-foreground")}>
                 <CalendarIcon className="mr-1.5 h-3.5 w-3.5" />
                 {dataInicio ? format(dataInicio, "dd/MM/yyyy") : "Início"}
               </Button>
@@ -192,7 +282,7 @@ const FaturamentoVeiculo = () => {
           <span className="text-xs text-muted-foreground">até</span>
           <Popover>
             <PopoverTrigger asChild>
-              <Button variant="outline" size="sm" className={cn("w-[140px] justify-start text-left font-normal text-xs", !dataFim && "text-muted-foreground")}>
+              <Button variant="outline" size="sm" className={cn("w-[130px] justify-start text-left font-normal text-xs", !dataFim && "text-muted-foreground")}>
                 <CalendarIcon className="mr-1.5 h-3.5 w-3.5" />
                 {dataFim ? format(dataFim, "dd/MM/yyyy") : "Fim"}
               </Button>
