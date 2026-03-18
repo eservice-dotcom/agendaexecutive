@@ -6,7 +6,6 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { Label } from "@/components/ui/label";
 import { Plus, Trash2, Truck, Pencil } from "lucide-react";
 import { Veiculo, getVeiculos, saveVeiculo, updateVeiculo, deleteVeiculo } from "@/data/cadastroStorage";
-import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { toast } from "sonner";
 
