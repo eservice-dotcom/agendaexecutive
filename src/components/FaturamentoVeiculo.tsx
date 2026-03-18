@@ -116,7 +116,9 @@ const FaturamentoVeiculo = () => {
       };
 
       existing.viagens += 1;
-      existing.receita += Number(item.valor) || 0;
+      const outrosDespesas = Array.isArray(item.outros_despesas) ? item.outros_despesas : [];
+      const valorTotal = (Number(item.valor) || 0) + (Number(item.estacionamento) || 0) + outrosDespesas.reduce((s: number, d: any) => s + (Number(d.valor) || 0), 0);
+      existing.receita += valorTotal;
       existing.custo += Number(item.custo) || 0;
       if (item.cliente) existing.clientes.push(item.cliente);
       if (item.cot) existing.cots.push(item.cot);
