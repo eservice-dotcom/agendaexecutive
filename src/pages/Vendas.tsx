@@ -227,6 +227,7 @@ const Vendas = () => {
   const [centrosReceita, setCentrosReceita] = useState<{ id: string; nome: string }[]>([]);
   const [subgruposCusto, setSubgruposCusto] = useState<SubgrupoCusto[]>([]);
   const [subgruposReceita, setSubgruposReceita] = useState<SubgrupoReceita[]>([]);
+  const [veiculosList, setVeiculosList] = useState<{ placa: string; modelo: string }[]>([]);
 
   // Edit venda dialog
   const [editVendaDialog, setEditVendaDialog] = useState<Venda | null>(null);
