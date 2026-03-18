@@ -215,6 +215,7 @@ const Vendas = () => {
     centro_receita: "",
     subgrupo_custo: "",
     subgrupo_receita: "",
+    placa: "",
   });
   const [quickAddFornecedor, setQuickAddFornecedor] = useState(false);
   const [quickAddFornecedorNome, setQuickAddFornecedorNome] = useState("");
