@@ -1659,6 +1659,22 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
                 </Select>
               </div>
               <div className="flex gap-2">
+                {selectedContasPagar.size > 0 && (() => {
+                  const selectedContas = filteredContasPagarList.filter(cp => selectedContasPagar.has(cp.id));
+                  const fornecedores = new Set(selectedContas.map(c => c.fornecedor));
+                  if (fornecedores.size === 1) {
+                    return (
+                      <Button variant="outline" size="sm" onClick={() => setWhatsappPagamento({ conta: selectedContas[0], contas: selectedContas, vendaInfo: null })} className="gap-1">
+                        <MessageCircle className="h-4 w-4" /> WhatsApp ({selectedContasPagar.size})
+                      </Button>
+                    );
+                  }
+                  return (
+                    <Button variant="outline" size="sm" disabled className="gap-1" title="Selecione contas do mesmo fornecedor">
+                      <MessageCircle className="h-4 w-4" /> Fornecedores diferentes
+                    </Button>
+                  );
+                })()}
                 <Button variant="outline" size="sm" onClick={() => printContasPagar(filteredContasPagarList, vendaOsMap)} className="gap-1">
                   <Printer className="h-4 w-4" /> Imprimir
                 </Button>
