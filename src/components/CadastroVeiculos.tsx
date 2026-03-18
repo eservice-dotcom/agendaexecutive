@@ -16,6 +16,7 @@ const CadastroVeiculos = () => {
   const [open, setOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [oldPlaca, setOldPlaca] = useState<string>("");
+  const [oldModelo, setOldModelo] = useState<string>("");
   const [form, setForm] = useState(emptyForm);
 
   const refresh = async () => {
@@ -27,6 +28,8 @@ const CadastroVeiculos = () => {
 
   const openNew = () => {
     setEditingId(null);
+    setOldPlaca("");
+    setOldModelo("");
     setForm(emptyForm);
     setOpen(true);
   };
@@ -34,37 +37,57 @@ const CadastroVeiculos = () => {
   const openEdit = (item: Veiculo) => {
     setEditingId(item.id);
     setOldPlaca(item.placa);
+    setOldModelo(item.modelo);
     setForm({ placa: item.placa, modelo: item.modelo, tipo: item.tipo, capacidade: item.capacidade, ano: item.ano });
     setOpen(true);
   };
 
   const handleSave = async () => {
     if (!form.placa.trim()) { toast.error("Placa é obrigatória"); return; }
+
+    const normalizedForm = {
+      ...form,
+      placa: form.placa.trim(),
+      modelo: form.modelo.trim(),
+      tipo: form.tipo.trim(),
+    };
+
     try {
       if (editingId) {
-        await updateVeiculo(editingId, form);
-        
-        // Se a placa mudou, atualizar todos os lançamentos vinculados
-        if (oldPlaca && oldPlaca !== form.placa.trim()) {
-          const { error: e1 } = await supabase.from("agenda_items").update({ placa: form.placa.trim() }).eq("placa", oldPlaca);
-          if (e1) console.error("Erro ao atualizar agenda_items placa:", e1);
-          const { error: e2 } = await supabase.from("contas_pagar").update({ placa: form.placa.trim() }).eq("placa", oldPlaca);
-          if (e2) console.error("Erro ao atualizar contas_pagar placa:", e2);
+        await updateVeiculo(editingId, normalizedForm);
+
+        if (oldModelo && (oldPlaca !== normalizedForm.placa || oldModelo !== normalizedForm.modelo)) {
+          const { error: agendaError } = await supabase
+            .from("agenda_items")
+            .update({
+              placa: normalizedForm.placa,
+              veiculo: normalizedForm.modelo,
+            })
+            .eq("veiculo", oldModelo)
+            .eq("placa", oldPlaca);
+
+          if (agendaError) throw agendaError;
         }
-        
-        // Atualizar o nome do veículo nos lançamentos da agenda com esta placa
-        const placaAtual = form.placa.trim();
-        const { error: e3 } = await supabase.from("agenda_items").update({ veiculo: form.modelo.trim() }).eq("placa", placaAtual);
-        if (e3) console.error("Erro ao atualizar agenda_items veiculo:", e3);
-        
+
+        if (oldPlaca && oldPlaca !== normalizedForm.placa) {
+          const { error: contasError } = await supabase
+            .from("contas_pagar")
+            .update({ placa: normalizedForm.placa })
+            .eq("placa", oldPlaca);
+
+          if (contasError) throw contasError;
+        }
+
         toast.success("Veículo e lançamentos atualizados!");
       } else {
-        await saveVeiculo(form);
+        await saveVeiculo(normalizedForm);
         toast.success("Veículo cadastrado!");
       }
+
       setForm(emptyForm);
       setEditingId(null);
       setOldPlaca("");
+      setOldModelo("");
       setOpen(false);
       await refresh();
     } catch (error: any) {
