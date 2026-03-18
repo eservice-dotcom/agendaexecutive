@@ -207,6 +207,7 @@ const Vendas = () => {
     descritivo: "",
     valor: "",
     data_vencimento: "",
+    data_pagamento: "",
     fornecedor: "",
     cliente: "",
     centro_custo: "",
