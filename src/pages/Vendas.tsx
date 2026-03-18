@@ -207,6 +207,7 @@ const Vendas = () => {
     descritivo: "",
     valor: "",
     data_vencimento: "",
+    data_pagamento: "",
     fornecedor: "",
     cliente: "",
     centro_custo: "",
@@ -1076,7 +1077,7 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
     else loadContasReceber();
   };
   const openNovaContaDialog = (type: "pagar" | "receber") => {
-    setNovaContaForm({ descritivo: "", valor: "", data_vencimento: "", fornecedor: "", cliente: "", centro_custo: "", centro_receita: "", subgrupo_custo: "", subgrupo_receita: "" });
+    setNovaContaForm({ descritivo: "", valor: "", data_vencimento: "", data_pagamento: "", fornecedor: "", cliente: "", centro_custo: "", centro_receita: "", subgrupo_custo: "", subgrupo_receita: "" });
     setQuickAddFornecedor(false);
     setQuickAddFornecedorNome("");
     setQuickAddCliente(false);
@@ -1140,7 +1141,8 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
         valor: parseFloat(novaContaForm.valor) || 0,
         data: today,
         data_vencimento: novaContaForm.data_vencimento || null,
-        status: "pendente",
+        data_pagamento: novaContaForm.data_pagamento || null,
+        status: novaContaForm.data_pagamento ? "pago" : "pendente",
         centro_custo: novaContaForm.centro_custo,
         subgrupo_custo: novaContaForm.subgrupo_custo,
       });
@@ -1159,7 +1161,8 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
         valor: parseFloat(novaContaForm.valor) || 0,
         data: today,
         data_vencimento: novaContaForm.data_vencimento || null,
-        status: "pendente",
+        data_pagamento: novaContaForm.data_pagamento || null,
+        status: novaContaForm.data_pagamento ? "pago" : "pendente",
         centro_receita: novaContaForm.centro_receita,
         subgrupo_receita: novaContaForm.subgrupo_receita,
       });
@@ -2509,7 +2512,7 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
                 <Label>Descritivo</Label>
                 <Textarea value={novaContaForm.descritivo} onChange={(e) => setNovaContaForm({ ...novaContaForm, descritivo: e.target.value })} placeholder="Descrição da conta" rows={3} />
               </div>
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-3 gap-3">
                 <div className="space-y-2">
                   <Label>Valor (R$)</Label>
                   <Input type="number" step="0.01" value={novaContaForm.valor} onChange={(e) => setNovaContaForm({ ...novaContaForm, valor: e.target.value })} />
@@ -2517,6 +2520,10 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
                 <div className="space-y-2">
                   <Label>Data de Vencimento</Label>
                   <Input type="date" value={novaContaForm.data_vencimento} onChange={(e) => setNovaContaForm({ ...novaContaForm, data_vencimento: e.target.value })} />
+                </div>
+                <div className="space-y-2">
+                  <Label>Data de {novaContaDialog === "pagar" ? "Pagamento" : "Recebimento"}</Label>
+                  <Input type="date" value={novaContaForm.data_pagamento} onChange={(e) => setNovaContaForm({ ...novaContaForm, data_pagamento: e.target.value })} />
                 </div>
               </div>
               {novaContaDialog === "pagar" ? (
