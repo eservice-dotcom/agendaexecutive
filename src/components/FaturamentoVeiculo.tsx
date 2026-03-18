@@ -38,7 +38,7 @@ const FaturamentoVeiculo = () => {
       while (true) {
         const { data } = await supabase
           .from("agenda_items")
-          .select("placa, veiculo, valor, custo, cliente, cot, data, origem, destino, motorista, fornecedor")
+          .select("placa, veiculo, valor, custo, cliente, cot, data, origem, destino, motorista, fornecedor, estacionamento, outros_despesas")
           .range(from, from + pageSize - 1);
         if (!data || data.length === 0) break;
         all = all.concat(data);
