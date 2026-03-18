@@ -6,6 +6,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { Label } from "@/components/ui/label";
 import { Plus, Trash2, Truck, Pencil } from "lucide-react";
 import { Veiculo, getVeiculos, saveVeiculo, updateVeiculo, deleteVeiculo } from "@/data/cadastroStorage";
+import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
 const emptyForm = { placa: "", modelo: "", tipo: "", capacidade: 0, ano: new Date().getFullYear() };
@@ -14,6 +15,7 @@ const CadastroVeiculos = () => {
   const [items, setItems] = useState<Veiculo[]>([]);
   const [open, setOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
+  const [oldPlaca, setOldPlaca] = useState<string>("");
   const [form, setForm] = useState(emptyForm);
 
   const refresh = async () => {
@@ -31,6 +33,7 @@ const CadastroVeiculos = () => {
 
   const openEdit = (item: Veiculo) => {
     setEditingId(item.id);
+    setOldPlaca(item.placa);
     setForm({ placa: item.placa, modelo: item.modelo, tipo: item.tipo, capacidade: item.capacidade, ano: item.ano });
     setOpen(true);
   };
@@ -40,13 +43,23 @@ const CadastroVeiculos = () => {
     try {
       if (editingId) {
         await updateVeiculo(editingId, form);
-        toast.success("Veículo atualizado!");
+        // Se a placa ou modelo mudou, atualizar todos os lançamentos vinculados
+        if (oldPlaca && oldPlaca !== form.placa) {
+          await supabase.from("agenda_items").update({ placa: form.placa }).eq("placa", oldPlaca);
+          await supabase.from("contas_pagar").update({ placa: form.placa }).eq("placa", oldPlaca);
+        }
+        // Atualizar o nome do veículo nos lançamentos da agenda
+        if (oldPlaca) {
+          await supabase.from("agenda_items").update({ veiculo: form.modelo }).eq("placa", form.placa);
+        }
+        toast.success("Veículo e lançamentos atualizados!");
       } else {
         await saveVeiculo(form);
         toast.success("Veículo cadastrado!");
       }
       setForm(emptyForm);
       setEditingId(null);
+      setOldPlaca("");
       setOpen(false);
       await refresh();
     } catch (error) {
@@ -76,7 +89,7 @@ const CadastroVeiculos = () => {
         </Button>
       </div>
 
-      <Dialog open={open} onOpenChange={(v) => { setOpen(v); if (!v) { setEditingId(null); setForm(emptyForm); } }}>
+      <Dialog open={open} onOpenChange={(v) => { setOpen(v); if (!v) { setEditingId(null); setOldPlaca(""); setForm(emptyForm); } }}>
         <DialogContent>
           <DialogHeader>
             <DialogTitle>{editingId ? "Editar Veículo" : "Novo Veículo"}</DialogTitle>
