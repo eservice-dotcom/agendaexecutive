@@ -14,13 +14,22 @@ interface ContaPagarInfo {
   data_vencimento: string | null;
   data_pagamento: string | null;
   status: string;
+  placa?: string;
+}
+
+interface VendaInfo {
+  numero_venda: number;
+  cliente: string;
+  cots: string[];
 }
 
 interface WhatsAppPagamentoDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   conta: ContaPagarInfo | null;
-  vendaInfo?: { numero_venda: number; cliente: string; cots: string[] } | null;
+  contas?: ContaPagarInfo[];
+  vendaInfo?: VendaInfo | null;
+  vendaInfoMap?: Record<string, VendaInfo>;
 }
 
 const formatCurrency = (v: number) =>
@@ -31,7 +40,7 @@ const formatDate = (d: string) => {
   return `${day}/${m}/${y}`;
 };
 
-const buildPagamentoMessage = (conta: ContaPagarInfo, vendaInfo?: { numero_venda: number; cliente: string; cots: string[] } | null) => {
+const buildSingleMessage = (conta: ContaPagarInfo, vendaInfo?: VendaInfo | null) => {
   let msg = `Olá *${conta.fornecedor}*!\n\n`;
   msg += `Segue informação de pagamento:\n\n`;
 
@@ -59,34 +68,69 @@ const buildPagamentoMessage = (conta: ContaPagarInfo, vendaInfo?: { numero_venda
   return msg;
 };
 
-const WhatsAppPagamentoDialog = ({ open, onOpenChange, conta, vendaInfo }: WhatsAppPagamentoDialogProps) => {
+const buildMultiMessage = (contas: ContaPagarInfo[], vendaInfoMap?: Record<string, VendaInfo>) => {
+  const fornecedor = contas[0]?.fornecedor || "";
+  let msg = `Olá *${fornecedor}*!\n\n`;
+  msg += `Seguem informações de pagamento:\n`;
+
+  const total = contas.reduce((s, c) => s + c.valor, 0);
+
+  contas.forEach((conta, i) => {
+    msg += `\n━━━━━━━━━━━━━━━━━━━━\n`;
+    msg += `*${i + 1}.* ${conta.descritivo}\n`;
+    msg += `💰 *Valor: ${formatCurrency(conta.valor)}*\n`;
+    msg += `📅 Data: ${formatDate(conta.data)}\n`;
+    if (conta.data_vencimento) {
+      msg += `📅 Vencimento: ${formatDate(conta.data_vencimento)}\n`;
+    }
+    if (conta.data_pagamento) {
+      msg += `✅ Pago em: ${formatDate(conta.data_pagamento)}\n`;
+    }
+    msg += `📊 Status: ${conta.status.toUpperCase()}\n`;
+  });
+
+  msg += `\n━━━━━━━━━━━━━━━━━━━━\n`;
+  msg += `💰 *TOTAL: ${formatCurrency(total)}*\n`;
+  msg += `\nQualquer dúvida, entre em contato.`;
+  return msg;
+};
+
+const WhatsAppPagamentoDialog = ({ open, onOpenChange, conta, contas, vendaInfo, vendaInfoMap }: WhatsAppPagamentoDialogProps) => {
   const [mensagemFinal, setMensagemFinal] = useState("");
   const [telefone, setTelefone] = useState("");
   const [pix, setPix] = useState("");
   const [loading, setLoading] = useState(false);
 
+  const allContas = contas && contas.length > 0 ? contas : conta ? [conta] : [];
+  const isMulti = allContas.length > 1;
+  const fornecedorName = allContas[0]?.fornecedor || "";
+
   useEffect(() => {
-    if (open && conta) {
-      setMensagemFinal(buildPagamentoMessage(conta, vendaInfo));
+    if (open && allContas.length > 0) {
+      if (isMulti) {
+        setMensagemFinal(buildMultiMessage(allContas, vendaInfoMap));
+      } else {
+        setMensagemFinal(buildSingleMessage(allContas[0], vendaInfo));
+      }
       fetchFornecedorData();
     }
-  }, [open, conta, vendaInfo]);
+  }, [open, conta, contas, vendaInfo, vendaInfoMap]);
 
   const fetchFornecedorData = async () => {
-    if (!conta) return;
+    if (allContas.length === 0) return;
     setLoading(true);
+    const name = allContas[0].fornecedor;
     const { data } = await supabase
       .from("fornecedores")
       .select("telefone, pix")
-      .ilike("razao_social", conta.fornecedor)
+      .ilike("razao_social", name)
       .maybeSingle();
     
     if (!data) {
-      // Fallback: partial match
       const { data: partial } = await supabase
         .from("fornecedores")
         .select("telefone, pix")
-        .ilike("razao_social", `%${conta.fornecedor}%`)
+        .ilike("razao_social", `%${name}%`)
         .limit(1)
         .maybeSingle();
       setTelefone(partial?.telefone || "");
@@ -128,7 +172,8 @@ const WhatsAppPagamentoDialog = ({ open, onOpenChange, conta, vendaInfo }: Whats
             Enviar Pagamento via WhatsApp
           </DialogTitle>
           <DialogDescription>
-            Para: <strong>{conta?.fornecedor}</strong>
+            Para: <strong>{fornecedorName}</strong>
+            {isMulti && <span className="ml-1 text-xs">({allContas.length} contas)</span>}
             {loading ? (
               <span className="ml-2 inline-flex items-center gap-1 text-muted-foreground">
                 <Loader2 className="h-3 w-3 animate-spin" /> Buscando dados...
@@ -150,7 +195,7 @@ const WhatsAppPagamentoDialog = ({ open, onOpenChange, conta, vendaInfo }: Whats
             <Textarea
               value={mensagemFinal}
               onChange={(e) => setMensagemFinal(e.target.value)}
-              rows={12}
+              rows={14}
               className="text-sm"
             />
             <Button onClick={handleSend} className="w-full gap-2" disabled={loading || !telefone}>
