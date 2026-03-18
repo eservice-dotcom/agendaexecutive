@@ -15,6 +15,7 @@ const CadastroVeiculos = () => {
   const [items, setItems] = useState<Veiculo[]>([]);
   const [open, setOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
+  const [oldPlaca, setOldPlaca] = useState<string>("");
   const [form, setForm] = useState(emptyForm);
 
   const refresh = async () => {
