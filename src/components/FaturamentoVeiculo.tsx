@@ -151,7 +151,7 @@ const FaturamentoVeiculo = () => {
     });
 
     return Array.from(map.values()).sort((a, b) => b.receita - a.receita);
-  }, [items]);
+  }, [filteredItems]);
 
   const totalReceita = dados.reduce((s, d) => s + d.receita, 0);
   const totalCusto = dados.reduce((s, d) => s + d.custo, 0);
