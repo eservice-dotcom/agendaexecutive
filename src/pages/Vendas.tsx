@@ -1687,6 +1687,18 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
               <Table>
                 <TableHeader>
                   <TableRow>
+                    <TableHead className="w-8">
+                      <Checkbox
+                        checked={filteredContasPagarList.length > 0 && filteredContasPagarList.every(cp => selectedContasPagar.has(cp.id))}
+                        onCheckedChange={(checked) => {
+                          if (checked) {
+                            setSelectedContasPagar(new Set(filteredContasPagarList.map(cp => cp.id)));
+                          } else {
+                            setSelectedContasPagar(new Set());
+                          }
+                        }}
+                      />
+                    </TableHead>
                     <TableHead>Venda</TableHead>
                     <TableHead>Data</TableHead>
                     <TableHead>Fornecedor</TableHead>
