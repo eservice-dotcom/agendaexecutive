@@ -232,7 +232,10 @@ const FaturamentoVeiculo = () => {
                                   </TableRow>
                                 </TableHeader>
                                 <TableBody>
-                                  {d.servicos.map((s: any, idx: number) => (
+                                  {d.servicos.map((s: any, idx: number) => {
+                                    const od = Array.isArray(s.outros_despesas) ? s.outros_despesas : [];
+                                    const sValorTotal = (Number(s.valor) || 0) + (Number(s.estacionamento) || 0) + od.reduce((sum: number, x: any) => sum + (Number(x.valor) || 0), 0);
+                                    return (
                                     <TableRow key={idx} className="hover:bg-primary/5">
                                       <TableCell className="font-mono text-xs py-1.5">{s.cot || "—"}</TableCell>
                                       <TableCell className="text-xs py-1.5">{s.data || "—"}</TableCell>
@@ -240,10 +243,11 @@ const FaturamentoVeiculo = () => {
                                       <TableCell className="text-xs py-1.5">{s.origem && s.destino ? `${s.origem} → ${s.destino}` : "—"}</TableCell>
                                       <TableCell className="text-xs py-1.5">{s.motorista || "—"}</TableCell>
                                       <TableCell className="text-xs py-1.5">{s.fornecedor || "—"}</TableCell>
-                                      <TableCell className="text-xs py-1.5 text-right font-mono font-semibold">{formatCurrency(Number(s.valor) || 0)}</TableCell>
+                                      <TableCell className="text-xs py-1.5 text-right font-mono font-semibold">{formatCurrency(sValorTotal)}</TableCell>
                                       <TableCell className="text-xs py-1.5 text-right font-mono text-muted-foreground">{formatCurrency(Number(s.custo) || 0)}</TableCell>
                                     </TableRow>
-                                  ))}
+                                    );
+                                  })}
                                   <TableRow className="bg-muted/40 hover:bg-muted/40 font-semibold">
                                     <TableCell colSpan={6} className="text-xs py-1.5">Subtotal Serviços</TableCell>
                                     <TableCell className="text-xs py-1.5 text-right font-mono">{formatCurrency(d.receita)}</TableCell>
