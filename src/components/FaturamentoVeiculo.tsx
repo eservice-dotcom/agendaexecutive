@@ -1,9 +1,14 @@
 import { useMemo, useEffect, useState } from "react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { Truck, Printer, ChevronDown, ChevronRight } from "lucide-react";
+import { Truck, Printer, ChevronDown, ChevronRight, CalendarIcon } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { printFatVeiculo } from "@/lib/printUtils";
+import { format } from "date-fns";
+import { ptBR } from "date-fns/locale";
+import { cn } from "@/lib/utils";
+import { Calendar } from "@/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 
 const formatCurrency = (value: number) =>
   new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(value);
@@ -19,6 +24,8 @@ const FaturamentoVeiculo = () => {
   const [items, setItems] = useState<any[]>([]);
   const [despesasVeiculo, setDespesasVeiculo] = useState<any[]>([]);
   const [printWithFinancials, setPrintWithFinancials] = useState(true);
+  const [dataInicio, setDataInicio] = useState<Date | undefined>(undefined);
+  const [dataFim, setDataFim] = useState<Date | undefined>(undefined);
   const [expandedKeys, setExpandedKeys] = useState<Set<string>>(new Set());
 
   const toggleExpand = (key: string) => {
@@ -64,21 +71,38 @@ const FaturamentoVeiculo = () => {
     };
     fetchAll();
   }, []);
+  const filteredItems = useMemo(() => {
+    return items.filter(item => {
+      if (!item.data) return true;
+      const d = item.data; // format: YYYY-MM-DD
+      if (dataInicio && d < format(dataInicio, "yyyy-MM-dd")) return false;
+      if (dataFim && d > format(dataFim, "yyyy-MM-dd")) return false;
+      return true;
+    });
+  }, [items, dataInicio, dataFim]);
+
+  const filteredDespesas = useMemo(() => {
+    return despesasVeiculo.filter(d => {
+      if (!d.data) return true;
+      if (dataInicio && d.data < format(dataInicio, "yyyy-MM-dd")) return false;
+      if (dataFim && d.data > format(dataFim, "yyyy-MM-dd")) return false;
+      return true;
+    });
+  }, [despesasVeiculo, dataInicio, dataFim]);
 
   const despesasPorPlaca = useMemo(() => {
     const map = new Map<string, number>();
-    despesasVeiculo.forEach((d) => {
-      const placa = d.placa;
-      if (placa) {
-        map.set(placa, (map.get(placa) || 0) + (Number(d.valor) || 0));
+    filteredDespesas.forEach((d) => {
+      if (d.placa) {
+        map.set(d.placa, (map.get(d.placa) || 0) + (Number(d.valor) || 0));
       }
     });
     return map;
-  }, [despesasVeiculo]);
+  }, [filteredDespesas]);
 
   const despesasDetalhesPorPlaca = useMemo(() => {
     const map = new Map<string, any[]>();
-    despesasVeiculo.forEach((d) => {
+    filteredDespesas.forEach((d) => {
       if (d.placa) {
         const arr = map.get(d.placa) || [];
         arr.push(d);
@@ -86,7 +110,7 @@ const FaturamentoVeiculo = () => {
       }
     });
     return map;
-  }, [despesasVeiculo]);
+  }, [filteredDespesas]);
 
   const dados = useMemo(() => {
     const map = new Map<string, {
@@ -101,7 +125,7 @@ const FaturamentoVeiculo = () => {
       servicos: any[];
     }>();
 
-    items.forEach((item) => {
+    filteredItems.forEach((item) => {
       const key = item.placa || `sem-placa-${item.veiculo || "veiculo"}`;
       const existing = map.get(key) || {
         key,
@@ -127,7 +151,7 @@ const FaturamentoVeiculo = () => {
     });
 
     return Array.from(map.values()).sort((a, b) => b.receita - a.receita);
-  }, [items]);
+  }, [filteredItems]);
 
   const totalReceita = dados.reduce((s, d) => s + d.receita, 0);
   const totalCusto = dados.reduce((s, d) => s + d.custo, 0);
@@ -145,15 +169,48 @@ const FaturamentoVeiculo = () => {
           <StatCard label="Resultado Líquido" value={formatCurrency(totalLiquido)} />
         </div>
       </div>
-      <div className="flex items-center justify-end gap-3">
+      <div className="flex flex-wrap items-center gap-3">
+        <div className="flex items-center gap-2">
+          <span className="text-xs font-medium text-muted-foreground">Período:</span>
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button variant="outline" size="sm" className={cn("w-[140px] justify-start text-left font-normal text-xs", !dataInicio && "text-muted-foreground")}>
+                <CalendarIcon className="mr-1.5 h-3.5 w-3.5" />
+                {dataInicio ? format(dataInicio, "dd/MM/yyyy") : "Início"}
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-auto p-0" align="start">
+              <Calendar mode="single" selected={dataInicio} onSelect={setDataInicio} locale={ptBR} initialFocus className={cn("p-3 pointer-events-auto")} />
+            </PopoverContent>
+          </Popover>
+          <span className="text-xs text-muted-foreground">até</span>
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button variant="outline" size="sm" className={cn("w-[140px] justify-start text-left font-normal text-xs", !dataFim && "text-muted-foreground")}>
+                <CalendarIcon className="mr-1.5 h-3.5 w-3.5" />
+                {dataFim ? format(dataFim, "dd/MM/yyyy") : "Fim"}
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-auto p-0" align="start">
+              <Calendar mode="single" selected={dataFim} onSelect={setDataFim} locale={ptBR} initialFocus className={cn("p-3 pointer-events-auto")} />
+            </PopoverContent>
+          </Popover>
+          {(dataInicio || dataFim) && (
+            <Button variant="ghost" size="sm" className="text-xs h-8 px-2" onClick={() => { setDataInicio(undefined); setDataFim(undefined); }}>
+              Limpar
+            </Button>
+          )}
+        </div>
+        <div className="ml-auto flex items-center gap-3">
         <label className="flex items-center gap-1.5 text-xs text-muted-foreground cursor-pointer select-none">
           <input type="checkbox" checked={printWithFinancials} onChange={e => setPrintWithFinancials(e.target.checked)} className="rounded" />
           Incluir financeiro
         </label>
-        <Button variant="outline" size="sm" onClick={() => printFatVeiculo(items, printWithFinancials)} className="gap-2">
+        <Button variant="outline" size="sm" onClick={() => printFatVeiculo(filteredItems, printWithFinancials)} className="gap-2">
           <Printer className="h-4 w-4" />
           Imprimir
         </Button>
+        </div>
       </div>
 
       <div className="overflow-auto rounded-lg border border-border bg-card shadow-sm">
