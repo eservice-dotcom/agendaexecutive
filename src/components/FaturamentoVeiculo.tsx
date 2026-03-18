@@ -25,6 +25,7 @@ const FaturamentoVeiculo = () => {
   const [despesasVeiculo, setDespesasVeiculo] = useState<any[]>([]);
   const [printWithFinancials, setPrintWithFinancials] = useState(true);
   const [dataInicio, setDataInicio] = useState<Date | undefined>(undefined);
+  const [dataFim, setDataFim] = useState<Date | undefined>(undefined);
   const [expandedKeys, setExpandedKeys] = useState<Set<string>>(new Set());
 
   const toggleExpand = (key: string) => {
