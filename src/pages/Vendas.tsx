@@ -77,6 +77,7 @@ interface ContaPagarDB {
   status: string;
   centro_custo: string;
   subgrupo_custo: string;
+  placa: string;
 }
 
 interface ContaReceberDB {
