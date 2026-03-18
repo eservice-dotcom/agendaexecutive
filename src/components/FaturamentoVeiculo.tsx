@@ -210,6 +210,7 @@ const FaturamentoVeiculo = () => {
           <Printer className="h-4 w-4" />
           Imprimir
         </Button>
+        </div>
       </div>
 
       <div className="overflow-auto rounded-lg border border-border bg-card shadow-sm">
