@@ -478,11 +478,14 @@ const Cotacoes = () => {
                         />
                       </div>
                       <div className="space-y-1">
-                        <Label className="text-xs">Hora Extra</Label>
+                        <Label className="text-xs">Hora Extra (R$)</Label>
                         <Input
-                          type="time"
-                          value={item.hora_extra}
+                          type="number"
+                          min={0}
+                          step="0.01"
+                          value={item.hora_extra || ""}
                           onChange={(e) => updateItem(idx, "hora_extra", e.target.value)}
+                          placeholder="0,00"
                         />
                       </div>
                       <div className="space-y-1">
