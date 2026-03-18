@@ -43,15 +43,20 @@ const CadastroVeiculos = () => {
     try {
       if (editingId) {
         await updateVeiculo(editingId, form);
-        // Se a placa ou modelo mudou, atualizar todos os lançamentos vinculados
-        if (oldPlaca && oldPlaca !== form.placa) {
-          await supabase.from("agenda_items").update({ placa: form.placa }).eq("placa", oldPlaca);
-          await supabase.from("contas_pagar").update({ placa: form.placa }).eq("placa", oldPlaca);
+        
+        // Se a placa mudou, atualizar todos os lançamentos vinculados
+        if (oldPlaca && oldPlaca !== form.placa.trim()) {
+          const { error: e1 } = await supabase.from("agenda_items").update({ placa: form.placa.trim() }).eq("placa", oldPlaca);
+          if (e1) console.error("Erro ao atualizar agenda_items placa:", e1);
+          const { error: e2 } = await supabase.from("contas_pagar").update({ placa: form.placa.trim() }).eq("placa", oldPlaca);
+          if (e2) console.error("Erro ao atualizar contas_pagar placa:", e2);
         }
-        // Atualizar o nome do veículo nos lançamentos da agenda
-        if (oldPlaca) {
-          await supabase.from("agenda_items").update({ veiculo: form.modelo }).eq("placa", form.placa);
-        }
+        
+        // Atualizar o nome do veículo nos lançamentos da agenda com esta placa
+        const placaAtual = form.placa.trim();
+        const { error: e3 } = await supabase.from("agenda_items").update({ veiculo: form.modelo.trim() }).eq("placa", placaAtual);
+        if (e3) console.error("Erro ao atualizar agenda_items veiculo:", e3);
+        
         toast.success("Veículo e lançamentos atualizados!");
       } else {
         await saveVeiculo(form);
@@ -62,8 +67,9 @@ const CadastroVeiculos = () => {
       setOldPlaca("");
       setOpen(false);
       await refresh();
-    } catch (error) {
-      toast.error("Erro ao salvar veículo");
+    } catch (error: any) {
+      console.error("Erro ao salvar veículo:", error);
+      toast.error("Erro ao salvar veículo: " + (error?.message || ""));
     }
   };
 
