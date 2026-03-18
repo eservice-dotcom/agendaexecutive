@@ -1,0 +1,1 @@
+ALTER TABLE public.contas_pagar ADD COLUMN placa text DEFAULT '' NOT NULL;
