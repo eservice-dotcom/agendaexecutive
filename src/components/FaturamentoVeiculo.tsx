@@ -89,20 +89,19 @@ const FaturamentoVeiculo = () => {
     });
   }, [despesasVeiculo, dataInicio, dataFim]);
 
-
+  const despesasPorPlaca = useMemo(() => {
     const map = new Map<string, number>();
-    despesasVeiculo.forEach((d) => {
-      const placa = d.placa;
-      if (placa) {
-        map.set(placa, (map.get(placa) || 0) + (Number(d.valor) || 0));
+    filteredDespesas.forEach((d) => {
+      if (d.placa) {
+        map.set(d.placa, (map.get(d.placa) || 0) + (Number(d.valor) || 0));
       }
     });
     return map;
-  }, [despesasVeiculo]);
+  }, [filteredDespesas]);
 
   const despesasDetalhesPorPlaca = useMemo(() => {
     const map = new Map<string, any[]>();
-    despesasVeiculo.forEach((d) => {
+    filteredDespesas.forEach((d) => {
       if (d.placa) {
         const arr = map.get(d.placa) || [];
         arr.push(d);
@@ -110,7 +109,7 @@ const FaturamentoVeiculo = () => {
       }
     });
     return map;
-  }, [despesasVeiculo]);
+  }, [filteredDespesas]);
 
   const dados = useMemo(() => {
     const map = new Map<string, {
