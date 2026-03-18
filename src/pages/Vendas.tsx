@@ -250,7 +250,8 @@ const Vendas = () => {
   const [filtroStatusReceber, setFiltroStatusReceber] = useState("");
 
   // WhatsApp pagamento
-  const [whatsappPagamento, setWhatsappPagamento] = useState<{ conta: any; vendaInfo: any } | null>(null);
+  const [whatsappPagamento, setWhatsappPagamento] = useState<{ conta: any; contas?: any[]; vendaInfo: any } | null>(null);
+  const [selectedContasPagar, setSelectedContasPagar] = useState<Set<string>>(new Set());
 
   // Closing report selection
   const [fechamentoDialogOpen, setFechamentoDialogOpen] = useState(false);
@@ -1658,6 +1659,22 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
                 </Select>
               </div>
               <div className="flex gap-2">
+                {selectedContasPagar.size > 0 && (() => {
+                  const selectedContas = filteredContasPagarList.filter(cp => selectedContasPagar.has(cp.id));
+                  const fornecedores = new Set(selectedContas.map(c => c.fornecedor));
+                  if (fornecedores.size === 1) {
+                    return (
+                      <Button variant="outline" size="sm" onClick={() => setWhatsappPagamento({ conta: selectedContas[0], contas: selectedContas, vendaInfo: null })} className="gap-1">
+                        <MessageCircle className="h-4 w-4" /> WhatsApp ({selectedContasPagar.size})
+                      </Button>
+                    );
+                  }
+                  return (
+                    <Button variant="outline" size="sm" disabled className="gap-1" title="Selecione contas do mesmo fornecedor">
+                      <MessageCircle className="h-4 w-4" /> Fornecedores diferentes
+                    </Button>
+                  );
+                })()}
                 <Button variant="outline" size="sm" onClick={() => printContasPagar(filteredContasPagarList, vendaOsMap)} className="gap-1">
                   <Printer className="h-4 w-4" /> Imprimir
                 </Button>
@@ -1670,6 +1687,18 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
               <Table>
                 <TableHeader>
                   <TableRow>
+                    <TableHead className="w-8">
+                      <Checkbox
+                        checked={filteredContasPagarList.length > 0 && filteredContasPagarList.every(cp => selectedContasPagar.has(cp.id))}
+                        onCheckedChange={(checked) => {
+                          if (checked) {
+                            setSelectedContasPagar(new Set(filteredContasPagarList.map(cp => cp.id)));
+                          } else {
+                            setSelectedContasPagar(new Set());
+                          }
+                        }}
+                      />
+                    </TableHead>
                     <TableHead>Venda</TableHead>
                     <TableHead>Data</TableHead>
                     <TableHead>Fornecedor</TableHead>
@@ -1688,13 +1717,26 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
                 <TableBody>
                   {filteredContasPagarList.length === 0 ? (
                     <TableRow>
-                       <TableCell colSpan={13} className="text-center text-muted-foreground py-8">
+                       <TableCell colSpan={14} className="text-center text-muted-foreground py-8">
                         Nenhuma conta a pagar
                       </TableCell>
                     </TableRow>
                   ) : (
                     filteredContasPagarList.map((cp) => (
                       <TableRow key={cp.id}>
+                        <TableCell>
+                          <Checkbox
+                            checked={selectedContasPagar.has(cp.id)}
+                            onCheckedChange={() => {
+                              setSelectedContasPagar(prev => {
+                                const next = new Set(prev);
+                                if (next.has(cp.id)) next.delete(cp.id);
+                                else next.add(cp.id);
+                                return next;
+                              });
+                            }}
+                          />
+                        </TableCell>
                         <TableCell className="font-mono text-xs font-bold">{vendaOsMap[cp.venda_id]?.numero_venda || "—"}</TableCell>
                         <TableCell className="font-mono text-xs">{formatDate(cp.data)}</TableCell>
                         <TableCell className="font-medium text-sm">{cp.fornecedor}</TableCell>
@@ -2658,8 +2700,9 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
 
         <WhatsAppPagamentoDialog
           open={!!whatsappPagamento}
-          onOpenChange={(v) => !v && setWhatsappPagamento(null)}
+          onOpenChange={(v) => { if (!v) { setWhatsappPagamento(null); setSelectedContasPagar(new Set()); } }}
           conta={whatsappPagamento?.conta || null}
+          contas={whatsappPagamento?.contas}
           vendaInfo={whatsappPagamento?.vendaInfo || null}
         />
       </main>
