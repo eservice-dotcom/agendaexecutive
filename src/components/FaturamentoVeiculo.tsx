@@ -125,7 +125,7 @@ const FaturamentoVeiculo = () => {
       servicos: any[];
     }>();
 
-    items.forEach((item) => {
+    filteredItems.forEach((item) => {
       const key = item.placa || `sem-placa-${item.veiculo || "veiculo"}`;
       const existing = map.get(key) || {
         key,
