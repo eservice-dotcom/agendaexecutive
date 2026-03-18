@@ -50,16 +50,26 @@ const tipoRowColor = (tipo: string): string => {
 };
 
 const manualColorOptions = [
-  { value: "#dbeafe", label: "Azul" },
-  { value: "#dcfce7", label: "Verde" },
-  { value: "#fef9c3", label: "Amarelo" },
-  { value: "#fce7f3", label: "Rosa" },
-  { value: "#f3e8ff", label: "Lilás" },
-  { value: "#ffedd5", label: "Laranja" },
-  { value: "#e0f2fe", label: "Ciano" },
-  { value: "#f1f5f9", label: "Cinza" },
-  { value: "#fecaca", label: "Vermelho" },
-  { value: "#d1fae5", label: "Menta" },
+  { value: "#3b82f6", label: "Azul" },
+  { value: "#22c55e", label: "Verde" },
+  { value: "#eab308", label: "Amarelo" },
+  { value: "#ec4899", label: "Rosa" },
+  { value: "#a855f7", label: "Roxo" },
+  { value: "#f97316", label: "Laranja" },
+  { value: "#06b6d4", label: "Ciano" },
+  { value: "#ef4444", label: "Vermelho" },
+  { value: "#14b8a6", label: "Teal" },
+  { value: "#8b5cf6", label: "Violeta" },
+  { value: "#f43f5e", label: "Magenta" },
+  { value: "#84cc16", label: "Lima" },
+  { value: "#0ea5e9", label: "Celeste" },
+  { value: "#d946ef", label: "Fúcsia" },
+  { value: "#facc15", label: "Dourado" },
+  { value: "#fb923c", label: "Pêssego" },
+  { value: "#2dd4bf", label: "Menta" },
+  { value: "#818cf8", label: "Índigo" },
+  { value: "#f472b6", label: "Pink" },
+  { value: "#94a3b8", label: "Cinza" },
 ];
 
 const formatCurrency = (value: number) =>
@@ -393,7 +403,7 @@ const AgendaTable = ({ items, onEdited, hideFinancials, onClone }: AgendaTablePr
                       </Button>
                     </PopoverTrigger>
                     <PopoverContent className="w-auto p-2" side="left">
-                      <div className="grid grid-cols-5 gap-1">
+                      <div className="grid grid-cols-5 gap-1.5">
                         {manualColorOptions.map((c) => (
                           <button
                             key={c.value}
