@@ -1045,7 +1045,7 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
       data_pagamento: editForm.data_pagamento || null,
       status: editForm.data_pagamento ? "pago" : "pendente",
       ...(type === "pagar"
-        ? { centro_custo: editForm.centro, subgrupo_custo: editForm.subgrupo, fornecedor: editForm.fornecedor }
+        ? { centro_custo: editForm.centro, subgrupo_custo: editForm.subgrupo, fornecedor: editForm.fornecedor, placa: editForm.placa }
         : { centro_receita: editForm.centro, subgrupo_receita: editForm.subgrupo, cliente: editForm.cliente }),
     };
     
