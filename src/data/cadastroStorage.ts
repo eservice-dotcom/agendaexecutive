@@ -131,6 +131,11 @@ export const saveVeiculo = async (item: Omit<Veiculo, "id">) => {
   if (error) throw error;
 };
 
+export const updateVeiculo = async (id: string, item: Partial<Omit<Veiculo, "id">>) => {
+  const { error } = await supabase.from("veiculos").update(item).eq("id", id);
+  if (error) throw error;
+};
+
 export const deleteVeiculo = async (id: string) => {
   const { error } = await supabase.from("veiculos").delete().eq("id", id);
   if (error) throw error;
