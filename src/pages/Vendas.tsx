@@ -1717,13 +1717,26 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
                 <TableBody>
                   {filteredContasPagarList.length === 0 ? (
                     <TableRow>
-                       <TableCell colSpan={13} className="text-center text-muted-foreground py-8">
+                       <TableCell colSpan={14} className="text-center text-muted-foreground py-8">
                         Nenhuma conta a pagar
                       </TableCell>
                     </TableRow>
                   ) : (
                     filteredContasPagarList.map((cp) => (
                       <TableRow key={cp.id}>
+                        <TableCell>
+                          <Checkbox
+                            checked={selectedContasPagar.has(cp.id)}
+                            onCheckedChange={() => {
+                              setSelectedContasPagar(prev => {
+                                const next = new Set(prev);
+                                if (next.has(cp.id)) next.delete(cp.id);
+                                else next.add(cp.id);
+                                return next;
+                              });
+                            }}
+                          />
+                        </TableCell>
                         <TableCell className="font-mono text-xs font-bold">{vendaOsMap[cp.venda_id]?.numero_venda || "—"}</TableCell>
                         <TableCell className="font-mono text-xs">{formatDate(cp.data)}</TableCell>
                         <TableCell className="font-medium text-sm">{cp.fornecedor}</TableCell>
