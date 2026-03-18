@@ -425,7 +425,8 @@ const Vendas = () => {
     loadCentrosReceita();
     loadSubgruposCusto();
     loadSubgruposReceita();
-  }, [loadVendas, loadClientes, loadFornecedores, loadContasPagar, loadContasReceber, loadVendaOsMap, loadCentrosCusto, loadCentrosReceita, loadSubgruposCusto, loadSubgruposReceita]);
+    loadVeiculos();
+  }, [loadVendas, loadClientes, loadFornecedores, loadContasPagar, loadContasReceber, loadVendaOsMap, loadCentrosCusto, loadCentrosReceita, loadSubgruposCusto, loadSubgruposReceita, loadVeiculos]);
 
   useEffect(() => {
     if (!cliente) {
