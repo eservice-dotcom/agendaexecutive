@@ -2700,8 +2700,9 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
 
         <WhatsAppPagamentoDialog
           open={!!whatsappPagamento}
-          onOpenChange={(v) => !v && setWhatsappPagamento(null)}
+          onOpenChange={(v) => { if (!v) { setWhatsappPagamento(null); setSelectedContasPagar(new Set()); } }}
           conta={whatsappPagamento?.conta || null}
+          contas={whatsappPagamento?.contas}
           vendaInfo={whatsappPagamento?.vendaInfo || null}
         />
       </main>
