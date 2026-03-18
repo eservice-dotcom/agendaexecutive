@@ -2061,6 +2061,22 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
                   </Select>
                 </div>
               </div>
+              {editDialog?.type === "pagar" && (
+                <div className="space-y-2">
+                  <Label>Veículo (Placa)</Label>
+                  <Select value={editForm.placa} onValueChange={(v) => setEditForm({ ...editForm, placa: v === "none" ? "" : v })}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Selecione (opcional)" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="none">Nenhum</SelectItem>
+                      {veiculosList.map((v) => (
+                        <SelectItem key={v.placa} value={v.placa}>{v.placa} - {v.modelo}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              )}
             </div>
             <DialogFooter>
               <Button variant="outline" onClick={() => setEditDialog(null)}>Cancelar</Button>
