@@ -206,7 +206,7 @@ const FaturamentoVeiculo = () => {
           <input type="checkbox" checked={printWithFinancials} onChange={e => setPrintWithFinancials(e.target.checked)} className="rounded" />
           Incluir financeiro
         </label>
-        <Button variant="outline" size="sm" onClick={() => printFatVeiculo(items, printWithFinancials)} className="gap-2">
+        <Button variant="outline" size="sm" onClick={() => printFatVeiculo(filteredItems, printWithFinancials)} className="gap-2">
           <Printer className="h-4 w-4" />
           Imprimir
         </Button>
