@@ -314,6 +314,11 @@ const Vendas = () => {
     if (data) setSubgruposReceita(data);
   }, []);
 
+  const loadVeiculos = useCallback(async () => {
+    const { data } = await supabase.from("veiculos").select("placa, modelo").order("placa");
+    if (data) setVeiculosList(data);
+  }, []);
+
   const loadContasPagar = useCallback(async () => {
     const { data } = await supabase
       .from("contas_pagar")
