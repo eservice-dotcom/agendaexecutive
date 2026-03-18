@@ -1154,6 +1154,7 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
         status: novaContaForm.data_pagamento ? "pago" : "pendente",
         centro_custo: novaContaForm.centro_custo,
         subgrupo_custo: novaContaForm.subgrupo_custo,
+        placa: novaContaForm.placa,
       });
       if (error) {
         toast({ title: "Erro ao salvar", description: error.message, variant: "destructive" });
