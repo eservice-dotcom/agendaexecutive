@@ -70,8 +70,26 @@ const FaturamentoVeiculo = () => {
     };
     fetchAll();
   }, []);
+  const filteredItems = useMemo(() => {
+    return items.filter(item => {
+      if (!item.data) return true;
+      const d = item.data; // format: YYYY-MM-DD
+      if (dataInicio && d < format(dataInicio, "yyyy-MM-dd")) return false;
+      if (dataFim && d > format(dataFim, "yyyy-MM-dd")) return false;
+      return true;
+    });
+  }, [items, dataInicio, dataFim]);
 
-  const despesasPorPlaca = useMemo(() => {
+  const filteredDespesas = useMemo(() => {
+    return despesasVeiculo.filter(d => {
+      if (!d.data) return true;
+      if (dataInicio && d.data < format(dataInicio, "yyyy-MM-dd")) return false;
+      if (dataFim && d.data > format(dataFim, "yyyy-MM-dd")) return false;
+      return true;
+    });
+  }, [despesasVeiculo, dataInicio, dataFim]);
+
+
     const map = new Map<string, number>();
     despesasVeiculo.forEach((d) => {
       const placa = d.placa;
