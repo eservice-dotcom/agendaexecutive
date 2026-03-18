@@ -435,7 +435,7 @@ const Cotacoes = () => {
 
             <div className="space-y-1.5 sm:col-span-2">
               <Label>Observações</Label>
-              <Input value={observacoes} onChange={(e) => setObservacoes(e.target.value)} placeholder="Observações gerais" />
+              <Textarea value={observacoes} onChange={(e) => setObservacoes(e.target.value)} placeholder="Observações gerais" rows={3} />
             </div>
 
             {/* Itens */}
