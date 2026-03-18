@@ -77,6 +77,7 @@ interface ContaPagarDB {
   status: string;
   centro_custo: string;
   subgrupo_custo: string;
+  placa: string;
 }
 
 interface ContaReceberDB {
@@ -199,7 +200,7 @@ const Vendas = () => {
 
   // Edit conta dialog
   const [editDialog, setEditDialog] = useState<{ type: "pagar" | "receber"; item: any } | null>(null);
-  const [editForm, setEditForm] = useState({ descritivo: "", valor: "", data_vencimento: "", data_pagamento: "", centro: "", subgrupo: "", cliente: "", fornecedor: "" });
+  const [editForm, setEditForm] = useState({ descritivo: "", valor: "", data_vencimento: "", data_pagamento: "", centro: "", subgrupo: "", cliente: "", fornecedor: "", placa: "" });
 
   // New manual conta dialogs
   const [novaContaDialog, setNovaContaDialog] = useState<"pagar" | "receber" | null>(null);
@@ -214,6 +215,7 @@ const Vendas = () => {
     centro_receita: "",
     subgrupo_custo: "",
     subgrupo_receita: "",
+    placa: "",
   });
   const [quickAddFornecedor, setQuickAddFornecedor] = useState(false);
   const [quickAddFornecedorNome, setQuickAddFornecedorNome] = useState("");
@@ -225,6 +227,7 @@ const Vendas = () => {
   const [centrosReceita, setCentrosReceita] = useState<{ id: string; nome: string }[]>([]);
   const [subgruposCusto, setSubgruposCusto] = useState<SubgrupoCusto[]>([]);
   const [subgruposReceita, setSubgruposReceita] = useState<SubgrupoReceita[]>([]);
+  const [veiculosList, setVeiculosList] = useState<{ placa: string; modelo: string }[]>([]);
 
   // Edit venda dialog
   const [editVendaDialog, setEditVendaDialog] = useState<Venda | null>(null);
@@ -309,6 +312,11 @@ const Vendas = () => {
   const loadSubgruposReceita = useCallback(async () => {
     const { data } = await supabase.from("subgrupos_receita").select("id, nome, centro_receita_id").order("nome");
     if (data) setSubgruposReceita(data);
+  }, []);
+
+  const loadVeiculos = useCallback(async () => {
+    const { data } = await supabase.from("veiculos").select("placa, modelo").order("placa");
+    if (data) setVeiculosList(data);
   }, []);
 
   const loadContasPagar = useCallback(async () => {
@@ -417,7 +425,8 @@ const Vendas = () => {
     loadCentrosReceita();
     loadSubgruposCusto();
     loadSubgruposReceita();
-  }, [loadVendas, loadClientes, loadFornecedores, loadContasPagar, loadContasReceber, loadVendaOsMap, loadCentrosCusto, loadCentrosReceita, loadSubgruposCusto, loadSubgruposReceita]);
+    loadVeiculos();
+  }, [loadVendas, loadClientes, loadFornecedores, loadContasPagar, loadContasReceber, loadVendaOsMap, loadCentrosCusto, loadCentrosReceita, loadSubgruposCusto, loadSubgruposReceita, loadVeiculos]);
 
   useEffect(() => {
     if (!cliente) {
@@ -1020,6 +1029,7 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
       subgrupo: (type === "pagar" ? item.subgrupo_custo : item.subgrupo_receita) || "",
       cliente: item.cliente || "",
       fornecedor: item.fornecedor || "",
+      placa: item.placa || "",
     });
     setEditDialog({ type, item });
   };
@@ -1035,7 +1045,7 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
       data_pagamento: editForm.data_pagamento || null,
       status: editForm.data_pagamento ? "pago" : "pendente",
       ...(type === "pagar"
-        ? { centro_custo: editForm.centro, subgrupo_custo: editForm.subgrupo, fornecedor: editForm.fornecedor }
+        ? { centro_custo: editForm.centro, subgrupo_custo: editForm.subgrupo, fornecedor: editForm.fornecedor, placa: editForm.placa }
         : { centro_receita: editForm.centro, subgrupo_receita: editForm.subgrupo, cliente: editForm.cliente }),
     };
     
@@ -1077,7 +1087,7 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
     else loadContasReceber();
   };
   const openNovaContaDialog = (type: "pagar" | "receber") => {
-    setNovaContaForm({ descritivo: "", valor: "", data_vencimento: "", data_pagamento: "", fornecedor: "", cliente: "", centro_custo: "", centro_receita: "", subgrupo_custo: "", subgrupo_receita: "" });
+    setNovaContaForm({ descritivo: "", valor: "", data_vencimento: "", data_pagamento: "", fornecedor: "", cliente: "", centro_custo: "", centro_receita: "", subgrupo_custo: "", subgrupo_receita: "", placa: "" });
     setQuickAddFornecedor(false);
     setQuickAddFornecedorNome("");
     setQuickAddCliente(false);
@@ -1145,6 +1155,7 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
         status: novaContaForm.data_pagamento ? "pago" : "pendente",
         centro_custo: novaContaForm.centro_custo,
         subgrupo_custo: novaContaForm.subgrupo_custo,
+        placa: novaContaForm.placa,
       });
       if (error) {
         toast({ title: "Erro ao salvar", description: error.message, variant: "destructive" });
@@ -2050,6 +2061,22 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
                   </Select>
                 </div>
               </div>
+              {editDialog?.type === "pagar" && (
+                <div className="space-y-2">
+                  <Label>Veículo (Placa)</Label>
+                  <Select value={editForm.placa} onValueChange={(v) => setEditForm({ ...editForm, placa: v === "none" ? "" : v })}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Selecione (opcional)" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="none">Nenhum</SelectItem>
+                      {veiculosList.map((v) => (
+                        <SelectItem key={v.placa} value={v.placa}>{v.placa} - {v.modelo}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              )}
             </div>
             <DialogFooter>
               <Button variant="outline" onClick={() => setEditDialog(null)}>Cancelar</Button>
@@ -2434,42 +2461,58 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
             </DialogHeader>
             <div className="space-y-4">
               {novaContaDialog === "pagar" ? (
-                <div className="space-y-2">
-                  <Label>Fornecedor</Label>
-                  {quickAddFornecedor ? (
-                    <div className="flex gap-2">
-                      <Input
-                        placeholder="Nome do novo fornecedor"
-                        value={quickAddFornecedorNome}
-                        onChange={(e) => setQuickAddFornecedorNome(e.target.value)}
-                        onKeyDown={(e) => e.key === "Enter" && handleQuickAddFornecedor()}
-                        autoFocus
-                      />
-                      <Button size="sm" onClick={handleQuickAddFornecedor} disabled={!quickAddFornecedorNome.trim()}>
-                        <Check className="h-4 w-4" />
-                      </Button>
-                      <Button size="sm" variant="ghost" onClick={() => { setQuickAddFornecedor(false); setQuickAddFornecedorNome(""); }}>
-                        <X className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  ) : (
-                    <div className="flex gap-2">
-                      <Select value={novaContaForm.fornecedor} onValueChange={(v) => setNovaContaForm({ ...novaContaForm, fornecedor: v })}>
-                        <SelectTrigger className="flex-1">
-                          <SelectValue placeholder="Selecione o fornecedor" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {fornecedores.map((f) => (
-                            <SelectItem key={f} value={f}>{f}</SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      <Button size="icon" variant="outline" onClick={() => setQuickAddFornecedor(true)} title="Cadastrar novo fornecedor">
-                        <Plus className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  )}
-                </div>
+                <>
+                  <div className="space-y-2">
+                    <Label>Fornecedor</Label>
+                    {quickAddFornecedor ? (
+                      <div className="flex gap-2">
+                        <Input
+                          placeholder="Nome do novo fornecedor"
+                          value={quickAddFornecedorNome}
+                          onChange={(e) => setQuickAddFornecedorNome(e.target.value)}
+                          onKeyDown={(e) => e.key === "Enter" && handleQuickAddFornecedor()}
+                          autoFocus
+                        />
+                        <Button size="sm" onClick={handleQuickAddFornecedor} disabled={!quickAddFornecedorNome.trim()}>
+                          <Check className="h-4 w-4" />
+                        </Button>
+                        <Button size="sm" variant="ghost" onClick={() => { setQuickAddFornecedor(false); setQuickAddFornecedorNome(""); }}>
+                          <X className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    ) : (
+                      <div className="flex gap-2">
+                        <Select value={novaContaForm.fornecedor} onValueChange={(v) => setNovaContaForm({ ...novaContaForm, fornecedor: v })}>
+                          <SelectTrigger className="flex-1">
+                            <SelectValue placeholder="Selecione o fornecedor" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {fornecedores.map((f) => (
+                              <SelectItem key={f} value={f}>{f}</SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        <Button size="icon" variant="outline" onClick={() => setQuickAddFornecedor(true)} title="Cadastrar novo fornecedor">
+                          <Plus className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    )}
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Veículo (Placa)</Label>
+                    <Select value={novaContaForm.placa} onValueChange={(v) => setNovaContaForm({ ...novaContaForm, placa: v === "none" ? "" : v })}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Selecione (opcional)" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="none">Nenhum</SelectItem>
+                        {veiculosList.map((v) => (
+                          <SelectItem key={v.placa} value={v.placa}>{v.placa} - {v.modelo}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </>
               ) : (
                 <div className="space-y-2">
                   <Label>Cliente</Label>

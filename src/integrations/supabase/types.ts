@@ -222,6 +222,7 @@ export type Database = {
           descritivo: string
           fornecedor: string
           id: string
+          placa: string
           status: string
           subgrupo_custo: string | null
           updated_at: string
@@ -238,6 +239,7 @@ export type Database = {
           descritivo?: string
           fornecedor?: string
           id?: string
+          placa?: string
           status?: string
           subgrupo_custo?: string | null
           updated_at?: string
@@ -254,6 +256,7 @@ export type Database = {
           descritivo?: string
           fornecedor?: string
           id?: string
+          placa?: string
           status?: string
           subgrupo_custo?: string | null
           updated_at?: string

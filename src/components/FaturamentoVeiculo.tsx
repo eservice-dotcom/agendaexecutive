@@ -17,10 +17,12 @@ const formatCompactList = (values: string[], max = 2) => {
 
 const FaturamentoVeiculo = () => {
   const [items, setItems] = useState<any[]>([]);
+  const [despesasVeiculo, setDespesasVeiculo] = useState<any[]>([]);
   const [printWithFinancials, setPrintWithFinancials] = useState(true);
 
   useEffect(() => {
     const fetchAll = async () => {
+      // Fetch agenda items
       let all: any[] = [];
       let from = 0;
       const pageSize = 1000;
@@ -35,9 +37,36 @@ const FaturamentoVeiculo = () => {
         from += pageSize;
       }
       setItems(all);
+
+      // Fetch contas_pagar with placa (operational expenses)
+      let allDespesas: any[] = [];
+      let fromD = 0;
+      while (true) {
+        const { data } = await supabase
+          .from("contas_pagar")
+          .select("placa, valor, status")
+          .neq("placa", "")
+          .range(fromD, fromD + pageSize - 1);
+        if (!data || data.length === 0) break;
+        allDespesas = allDespesas.concat(data);
+        if (data.length < pageSize) break;
+        fromD += pageSize;
+      }
+      setDespesasVeiculo(allDespesas.filter(d => d.status !== "cancelado"));
     };
     fetchAll();
   }, []);
+
+  const despesasPorPlaca = useMemo(() => {
+    const map = new Map<string, number>();
+    despesasVeiculo.forEach((d) => {
+      const placa = d.placa;
+      if (placa) {
+        map.set(placa, (map.get(placa) || 0) + (Number(d.valor) || 0));
+      }
+    });
+    return map;
+  }, [despesasVeiculo]);
 
   const dados = useMemo(() => {
     const map = new Map<string, {
@@ -77,15 +106,18 @@ const FaturamentoVeiculo = () => {
 
   const totalReceita = dados.reduce((s, d) => s + d.receita, 0);
   const totalCusto = dados.reduce((s, d) => s + d.custo, 0);
+  const totalDespesas = Array.from(despesasPorPlaca.values()).reduce((s, v) => s + v, 0);
+  const totalLiquido = totalReceita - totalCusto - totalDespesas;
 
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <div className="grid flex-1 grid-cols-2 gap-3 sm:grid-cols-4">
+        <div className="grid flex-1 grid-cols-2 gap-3 sm:grid-cols-5">
           <StatCard label="Veículos" value={dados.length.toString()} />
           <StatCard label="Total Viagens" value={dados.reduce((s, d) => s + d.viagens, 0).toString()} />
           <StatCard label="Receita Total" value={formatCurrency(totalReceita)} accent />
-          <StatCard label="Margem Total" value={formatCurrency(totalReceita - totalCusto)} />
+          <StatCard label="Desp. Operacionais" value={formatCurrency(totalDespesas)} />
+          <StatCard label="Resultado Líquido" value={formatCurrency(totalLiquido)} />
         </div>
       </div>
       <div className="flex items-center justify-end gap-3">
@@ -109,45 +141,52 @@ const FaturamentoVeiculo = () => {
               <TableHead className="font-semibold">O.S.</TableHead>
               <TableHead className="font-semibold text-center">Viagens</TableHead>
               <TableHead className="font-semibold text-right">Receita</TableHead>
-              <TableHead className="font-semibold text-right">Custo</TableHead>
-              <TableHead className="font-semibold text-right">Margem</TableHead>
+              <TableHead className="font-semibold text-right">Custo Forn.</TableHead>
+              <TableHead className="font-semibold text-right">Desp. Oper.</TableHead>
+              <TableHead className="font-semibold text-right">Líquido</TableHead>
               <TableHead className="font-semibold text-right">% Margem</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {dados.map((d) => (
-              <TableRow key={d.key} className="transition-colors hover:bg-primary/5">
-                <TableCell className="font-medium">
-                  <span className="flex items-center gap-2">
-                    <Truck className="h-4 w-4 text-muted-foreground" />
-                    {d.veiculo}
-                  </span>
-                </TableCell>
-                <TableCell className="font-mono text-sm">{d.placa}</TableCell>
-                <TableCell className="max-w-[220px] text-xs text-muted-foreground">{formatCompactList(d.clientes)}</TableCell>
-                <TableCell className="max-w-[220px] font-mono text-xs text-muted-foreground">{formatCompactList(d.cots, 3)}</TableCell>
-                <TableCell className="text-center">
-                  <span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-primary/10 text-xs font-bold text-primary">
-                    {d.viagens}
-                  </span>
-                </TableCell>
-                <TableCell className="text-right font-mono text-sm font-semibold">{formatCurrency(d.receita)}</TableCell>
-                <TableCell className="text-right font-mono text-sm text-muted-foreground">{formatCurrency(d.custo)}</TableCell>
-                <TableCell className="text-right font-mono text-sm font-semibold text-accent">{formatCurrency(d.receita - d.custo)}</TableCell>
-                <TableCell className="text-right font-mono text-sm">
-                  {d.receita > 0 ? `${(((d.receita - d.custo) / d.receita) * 100).toFixed(1)}%` : "0%"}
-                </TableCell>
-              </TableRow>
-            ))}
+            {dados.map((d) => {
+              const despOper = despesasPorPlaca.get(d.placa) || 0;
+              const liquido = d.receita - d.custo - despOper;
+              return (
+                <TableRow key={d.key} className="transition-colors hover:bg-primary/5">
+                  <TableCell className="font-medium">
+                    <span className="flex items-center gap-2">
+                      <Truck className="h-4 w-4 text-muted-foreground" />
+                      {d.veiculo}
+                    </span>
+                  </TableCell>
+                  <TableCell className="font-mono text-sm">{d.placa}</TableCell>
+                  <TableCell className="max-w-[220px] text-xs text-muted-foreground">{formatCompactList(d.clientes)}</TableCell>
+                  <TableCell className="max-w-[220px] font-mono text-xs text-muted-foreground">{formatCompactList(d.cots, 3)}</TableCell>
+                  <TableCell className="text-center">
+                    <span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-primary/10 text-xs font-bold text-primary">
+                      {d.viagens}
+                    </span>
+                  </TableCell>
+                  <TableCell className="text-right font-mono text-sm font-semibold">{formatCurrency(d.receita)}</TableCell>
+                  <TableCell className="text-right font-mono text-sm text-muted-foreground">{formatCurrency(d.custo)}</TableCell>
+                  <TableCell className="text-right font-mono text-sm text-muted-foreground">{formatCurrency(despOper)}</TableCell>
+                  <TableCell className={`text-right font-mono text-sm font-semibold ${liquido >= 0 ? "text-accent" : "text-destructive"}`}>{formatCurrency(liquido)}</TableCell>
+                  <TableCell className="text-right font-mono text-sm">
+                    {d.receita > 0 ? `${((liquido / d.receita) * 100).toFixed(1)}%` : "0%"}
+                  </TableCell>
+                </TableRow>
+              );
+            })}
             {dados.length > 0 && (
               <TableRow className="bg-muted/50 font-bold hover:bg-muted/50">
                 <TableCell colSpan={4} className="font-semibold">TOTAL</TableCell>
                 <TableCell className="text-center">{dados.reduce((s, d) => s + d.viagens, 0)}</TableCell>
                 <TableCell className="text-right font-mono text-sm">{formatCurrency(totalReceita)}</TableCell>
                 <TableCell className="text-right font-mono text-sm">{formatCurrency(totalCusto)}</TableCell>
-                <TableCell className="text-right font-mono text-sm text-accent">{formatCurrency(totalReceita - totalCusto)}</TableCell>
+                <TableCell className="text-right font-mono text-sm">{formatCurrency(totalDespesas)}</TableCell>
+                <TableCell className={`text-right font-mono text-sm font-semibold ${totalLiquido >= 0 ? "text-accent" : "text-destructive"}`}>{formatCurrency(totalLiquido)}</TableCell>
                 <TableCell className="text-right font-mono text-sm">
-                  {totalReceita > 0 ? `${(((totalReceita - totalCusto) / totalReceita) * 100).toFixed(1)}%` : "0%"}
+                  {totalReceita > 0 ? `${((totalLiquido / totalReceita) * 100).toFixed(1)}%` : "0%"}
                 </TableCell>
               </TableRow>
             )}
