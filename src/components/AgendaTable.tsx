@@ -403,7 +403,7 @@ const AgendaTable = ({ items, onEdited, hideFinancials, onClone }: AgendaTablePr
                       </Button>
                     </PopoverTrigger>
                     <PopoverContent className="w-auto p-2" side="left">
-                      <div className="grid grid-cols-5 gap-1">
+                      <div className="grid grid-cols-5 gap-1.5">
                         {manualColorOptions.map((c) => (
                           <button
                             key={c.value}
