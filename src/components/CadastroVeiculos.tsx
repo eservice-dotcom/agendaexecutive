@@ -89,7 +89,7 @@ const CadastroVeiculos = () => {
         </Button>
       </div>
 
-      <Dialog open={open} onOpenChange={(v) => { setOpen(v); if (!v) { setEditingId(null); setForm(emptyForm); } }}>
+      <Dialog open={open} onOpenChange={(v) => { setOpen(v); if (!v) { setEditingId(null); setOldPlaca(""); setForm(emptyForm); } }}>
         <DialogContent>
           <DialogHeader>
             <DialogTitle>{editingId ? "Editar Veículo" : "Novo Veículo"}</DialogTitle>
