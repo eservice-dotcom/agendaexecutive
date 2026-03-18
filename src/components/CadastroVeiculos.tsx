@@ -4,32 +4,51 @@ import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
-import { Plus, Trash2, Truck } from "lucide-react";
-import { Veiculo, getVeiculos, saveVeiculo, deleteVeiculo } from "@/data/cadastroStorage";
+import { Plus, Trash2, Truck, Pencil } from "lucide-react";
+import { Veiculo, getVeiculos, saveVeiculo, updateVeiculo, deleteVeiculo } from "@/data/cadastroStorage";
 import { toast } from "sonner";
+
+const emptyForm = { placa: "", modelo: "", tipo: "", capacidade: 0, ano: new Date().getFullYear() };
 
 const CadastroVeiculos = () => {
   const [items, setItems] = useState<Veiculo[]>([]);
   const [open, setOpen] = useState(false);
-  const [form, setForm] = useState({ placa: "", modelo: "", tipo: "", capacidade: 0, ano: new Date().getFullYear() });
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [form, setForm] = useState(emptyForm);
 
   const refresh = async () => {
     const data = await getVeiculos();
     setItems(data);
   };
 
-  useEffect(() => {
-    refresh();
-  }, []);
+  useEffect(() => { refresh(); }, []);
+
+  const openNew = () => {
+    setEditingId(null);
+    setForm(emptyForm);
+    setOpen(true);
+  };
+
+  const openEdit = (item: Veiculo) => {
+    setEditingId(item.id);
+    setForm({ placa: item.placa, modelo: item.modelo, tipo: item.tipo, capacidade: item.capacidade, ano: item.ano });
+    setOpen(true);
+  };
 
   const handleSave = async () => {
     if (!form.placa.trim()) { toast.error("Placa é obrigatória"); return; }
     try {
-      await saveVeiculo(form);
-      setForm({ placa: "", modelo: "", tipo: "", capacidade: 0, ano: new Date().getFullYear() });
+      if (editingId) {
+        await updateVeiculo(editingId, form);
+        toast.success("Veículo atualizado!");
+      } else {
+        await saveVeiculo(form);
+        toast.success("Veículo cadastrado!");
+      }
+      setForm(emptyForm);
+      setEditingId(null);
       setOpen(false);
       await refresh();
-      toast.success("Veículo cadastrado!");
     } catch (error) {
       toast.error("Erro ao salvar veículo");
     }
@@ -52,16 +71,16 @@ const CadastroVeiculos = () => {
           <Truck className="h-4 w-4" />
           {items.length} veículo(s) cadastrado(s)
         </div>
-        <Button onClick={() => setOpen(true)} className="gap-2">
+        <Button onClick={openNew} className="gap-2">
           <Plus className="h-4 w-4" /> Novo Veículo
         </Button>
       </div>
 
-      <Dialog open={open} onOpenChange={setOpen}>
+      <Dialog open={open} onOpenChange={(v) => { setOpen(v); if (!v) { setEditingId(null); setForm(emptyForm); } }}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Novo Veículo</DialogTitle>
-            <DialogDescription>Preencha os dados do veículo</DialogDescription>
+            <DialogTitle>{editingId ? "Editar Veículo" : "Novo Veículo"}</DialogTitle>
+            <DialogDescription>{editingId ? "Altere os dados do veículo" : "Preencha os dados do veículo"}</DialogDescription>
           </DialogHeader>
           <div className="grid gap-3">
             <div className="grid grid-cols-2 gap-3">
@@ -73,7 +92,7 @@ const CadastroVeiculos = () => {
               <div><Label>Capacidade</Label><Input type="number" value={form.capacidade || ""} onChange={(e) => setForm({ ...form, capacidade: Number(e.target.value) })} /></div>
               <div><Label>Ano</Label><Input type="number" value={form.ano} onChange={(e) => setForm({ ...form, ano: Number(e.target.value) })} /></div>
             </div>
-            <Button onClick={handleSave}>Salvar</Button>
+            <Button onClick={handleSave}>{editingId ? "Atualizar" : "Salvar"}</Button>
           </div>
         </DialogContent>
       </Dialog>
@@ -90,7 +109,7 @@ const CadastroVeiculos = () => {
                 <TableHead className="font-semibold">Tipo</TableHead>
                 <TableHead className="font-semibold text-center">Capacidade</TableHead>
                 <TableHead className="font-semibold text-center">Ano</TableHead>
-                <TableHead className="w-12"></TableHead>
+                <TableHead className="w-20"></TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -102,9 +121,14 @@ const CadastroVeiculos = () => {
                   <TableCell className="text-center">{item.capacidade}</TableCell>
                   <TableCell className="text-center">{item.ano}</TableCell>
                   <TableCell>
-                    <Button variant="ghost" size="sm" className="h-7 w-7 p-0 text-destructive" onClick={() => handleDelete(item.id)}>
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
+                    <div className="flex items-center gap-1">
+                      <Button variant="ghost" size="sm" className="h-7 w-7 p-0" onClick={() => openEdit(item)}>
+                        <Pencil className="h-4 w-4" />
+                      </Button>
+                      <Button variant="ghost" size="sm" className="h-7 w-7 p-0 text-destructive" onClick={() => handleDelete(item.id)}>
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
                   </TableCell>
                 </TableRow>
               ))}
