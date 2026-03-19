@@ -75,6 +75,7 @@ const Index = () => {
   const [fechamentoSearch, setFechamentoSearch] = useState("");
   const [fechamentoDataInicio, setFechamentoDataInicio] = useState("");
   const [fechamentoDataFim, setFechamentoDataFim] = useState("");
+  const [fechamentoReceptivo, setFechamentoReceptivo] = useState("");
 
   const reloadData = useCallback(async () => {
     const data = await getAgendaItems();
