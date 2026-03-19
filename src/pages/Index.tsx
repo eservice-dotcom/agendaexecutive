@@ -490,6 +490,19 @@ const Index = () => {
                     placeholder="Data fim"
                     className="h-9"
                   />
+                  {fechamentoReceptivos.length > 0 && (
+                    <Select value={fechamentoReceptivo} onValueChange={(v) => setFechamentoReceptivo(v === "all" ? "" : v)}>
+                      <SelectTrigger className="h-9">
+                        <SelectValue placeholder="Todos receptivos" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">Todos receptivos</SelectItem>
+                        {fechamentoReceptivos.map((r) => (
+                          <SelectItem key={r} value={r}>{r}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  )}
                 </div>
 
                 {fechamentoCliente && (

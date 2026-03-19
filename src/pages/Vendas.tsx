@@ -2408,6 +2408,19 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
                       placeholder="Data fim"
                       className="h-9 w-[140px]"
                     />
+                    {fechamentoReceptivos.length > 0 && (
+                      <Select value={fechamentoReceptivo} onValueChange={(v) => setFechamentoReceptivo(v === "all" ? "" : v)}>
+                        <SelectTrigger className="h-9 w-[160px]">
+                          <SelectValue placeholder="Todos receptivos" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="all">Todos receptivos</SelectItem>
+                          {fechamentoReceptivos.map((r) => (
+                            <SelectItem key={r} value={r}>{r}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    )}
                     <div className="flex items-center gap-2">
                       <Checkbox
                         checked={fechamentoSelected.size === fechamentoItems.length && fechamentoItems.length > 0}
