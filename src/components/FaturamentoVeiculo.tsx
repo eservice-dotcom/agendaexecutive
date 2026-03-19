@@ -78,15 +78,22 @@ const FaturamentoVeiculo = () => {
     };
     fetchAll();
   }, []);
+  const allPlacas = useMemo(() => {
+    const set = new Set<string>();
+    items.forEach(i => { if (i.placa) set.add(i.placa); });
+    return Array.from(set).sort();
+  }, [items]);
+
   const filteredItems = useMemo(() => {
     return items.filter(item => {
       if (!item.data) return true;
-      const d = item.data; // format: YYYY-MM-DD
+      const d = item.data;
       if (dataInicio && d < format(dataInicio, "yyyy-MM-dd")) return false;
       if (dataFim && d > format(dataFim, "yyyy-MM-dd")) return false;
+      if (selectedPlaca !== "todos" && item.placa !== selectedPlaca) return false;
       return true;
     });
-  }, [items, dataInicio, dataFim]);
+  }, [items, dataInicio, dataFim, selectedPlaca]);
 
   const filteredDespesas = useMemo(() => {
     return despesasVeiculo.filter(d => {
