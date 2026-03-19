@@ -1578,7 +1578,7 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
                 </Select>
               </div>
               <div className="flex gap-2">
-                <Button variant="outline" size="sm" onClick={() => printContasReceber(filteredContasReceberList, vendaOsMap)} className="gap-1">
+                <Button variant="outline" size="sm" onClick={() => { const l = new URL(logo, window.location.origin).href; printContasReceber(filteredContasReceberList, vendaOsMap, l); }} className="gap-1">
                   <Printer className="h-4 w-4" /> Imprimir
                 </Button>
                 <Button variant="outline" size="sm" onClick={() => openNovaContaDialog("receber")} className="gap-1">
