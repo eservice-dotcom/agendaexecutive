@@ -147,7 +147,17 @@ export const printFatVeiculo = (
     const totalC = dados.reduce((s, d) => s + d.custo, 0);
     const totalD = Array.from(despesasPorPlaca.values()).reduce((s, v) => s + v.total, 0);
     const totalL = totalR - totalC - totalD;
-    body += `<div class="totals"><b>Receita Total:</b> ${formatCurrency(totalR)} &nbsp;|&nbsp; <b>Custo Forn.:</b> ${formatCurrency(totalC)} &nbsp;|&nbsp; <b>Desp. Oper.:</b> ${formatCurrency(totalD)} &nbsp;|&nbsp; <b>Líquido:</b> ${formatCurrency(totalL)}</div>`;
+    const totalPct = totalR > 0 ? ((totalL / totalR) * 100).toFixed(1) : "0";
+    body += `<div class="totals">
+<b>Receita Total:</b> ${formatCurrency(totalR)} &nbsp;|&nbsp;
+<b>Custo Forn.:</b> ${formatCurrency(totalC)} &nbsp;|&nbsp;
+<b>Desp. Oper.:</b> ${formatCurrency(totalD)}
+</div>
+<div class="resultado">
+<span class="resultado-label">RESULTADO LÍQUIDO</span>
+<span class="resultado-valor">${formatCurrency(totalL)}</span>
+<span class="resultado-pct">(${totalPct}% de margem)</span>
+</div>`;
   }
 
   const w = window.open("", "_blank");
@@ -163,8 +173,12 @@ th,td{border:1px solid #ccc;padding:3px 6px;text-align:left}
 th{background:#f0f0f0;font-weight:600;font-size:9px}
 td{font-size:9px}
 .r{text-align:right}.c{text-align:center}.b{font-weight:700}
-.totals{margin-top:12px;font-size:11px;padding:8px;background:#f0f0f0;border-radius:4px}
-.vehicle-block{margin-bottom:16px;page-break-inside:avoid}
+.totals{margin-top:16px;font-size:11px;padding:8px;background:#f0f0f0;border-radius:4px}
+.resultado{margin-top:8px;padding:12px;background:#1a3a5c;color:#fff;border-radius:4px;display:flex;align-items:center;gap:12px}
+.resultado-label{font-size:12px;font-weight:700;letter-spacing:0.5px}
+.resultado-valor{font-size:18px;font-weight:700}
+.resultado-pct{font-size:11px;opacity:0.8}
+.vehicle-block{margin-bottom:14px}
 .vehicle-header{font-size:13px;font-weight:700;color:#1a3a5c;border-bottom:2px solid #1a3a5c;padding-bottom:2px;margin-bottom:4px}
 .vehicle-summary{font-size:10px;margin-bottom:4px;color:#444}
 .desp-title{font-size:10px;font-weight:700;margin-top:6px;margin-bottom:2px;color:#555}
