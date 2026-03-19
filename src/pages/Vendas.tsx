@@ -1587,12 +1587,14 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
                     <TableHead>O.S.</TableHead>
                     <TableHead>Centro Receita</TableHead>
                     <TableHead>Subgrupo</TableHead>
-                    <TableHead>Descritivo</TableHead>
-                    <TableHead className="text-right">Valor</TableHead>
-                    <TableHead>Vencimento</TableHead>
-                    <TableHead>Pagamento</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead className="w-[100px]" />
+                     <TableHead>Descritivo</TableHead>
+                     <TableHead className="text-right">Valor</TableHead>
+                     <TableHead className="text-right">Pago</TableHead>
+                     <TableHead className="text-right">Saldo</TableHead>
+                     <TableHead>Vencimento</TableHead>
+                     <TableHead>Pagamento</TableHead>
+                     <TableHead>Status</TableHead>
+                     <TableHead className="w-[100px]" />
                   </TableRow>
                 </TableHeader>
                 <TableBody>
