@@ -216,6 +216,7 @@ const Index = () => {
     setFechamentoSearch("");
     setFechamentoDataInicio("");
     setFechamentoDataFim("");
+    setFechamentoReceptivo("");
     setFechamentoDialogOpen(true);
     setActiveTab("fechamentos");
   };
