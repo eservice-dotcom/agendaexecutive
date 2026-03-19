@@ -6,6 +6,41 @@ const formatDate = (d: string) => {
   return `${day}/${m}/${y}`;
 };
 
+const brandedStyles = () => `<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Segoe UI',Arial,sans-serif;color:#1a1a1a;font-size:11px;padding:0}
+.page{max-width:297mm;margin:0 auto;padding:12mm 15mm}
+h1{font-size:16px;margin-bottom:4px;color:#1a3a5c}
+.sub{font-size:10px;color:#666;margin-bottom:12px}
+table{width:100%;border-collapse:collapse;margin-top:8px}
+th{background:#1a3a5c;color:#fff;padding:6px 8px;font-size:9px;text-transform:uppercase;letter-spacing:0.3px}
+td{border-bottom:1px solid #ddd;padding:5px 8px;font-size:10px}
+tr:nth-child(even){background:#f8f9fa}
+.r{text-align:right}.c{text-align:center}.b{font-weight:700}
+.totals{margin-top:14px;font-size:11px;padding:10px 12px;background:#f0f4f8;border-radius:6px;border-left:4px solid #1a3a5c}
+.header-brand{display:flex;align-items:center;justify-content:space-between;border-bottom:3px solid #c8a456;padding-bottom:12px;margin-bottom:16px}
+.header-left{display:flex;align-items:center;gap:12px}
+.header-left img{height:70px;width:70px;object-fit:contain}
+.header-left .company{font-size:18px;font-weight:700;color:#1a3a5c}
+.header-right{text-align:right}
+.header-right .report-title{font-size:14px;font-weight:700;color:#1a3a5c}
+.header-right .report-date{font-size:10px;color:#666;margin-top:2px}
+.footer{margin-top:24px;border-top:2px solid #c8a456;padding-top:10px;display:flex;justify-content:space-between;font-size:9px;color:#888}
+@media print{body{padding:0}.page{padding:8mm 12mm}@page{size:landscape;margin:0}}
+</style>`;
+
+const brandedHeader = (logoUrl: string, title: string) => `
+<div class="header-brand">
+  <div class="header-left">
+    ${logoUrl ? `<img src="${logoUrl}" alt="Logo" />` : ""}
+    <span class="company">Executive Service</span>
+  </div>
+  <div class="header-right">
+    <div class="report-title">${title}</div>
+    <div class="report-date">Emitido em: ${new Date().toLocaleString("pt-BR")}</div>
+  </div>
+</div>`;
+
 const openPrint = (title: string, body: string) => {
   const w = window.open("", "_blank");
   if (!w) return;
@@ -192,7 +227,7 @@ ${body}
   w.onload = () => w.print();
 };
 
-export const printContasPagar = (items: any[], vendaOsMap: Record<string, any> = {}) => {
+export const printContasPagar = (items: any[], vendaOsMap: Record<string, any> = {}, logoUrl = "") => {
   const rows = items.map(cp => {
     const venda = vendaOsMap[cp.venda_id];
     return `<tr>
@@ -215,24 +250,38 @@ export const printContasPagar = (items: any[], vendaOsMap: Record<string, any> =
   const totalPendente = items.filter(c => c.status === "pendente").reduce((s, c) => s + Number(c.valor), 0);
   const totalPago = items.filter(c => c.status === "pago").reduce((s, c) => s + Number(c.valor), 0);
 
-  openPrint("Relatório de Contas a Pagar", `
-<p class="sub">${items.length} registro(s)</p>
-<table>
-<thead><tr>
-<th class="c">Venda</th><th>Data</th><th>Fornecedor</th><th>Cliente</th><th>O.S.</th>
-<th>Centro Custo</th><th>Subgrupo</th><th>Descritivo</th>
-<th class="r">Valor</th><th>Vencimento</th><th>Pagamento</th><th class="c">Status</th>
-</tr></thead>
-<tbody>${rows}</tbody>
-</table>
-<div class="totals">
-<b>Total:</b> ${formatCurrency(total)} &nbsp;|&nbsp;
-<b>Pendente:</b> ${formatCurrency(totalPendente)} &nbsp;|&nbsp;
-<b>Pago:</b> ${formatCurrency(totalPago)}
-</div>`);
+  const w = window.open("", "_blank");
+  if (!w) return;
+  w.document.write(`<!DOCTYPE html><html><head><title>Relatório de Contas a Pagar</title>
+${brandedStyles()}
+</head><body>
+<div class="page">
+  ${brandedHeader(logoUrl, "Relatório de Contas a Pagar")}
+  <p class="sub">${items.length} registro(s)</p>
+  <table>
+  <thead><tr>
+  <th class="c">Venda</th><th>Data</th><th>Fornecedor</th><th>Cliente</th><th>O.S.</th>
+  <th>Centro Custo</th><th>Subgrupo</th><th>Descritivo</th>
+  <th class="r">Valor</th><th>Vencimento</th><th>Pagamento</th><th class="c">Status</th>
+  </tr></thead>
+  <tbody>${rows}</tbody>
+  </table>
+  <div class="totals">
+  <b>Total:</b> ${formatCurrency(total)} &nbsp;|&nbsp;
+  <b>Pendente:</b> ${formatCurrency(totalPendente)} &nbsp;|&nbsp;
+  <b>Pago:</b> ${formatCurrency(totalPago)}
+  </div>
+  <div class="footer">
+    <span>Documento gerado em ${new Date().toLocaleString("pt-BR")}</span>
+    <span>Executive Service — Transporte Executivo</span>
+  </div>
+</div>
+</body></html>`);
+  w.document.close();
+  w.onload = () => w.print();
 };
 
-export const printContasReceber = (items: any[], vendaOsMap: Record<string, any> = {}) => {
+export const printContasReceber = (items: any[], vendaOsMap: Record<string, any> = {}, logoUrl = "") => {
   const rows = items.map(cr => {
     const venda = vendaOsMap[cr.venda_id];
     return `<tr>
@@ -254,21 +303,35 @@ export const printContasReceber = (items: any[], vendaOsMap: Record<string, any>
   const totalPendente = items.filter(c => c.status === "pendente").reduce((s, c) => s + Number(c.valor), 0);
   const totalPago = items.filter(c => c.status === "pago").reduce((s, c) => s + Number(c.valor), 0);
 
-  openPrint("Relatório de Contas a Receber", `
-<p class="sub">${items.length} registro(s)</p>
-<table>
-<thead><tr>
-<th class="c">Venda</th><th>Data</th><th>Cliente</th><th>O.S.</th>
-<th>Centro Receita</th><th>Subgrupo</th><th>Descritivo</th>
-<th class="r">Valor</th><th>Vencimento</th><th>Pagamento</th><th class="c">Status</th>
-</tr></thead>
-<tbody>${rows}</tbody>
-</table>
-<div class="totals">
-<b>Total:</b> ${formatCurrency(total)} &nbsp;|&nbsp;
-<b>Pendente:</b> ${formatCurrency(totalPendente)} &nbsp;|&nbsp;
-<b>Pago:</b> ${formatCurrency(totalPago)}
-</div>`);
+  const w = window.open("", "_blank");
+  if (!w) return;
+  w.document.write(`<!DOCTYPE html><html><head><title>Relatório de Contas a Receber</title>
+${brandedStyles()}
+</head><body>
+<div class="page">
+  ${brandedHeader(logoUrl, "Relatório de Contas a Receber")}
+  <p class="sub">${items.length} registro(s)</p>
+  <table>
+  <thead><tr>
+  <th class="c">Venda</th><th>Data</th><th>Cliente</th><th>O.S.</th>
+  <th>Centro Receita</th><th>Subgrupo</th><th>Descritivo</th>
+  <th class="r">Valor</th><th>Vencimento</th><th>Pagamento</th><th class="c">Status</th>
+  </tr></thead>
+  <tbody>${rows}</tbody>
+  </table>
+  <div class="totals">
+  <b>Total:</b> ${formatCurrency(total)} &nbsp;|&nbsp;
+  <b>Pendente:</b> ${formatCurrency(totalPendente)} &nbsp;|&nbsp;
+  <b>Pago:</b> ${formatCurrency(totalPago)}
+  </div>
+  <div class="footer">
+    <span>Documento gerado em ${new Date().toLocaleString("pt-BR")}</span>
+    <span>Executive Service — Transporte Executivo</span>
+  </div>
+</div>
+</body></html>`);
+  w.document.close();
+  w.onload = () => w.print();
 };
 
 export const printCotacao = (cotacao: {
