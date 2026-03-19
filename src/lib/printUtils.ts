@@ -246,7 +246,7 @@ ${brandedStyles()}
   w.onload = () => w.print();
 };
 
-export const printContasReceber = (items: any[], vendaOsMap: Record<string, any> = {}) => {
+export const printContasReceber = (items: any[], vendaOsMap: Record<string, any> = {}, logoUrl = "") => {
   const rows = items.map(cr => {
     const venda = vendaOsMap[cr.venda_id];
     return `<tr>
@@ -268,21 +268,35 @@ export const printContasReceber = (items: any[], vendaOsMap: Record<string, any>
   const totalPendente = items.filter(c => c.status === "pendente").reduce((s, c) => s + Number(c.valor), 0);
   const totalPago = items.filter(c => c.status === "pago").reduce((s, c) => s + Number(c.valor), 0);
 
-  openPrint("Relatório de Contas a Receber", `
-<p class="sub">${items.length} registro(s)</p>
-<table>
-<thead><tr>
-<th class="c">Venda</th><th>Data</th><th>Cliente</th><th>O.S.</th>
-<th>Centro Receita</th><th>Subgrupo</th><th>Descritivo</th>
-<th class="r">Valor</th><th>Vencimento</th><th>Pagamento</th><th class="c">Status</th>
-</tr></thead>
-<tbody>${rows}</tbody>
-</table>
-<div class="totals">
-<b>Total:</b> ${formatCurrency(total)} &nbsp;|&nbsp;
-<b>Pendente:</b> ${formatCurrency(totalPendente)} &nbsp;|&nbsp;
-<b>Pago:</b> ${formatCurrency(totalPago)}
-</div>`);
+  const w = window.open("", "_blank");
+  if (!w) return;
+  w.document.write(`<!DOCTYPE html><html><head><title>Relatório de Contas a Receber</title>
+${brandedStyles()}
+</head><body>
+<div class="page">
+  ${brandedHeader(logoUrl, "Relatório de Contas a Receber")}
+  <p class="sub">${items.length} registro(s)</p>
+  <table>
+  <thead><tr>
+  <th class="c">Venda</th><th>Data</th><th>Cliente</th><th>O.S.</th>
+  <th>Centro Receita</th><th>Subgrupo</th><th>Descritivo</th>
+  <th class="r">Valor</th><th>Vencimento</th><th>Pagamento</th><th class="c">Status</th>
+  </tr></thead>
+  <tbody>${rows}</tbody>
+  </table>
+  <div class="totals">
+  <b>Total:</b> ${formatCurrency(total)} &nbsp;|&nbsp;
+  <b>Pendente:</b> ${formatCurrency(totalPendente)} &nbsp;|&nbsp;
+  <b>Pago:</b> ${formatCurrency(totalPago)}
+  </div>
+  <div class="footer">
+    <span>Documento gerado em ${new Date().toLocaleString("pt-BR")}</span>
+    <span>Executive Service — Transporte Executivo</span>
+  </div>
+</div>
+</body></html>`);
+  w.document.close();
+  w.onload = () => w.print();
 };
 
 export const printCotacao = (cotacao: {
