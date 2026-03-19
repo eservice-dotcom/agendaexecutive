@@ -1615,6 +1615,8 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
                         <TableCell className="text-sm">{cr.subgrupo_receita || "—"}</TableCell>
                         <TableCell className="text-sm">{cr.descritivo}</TableCell>
                         <TableCell className="text-right font-mono">{formatCurrency(cr.valor)}</TableCell>
+                        <TableCell className="text-right font-mono">{formatCurrency(cr.valor_pago || 0)}</TableCell>
+                        <TableCell className="text-right font-mono">{formatCurrency(Number(cr.valor) - Number(cr.valor_pago || 0))}</TableCell>
                         <TableCell className="font-mono text-xs">{cr.data_vencimento ? formatDate(cr.data_vencimento) : "—"}</TableCell>
                         <TableCell className="font-mono text-xs">{cr.data_pagamento ? formatDate(cr.data_pagamento) : "—"}</TableCell>
                         <TableCell>
@@ -1622,9 +1624,9 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
                         </TableCell>
                         <TableCell>
                           <div className="flex gap-1">
-                            {cr.status === "pendente" && (
+                            {(cr.status === "pendente" || cr.status === "parcial") && (
                               <>
-                                <Button variant="ghost" size="icon" onClick={() => handleBaixa("receber", cr.id)} title="Dar Baixa">
+                                <Button variant="ghost" size="icon" onClick={() => handleBaixa("receber", cr)} title="Dar Baixa">
                                   <CheckCircle className="h-4 w-4 text-green-600" />
                                 </Button>
                                 <Button variant="ghost" size="icon" onClick={() => handleCancelarConta("receber", cr.id)} title="Cancelar">
