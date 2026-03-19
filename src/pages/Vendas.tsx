@@ -943,6 +943,7 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
     setFechamentoSearch("");
     setFechamentoDataInicio("");
     setFechamentoDataFim("");
+    setFechamentoReceptivo("");
     setFechamentoDialogOpen(true);
   };
 
