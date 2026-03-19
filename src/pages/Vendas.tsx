@@ -1369,6 +1369,7 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
     switch (s) {
       case "pago": return "default";
       case "pendente": return "secondary";
+      case "parcial": return "outline";
       case "cancelado": return "destructive";
       default: return "outline";
     }
