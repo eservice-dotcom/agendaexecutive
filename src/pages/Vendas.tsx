@@ -271,6 +271,7 @@ const Vendas = () => {
   const [fechamentoSearch, setFechamentoSearch] = useState("");
   const [fechamentoDataInicio, setFechamentoDataInicio] = useState("");
   const [fechamentoDataFim, setFechamentoDataFim] = useState("");
+  const [fechamentoReceptivo, setFechamentoReceptivo] = useState("");
 
   const loadVendas = useCallback(async () => {
     const { data, error } = await supabase
