@@ -1600,7 +1600,7 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
                 <TableBody>
                   {filteredContasReceberList.length === 0 ? (
                     <TableRow>
-                       <TableCell colSpan={12} className="text-center text-muted-foreground py-8">
+                       <TableCell colSpan={14} className="text-center text-muted-foreground py-8">
                         Nenhuma conta a receber
                       </TableCell>
                     </TableRow>
