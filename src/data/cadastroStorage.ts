@@ -85,7 +85,7 @@ export const saveCliente = async (item: Omit<Cliente, "id">) => {
   if (error) throw error;
 };
 
-export const updateCliente = async (id: string, item: Omit<Cliente, "id">) => {
+export const updateCliente = async (id: string, item: Omit<Cliente, "id">, oldNome?: string) => {
   const { error } = await supabase.from("clientes").update({
     nome: item.nome,
     cnpj_cpf: item.cnpjCpf,
@@ -97,6 +97,16 @@ export const updateCliente = async (id: string, item: Omit<Cliente, "id">) => {
     uf: item.uf || "",
   }).eq("id", id);
   if (error) throw error;
+
+  // Se o nome mudou, atualizar registros relacionados
+  if (oldNome && oldNome !== item.nome) {
+    await Promise.all([
+      supabase.from("agenda_items").update({ cliente: item.nome } as any).eq("cliente", oldNome),
+      supabase.from("contas_receber").update({ cliente: item.nome } as any).eq("cliente", oldNome),
+      supabase.from("vendas").update({ cliente: item.nome } as any).eq("cliente", oldNome),
+      supabase.from("fechamentos").update({ cliente: item.nome } as any).eq("cliente", oldNome),
+    ]);
+  }
 };
 
 export const deleteCliente = async (id: string) => {
