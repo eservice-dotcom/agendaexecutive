@@ -34,7 +34,8 @@ const CadastroClientes = () => {
     if (!form.nome.trim()) { toast.error("Nome é obrigatório"); return; }
     try {
       if (editingId) {
-        await updateCliente(editingId, form);
+        const old = items.find(i => i.id === editingId);
+        await updateCliente(editingId, form, old?.nome);
         toast.success("Cliente atualizado!");
       } else {
         await saveCliente(form);
