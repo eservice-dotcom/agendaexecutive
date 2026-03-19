@@ -1675,6 +1675,7 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
                   <SelectContent>
                     <SelectItem value="all">Todos os status</SelectItem>
                     <SelectItem value="pendente">Pendente</SelectItem>
+                    <SelectItem value="parcial">Parcial</SelectItem>
                     <SelectItem value="pago">Pago</SelectItem>
                     <SelectItem value="cancelado">Cancelado</SelectItem>
                   </SelectContent>
