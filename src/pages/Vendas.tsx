@@ -71,6 +71,7 @@ interface ContaPagarDB {
   fornecedor: string;
   descritivo: string;
   valor: number;
+  valor_pago: number;
   data: string;
   data_vencimento: string | null;
   data_pagamento: string | null;
