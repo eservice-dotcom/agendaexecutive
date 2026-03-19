@@ -333,7 +333,7 @@ const AgendaTable = ({ items, onEdited, hideFinancials, onClone }: AgendaTablePr
                 </span>
               </TableCell>
               {canViewFinancials && (
-                <TableCell className="px-0.5 py-0 text-right font-mono text-[9px] font-semibold text-foreground truncate">
+                <TableCell className={`px-0.5 py-0 text-right font-mono text-[9px] font-semibold text-foreground truncate ${!item.valor ? 'bg-orange-200 dark:bg-orange-900/40' : ''}`}>
                   {formatCurrency(
                     item.valor +
                     (item.estacionamento || 0) +
