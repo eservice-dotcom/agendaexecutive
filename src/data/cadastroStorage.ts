@@ -234,7 +234,7 @@ export const saveFornecedor = async (item: Omit<Fornecedor, "id">) => {
   if (error) throw error;
 };
 
-export const updateFornecedor = async (id: string, item: Omit<Fornecedor, "id">) => {
+export const updateFornecedor = async (id: string, item: Omit<Fornecedor, "id">, oldRazaoSocial?: string) => {
   const { error } = await supabase.from("fornecedores").update({
     razao_social: item.razaoSocial,
     cnpj: item.cnpj,
@@ -244,6 +244,14 @@ export const updateFornecedor = async (id: string, item: Omit<Fornecedor, "id">)
     pix: item.pix,
   } as any).eq("id", id);
   if (error) throw error;
+
+  // Se a razão social mudou, atualizar registros relacionados
+  if (oldRazaoSocial && oldRazaoSocial !== item.razaoSocial) {
+    await Promise.all([
+      supabase.from("agenda_items").update({ fornecedor: item.razaoSocial } as any).eq("fornecedor", oldRazaoSocial),
+      supabase.from("contas_pagar").update({ fornecedor: item.razaoSocial } as any).eq("fornecedor", oldRazaoSocial),
+    ]);
+  }
 };
 
 export const deleteFornecedor = async (id: string) => {
