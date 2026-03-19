@@ -33,6 +33,7 @@ const FaturamentoVeiculo = () => {
   const [dataInicio, setDataInicio] = useState<Date | undefined>(undefined);
   const [dataFim, setDataFim] = useState<Date | undefined>(undefined);
   const [expandedKeys, setExpandedKeys] = useState<Set<string>>(new Set());
+  const [selectedPlaca, setSelectedPlaca] = useState<string>("todos");
 
   const toggleExpand = (key: string) => {
     setExpandedKeys(prev => {
@@ -77,15 +78,22 @@ const FaturamentoVeiculo = () => {
     };
     fetchAll();
   }, []);
+  const allPlacas = useMemo(() => {
+    const set = new Set<string>();
+    items.forEach(i => { if (i.placa) set.add(i.placa); });
+    return Array.from(set).sort();
+  }, [items]);
+
   const filteredItems = useMemo(() => {
     return items.filter(item => {
       if (!item.data) return true;
-      const d = item.data; // format: YYYY-MM-DD
+      const d = item.data;
       if (dataInicio && d < format(dataInicio, "yyyy-MM-dd")) return false;
       if (dataFim && d > format(dataFim, "yyyy-MM-dd")) return false;
+      if (selectedPlaca !== "todos" && item.placa !== selectedPlaca) return false;
       return true;
     });
-  }, [items, dataInicio, dataFim]);
+  }, [items, dataInicio, dataFim, selectedPlaca]);
 
   const filteredDespesas = useMemo(() => {
     return despesasVeiculo.filter(d => {
@@ -296,6 +304,19 @@ const FaturamentoVeiculo = () => {
               Limpar
             </Button>
           )}
+
+          <span className="text-xs text-muted-foreground ml-1">Veículo:</span>
+          <Select value={selectedPlaca} onValueChange={setSelectedPlaca}>
+            <SelectTrigger className="w-[160px] h-8 text-xs">
+              <SelectValue placeholder="Todos" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="todos" className="text-xs">Todos</SelectItem>
+              {allPlacas.map(p => (
+                <SelectItem key={p} value={p} className="text-xs">{p}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
         <div className="ml-auto flex items-center gap-3">
         <label className="flex items-center gap-1.5 text-xs text-muted-foreground cursor-pointer select-none">
