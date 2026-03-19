@@ -247,6 +247,10 @@ const Index = () => {
     setFechamentoExtrasSelected(new Set(agendaExtras.map((_: any, i: number) => i)));
   };
 
+  const fechamentoReceptivos = useMemo(() => {
+    return [...new Set(fechamentoItems.map((i: any) => i.receptivo).filter(Boolean))].sort();
+  }, [fechamentoItems]);
+
   const fechamentoFilteredItems = useMemo(() => {
     const mapped = fechamentoItems.map((item: any, idx: number) => ({ item, idx }));
     return mapped.filter(({ item }) => {
@@ -261,9 +265,10 @@ const Index = () => {
       }
       if (fechamentoDataInicio && item.data < fechamentoDataInicio) return false;
       if (fechamentoDataFim && item.data > fechamentoDataFim) return false;
+      if (fechamentoReceptivo && (item.receptivo || "") !== fechamentoReceptivo) return false;
       return true;
     });
-  }, [fechamentoItems, fechamentoSearch, fechamentoDataInicio, fechamentoDataFim]);
+  }, [fechamentoItems, fechamentoSearch, fechamentoDataInicio, fechamentoDataFim, fechamentoReceptivo]);
 
   const handleGerarFechamento = async (format: "print" | "excel" = "print") => {
     if (!fechamentoCliente || !session?.user?.id) return;
