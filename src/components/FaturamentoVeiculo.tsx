@@ -33,6 +33,7 @@ const FaturamentoVeiculo = () => {
   const [dataInicio, setDataInicio] = useState<Date | undefined>(undefined);
   const [dataFim, setDataFim] = useState<Date | undefined>(undefined);
   const [expandedKeys, setExpandedKeys] = useState<Set<string>>(new Set());
+  const [selectedPlaca, setSelectedPlaca] = useState<string>("todos");
 
   const toggleExpand = (key: string) => {
     setExpandedKeys(prev => {
