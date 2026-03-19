@@ -1067,11 +1067,32 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
     }
   };
 
-  const handleBaixa = async (type: "pagar" | "receber", id: string) => {
+  const handleBaixa = (type: "pagar" | "receber", item: any) => {
+    const saldo = Number(item.valor) - Number(item.valor_pago || 0);
+    setBaixaValor(saldo.toFixed(2));
+    setBaixaDialog({ type, item });
+  };
+
+  const handleConfirmBaixa = async () => {
+    if (!baixaDialog) return;
+    const { type, item } = baixaDialog;
+    const valorBaixa = parseFloat(baixaValor) || 0;
+    if (valorBaixa <= 0) {
+      toast({ title: "Valor inválido", variant: "destructive" });
+      return;
+    }
+    const novoValorPago = Number(item.valor_pago || 0) + valorBaixa;
+    const valorTotal = Number(item.valor);
+    const novoStatus = novoValorPago >= valorTotal ? "pago" : "parcial";
     const today = new Date().toISOString().split("T")[0];
     const table = type === "pagar" ? "contas_pagar" : "contas_receber";
-    await supabase.from(table).update({ data_pagamento: today, status: "pago" }).eq("id", id);
-    toast({ title: "Baixa realizada!" });
+    await supabase.from(table).update({
+      valor_pago: Math.min(novoValorPago, valorTotal),
+      status: novoStatus,
+      data_pagamento: novoStatus === "pago" ? today : null,
+    }).eq("id", item.id);
+    toast({ title: novoStatus === "pago" ? "Baixa total realizada!" : "Baixa parcial realizada!" });
+    setBaixaDialog(null);
     if (type === "pagar") loadContasPagar();
     else loadContasReceber();
   };
