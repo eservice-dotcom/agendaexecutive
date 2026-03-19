@@ -311,7 +311,7 @@ const AgendaTable = ({ items, onEdited, hideFinancials, onClone }: AgendaTablePr
                   <span className="truncate">{item.veiculo}</span>
                 </span>
               </TableCell>
-              <TableCell className="px-0.5 py-0 text-[9px] truncate">
+              <TableCell className={`px-0.5 py-0 text-[9px] truncate ${!item.motorista ? 'bg-blue-200 dark:bg-blue-900/40' : ''}`}>
                 <span className="flex items-center gap-0.5">
                   <User className="h-2 w-2 text-muted-foreground shrink-0" />
                   <span className="truncate">{item.motorista}</span>
