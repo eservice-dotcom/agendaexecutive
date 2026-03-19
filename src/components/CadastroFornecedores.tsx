@@ -27,7 +27,8 @@ const CadastroFornecedores = () => {
     if (!form.razaoSocial.trim()) { toast.error("Razão Social é obrigatória"); return; }
     try {
       if (editingId) {
-        await updateFornecedor(editingId, form);
+        const old = items.find(i => i.id === editingId);
+        await updateFornecedor(editingId, form, old?.razaoSocial);
         toast.success("Fornecedor atualizado!");
       } else {
         await saveFornecedor(form);
