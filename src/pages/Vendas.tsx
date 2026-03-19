@@ -1751,7 +1751,7 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
                 <TableBody>
                   {filteredContasPagarList.length === 0 ? (
                     <TableRow>
-                       <TableCell colSpan={14} className="text-center text-muted-foreground py-8">
+                       <TableCell colSpan={16} className="text-center text-muted-foreground py-8">
                         Nenhuma conta a pagar
                       </TableCell>
                     </TableRow>
