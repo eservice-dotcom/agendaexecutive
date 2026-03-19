@@ -244,7 +244,7 @@ const AgendaTable = ({ items, onEdited, hideFinancials, onClone }: AgendaTablePr
         </TableHeader>
         <TableBody>
           {items.map((item, idx) => (
-            <TableRow key={item.id} className={`transition-colors hover:bg-primary/10 ${!item.corManual ? (!item.motorista ? 'bg-blue-200 dark:bg-blue-900/40' : idx % 2 === 1 ? 'bg-yellow-50/60 dark:bg-yellow-900/10' : tipoRowColor(item.tipo)) : ''}`} style={item.corManual ? { backgroundColor: item.corManual } : undefined}>
+            <TableRow key={item.id} className={`transition-colors hover:bg-primary/10 ${!item.corManual ? (idx % 2 === 1 ? 'bg-yellow-50/60 dark:bg-yellow-900/10' : tipoRowColor(item.tipo)) : ''}`} style={item.corManual ? { backgroundColor: item.corManual } : undefined}>
               <TableCell className={`px-0.5 py-0 font-mono text-[9px] truncate sticky left-0 z-10`} style={item.corManual ? { backgroundColor: item.corManual } : undefined} >{formatDate(item.data)}</TableCell>
               <TableCell className={`px-0.5 py-0 font-mono text-[9px] font-medium truncate sticky left-[58px] z-10`} style={item.corManual ? { backgroundColor: item.corManual } : undefined}>{item.hora}</TableCell>
               <TableCell className="px-0.5 py-0 font-medium text-[9px] truncate">{item.cliente}</TableCell>
@@ -311,7 +311,7 @@ const AgendaTable = ({ items, onEdited, hideFinancials, onClone }: AgendaTablePr
                   <span className="truncate">{item.veiculo}</span>
                 </span>
               </TableCell>
-              <TableCell className="px-0.5 py-0 text-[9px] truncate">
+              <TableCell className={`px-0.5 py-0 text-[9px] truncate ${!item.motorista ? 'bg-blue-200 dark:bg-blue-900/40' : ''}`}>
                 <span className="flex items-center gap-0.5">
                   <User className="h-2 w-2 text-muted-foreground shrink-0" />
                   <span className="truncate">{item.motorista}</span>
@@ -333,7 +333,7 @@ const AgendaTable = ({ items, onEdited, hideFinancials, onClone }: AgendaTablePr
                 </span>
               </TableCell>
               {canViewFinancials && (
-                <TableCell className="px-0.5 py-0 text-right font-mono text-[9px] font-semibold text-foreground truncate">
+                <TableCell className={`px-0.5 py-0 text-right font-mono text-[9px] font-semibold text-foreground truncate ${!item.valor ? 'bg-orange-200 dark:bg-orange-900/40' : ''}`}>
                   {formatCurrency(
                     item.valor +
                     (item.estacionamento || 0) +
@@ -363,7 +363,7 @@ const AgendaTable = ({ items, onEdited, hideFinancials, onClone }: AgendaTablePr
                 </span>
               </TableCell>
               {canViewFinancials && (
-                <TableCell className="px-0.5 py-0 text-right font-mono text-[9px] text-muted-foreground truncate">
+                <TableCell className={`px-0.5 py-0 text-right font-mono text-[9px] text-muted-foreground truncate ${!item.custo ? 'bg-orange-200 dark:bg-orange-900/40' : ''}`}>
                   {formatCurrency(item.custo)}
                 </TableCell>
               )}
