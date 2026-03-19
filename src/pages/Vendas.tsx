@@ -2741,6 +2741,47 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
           contas={whatsappPagamento?.contas}
           vendaInfo={whatsappPagamento?.vendaInfo || null}
         />
+
+        {/* Baixa Parcial Dialog */}
+        <Dialog open={!!baixaDialog} onOpenChange={(v) => { if (!v) setBaixaDialog(null); }}>
+          <DialogContent className="max-w-md">
+            <DialogHeader>
+              <DialogTitle>Dar Baixa</DialogTitle>
+            </DialogHeader>
+            {baixaDialog && (
+              <div className="space-y-4">
+                <div className="grid grid-cols-2 gap-4 text-sm">
+                  <div>
+                    <Label className="text-muted-foreground">Valor Total</Label>
+                    <p className="font-mono font-bold">{formatCurrency(baixaDialog.item.valor)}</p>
+                  </div>
+                  <div>
+                    <Label className="text-muted-foreground">Já Pago</Label>
+                    <p className="font-mono font-bold">{formatCurrency(baixaDialog.item.valor_pago || 0)}</p>
+                  </div>
+                  <div>
+                    <Label className="text-muted-foreground">Saldo Restante</Label>
+                    <p className="font-mono font-bold">{formatCurrency(Number(baixaDialog.item.valor) - Number(baixaDialog.item.valor_pago || 0))}</p>
+                  </div>
+                </div>
+                <div>
+                  <Label>Valor desta baixa</Label>
+                  <Input
+                    type="number"
+                    step="0.01"
+                    value={baixaValor}
+                    onChange={(e) => setBaixaValor(e.target.value)}
+                    placeholder="0,00"
+                  />
+                </div>
+              </div>
+            )}
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setBaixaDialog(null)}>Cancelar</Button>
+              <Button onClick={handleConfirmBaixa}>Confirmar Baixa</Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
       </main>
     </div>
   );
