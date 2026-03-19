@@ -1416,8 +1416,8 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
     return filtered;
   }, [contasReceberList, filtroOsReceber, filtroClienteReceber, filtroStatusReceber, vendaOsMap]);
 
-  const totalPagarPendente = contasPagarList.filter(c => c.status === "pendente").reduce((s, c) => s + Number(c.valor), 0);
-  const totalReceberPendente = contasReceberList.filter(c => c.status === "pendente").reduce((s, c) => s + Number(c.valor), 0);
+  const totalPagarPendente = contasPagarList.filter(c => c.status === "pendente" || c.status === "parcial").reduce((s, c) => s + (Number(c.valor) - Number(c.valor_pago || 0)), 0);
+  const totalReceberPendente = contasReceberList.filter(c => c.status === "pendente" || c.status === "parcial").reduce((s, c) => s + (Number(c.valor) - Number(c.valor_pago || 0)), 0);
 
   return (
     <div className="min-h-screen bg-background">
