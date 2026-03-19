@@ -118,7 +118,7 @@ export const printFatVeiculo = (
     }
 
     body += `<table><thead><tr><th>O.S.</th><th>Data</th><th>Cliente</th><th>Trajeto</th><th>Motorista</th><th>Fornecedor</th>`;
-    if (includeFinancials) body += `<th class="r">Receita</th><th class="r">Custo</th>`;
+    if (includeFinancials) body += `<th class="r">Receita</th><th class="r">Custo Forn.</th>`;
     body += `</tr></thead><tbody>`;
     d.servicos.forEach((s: any) => {
       body += `<tr><td>${s.cot || "—"}</td><td>${s.data ? formatDate(s.data) : "—"}</td><td>${s.cliente || "—"}</td>`;
