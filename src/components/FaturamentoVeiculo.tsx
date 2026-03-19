@@ -304,6 +304,19 @@ const FaturamentoVeiculo = () => {
               Limpar
             </Button>
           )}
+
+          <span className="text-xs text-muted-foreground ml-1">Veículo:</span>
+          <Select value={selectedPlaca} onValueChange={setSelectedPlaca}>
+            <SelectTrigger className="w-[160px] h-8 text-xs">
+              <SelectValue placeholder="Todos" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="todos" className="text-xs">Todos</SelectItem>
+              {allPlacas.map(p => (
+                <SelectItem key={p} value={p} className="text-xs">{p}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
         <div className="ml-auto flex items-center gap-3">
         <label className="flex items-center gap-1.5 text-xs text-muted-foreground cursor-pointer select-none">
