@@ -71,6 +71,7 @@ interface ContaPagarDB {
   fornecedor: string;
   descritivo: string;
   valor: number;
+  valor_pago: number;
   data: string;
   data_vencimento: string | null;
   data_pagamento: string | null;
@@ -86,6 +87,7 @@ interface ContaReceberDB {
   cliente: string;
   descritivo: string;
   valor: number;
+  valor_pago: number;
   data: string;
   data_vencimento: string | null;
   data_pagamento: string | null;
@@ -201,6 +203,10 @@ const Vendas = () => {
   // Edit conta dialog
   const [editDialog, setEditDialog] = useState<{ type: "pagar" | "receber"; item: any } | null>(null);
   const [editForm, setEditForm] = useState({ descritivo: "", valor: "", data_vencimento: "", data_pagamento: "", centro: "", subgrupo: "", cliente: "", fornecedor: "", placa: "" });
+
+  // Baixa parcial dialog
+  const [baixaDialog, setBaixaDialog] = useState<{ type: "pagar" | "receber"; item: any } | null>(null);
+  const [baixaValor, setBaixaValor] = useState("");
 
   // New manual conta dialogs
   const [novaContaDialog, setNovaContaDialog] = useState<"pagar" | "receber" | null>(null);
@@ -1061,11 +1067,32 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
     }
   };
 
-  const handleBaixa = async (type: "pagar" | "receber", id: string) => {
+  const handleBaixa = (type: "pagar" | "receber", item: any) => {
+    const saldo = Number(item.valor) - Number(item.valor_pago || 0);
+    setBaixaValor(saldo.toFixed(2));
+    setBaixaDialog({ type, item });
+  };
+
+  const handleConfirmBaixa = async () => {
+    if (!baixaDialog) return;
+    const { type, item } = baixaDialog;
+    const valorBaixa = parseFloat(baixaValor) || 0;
+    if (valorBaixa <= 0) {
+      toast({ title: "Valor inválido", variant: "destructive" });
+      return;
+    }
+    const novoValorPago = Number(item.valor_pago || 0) + valorBaixa;
+    const valorTotal = Number(item.valor);
+    const novoStatus = novoValorPago >= valorTotal ? "pago" : "parcial";
     const today = new Date().toISOString().split("T")[0];
     const table = type === "pagar" ? "contas_pagar" : "contas_receber";
-    await supabase.from(table).update({ data_pagamento: today, status: "pago" }).eq("id", id);
-    toast({ title: "Baixa realizada!" });
+    await supabase.from(table).update({
+      valor_pago: Math.min(novoValorPago, valorTotal),
+      status: novoStatus,
+      data_pagamento: novoStatus === "pago" ? today : null,
+    }).eq("id", item.id);
+    toast({ title: novoStatus === "pago" ? "Baixa total realizada!" : "Baixa parcial realizada!" });
+    setBaixaDialog(null);
     if (type === "pagar") loadContasPagar();
     else loadContasReceber();
   };
@@ -1342,6 +1369,7 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
     switch (s) {
       case "pago": return "default";
       case "pendente": return "secondary";
+      case "parcial": return "outline";
       case "cancelado": return "destructive";
       default: return "outline";
     }
@@ -1388,8 +1416,8 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
     return filtered;
   }, [contasReceberList, filtroOsReceber, filtroClienteReceber, filtroStatusReceber, vendaOsMap]);
 
-  const totalPagarPendente = contasPagarList.filter(c => c.status === "pendente").reduce((s, c) => s + Number(c.valor), 0);
-  const totalReceberPendente = contasReceberList.filter(c => c.status === "pendente").reduce((s, c) => s + Number(c.valor), 0);
+  const totalPagarPendente = contasPagarList.filter(c => c.status === "pendente" || c.status === "parcial").reduce((s, c) => s + (Number(c.valor) - Number(c.valor_pago || 0)), 0);
+  const totalReceberPendente = contasReceberList.filter(c => c.status === "pendente" || c.status === "parcial").reduce((s, c) => s + (Number(c.valor) - Number(c.valor_pago || 0)), 0);
 
   return (
     <div className="min-h-screen bg-background">
@@ -1535,6 +1563,7 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
                   <SelectContent>
                     <SelectItem value="all">Todos os status</SelectItem>
                     <SelectItem value="pendente">Pendente</SelectItem>
+                    <SelectItem value="parcial">Parcial</SelectItem>
                     <SelectItem value="pago">Pago</SelectItem>
                     <SelectItem value="cancelado">Cancelado</SelectItem>
                   </SelectContent>
@@ -1559,18 +1588,20 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
                     <TableHead>O.S.</TableHead>
                     <TableHead>Centro Receita</TableHead>
                     <TableHead>Subgrupo</TableHead>
-                    <TableHead>Descritivo</TableHead>
-                    <TableHead className="text-right">Valor</TableHead>
-                    <TableHead>Vencimento</TableHead>
-                    <TableHead>Pagamento</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead className="w-[100px]" />
+                     <TableHead>Descritivo</TableHead>
+                     <TableHead className="text-right">Valor</TableHead>
+                     <TableHead className="text-right">Pago</TableHead>
+                     <TableHead className="text-right">Saldo</TableHead>
+                     <TableHead>Vencimento</TableHead>
+                     <TableHead>Pagamento</TableHead>
+                     <TableHead>Status</TableHead>
+                     <TableHead className="w-[100px]" />
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {filteredContasReceberList.length === 0 ? (
                     <TableRow>
-                       <TableCell colSpan={12} className="text-center text-muted-foreground py-8">
+                       <TableCell colSpan={14} className="text-center text-muted-foreground py-8">
                         Nenhuma conta a receber
                       </TableCell>
                     </TableRow>
@@ -1585,6 +1616,8 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
                         <TableCell className="text-sm">{cr.subgrupo_receita || "—"}</TableCell>
                         <TableCell className="text-sm">{cr.descritivo}</TableCell>
                         <TableCell className="text-right font-mono">{formatCurrency(cr.valor)}</TableCell>
+                        <TableCell className="text-right font-mono">{formatCurrency(cr.valor_pago || 0)}</TableCell>
+                        <TableCell className="text-right font-mono">{formatCurrency(Number(cr.valor) - Number(cr.valor_pago || 0))}</TableCell>
                         <TableCell className="font-mono text-xs">{cr.data_vencimento ? formatDate(cr.data_vencimento) : "—"}</TableCell>
                         <TableCell className="font-mono text-xs">{cr.data_pagamento ? formatDate(cr.data_pagamento) : "—"}</TableCell>
                         <TableCell>
@@ -1592,9 +1625,9 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
                         </TableCell>
                         <TableCell>
                           <div className="flex gap-1">
-                            {cr.status === "pendente" && (
+                            {(cr.status === "pendente" || cr.status === "parcial") && (
                               <>
-                                <Button variant="ghost" size="icon" onClick={() => handleBaixa("receber", cr.id)} title="Dar Baixa">
+                                <Button variant="ghost" size="icon" onClick={() => handleBaixa("receber", cr)} title="Dar Baixa">
                                   <CheckCircle className="h-4 w-4 text-green-600" />
                                 </Button>
                                 <Button variant="ghost" size="icon" onClick={() => handleCancelarConta("receber", cr.id)} title="Cancelar">
@@ -1642,6 +1675,7 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
                   <SelectContent>
                     <SelectItem value="all">Todos os status</SelectItem>
                     <SelectItem value="pendente">Pendente</SelectItem>
+                    <SelectItem value="parcial">Parcial</SelectItem>
                     <SelectItem value="pago">Pago</SelectItem>
                     <SelectItem value="cancelado">Cancelado</SelectItem>
                   </SelectContent>
@@ -1708,6 +1742,8 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
                     <TableHead>Subgrupo</TableHead>
                     <TableHead>Descritivo</TableHead>
                     <TableHead className="text-right">Valor</TableHead>
+                    <TableHead className="text-right">Pago</TableHead>
+                    <TableHead className="text-right">Saldo</TableHead>
                     <TableHead>Vencimento</TableHead>
                     <TableHead>Pagamento</TableHead>
                     <TableHead>Status</TableHead>
@@ -1717,7 +1753,7 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
                 <TableBody>
                   {filteredContasPagarList.length === 0 ? (
                     <TableRow>
-                       <TableCell colSpan={14} className="text-center text-muted-foreground py-8">
+                       <TableCell colSpan={16} className="text-center text-muted-foreground py-8">
                         Nenhuma conta a pagar
                       </TableCell>
                     </TableRow>
@@ -1746,6 +1782,8 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
                         <TableCell className="text-sm">{cp.subgrupo_custo || "—"}</TableCell>
                         <TableCell className="text-sm">{cp.descritivo}</TableCell>
                         <TableCell className="text-right font-mono">{formatCurrency(cp.valor)}</TableCell>
+                        <TableCell className="text-right font-mono">{formatCurrency(cp.valor_pago || 0)}</TableCell>
+                        <TableCell className="text-right font-mono">{formatCurrency(Number(cp.valor) - Number(cp.valor_pago || 0))}</TableCell>
                         <TableCell className="font-mono text-xs">{cp.data_vencimento ? formatDate(cp.data_vencimento) : "—"}</TableCell>
                         <TableCell className="font-mono text-xs">{cp.data_pagamento ? formatDate(cp.data_pagamento) : "—"}</TableCell>
                         <TableCell>
@@ -1753,8 +1791,8 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
                         </TableCell>
                         <TableCell>
                           <div className="flex gap-1">
-                            {cp.status === "pendente" && (
-                              <Button variant="ghost" size="icon" onClick={() => handleBaixa("pagar", cp.id)} title="Dar Baixa">
+                            {(cp.status === "pendente" || cp.status === "parcial") && (
+                              <Button variant="ghost" size="icon" onClick={() => handleBaixa("pagar", cp)} title="Dar Baixa">
                                 <CheckCircle className="h-4 w-4 text-green-600" />
                               </Button>
                             )}
@@ -2705,6 +2743,47 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
           contas={whatsappPagamento?.contas}
           vendaInfo={whatsappPagamento?.vendaInfo || null}
         />
+
+        {/* Baixa Parcial Dialog */}
+        <Dialog open={!!baixaDialog} onOpenChange={(v) => { if (!v) setBaixaDialog(null); }}>
+          <DialogContent className="max-w-md">
+            <DialogHeader>
+              <DialogTitle>Dar Baixa</DialogTitle>
+            </DialogHeader>
+            {baixaDialog && (
+              <div className="space-y-4">
+                <div className="grid grid-cols-2 gap-4 text-sm">
+                  <div>
+                    <Label className="text-muted-foreground">Valor Total</Label>
+                    <p className="font-mono font-bold">{formatCurrency(baixaDialog.item.valor)}</p>
+                  </div>
+                  <div>
+                    <Label className="text-muted-foreground">Já Pago</Label>
+                    <p className="font-mono font-bold">{formatCurrency(baixaDialog.item.valor_pago || 0)}</p>
+                  </div>
+                  <div>
+                    <Label className="text-muted-foreground">Saldo Restante</Label>
+                    <p className="font-mono font-bold">{formatCurrency(Number(baixaDialog.item.valor) - Number(baixaDialog.item.valor_pago || 0))}</p>
+                  </div>
+                </div>
+                <div>
+                  <Label>Valor desta baixa</Label>
+                  <Input
+                    type="number"
+                    step="0.01"
+                    value={baixaValor}
+                    onChange={(e) => setBaixaValor(e.target.value)}
+                    placeholder="0,00"
+                  />
+                </div>
+              </div>
+            )}
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setBaixaDialog(null)}>Cancelar</Button>
+              <Button onClick={handleConfirmBaixa}>Confirmar Baixa</Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
       </main>
     </div>
   );
