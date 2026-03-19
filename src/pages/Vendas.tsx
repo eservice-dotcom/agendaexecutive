@@ -271,6 +271,7 @@ const Vendas = () => {
   const [fechamentoSearch, setFechamentoSearch] = useState("");
   const [fechamentoDataInicio, setFechamentoDataInicio] = useState("");
   const [fechamentoDataFim, setFechamentoDataFim] = useState("");
+  const [fechamentoReceptivo, setFechamentoReceptivo] = useState("");
 
   const loadVendas = useCallback(async () => {
     const { data, error } = await supabase
@@ -887,7 +888,7 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
 
     const { data } = await supabase
       .from("agenda_items")
-      .select("id, cot, data, hora, tipo, origem, destino, pax, motorista, veiculo, placa, fornecedor, valor, custo, km_in, km_fim, km_extra, hora_in, hora_fim, hora_extra, estacionamento, outros, outros_despesas, cliente")
+      .select("id, cot, data, hora, tipo, origem, destino, pax, motorista, veiculo, placa, fornecedor, valor, custo, km_in, km_fim, km_extra, hora_in, hora_fim, hora_extra, estacionamento, outros, outros_despesas, cliente, receptivo")
       .eq("cliente", cli)
       .order("data", { ascending: true });
 
@@ -927,6 +928,7 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
     setFechamentoSearch("");
     setFechamentoDataInicio("");
     setFechamentoDataFim("");
+    setFechamentoReceptivo("");
     setFechamentoDialogOpen(true);
   };
 
@@ -941,6 +943,7 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
     setFechamentoSearch("");
     setFechamentoDataInicio("");
     setFechamentoDataFim("");
+    setFechamentoReceptivo("");
     setFechamentoDialogOpen(true);
   };
 
@@ -950,6 +953,10 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
     setFechamentoExtrasSelected(new Set());
     await loadFechamentoItemsByCliente(cli);
   };
+
+  const fechamentoReceptivos = useMemo(() => {
+    return [...new Set(fechamentoItems.map((i: any) => i.receptivo).filter(Boolean))].sort();
+  }, [fechamentoItems]);
 
   const fechamentoFilteredItems = useMemo(() => {
     const mapped = fechamentoItems.map((item: any, idx: number) => ({ item, idx }));
@@ -965,9 +972,10 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
       }
       if (fechamentoDataInicio && item.data < fechamentoDataInicio) return false;
       if (fechamentoDataFim && item.data > fechamentoDataFim) return false;
+      if (fechamentoReceptivo && (item.receptivo || "") !== fechamentoReceptivo) return false;
       return true;
     });
-  }, [fechamentoItems, fechamentoSearch, fechamentoDataInicio, fechamentoDataFim]);
+  }, [fechamentoItems, fechamentoSearch, fechamentoDataInicio, fechamentoDataFim, fechamentoReceptivo]);
 
   const handleGerarFechamento = async (format: "print" | "excel" = "print") => {
     if (!fechamentoCliente || !session?.user?.id) return;
@@ -2400,6 +2408,19 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
                       placeholder="Data fim"
                       className="h-9 w-[140px]"
                     />
+                    {fechamentoReceptivos.length > 0 && (
+                      <Select value={fechamentoReceptivo} onValueChange={(v) => setFechamentoReceptivo(v === "all" ? "" : v)}>
+                        <SelectTrigger className="h-9 w-[160px]">
+                          <SelectValue placeholder="Todos receptivos" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="all">Todos receptivos</SelectItem>
+                          {fechamentoReceptivos.map((r) => (
+                            <SelectItem key={r} value={r}>{r}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    )}
                     <div className="flex items-center gap-2">
                       <Checkbox
                         checked={fechamentoSelected.size === fechamentoItems.length && fechamentoItems.length > 0}
