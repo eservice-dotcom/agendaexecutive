@@ -73,39 +73,109 @@ export const printAgenda = (items: any[], includeFinancials = true) => {
 ${totals}`);
 };
 
-export const printFatVeiculo = (items: any[], includeFinancials = true) => {
-  const map = new Map<string, { veiculo: string; placa: string; viagens: number; receita: number; custo: number }>();
+export const printFatVeiculo = (
+  items: any[],
+  includeFinancials = true,
+  despesasVeiculo: any[] = []
+) => {
+  const despesasPorPlaca = new Map<string, { total: number; detalhes: any[] }>();
+  despesasVeiculo.forEach(d => {
+    if (d.placa) {
+      const e = despesasPorPlaca.get(d.placa) || { total: 0, detalhes: [] };
+      e.total += Number(d.valor) || 0;
+      e.detalhes.push(d);
+      despesasPorPlaca.set(d.placa, e);
+    }
+  });
+
+  const map = new Map<string, { veiculo: string; placa: string; viagens: number; receita: number; custo: number; servicos: any[] }>();
   items.forEach(i => {
-    const e = map.get(i.placa) || { veiculo: i.veiculo, placa: i.placa, viagens: 0, receita: 0, custo: 0 };
-    e.viagens += 1; e.receita += Number(i.valor); e.custo += Number(i.custo);
-    map.set(i.placa, e);
+    const key = i.placa || `sem-placa-${i.veiculo || "v"}`;
+    const e = map.get(key) || { veiculo: i.veiculo, placa: i.placa, viagens: 0, receita: 0, custo: 0, servicos: [] };
+    e.viagens += 1;
+    const od = Array.isArray(i.outros_despesas) ? i.outros_despesas : [];
+    const valorTotal = (Number(i.valor) || 0) + (Number(i.estacionamento) || 0) + od.reduce((s: number, x: any) => s + (Number(x.valor) || 0), 0);
+    e.receita += valorTotal;
+    e.custo += Number(i.custo) || 0;
+    e.servicos.push({ ...i, valorTotal });
+    map.set(key, e);
   });
   const dados = Array.from(map.values()).sort((a, b) => b.receita - a.receita);
 
-  const rows = dados.map(d => {
-    let row = `<tr><td>${d.veiculo}</td><td>${d.placa}</td><td class="c">${d.viagens}</td>`;
-    if (includeFinancials) {
-      const margem = d.receita - d.custo;
-      const pct = d.receita > 0 ? ((margem / d.receita) * 100).toFixed(1) : "0";
-      row += `<td class="r">${formatCurrency(d.receita)}</td><td class="r">${formatCurrency(d.custo)}</td>
-<td class="r b">${formatCurrency(margem)}</td><td class="r">${pct}%</td>`;
-    }
-    row += `</tr>`;
-    return row;
-  }).join("");
+  let body = "";
+  dados.forEach(d => {
+    const despData = despesasPorPlaca.get(d.placa) || { total: 0, detalhes: [] };
+    const liquido = d.receita - d.custo - despData.total;
+    const pct = d.receita > 0 ? ((liquido / d.receita) * 100).toFixed(1) : "0";
 
-  const finHeaders = includeFinancials ? `<th class="r">Receita</th><th class="r">Custo</th><th class="r">Margem</th><th class="r">%</th>` : "";
-  let totals = "";
-  if (includeFinancials) {
+    body += `<div class="vehicle-block">`;
+    body += `<div class="vehicle-header">${d.veiculo} — ${d.placa}</div>`;
+
+    if (includeFinancials) {
+      body += `<div class="vehicle-summary">Viagens: <b>${d.viagens}</b> &nbsp;|&nbsp; Receita: <b>${formatCurrency(d.receita)}</b> &nbsp;|&nbsp; Custo Forn.: <b>${formatCurrency(d.custo)}</b> &nbsp;|&nbsp; Desp. Oper.: <b>${formatCurrency(despData.total)}</b> &nbsp;|&nbsp; Líquido: <b>${formatCurrency(liquido)}</b> (${pct}%)</div>`;
+    } else {
+      body += `<div class="vehicle-summary">Viagens: <b>${d.viagens}</b></div>`;
+    }
+
+    body += `<table><thead><tr><th>O.S.</th><th>Data</th><th>Cliente</th><th>Trajeto</th><th>Motorista</th><th>Fornecedor</th>`;
+    if (includeFinancials) body += `<th class="r">Receita</th><th class="r">Custo</th>`;
+    body += `</tr></thead><tbody>`;
+    d.servicos.forEach((s: any) => {
+      body += `<tr><td>${s.cot || "—"}</td><td>${s.data ? formatDate(s.data) : "—"}</td><td>${s.cliente || "—"}</td>`;
+      body += `<td>${s.origem && s.destino ? `${s.origem} → ${s.destino}` : "—"}</td>`;
+      body += `<td>${s.motorista || "—"}</td><td>${s.fornecedor || "—"}</td>`;
+      if (includeFinancials) body += `<td class="r">${formatCurrency(s.valorTotal)}</td><td class="r">${formatCurrency(Number(s.custo) || 0)}</td>`;
+      body += `</tr>`;
+    });
+    body += `</tbody></table>`;
+
+    if (includeFinancials && despData.detalhes.length > 0) {
+      body += `<p class="desp-title">Despesas Operacionais</p>`;
+      body += `<table><thead><tr><th>Data</th><th>Descritivo</th><th>Status</th><th class="r">Valor</th></tr></thead><tbody>`;
+      despData.detalhes.forEach((dp: any) => {
+        body += `<tr><td>${dp.data ? formatDate(dp.data) : "—"}</td><td>${dp.descritivo || "—"}</td><td class="c">${dp.status}</td><td class="r">${formatCurrency(Number(dp.valor) || 0)}</td></tr>`;
+      });
+      body += `<tr class="b"><td colspan="3" class="r">Subtotal Despesas</td><td class="r">${formatCurrency(despData.total)}</td></tr>`;
+      body += `</tbody></table>`;
+    }
+
+    body += `</div>`;
+  });
+
+  if (includeFinancials && dados.length > 0) {
     const totalR = dados.reduce((s, d) => s + d.receita, 0);
     const totalC = dados.reduce((s, d) => s + d.custo, 0);
-    totals = `<div class="totals"><b>Receita:</b> ${formatCurrency(totalR)} | <b>Custo:</b> ${formatCurrency(totalC)} | <b>Margem:</b> ${formatCurrency(totalR - totalC)}</div>`;
+    const totalD = Array.from(despesasPorPlaca.values()).reduce((s, v) => s + v.total, 0);
+    const totalL = totalR - totalC - totalD;
+    body += `<div class="totals"><b>Receita Total:</b> ${formatCurrency(totalR)} &nbsp;|&nbsp; <b>Custo Forn.:</b> ${formatCurrency(totalC)} &nbsp;|&nbsp; <b>Desp. Oper.:</b> ${formatCurrency(totalD)} &nbsp;|&nbsp; <b>Líquido:</b> ${formatCurrency(totalL)}</div>`;
   }
 
-  openPrint("Faturamento por Veículo", `
-<table><thead><tr><th>Veículo</th><th>Placa</th><th class="c">Viagens</th>${finHeaders}
-</tr></thead><tbody>${rows}</tbody></table>
-${totals}`);
+  const w = window.open("", "_blank");
+  if (!w) return;
+  w.document.write(`<!DOCTYPE html><html><head><title>Faturamento por Veículo</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:Arial,sans-serif;padding:20px;color:#1a1a1a;font-size:11px}
+h1{font-size:16px;margin-bottom:4px}
+.sub{font-size:10px;color:#666;margin-bottom:12px}
+table{width:100%;border-collapse:collapse;margin-top:4px;margin-bottom:8px}
+th,td{border:1px solid #ccc;padding:3px 6px;text-align:left}
+th{background:#f0f0f0;font-weight:600;font-size:9px}
+td{font-size:9px}
+.r{text-align:right}.c{text-align:center}.b{font-weight:700}
+.totals{margin-top:12px;font-size:11px;padding:8px;background:#f0f0f0;border-radius:4px}
+.vehicle-block{margin-bottom:16px;page-break-inside:avoid}
+.vehicle-header{font-size:13px;font-weight:700;color:#1a3a5c;border-bottom:2px solid #1a3a5c;padding-bottom:2px;margin-bottom:4px}
+.vehicle-summary{font-size:10px;margin-bottom:4px;color:#444}
+.desp-title{font-size:10px;font-weight:700;margin-top:6px;margin-bottom:2px;color:#555}
+@media print{body{padding:10px}@page{size:landscape;margin:8mm}}
+</style></head><body>
+<h1>Faturamento por Veículo</h1>
+<p class="sub">Emitido em: ${new Date().toLocaleString("pt-BR")} — ${dados.length} veículo(s)</p>
+${body}
+</body></html>`);
+  w.document.close();
+  w.onload = () => w.print();
 };
 
 export const printContasPagar = (items: any[], vendaOsMap: Record<string, any> = {}) => {
