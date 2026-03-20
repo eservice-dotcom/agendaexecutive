@@ -227,6 +227,10 @@ const Vendas = () => {
   const [quickAddFornecedorNome, setQuickAddFornecedorNome] = useState("");
   const [quickAddCliente, setQuickAddCliente] = useState(false);
   const [quickAddClienteNome, setQuickAddClienteNome] = useState("");
+  const [quickAddCentroCusto, setQuickAddCentroCusto] = useState(false);
+  const [quickAddCentroCustoNome, setQuickAddCentroCustoNome] = useState("");
+  const [quickAddSubgrupoCusto, setQuickAddSubgrupoCusto] = useState(false);
+  const [quickAddSubgrupoCustoNome, setQuickAddSubgrupoCustoNome] = useState("");
 
   // Centros de custo/receita and subgrupos
   const [centrosCusto, setCentrosCusto] = useState<{ id: string; nome: string }[]>([]);
