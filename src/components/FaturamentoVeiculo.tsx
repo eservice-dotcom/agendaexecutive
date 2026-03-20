@@ -66,7 +66,7 @@ const FaturamentoVeiculo = () => {
       while (true) {
         const { data } = await supabase
           .from("contas_pagar")
-          .select("placa, valor, status, descritivo, data")
+          .select("placa, valor, valor_pago, status, descritivo, data, data_pagamento")
           .neq("placa", "")
           .range(fromD, fromD + pageSize - 1);
         if (!data || data.length === 0) break;
