@@ -443,6 +443,22 @@ const Vendas = () => {
   }, [loadVendas, loadClientes, loadFornecedores, loadContasPagar, loadContasReceber, loadVendaOsMap, loadCentrosCusto, loadCentrosReceita, loadSubgruposCusto, loadSubgruposReceita, loadVeiculos]);
 
   useEffect(() => {
+    const node = zoomPagarRef.current;
+    if (!node) return;
+    const handler = (e: WheelEvent) => {
+      if (e.ctrlKey || e.metaKey) {
+        e.preventDefault();
+        e.stopPropagation();
+        setZoomPagar((prev) => {
+          const next = prev + (e.deltaY < 0 ? 0.05 : -0.05);
+          return Math.min(Math.max(next, 0.4), 1.5);
+        });
+      }
+    };
+    node.addEventListener('wheel', handler, { passive: false });
+    return () => node.removeEventListener('wheel', handler);
+  }, []);
+
     if (!cliente) {
       setAgendaItems([]);
       return;
