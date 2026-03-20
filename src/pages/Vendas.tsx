@@ -1777,44 +1777,73 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
                   <Button variant="ghost" size="sm" className="h-6 text-xs" onClick={() => setZoomPagar(1)}>Reset</Button>
                 </div>
               )}
-            <div className="flex items-center justify-between mb-2 gap-2">
-              <div className="flex items-center gap-2">
-                <Search className="h-4 w-4 text-muted-foreground" />
-                <Input
-                  placeholder="Filtrar por nº da O.S."
-                  value={filtroOsPagar}
-                  onChange={(e) => setFiltroOsPagar(e.target.value)}
-                  className="w-48 h-8 text-sm"
-                />
-                <Input
-                  placeholder="Filtrar por fornecedor"
-                  value={filtroFornecedorPagar}
-                  onChange={(e) => setFiltroFornecedorPagar(e.target.value)}
-                  className="w-48 h-8 text-sm"
-                />
-                <Select value={filtroStatusPagar || "all"} onValueChange={(v) => setFiltroStatusPagar(v === "all" ? "" : v)}>
-                  <SelectTrigger className="w-40 h-8 text-sm">
-                    <SelectValue placeholder="Status" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">Todos os status</SelectItem>
-                    <SelectItem value="pendente">Pendente</SelectItem>
-                    <SelectItem value="parcial">Parcial</SelectItem>
-                    <SelectItem value="pago">Pago</SelectItem>
-                    <SelectItem value="cancelado">Cancelado</SelectItem>
-                  </SelectContent>
-                </Select>
-                <Select value={filtroCentroCustoPagar || "all"} onValueChange={(v) => setFiltroCentroCustoPagar(v === "all" ? "" : v)}>
-                  <SelectTrigger className="w-48 h-8 text-sm">
-                    <SelectValue placeholder="Centro de Custo" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">Todos os centros</SelectItem>
-                    {centrosCusto.map((c) => (
-                      <SelectItem key={c.id} value={c.nome}>{c.nome}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+            <div className="flex flex-wrap items-end justify-between mb-2 gap-2">
+              <div className="flex flex-wrap items-end gap-3">
+                <div className="flex flex-col gap-0.5">
+                  <span className="text-xs font-medium text-muted-foreground">O.S.</span>
+                  <Input
+                    placeholder="Nº da O.S."
+                    value={filtroOsPagar}
+                    onChange={(e) => setFiltroOsPagar(e.target.value)}
+                    className="w-36 h-8 text-sm"
+                  />
+                </div>
+                <div className="flex flex-col gap-0.5">
+                  <span className="text-xs font-medium text-muted-foreground">Fornecedor</span>
+                  <Input
+                    placeholder="Nome do fornecedor"
+                    value={filtroFornecedorPagar}
+                    onChange={(e) => setFiltroFornecedorPagar(e.target.value)}
+                    className="w-40 h-8 text-sm"
+                  />
+                </div>
+                <div className="flex flex-col gap-0.5">
+                  <span className="text-xs font-medium text-muted-foreground">Status</span>
+                  <Select value={filtroStatusPagar || "all"} onValueChange={(v) => setFiltroStatusPagar(v === "all" ? "" : v)}>
+                    <SelectTrigger className="w-36 h-8 text-sm">
+                      <SelectValue placeholder="Todos" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">Todos os status</SelectItem>
+                      <SelectItem value="pendente">Pendente</SelectItem>
+                      <SelectItem value="parcial">Parcial</SelectItem>
+                      <SelectItem value="pago">Pago</SelectItem>
+                      <SelectItem value="cancelado">Cancelado</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="flex flex-col gap-0.5">
+                  <span className="text-xs font-medium text-muted-foreground">Centro de Custo</span>
+                  <Select value={filtroCentroCustoPagar || "all"} onValueChange={(v) => setFiltroCentroCustoPagar(v === "all" ? "" : v)}>
+                    <SelectTrigger className="w-44 h-8 text-sm">
+                      <SelectValue placeholder="Todos" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">Todos os centros</SelectItem>
+                      {centrosCusto.map((c) => (
+                        <SelectItem key={c.id} value={c.nome}>{c.nome}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="flex flex-col gap-0.5">
+                  <span className="text-xs font-medium text-muted-foreground">Vencimento De</span>
+                  <Input
+                    type="date"
+                    value={filtroVencimentoInicioPagar}
+                    onChange={(e) => setFiltroVencimentoInicioPagar(e.target.value)}
+                    className="w-36 h-8 text-sm"
+                  />
+                </div>
+                <div className="flex flex-col gap-0.5">
+                  <span className="text-xs font-medium text-muted-foreground">Vencimento Até</span>
+                  <Input
+                    type="date"
+                    value={filtroVencimentoFimPagar}
+                    onChange={(e) => setFiltroVencimentoFimPagar(e.target.value)}
+                    className="w-36 h-8 text-sm"
+                  />
+                </div>
               </div>
               <div className="flex gap-2">
                 {selectedContasPagar.size > 0 && (() => {
