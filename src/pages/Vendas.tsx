@@ -1886,9 +1886,8 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
                 </TableBody>
               </Table>
             </div>
-                </div>
-              );
-            })()}
+            </div>
+          </TabsContent>
           </TabsContent>
 
           {/* ===== DASHBOARD TAB ===== */}
