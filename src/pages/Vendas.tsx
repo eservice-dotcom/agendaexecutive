@@ -1888,7 +1888,6 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
             </div>
             </div>
           </TabsContent>
-          </TabsContent>
 
           {/* ===== DASHBOARD TAB ===== */}
           <TabsContent value="dashboard">
