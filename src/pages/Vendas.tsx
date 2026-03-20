@@ -1132,6 +1132,10 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
     setQuickAddFornecedorNome("");
     setQuickAddCliente(false);
     setQuickAddClienteNome("");
+    setQuickAddCentroCusto(false);
+    setQuickAddCentroCustoNome("");
+    setQuickAddSubgrupoCusto(false);
+    setQuickAddSubgrupoCustoNome("");
     setNovaContaDialog(type);
   };
   const handleQuickAddFornecedor = async () => {
