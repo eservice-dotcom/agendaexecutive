@@ -100,9 +100,10 @@ const FaturamentoVeiculo = () => {
       if (!d.data) return true;
       if (dataInicio && d.data < format(dataInicio, "yyyy-MM-dd")) return false;
       if (dataFim && d.data > format(dataFim, "yyyy-MM-dd")) return false;
+      if (selectedPlaca !== "todos" && d.placa !== selectedPlaca) return false;
       return true;
     });
-  }, [despesasVeiculo, dataInicio, dataFim]);
+  }, [despesasVeiculo, dataInicio, dataFim, selectedPlaca]);
 
   const despesasPorPlaca = useMemo(() => {
     const map = new Map<string, number>();
