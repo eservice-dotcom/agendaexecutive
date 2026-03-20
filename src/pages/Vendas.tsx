@@ -179,7 +179,29 @@ const Vendas = () => {
   const [loading, setLoading] = useState(false);
   const [activeTab, setActiveTab] = useState("vendas");
   const [zoomPagar, setZoomPagar] = useState(1);
-  const zoomPagarRef = useRef<HTMLDivElement>(null);
+  const zoomPagarNodeRef = useRef<HTMLDivElement | null>(null);
+  const zoomPagarHandlerRef = useRef<((e: WheelEvent) => void) | null>(null);
+  const zoomPagarCallbackRef = useCallback((node: HTMLDivElement | null) => {
+    // Cleanup old
+    if (zoomPagarNodeRef.current && zoomPagarHandlerRef.current) {
+      zoomPagarNodeRef.current.removeEventListener('wheel', zoomPagarHandlerRef.current);
+    }
+    zoomPagarNodeRef.current = node;
+    if (node) {
+      const handler = (e: WheelEvent) => {
+        if (e.ctrlKey || e.metaKey) {
+          e.preventDefault();
+          e.stopPropagation();
+          setZoomPagar((prev) => {
+            const next = prev + (e.deltaY < 0 ? 0.05 : -0.05);
+            return Math.min(Math.max(next, 0.4), 1.5);
+          });
+        }
+      };
+      zoomPagarHandlerRef.current = handler;
+      node.addEventListener('wheel', handler, { passive: false });
+    }
+  }, []);
 
   // Form state
   const [cliente, setCliente] = useState("");
@@ -446,22 +468,6 @@ const Vendas = () => {
     loadVeiculos();
   }, [loadVendas, loadClientes, loadFornecedores, loadContasPagar, loadContasReceber, loadVendaOsMap, loadCentrosCusto, loadCentrosReceita, loadSubgruposCusto, loadSubgruposReceita, loadVeiculos]);
 
-  useEffect(() => {
-    const node = zoomPagarRef.current;
-    if (!node) return;
-    const handler = (e: WheelEvent) => {
-      if (e.ctrlKey || e.metaKey) {
-        e.preventDefault();
-        e.stopPropagation();
-        setZoomPagar((prev) => {
-          const next = prev + (e.deltaY < 0 ? 0.05 : -0.05);
-          return Math.min(Math.max(next, 0.4), 1.5);
-        });
-      }
-    };
-    node.addEventListener('wheel', handler, { passive: false });
-    return () => node.removeEventListener('wheel', handler);
-  }, []);
 
   useEffect(() => {
     if (!cliente) {
@@ -1768,7 +1774,7 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
           {/* ===== CONTAS A PAGAR TAB ===== */}
           <TabsContent value="pagar">
             <div
-              ref={zoomPagarRef}
+              ref={zoomPagarCallbackRef}
               style={{ transformOrigin: 'top left', transform: `scale(${zoomPagar})`, width: `${100 / zoomPagar}%` }}
             >
               {zoomPagar !== 1 && (
