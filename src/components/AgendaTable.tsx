@@ -199,7 +199,7 @@ const AgendaTable = ({ items, onEdited, hideFinancials, onClone }: AgendaTablePr
           <col style={{ width: '72px' }} />  {/* Destino */}
           <col style={{ width: '50px' }} />  {/* Placa */}
           <col style={{ width: '64px' }} />  {/* Veículo */}
-          <col style={{ width: '64px' }} />  {/* Motorista */}
+          <col style={{ width: '90px' }} />  {/* Motorista */}
           <col style={{ width: '82px' }} /> {/* Telefone */}
           {canViewFinancials && (
             <col style={{ width: '58px' }} />
