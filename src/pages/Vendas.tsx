@@ -1708,15 +1708,20 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
           {/* ===== CONTAS A PAGAR TAB ===== */}
           <TabsContent value="pagar">
             <div
-              onWheel={(e) => {
-                if (e.ctrlKey || e.metaKey) {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  setZoomPagar((prev) => {
-                    const next = prev + (e.deltaY < 0 ? 0.05 : -0.05);
-                    return Math.min(Math.max(next, 0.4), 1.5);
-                  });
-                }
+              ref={(node) => {
+                if (!node) return;
+                const handler = (e: WheelEvent) => {
+                  if (e.ctrlKey || e.metaKey) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    setZoomPagar((prev) => {
+                      const next = prev + (e.deltaY < 0 ? 0.05 : -0.05);
+                      return Math.min(Math.max(next, 0.4), 1.5);
+                    });
+                  }
+                };
+                node.addEventListener('wheel', handler, { passive: false });
+                return () => node.removeEventListener('wheel', handler);
               }}
               style={{ transformOrigin: 'top left', transform: `scale(${zoomPagar})`, width: `${100 / zoomPagar}%` }}
             >
