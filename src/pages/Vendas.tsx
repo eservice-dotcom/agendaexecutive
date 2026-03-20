@@ -1707,9 +1707,8 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
 
           {/* ===== CONTAS A PAGAR TAB ===== */}
           <TabsContent value="pagar">
-            {(() => {
-              const [zoomPagar, setZoomPagar] = React.useState(1);
-              const handleWheelPagar = (e: React.WheelEvent<HTMLDivElement>) => {
+            <div
+              onWheel={(e) => {
                 if (e.ctrlKey || e.metaKey) {
                   e.preventDefault();
                   e.stopPropagation();
@@ -1718,18 +1717,15 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
                     return Math.min(Math.max(next, 0.4), 1.5);
                   });
                 }
-              };
-              return (
-                <div
-                  onWheel={handleWheelPagar}
-                  style={{ transformOrigin: 'top left', transform: `scale(${zoomPagar})`, width: `${100 / zoomPagar}%` }}
-                >
-                  {zoomPagar !== 1 && (
-                    <div className="flex items-center justify-end mb-1 gap-2">
-                      <span className="text-xs text-muted-foreground">Zoom: {Math.round(zoomPagar * 100)}%</span>
-                      <Button variant="ghost" size="sm" className="h-6 text-xs" onClick={() => setZoomPagar(1)}>Reset</Button>
-                    </div>
-                  )}
+              }}
+              style={{ transformOrigin: 'top left', transform: `scale(${zoomPagar})`, width: `${100 / zoomPagar}%` }}
+            >
+              {zoomPagar !== 1 && (
+                <div className="flex items-center justify-end mb-1 gap-2">
+                  <span className="text-xs text-muted-foreground">Zoom: {Math.round(zoomPagar * 100)}%</span>
+                  <Button variant="ghost" size="sm" className="h-6 text-xs" onClick={() => setZoomPagar(1)}>Reset</Button>
+                </div>
+              )}
             <div className="flex items-center justify-between mb-2 gap-2">
               <div className="flex items-center gap-2">
                 <Search className="h-4 w-4 text-muted-foreground" />
