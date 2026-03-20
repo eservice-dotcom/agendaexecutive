@@ -1178,6 +1178,38 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
     setQuickAddClienteNome("");
   };
 
+  const handleQuickAddCentroCusto = async () => {
+    const nome = quickAddCentroCustoNome.trim();
+    if (!nome || !session) return;
+    const { error } = await supabase.from("centros_custo").insert({ nome, user_id: session.user.id });
+    if (error) {
+      toast({ title: "Erro ao cadastrar centro de custo", description: error.message, variant: "destructive" });
+      return;
+    }
+    toast({ title: `Centro de custo "${nome}" cadastrado!` });
+    await loadCentrosCusto();
+    setNovaContaForm({ ...novaContaForm, centro_custo: nome, subgrupo_custo: "" });
+    setQuickAddCentroCusto(false);
+    setQuickAddCentroCustoNome("");
+  };
+
+  const handleQuickAddSubgrupoCusto = async () => {
+    const nome = quickAddSubgrupoCustoNome.trim();
+    if (!nome || !session || !novaContaForm.centro_custo) return;
+    const centroObj = centrosCusto.find((c) => c.nome === novaContaForm.centro_custo);
+    if (!centroObj) return;
+    const { error } = await supabase.from("subgrupos_custo").insert({ nome, centro_custo_id: centroObj.id, user_id: session.user.id });
+    if (error) {
+      toast({ title: "Erro ao cadastrar subgrupo", description: error.message, variant: "destructive" });
+      return;
+    }
+    toast({ title: `Subgrupo "${nome}" cadastrado!` });
+    await loadSubgruposCusto();
+    setNovaContaForm({ ...novaContaForm, subgrupo_custo: nome });
+    setQuickAddSubgrupoCusto(false);
+    setQuickAddSubgrupoCustoNome("");
+  };
+
   const handleSaveNovaConta = async () => {
     if (!novaContaDialog || !session) return;
     const today = new Date().toISOString().split("T")[0];
