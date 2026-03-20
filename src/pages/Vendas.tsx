@@ -1495,8 +1495,14 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
     if (filtroStatusReceber) {
       filtered = filtered.filter((cr) => cr.status === filtroStatusReceber);
     }
+    if (filtroVencimentoInicioReceber) {
+      filtered = filtered.filter((cr) => cr.data_vencimento && cr.data_vencimento >= filtroVencimentoInicioReceber);
+    }
+    if (filtroVencimentoFimReceber) {
+      filtered = filtered.filter((cr) => cr.data_vencimento && cr.data_vencimento <= filtroVencimentoFimReceber);
+    }
     return filtered;
-  }, [contasReceberList, filtroOsReceber, filtroClienteReceber, filtroStatusReceber, vendaOsMap]);
+  }, [contasReceberList, filtroOsReceber, filtroClienteReceber, filtroStatusReceber, filtroVencimentoInicioReceber, filtroVencimentoFimReceber, vendaOsMap]);
 
   const totalPagarPendente = contasPagarList.filter(c => c.status === "pendente" || c.status === "parcial").reduce((s, c) => s + (Number(c.valor) - Number(c.valor_pago || 0)), 0);
   const totalReceberPendente = contasReceberList.filter(c => c.status === "pendente" || c.status === "parcial").reduce((s, c) => s + (Number(c.valor) - Number(c.valor_pago || 0)), 0);
