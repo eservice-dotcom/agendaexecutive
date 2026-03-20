@@ -255,11 +255,15 @@ const Vendas = () => {
   const [filtroFornecedorPagar, setFiltroFornecedorPagar] = useState("");
   const [filtroStatusPagar, setFiltroStatusPagar] = useState("");
   const [filtroCentroCustoPagar, setFiltroCentroCustoPagar] = useState("");
+  const [filtroVencimentoInicioPagar, setFiltroVencimentoInicioPagar] = useState("");
+  const [filtroVencimentoFimPagar, setFiltroVencimentoFimPagar] = useState("");
 
   // Filtro contas a receber por OS e cliente
   const [filtroOsReceber, setFiltroOsReceber] = useState("");
   const [filtroClienteReceber, setFiltroClienteReceber] = useState("");
   const [filtroStatusReceber, setFiltroStatusReceber] = useState("");
+  const [filtroVencimentoInicioReceber, setFiltroVencimentoInicioReceber] = useState("");
+  const [filtroVencimentoFimReceber, setFiltroVencimentoFimReceber] = useState("");
 
   // WhatsApp pagamento
   const [whatsappPagamento, setWhatsappPagamento] = useState<{ conta: any; contas?: any[]; vendaInfo: any } | null>(null);
