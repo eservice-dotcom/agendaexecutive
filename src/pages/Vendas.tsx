@@ -459,7 +459,7 @@ const Vendas = () => {
     return () => node.removeEventListener('wheel', handler);
   }, []);
 
-    if (!cliente) {
+    useEffect(() => {
       setAgendaItems([]);
       return;
     }
