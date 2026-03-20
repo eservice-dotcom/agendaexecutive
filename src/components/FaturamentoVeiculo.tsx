@@ -66,7 +66,7 @@ const FaturamentoVeiculo = () => {
       while (true) {
         const { data } = await supabase
           .from("contas_pagar")
-          .select("placa, valor, status, descritivo, data")
+          .select("placa, valor, valor_pago, status, descritivo, data, data_pagamento")
           .neq("placa", "")
           .range(fromD, fromD + pageSize - 1);
         if (!data || data.length === 0) break;
@@ -97,9 +97,10 @@ const FaturamentoVeiculo = () => {
 
   const filteredDespesas = useMemo(() => {
     return despesasVeiculo.filter(d => {
-      if (!d.data) return true;
-      if (dataInicio && d.data < format(dataInicio, "yyyy-MM-dd")) return false;
-      if (dataFim && d.data > format(dataFim, "yyyy-MM-dd")) return false;
+      const dateRef = d.data_pagamento || d.data;
+      if (!dateRef) return true;
+      if (dataInicio && dateRef < format(dataInicio, "yyyy-MM-dd")) return false;
+      if (dataFim && dateRef > format(dataFim, "yyyy-MM-dd")) return false;
       if (selectedPlaca !== "todos" && d.placa !== selectedPlaca) return false;
       return true;
     });
