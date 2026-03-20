@@ -1774,7 +1774,7 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
           {/* ===== CONTAS A PAGAR TAB ===== */}
           <TabsContent value="pagar">
             <div
-              ref={zoomPagarRef}
+              ref={zoomPagarCallbackRef}
               style={{ transformOrigin: 'top left', transform: `scale(${zoomPagar})`, width: `${100 / zoomPagar}%` }}
             >
               {zoomPagar !== 1 && (
