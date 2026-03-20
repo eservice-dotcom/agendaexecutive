@@ -179,6 +179,7 @@ const Vendas = () => {
   const [loading, setLoading] = useState(false);
   const [activeTab, setActiveTab] = useState("vendas");
   const [zoomPagar, setZoomPagar] = useState(1);
+  const zoomPagarRef = useRef<HTMLDivElement>(null);
 
   // Form state
   const [cliente, setCliente] = useState("");
