@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, useCallback } from "react";
+import { useState, useEffect, useMemo, useCallback, useRef } from "react";
 import { Link } from "react-router-dom";
 import { ArrowLeft, Plus, Trash2, ShoppingCart, Search, Check, FileText, XCircle, DollarSign, CheckCircle, Download, Pencil, ClipboardList, X, Printer, MessageCircle, FileSpreadsheet } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
@@ -178,6 +178,8 @@ const Vendas = () => {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [activeTab, setActiveTab] = useState("vendas");
+  const [zoomPagar, setZoomPagar] = useState(1);
+  const zoomPagarRef = useRef<HTMLDivElement>(null);
 
   // Form state
   const [cliente, setCliente] = useState("");
@@ -439,6 +441,23 @@ const Vendas = () => {
     loadSubgruposReceita();
     loadVeiculos();
   }, [loadVendas, loadClientes, loadFornecedores, loadContasPagar, loadContasReceber, loadVendaOsMap, loadCentrosCusto, loadCentrosReceita, loadSubgruposCusto, loadSubgruposReceita, loadVeiculos]);
+
+  useEffect(() => {
+    const node = zoomPagarRef.current;
+    if (!node) return;
+    const handler = (e: WheelEvent) => {
+      if (e.ctrlKey || e.metaKey) {
+        e.preventDefault();
+        e.stopPropagation();
+        setZoomPagar((prev) => {
+          const next = prev + (e.deltaY < 0 ? 0.05 : -0.05);
+          return Math.min(Math.max(next, 0.4), 1.5);
+        });
+      }
+    };
+    node.addEventListener('wheel', handler, { passive: false });
+    return () => node.removeEventListener('wheel', handler);
+  }, []);
 
   useEffect(() => {
     if (!cliente) {
@@ -1706,6 +1725,16 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
 
           {/* ===== CONTAS A PAGAR TAB ===== */}
           <TabsContent value="pagar">
+            <div
+              ref={zoomPagarRef}
+              style={{ transformOrigin: 'top left', transform: `scale(${zoomPagar})`, width: `${100 / zoomPagar}%` }}
+            >
+              {zoomPagar !== 1 && (
+                <div className="flex items-center justify-end mb-1 gap-2">
+                  <span className="text-xs text-muted-foreground">Zoom: {Math.round(zoomPagar * 100)}%</span>
+                  <Button variant="ghost" size="sm" className="h-6 text-xs" onClick={() => setZoomPagar(1)}>Reset</Button>
+                </div>
+              )}
             <div className="flex items-center justify-between mb-2 gap-2">
               <div className="flex items-center gap-2">
                 <Search className="h-4 w-4 text-muted-foreground" />
@@ -1865,6 +1894,7 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
                   )}
                 </TableBody>
               </Table>
+            </div>
             </div>
           </TabsContent>
 
