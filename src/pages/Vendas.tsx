@@ -178,6 +178,7 @@ const Vendas = () => {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [activeTab, setActiveTab] = useState("vendas");
+  const [zoomPagar, setZoomPagar] = useState(1);
 
   // Form state
   const [cliente, setCliente] = useState("");
