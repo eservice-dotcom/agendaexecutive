@@ -1429,8 +1429,13 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
     const fornSearch = filtroFornecedorPagar.trim().toLowerCase();
     if (osSearch) {
       filtered = filtered.filter((cp) => {
+        // Search in vendaOsMap cots
         const cots = vendaOsMap[cp.venda_id]?.cots || [];
-        return cots.some((cot) => cot.toLowerCase().includes(osSearch));
+        if (cots.some((cot) => cot.toLowerCase().includes(osSearch))) return true;
+        // Also search in descritivo for manually inserted entries
+        if (cp.descritivo?.toLowerCase().includes(osSearch)) return true;
+        if (cp.fornecedor?.toLowerCase().includes(osSearch)) return true;
+        return false;
       });
     }
     if (fornSearch) {
