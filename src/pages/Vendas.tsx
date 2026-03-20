@@ -1470,8 +1470,14 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
     if (filtroCentroCustoPagar) {
       filtered = filtered.filter((cp) => (cp as any).centro_custo === filtroCentroCustoPagar);
     }
+    if (filtroVencimentoInicioPagar) {
+      filtered = filtered.filter((cp) => cp.data_vencimento && cp.data_vencimento >= filtroVencimentoInicioPagar);
+    }
+    if (filtroVencimentoFimPagar) {
+      filtered = filtered.filter((cp) => cp.data_vencimento && cp.data_vencimento <= filtroVencimentoFimPagar);
+    }
     return filtered;
-  }, [contasPagarList, filtroOsPagar, filtroFornecedorPagar, filtroStatusPagar, filtroCentroCustoPagar, vendaOsMap]);
+  }, [contasPagarList, filtroOsPagar, filtroFornecedorPagar, filtroStatusPagar, filtroCentroCustoPagar, filtroVencimentoInicioPagar, filtroVencimentoFimPagar, vendaOsMap]);
 
   const filteredContasReceberList = useMemo(() => {
     let filtered = contasReceberList;
