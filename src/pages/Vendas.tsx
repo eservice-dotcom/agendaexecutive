@@ -2709,40 +2709,68 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
               {novaContaDialog === "pagar" ? (
                 <div className="grid grid-cols-2 gap-3">
                   <div className="space-y-2">
-                    <Label>Centro de Custo</Label>
-                    <Select value={novaContaForm.centro_custo} onValueChange={(v) => setNovaContaForm({ ...novaContaForm, centro_custo: v === "none" ? "" : v, subgrupo_custo: "" })}>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Selecione (opcional)" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="none">Nenhum</SelectItem>
-                        {centrosCusto.map((c) => (
-                          <SelectItem key={c.id} value={c.nome}>{c.nome}</SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                    <div className="flex items-center justify-between">
+                      <Label>Centro de Custo</Label>
+                      <Button type="button" variant="ghost" size="sm" className="h-6 text-xs gap-1 px-2" onClick={() => setQuickAddCentroCusto(!quickAddCentroCusto)}>
+                        <Plus className="h-3 w-3" /> Novo
+                      </Button>
+                    </div>
+                    {quickAddCentroCusto ? (
+                      <div className="flex gap-1">
+                        <Input placeholder="Nome do centro..." value={quickAddCentroCustoNome} onChange={(e) => setQuickAddCentroCustoNome(e.target.value)} onKeyDown={(e) => e.key === "Enter" && handleQuickAddCentroCusto()} className="h-9" />
+                        <Button size="sm" onClick={handleQuickAddCentroCusto} className="h-9"><Check className="h-3 w-3" /></Button>
+                        <Button size="sm" variant="ghost" onClick={() => { setQuickAddCentroCusto(false); setQuickAddCentroCustoNome(""); }} className="h-9"><X className="h-3 w-3" /></Button>
+                      </div>
+                    ) : (
+                      <Select value={novaContaForm.centro_custo} onValueChange={(v) => setNovaContaForm({ ...novaContaForm, centro_custo: v === "none" ? "" : v, subgrupo_custo: "" })}>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Selecione (opcional)" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="none">Nenhum</SelectItem>
+                          {centrosCusto.map((c) => (
+                            <SelectItem key={c.id} value={c.nome}>{c.nome}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    )}
                   </div>
                   <div className="space-y-2">
-                    <Label>Subgrupo</Label>
-                    <Select
-                      value={novaContaForm.subgrupo_custo}
-                      onValueChange={(v) => setNovaContaForm({ ...novaContaForm, subgrupo_custo: v === "none" ? "" : v })}
-                      disabled={!novaContaForm.centro_custo}
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder={novaContaForm.centro_custo ? "Selecione (opcional)" : "Selecione centro"} />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="none">Nenhum</SelectItem>
-                        {(() => {
-                          const centroObj = centrosCusto.find((c) => c.nome === novaContaForm.centro_custo);
-                          if (!centroObj) return null;
-                          return subgruposCusto.filter((s) => s.centro_custo_id === centroObj.id).map((s) => (
-                            <SelectItem key={s.id} value={s.nome}>{s.nome}</SelectItem>
-                          ));
-                        })()}
-                      </SelectContent>
-                    </Select>
+                    <div className="flex items-center justify-between">
+                      <Label>Subgrupo</Label>
+                      {novaContaForm.centro_custo && (
+                        <Button type="button" variant="ghost" size="sm" className="h-6 text-xs gap-1 px-2" onClick={() => setQuickAddSubgrupoCusto(!quickAddSubgrupoCusto)}>
+                          <Plus className="h-3 w-3" /> Novo
+                        </Button>
+                      )}
+                    </div>
+                    {quickAddSubgrupoCusto && novaContaForm.centro_custo ? (
+                      <div className="flex gap-1">
+                        <Input placeholder="Nome do subgrupo..." value={quickAddSubgrupoCustoNome} onChange={(e) => setQuickAddSubgrupoCustoNome(e.target.value)} onKeyDown={(e) => e.key === "Enter" && handleQuickAddSubgrupoCusto()} className="h-9" />
+                        <Button size="sm" onClick={handleQuickAddSubgrupoCusto} className="h-9"><Check className="h-3 w-3" /></Button>
+                        <Button size="sm" variant="ghost" onClick={() => { setQuickAddSubgrupoCusto(false); setQuickAddSubgrupoCustoNome(""); }} className="h-9"><X className="h-3 w-3" /></Button>
+                      </div>
+                    ) : (
+                      <Select
+                        value={novaContaForm.subgrupo_custo}
+                        onValueChange={(v) => setNovaContaForm({ ...novaContaForm, subgrupo_custo: v === "none" ? "" : v })}
+                        disabled={!novaContaForm.centro_custo}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder={novaContaForm.centro_custo ? "Selecione (opcional)" : "Selecione centro"} />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="none">Nenhum</SelectItem>
+                          {(() => {
+                            const centroObj = centrosCusto.find((c) => c.nome === novaContaForm.centro_custo);
+                            if (!centroObj) return null;
+                            return subgruposCusto.filter((s) => s.centro_custo_id === centroObj.id).map((s) => (
+                              <SelectItem key={s.id} value={s.nome}>{s.nome}</SelectItem>
+                            ));
+                          })()}
+                        </SelectContent>
+                      </Select>
+                    )}
                   </div>
                 </div>
               ) : (
