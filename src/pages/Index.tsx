@@ -2,7 +2,7 @@ import { useState, useMemo, useCallback, useEffect } from "react";
 import { CalendarDays, ListChecks, Truck, Building2, Plus, BarChart3, Printer, EyeOff, Eye, ShoppingCart, FileText, Search, Trash2, ClipboardList, Archive, FileSpreadsheet, X, DollarSign, ChevronDown } from "lucide-react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import logo from "@/assets/logo-executive-service.png";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
@@ -54,6 +54,7 @@ const initialFilters: FiltersState = {
 };
 
 const Index = () => {
+  const navigate = useNavigate();
   const { canViewFinancials: hasPermission, signOut, session } = useAuth();
   const [showFinancials, setShowFinancials] = useState(true);
   const canViewFinancials = hasPermission && showFinancials;
@@ -385,7 +386,7 @@ const Index = () => {
 
       <main className="mx-auto max-w-[1600px] space-y-4 px-4 py-6 sm:px-6 lg:px-8">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
-          <TabsList className={`grid w-full sm:w-auto sm:inline-grid ${canViewFinancials ? 'grid-cols-5' : 'grid-cols-2'}`}>
+          <TabsList className={`grid w-full sm:w-auto sm:inline-grid ${canViewFinancials ? 'grid-cols-6' : 'grid-cols-2'}`}>
             <TabsTrigger value="agenda" className="gap-2">
               <CalendarDays className="h-4 w-4" />
               Agenda
@@ -396,6 +397,10 @@ const Index = () => {
             </TabsTrigger>
             {canViewFinancials && (
               <>
+                <TabsTrigger value="vendas" className="gap-2" onClick={() => navigate('/vendas')}>
+                  <ShoppingCart className="h-4 w-4" />
+                  Vendas
+                </TabsTrigger>
                 <TabsTrigger value="fat-veiculo" className="gap-2">
                   <Truck className="h-4 w-4" />
                   Fat. Veículo
