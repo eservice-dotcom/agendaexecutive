@@ -54,6 +54,7 @@ const initialFilters: FiltersState = {
 };
 
 const Index = () => {
+  const navigate = useNavigate();
   const { canViewFinancials: hasPermission, signOut, session } = useAuth();
   const [showFinancials, setShowFinancials] = useState(true);
   const canViewFinancials = hasPermission && showFinancials;
