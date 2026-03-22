@@ -1,5 +1,6 @@
 import { useState, useMemo, useCallback, useEffect } from "react";
-import { CalendarDays, ListChecks, Truck, Building2, Plus, BarChart3, Printer, EyeOff, Eye, ShoppingCart, FileText, Search, Trash2, ClipboardList, Archive, FileSpreadsheet, X } from "lucide-react";
+import { CalendarDays, ListChecks, Truck, Building2, Plus, BarChart3, Printer, EyeOff, Eye, ShoppingCart, FileText, Search, Trash2, ClipboardList, Archive, FileSpreadsheet, X, DollarSign, ChevronDown } from "lucide-react";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import logo from "@/assets/logo-executive-service.png";
 import { Link } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
@@ -349,11 +350,18 @@ const Index = () => {
               </button>
             )}
             {hasPermission && (
-              <Link to="/vendas">
-                <span className="flex items-center gap-1 text-sm text-primary-foreground/80 hover:text-primary-foreground">
-                  <ShoppingCart className="h-4 w-4" /> Vendas
-                </span>
-              </Link>
+              <DropdownMenu>
+                <DropdownMenuTrigger className="flex items-center gap-1 text-sm text-primary-foreground/80 hover:text-primary-foreground outline-none">
+                  <DollarSign className="h-4 w-4" /> Financeiro <ChevronDown className="h-3 w-3" />
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem asChild>
+                    <Link to="/vendas" className="flex items-center gap-2 cursor-pointer">
+                      <ShoppingCart className="h-4 w-4" /> Vendas
+                    </Link>
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             )}
             <Link to="/cotacoes">
               <span className="flex items-center gap-1 text-sm text-primary-foreground/80 hover:text-primary-foreground">
