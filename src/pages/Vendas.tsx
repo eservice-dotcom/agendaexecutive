@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo, useCallback, useRef } from "react";
 import { Link } from "react-router-dom";
-import { ArrowLeft, Plus, Trash2, ShoppingCart, Search, Check, FileText, XCircle, DollarSign, CheckCircle, Download, Pencil, ClipboardList, X, Printer, MessageCircle, FileSpreadsheet } from "lucide-react";
+import { ArrowLeft, Plus, Trash2, ShoppingCart, Search, Check, FileText, XCircle, DollarSign, CheckCircle, Download, Pencil, ClipboardList, X, Printer, MessageCircle, FileSpreadsheet, RefreshCw } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
@@ -731,6 +731,84 @@ const Vendas = () => {
       loadVendaOsMap();
     } catch (err: any) {
       toast({ title: "Erro ao cancelar", description: err.message, variant: "destructive" });
+    }
+  };
+
+  const handleRegerarContasPagar = async (venda: Venda) => {
+    if (!confirm("Regerar contas a pagar desta venda? As contas a pagar existentes (não pagas) serão excluídas e recriadas com base nos custos atuais da agenda.")) return;
+    try {
+      // Get venda items with agenda data
+      const { data: vendaItems } = await supabase
+        .from("venda_items")
+        .select("agenda_item_id")
+        .eq("venda_id", venda.id);
+
+      if (!vendaItems || vendaItems.length === 0) {
+        toast({ title: "Nenhum serviço vinculado a esta venda", variant: "destructive" });
+        return;
+      }
+
+      // Fetch current agenda items with updated costs
+      const agendaIds = vendaItems.map((vi) => vi.agenda_item_id);
+      const { data: agendaItems } = await supabase
+        .from("agenda_items")
+        .select("*")
+        .in("id", agendaIds);
+
+      if (!agendaItems) {
+        toast({ title: "Erro ao buscar serviços da agenda", variant: "destructive" });
+        return;
+      }
+
+      // Delete existing non-paid contas_pagar for this venda
+      await supabase
+        .from("contas_pagar")
+        .delete()
+        .eq("venda_id", venda.id)
+        .in("status", ["pendente", "cancelado"]);
+
+      // Group by fornecedor (same logic as original creation)
+      const fornecedorMap = new Map<string, { total: number; items: any[] }>();
+      agendaItems.forEach((item) => {
+        if (item.fornecedor && Number(item.custo) > 0) {
+          const existing = fornecedorMap.get(item.fornecedor) || { total: 0, items: [] };
+          existing.total += Number(item.custo);
+          existing.items.push(item);
+          fornecedorMap.set(item.fornecedor, existing);
+        }
+      });
+
+      if (fornecedorMap.size === 0) {
+        toast({ title: "Nenhum serviço com custo > 0 encontrado", description: "Verifique os custos na agenda.", variant: "destructive" });
+        return;
+      }
+
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error("Usuário não autenticado");
+
+      const novasContas = Array.from(fornecedorMap.entries()).map(([fornecedor, info]) => {
+        const descLines = info.items.map((item: any) =>
+          `O.S. ${item.cot} - ${item.tipo} - ${item.origem} → ${item.destino} - ${item.motorista} (${formatDate(item.data)}) - ${formatCurrency(Number(item.custo))}`
+        );
+        return {
+          venda_id: venda.id,
+          user_id: user.id,
+          fornecedor,
+          descritivo: descLines.join(" | "),
+          valor: info.total,
+          data: venda.data_venda,
+          data_vencimento: venda.data_vencimento || null,
+          status: "pendente",
+        };
+      });
+
+      const { error } = await supabase.from("contas_pagar").insert(novasContas);
+      if (error) throw error;
+
+      toast({ title: "Contas a pagar regeradas com sucesso", description: `${novasContas.length} registro(s) criado(s).` });
+      loadContasPagar();
+    } catch (err: any) {
+      toast({ title: "Erro ao regerar contas a pagar", description: err.message, variant: "destructive" });
     }
   };
 
@@ -1615,6 +1693,11 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
                             <Button variant="ghost" size="icon" onClick={() => handleRelatorioFechamento(v)} title="Relatório de Fechamento">
                               <ClipboardList className="h-4 w-4 text-primary" />
                             </Button>
+                            {v.status !== "cancelado" && (
+                              <Button variant="ghost" size="icon" onClick={() => handleRegerarContasPagar(v)} title="Regerar Contas a Pagar">
+                                <RefreshCw className="h-4 w-4 text-amber-600" />
+                              </Button>
+                            )}
                             {v.status !== "cancelado" && (
                               <Button variant="ghost" size="icon" onClick={() => handleCancelar(v)} title="Cancelar Venda">
                                 <XCircle className="h-4 w-4 text-destructive" />
