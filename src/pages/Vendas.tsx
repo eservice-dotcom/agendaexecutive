@@ -1694,6 +1694,11 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
                               <ClipboardList className="h-4 w-4 text-primary" />
                             </Button>
                             {v.status !== "cancelado" && (
+                              <Button variant="ghost" size="icon" onClick={() => handleRegerarContasPagar(v)} title="Regerar Contas a Pagar">
+                                <RefreshCw className="h-4 w-4 text-amber-600" />
+                              </Button>
+                            )}
+                            {v.status !== "cancelado" && (
                               <Button variant="ghost" size="icon" onClick={() => handleCancelar(v)} title="Cancelar Venda">
                                 <XCircle className="h-4 w-4 text-destructive" />
                               </Button>
