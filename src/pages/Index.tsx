@@ -356,13 +356,15 @@ const Index = () => {
                   <DollarSign className="h-4 w-4" /> Financeiro <ChevronDown className="h-3 w-3" />
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
-                  <DropdownMenuItem asChild>
-                    <Link to="/vendas" className="flex items-center gap-2 cursor-pointer">
-                      <ShoppingCart className="h-4 w-4" /> Vendas
-                    </Link>
-                  </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
+            )}
+            {hasPermission && (
+              <Link to="/vendas">
+                <span className="flex items-center gap-1 text-sm text-primary-foreground/80 hover:text-primary-foreground">
+                  <ShoppingCart className="h-4 w-4" /> Vendas
+                </span>
+              </Link>
             )}
             <Link to="/cotacoes">
               <span className="flex items-center gap-1 text-sm text-primary-foreground/80 hover:text-primary-foreground">
@@ -386,7 +388,7 @@ const Index = () => {
 
       <main className="mx-auto max-w-[1600px] space-y-4 px-4 py-6 sm:px-6 lg:px-8">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
-          <TabsList className={`grid w-full sm:w-auto sm:inline-grid ${canViewFinancials ? 'grid-cols-6' : 'grid-cols-2'}`}>
+          <TabsList className={`grid w-full sm:w-auto sm:inline-grid ${canViewFinancials ? 'grid-cols-5' : 'grid-cols-2'}`}>
             <TabsTrigger value="agenda" className="gap-2">
               <CalendarDays className="h-4 w-4" />
               Agenda
@@ -397,10 +399,6 @@ const Index = () => {
             </TabsTrigger>
             {canViewFinancials && (
               <>
-                <TabsTrigger value="vendas" className="gap-2" onClick={() => navigate('/vendas')}>
-                  <ShoppingCart className="h-4 w-4" />
-                  Vendas
-                </TabsTrigger>
                 <TabsTrigger value="fat-veiculo" className="gap-2">
                   <Truck className="h-4 w-4" />
                   Fat. Veículo
