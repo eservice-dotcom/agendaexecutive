@@ -7,6 +7,7 @@ import CadastroFornecedores from "@/components/CadastroFornecedores";
 import CadastroTiposServico from "@/components/CadastroTiposServico";
 import CadastroUsuarios from "@/components/CadastroUsuarios";
 import CadastroMensagens from "@/components/CadastroMensagens";
+import MobileTokenManager from "@/components/MobileTokenManager";
 import CadastroCentrosCusto from "@/components/CadastroCentrosCusto";
 import CadastroCentrosReceita from "@/components/CadastroCentrosReceita";
 import logo from "@/assets/logo-executive-service.png";
@@ -82,7 +83,12 @@ const Cadastros = () => {
             </div>
           </TabsContent>
           <TabsContent value="mensagens"><CadastroMensagens /></TabsContent>
-          <TabsContent value="usuarios"><CadastroUsuarios /></TabsContent>
+          <TabsContent value="usuarios">
+            <div className="space-y-6">
+              <CadastroUsuarios />
+              <MobileTokenManager />
+            </div>
+          </TabsContent>
         </Tabs>
       </main>
     </div>
