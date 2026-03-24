@@ -399,10 +399,6 @@ const Index = () => {
             </TabsTrigger>
             {canViewFinancials && (
               <>
-                <TabsTrigger value="vendas" className="gap-2" onClick={() => navigate('/vendas')}>
-                  <ShoppingCart className="h-4 w-4" />
-                  Vendas
-                </TabsTrigger>
                 <TabsTrigger value="fat-veiculo" className="gap-2">
                   <Truck className="h-4 w-4" />
                   Fat. Veículo
