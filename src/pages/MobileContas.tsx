@@ -103,17 +103,21 @@ const MobileContas = () => {
     }
     if (!session?.user.id) return;
     setSaving(true);
+    const valorNum = parseFloat(valor);
+    const today = new Date().toISOString().split("T")[0];
     const { error } = await supabase.from("contas_pagar").insert({
       user_id: session.user.id,
       fornecedor: fornecedor.trim(),
       descritivo: descritivo.trim(),
-      valor: parseFloat(valor),
-      data: new Date().toISOString().split("T")[0],
+      valor: valorNum,
+      data: today,
       data_vencimento: dataVencimento || null,
       centro_custo: centroCusto || "",
       subgrupo_custo: subgrupoCusto || "",
       placa: placa || "",
-      status: "pendente",
+      status: jaPago ? "pago" : "pendente",
+      valor_pago: jaPago ? valorNum : 0,
+      data_pagamento: jaPago ? (dataPagamento || today) : null,
     });
     if (error) {
       toast.error("Erro ao criar conta");
