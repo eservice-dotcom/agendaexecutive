@@ -126,7 +126,7 @@ const MobileContas = () => {
       toast.success("Conta criada!");
       setFornecedor(""); setDescritivo(""); setValor(""); setDataVencimento("");
       setCentroCusto(""); setSubgrupoCusto(""); setPlaca("");
-      setView("list");
+      setJaPago(false); setDataPagamento(new Date().toISOString().split("T")[0]);
       loadContas();
     }
     setSaving(false);
