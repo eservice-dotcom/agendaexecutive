@@ -569,6 +569,36 @@ export type Database = {
         }
         Relationships: []
       }
+      mobile_access_tokens: {
+        Row: {
+          created_at: string
+          created_by: string
+          id: string
+          is_active: boolean
+          label: string
+          last_used_at: string | null
+          token: string
+        }
+        Insert: {
+          created_at?: string
+          created_by: string
+          id?: string
+          is_active?: boolean
+          label?: string
+          last_used_at?: string | null
+          token?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string
+          id?: string
+          is_active?: boolean
+          label?: string
+          last_used_at?: string | null
+          token?: string
+        }
+        Relationships: []
+      }
       motoristas: {
         Row: {
           categoria: string
