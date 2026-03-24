@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo, useCallback, useRef } from "react";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import { ArrowLeft, Plus, Trash2, ShoppingCart, Search, Check, FileText, XCircle, DollarSign, CheckCircle, Download, Pencil, ClipboardList, X, Printer, MessageCircle, FileSpreadsheet, RefreshCw } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
@@ -174,10 +174,14 @@ const formatDate = (d: string) => {
 
 const Vendas = () => {
   const { session, signOut } = useAuth();
+  const [searchParams] = useSearchParams();
   const [vendas, setVendas] = useState<Venda[]>([]);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [activeTab, setActiveTab] = useState("vendas");
+  const [activeTab, setActiveTab] = useState(() => {
+    const tab = searchParams.get("tab");
+    return tab && ["vendas", "receber", "pagar", "dashboard"].includes(tab) ? tab : "vendas";
+  });
   const [zoomPagar, setZoomPagar] = useState(1);
   const zoomPagarNodeRef = useRef<HTMLDivElement | null>(null);
   const zoomPagarHandlerRef = useRef<((e: WheelEvent) => void) | null>(null);

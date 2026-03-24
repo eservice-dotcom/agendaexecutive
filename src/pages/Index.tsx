@@ -356,6 +356,21 @@ const Index = () => {
                   <DollarSign className="h-4 w-4" /> Financeiro <ChevronDown className="h-3 w-3" />
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
+                  <DropdownMenuItem asChild>
+                    <Link to="/vendas?tab=receber" className="flex items-center gap-2 cursor-pointer">
+                      Contas a Receber
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link to="/vendas?tab=pagar" className="flex items-center gap-2 cursor-pointer">
+                      Contas a Pagar
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link to="/vendas?tab=dashboard" className="flex items-center gap-2 cursor-pointer">
+                      Dashboard
+                    </Link>
+                  </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
             )}
