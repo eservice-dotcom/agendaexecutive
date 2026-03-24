@@ -56,6 +56,8 @@ const MobileContas = () => {
   const [centroCusto, setCentroCusto] = useState("");
   const [subgrupoCusto, setSubgrupoCusto] = useState("");
   const [placa, setPlaca] = useState("");
+  const [jaPago, setJaPago] = useState(false);
+  const [dataPagamento, setDataPagamento] = useState(new Date().toISOString().split("T")[0]);
 
   const [baixaDialog, setBaixaDialog] = useState(false);
   const [selectedConta, setSelectedConta] = useState<ContaPagar | null>(null);
