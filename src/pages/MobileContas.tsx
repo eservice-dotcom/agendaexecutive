@@ -6,10 +6,11 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { toast, Toaster } from "sonner";
-import { Plus, CheckCircle, DollarSign, ArrowLeft, Loader2, RefreshCw } from "lucide-react";
+import { Plus, CheckCircle, DollarSign, Loader2, RefreshCw } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
-
-const API_BASE = `https://${import.meta.env.VITE_SUPABASE_PROJECT_ID}.supabase.co/functions/v1/mobile-contas`;
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
+import { Navigate } from "react-router-dom";
 
 interface ContaPagar {
   id: string;
@@ -36,15 +37,13 @@ const formatDate = (d: string | null) => {
 };
 
 const MobileContas = () => {
-  const params = new URLSearchParams(window.location.search);
-  const token = params.get("token") || "";
+  const { session, loading: authLoading } = useAuth();
 
   const [view, setView] = useState<"list" | "new">("list");
   const [contas, setContas] = useState<ContaPagar[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
 
-  // Form state
   const [fornecedores, setFornecedores] = useState<string[]>([]);
   const [centrosCusto, setCentrosCusto] = useState<{ id: string; nome: string }[]>([]);
   const [subgrupos, setSubgrupos] = useState<{ id: string; nome: string; centro_custo_id: string }[]>([]);
@@ -58,92 +57,70 @@ const MobileContas = () => {
   const [subgrupoCusto, setSubgrupoCusto] = useState("");
   const [placa, setPlaca] = useState("");
 
-  // Baixa dialog
   const [baixaDialog, setBaixaDialog] = useState(false);
   const [selectedConta, setSelectedConta] = useState<ContaPagar | null>(null);
   const [valorBaixa, setValorBaixa] = useState("");
   const [dataBaixa, setDataBaixa] = useState(new Date().toISOString().split("T")[0]);
 
-  const [authError, setAuthError] = useState(false);
-
-  const apiFetch = useCallback(async (path: string, options?: RequestInit) => {
-    const sep = path.includes("?") ? "&" : "?";
-    const res = await fetch(`${API_BASE}${path}${sep}token=${token}`, {
-      ...options,
-      headers: { "Content-Type": "application/json", ...(options?.headers || {}) },
-    });
-    if (res.status === 401) {
-      setAuthError(true);
-      throw new Error("Token inválido");
-    }
-    return res.json();
-  }, [token]);
-
   const loadContas = useCallback(async () => {
     setLoading(true);
-    try {
-      const data = await apiFetch("");
-      setContas(data);
-    } catch {
-      // handled
-    }
+    const { data } = await supabase
+      .from("contas_pagar")
+      .select("*")
+      .in("status", ["pendente", "parcial"])
+      .order("data_vencimento", { ascending: true, nullsFirst: false })
+      .limit(200);
+    setContas((data as ContaPagar[]) || []);
     setLoading(false);
-  }, [apiFetch]);
+  }, []);
 
   const loadSelects = useCallback(async () => {
-    try {
-      const [f, c, s, v] = await Promise.all([
-        apiFetch("?action=fornecedores"),
-        apiFetch("?action=centros_custo"),
-        apiFetch("?action=subgrupos_custo"),
-        apiFetch("?action=veiculos"),
-      ]);
-      setFornecedores(f.map((x: any) => x.razao_social));
-      setCentrosCusto(c);
-      setSubgrupos(s);
-      setVeiculos(v);
-    } catch {
-      // handled
-    }
-  }, [apiFetch]);
+    const [f, c, s, v] = await Promise.all([
+      supabase.from("fornecedores").select("razao_social").order("razao_social"),
+      supabase.from("centros_custo").select("id, nome").order("nome"),
+      supabase.from("subgrupos_custo").select("id, nome, centro_custo_id").order("nome"),
+      supabase.from("veiculos").select("placa, modelo").order("placa"),
+    ]);
+    setFornecedores(f.data?.map((x) => x.razao_social) || []);
+    setCentrosCusto(c.data || []);
+    setSubgrupos(s.data || []);
+    setVeiculos(v.data || []);
+  }, []);
 
   useEffect(() => {
-    if (!token) {
-      setAuthError(true);
-      setLoading(false);
-      return;
+    if (session) {
+      loadContas();
+      loadSelects();
     }
-    loadContas();
-    loadSelects();
-  }, [token, loadContas, loadSelects]);
+  }, [session, loadContas, loadSelects]);
 
   const handleCreate = async () => {
     if (!fornecedor || !valor) {
       toast.error("Fornecedor e valor são obrigatórios");
       return;
     }
+    if (!session?.user.id) return;
     setSaving(true);
-    try {
-      await apiFetch("", {
-        method: "POST",
-        body: JSON.stringify({
-          action: "create",
-          fornecedor,
-          descritivo,
-          valor: parseFloat(valor),
-          data_vencimento: dataVencimento || null,
-          centro_custo: centroCusto,
-          subgrupo_custo: subgrupoCusto,
-          placa,
-        }),
-      });
-      toast.success("Conta criada com sucesso!");
+    const { error } = await supabase.from("contas_pagar").insert({
+      user_id: session.user.id,
+      fornecedor: fornecedor.trim(),
+      descritivo: descritivo.trim(),
+      valor: parseFloat(valor),
+      data: new Date().toISOString().split("T")[0],
+      data_vencimento: dataVencimento || null,
+      centro_custo: centroCusto || "",
+      subgrupo_custo: subgrupoCusto || "",
+      placa: placa || "",
+      status: "pendente",
+    });
+    if (error) {
+      toast.error("Erro ao criar conta");
+    } else {
+      toast.success("Conta criada!");
       setFornecedor(""); setDescritivo(""); setValor(""); setDataVencimento("");
       setCentroCusto(""); setSubgrupoCusto(""); setPlaca("");
       setView("list");
       loadContas();
-    } catch {
-      toast.error("Erro ao criar conta");
     }
     setSaving(false);
   };
@@ -151,22 +128,26 @@ const MobileContas = () => {
   const handleBaixa = async () => {
     if (!selectedConta) return;
     setSaving(true);
-    try {
-      await apiFetch("", {
-        method: "POST",
-        body: JSON.stringify({
-          action: "baixa",
-          id: selectedConta.id,
-          valor_pago: parseFloat(valorBaixa) || selectedConta.valor - selectedConta.valor_pago,
-          data_pagamento: dataBaixa,
-        }),
-      });
-      toast.success("Baixa realizada com sucesso!");
+    const pago = parseFloat(valorBaixa) || (selectedConta.valor - selectedConta.valor_pago);
+    const totalPago = selectedConta.valor_pago + pago;
+    const newStatus = totalPago >= selectedConta.valor ? "pago" : "parcial";
+
+    const { error } = await supabase
+      .from("contas_pagar")
+      .update({
+        valor_pago: totalPago,
+        data_pagamento: dataBaixa || new Date().toISOString().split("T")[0],
+        status: newStatus,
+      })
+      .eq("id", selectedConta.id);
+
+    if (error) {
+      toast.error("Erro ao dar baixa");
+    } else {
+      toast.success("Baixa realizada!");
       setBaixaDialog(false);
       setSelectedConta(null);
       loadContas();
-    } catch {
-      toast.error("Erro ao dar baixa");
     }
     setSaving(false);
   };
@@ -184,21 +165,16 @@ const MobileContas = () => {
     return centro ? s.centro_custo_id === centro.id : true;
   });
 
-  if (authError) {
+  if (authLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-muted p-4">
-        <Toaster richColors position="top-center" />
-        <Card className="w-full max-w-sm">
-          <CardContent className="pt-6 text-center space-y-3">
-            <DollarSign className="h-12 w-12 mx-auto text-destructive" />
-            <h2 className="text-lg font-bold">Acesso Negado</h2>
-            <p className="text-sm text-muted-foreground">
-              Token inválido ou expirado. Solicite um novo link de acesso ao administrador.
-            </p>
-          </CardContent>
-        </Card>
+      <div className="min-h-screen flex items-center justify-center bg-muted">
+        <Loader2 className="h-6 w-6 animate-spin text-primary" />
       </div>
     );
+  }
+
+  if (!session) {
+    return <Navigate to="/login" replace />;
   }
 
   return (
@@ -208,16 +184,11 @@ const MobileContas = () => {
       {/* Header */}
       <div className="bg-primary text-primary-foreground p-4 flex items-center justify-between sticky top-0 z-10">
         <div className="flex items-center gap-2">
-          {view === "new" && (
-            <Button variant="ghost" size="icon" onClick={() => setView("list")} className="text-primary-foreground">
-              <ArrowLeft className="h-5 w-5" />
-            </Button>
-          )}
           <DollarSign className="h-5 w-5" />
           <span className="font-semibold text-sm">Contas a Pagar</span>
         </div>
         <div className="flex gap-2">
-          {view === "list" && (
+          {view === "list" ? (
             <>
               <Button variant="ghost" size="icon" onClick={loadContas} className="text-primary-foreground">
                 <RefreshCw className="h-4 w-4" />
@@ -226,6 +197,10 @@ const MobileContas = () => {
                 <Plus className="h-4 w-4" /> Nova
               </Button>
             </>
+          ) : (
+            <Button variant="secondary" size="sm" onClick={() => setView("list")}>
+              Voltar
+            </Button>
           )}
         </div>
       </div>
@@ -254,7 +229,7 @@ const MobileContas = () => {
                         <p className="text-xs text-muted-foreground truncate">{conta.descritivo}</p>
                       )}
                     </div>
-                    <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${
+                    <span className={`text-xs font-medium px-2 py-0.5 rounded-full shrink-0 ${
                       conta.status === "pendente" ? "bg-amber-100 text-amber-800" : "bg-blue-100 text-blue-800"
                     }`}>
                       {conta.status}
