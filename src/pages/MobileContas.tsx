@@ -7,6 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Textarea } from "@/components/ui/textarea";
 import { toast, Toaster } from "sonner";
 import { Plus, CheckCircle, DollarSign, Loader2, RefreshCw } from "lucide-react";
+import { Switch } from "@/components/ui/switch";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
@@ -56,6 +57,8 @@ const MobileContas = () => {
   const [centroCusto, setCentroCusto] = useState("");
   const [subgrupoCusto, setSubgrupoCusto] = useState("");
   const [placa, setPlaca] = useState("");
+  const [jaPago, setJaPago] = useState(false);
+  const [dataPagamento, setDataPagamento] = useState(new Date().toISOString().split("T")[0]);
 
   const [baixaDialog, setBaixaDialog] = useState(false);
   const [selectedConta, setSelectedConta] = useState<ContaPagar | null>(null);
@@ -101,17 +104,21 @@ const MobileContas = () => {
     }
     if (!session?.user.id) return;
     setSaving(true);
+    const valorNum = parseFloat(valor);
+    const today = new Date().toISOString().split("T")[0];
     const { error } = await supabase.from("contas_pagar").insert({
       user_id: session.user.id,
       fornecedor: fornecedor.trim(),
       descritivo: descritivo.trim(),
-      valor: parseFloat(valor),
-      data: new Date().toISOString().split("T")[0],
+      valor: valorNum,
+      data: today,
       data_vencimento: dataVencimento || null,
       centro_custo: centroCusto || "",
       subgrupo_custo: subgrupoCusto || "",
       placa: placa || "",
-      status: "pendente",
+      status: jaPago ? "pago" : "pendente",
+      valor_pago: jaPago ? valorNum : 0,
+      data_pagamento: jaPago ? (dataPagamento || today) : null,
     });
     if (error) {
       toast.error("Erro ao criar conta");
@@ -119,7 +126,7 @@ const MobileContas = () => {
       toast.success("Conta criada!");
       setFornecedor(""); setDescritivo(""); setValor(""); setDataVencimento("");
       setCentroCusto(""); setSubgrupoCusto(""); setPlaca("");
-      setView("list");
+      setJaPago(false); setDataPagamento(new Date().toISOString().split("T")[0]);
       loadContas();
     }
     setSaving(false);
@@ -349,9 +356,28 @@ const MobileContas = () => {
                 </div>
               </div>
 
+              <div className="flex items-center justify-between p-3 border rounded-md bg-accent/30">
+                <div>
+                  <Label className="text-xs font-semibold">Já pago?</Label>
+                  <p className="text-[10px] text-muted-foreground">Lançar com baixa automática</p>
+                </div>
+                <Switch checked={jaPago} onCheckedChange={setJaPago} />
+              </div>
+
+              {jaPago && (
+                <div>
+                  <Label className="text-xs">Data Pagamento</Label>
+                  <Input
+                    type="date"
+                    value={dataPagamento}
+                    onChange={(e) => setDataPagamento(e.target.value)}
+                  />
+                </div>
+              )}
+
               <Button onClick={handleCreate} disabled={saving} className="w-full gap-2">
                 {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />}
-                Criar Conta
+                {jaPago ? "Criar e Baixar" : "Criar Conta"}
               </Button>
             </CardContent>
           </Card>
