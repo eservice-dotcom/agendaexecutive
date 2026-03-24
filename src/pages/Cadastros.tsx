@@ -83,7 +83,12 @@ const Cadastros = () => {
             </div>
           </TabsContent>
           <TabsContent value="mensagens"><CadastroMensagens /></TabsContent>
-          <TabsContent value="usuarios"><CadastroUsuarios /></TabsContent>
+          <TabsContent value="usuarios">
+            <div className="space-y-6">
+              <CadastroUsuarios />
+              <MobileTokenManager />
+            </div>
+          </TabsContent>
         </Tabs>
       </main>
     </div>
