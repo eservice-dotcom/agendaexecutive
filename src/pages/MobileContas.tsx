@@ -356,9 +356,28 @@ const MobileContas = () => {
                 </div>
               </div>
 
+              <div className="flex items-center justify-between p-3 border rounded-md bg-accent/30">
+                <div>
+                  <Label className="text-xs font-semibold">Já pago?</Label>
+                  <p className="text-[10px] text-muted-foreground">Lançar com baixa automática</p>
+                </div>
+                <Switch checked={jaPago} onCheckedChange={setJaPago} />
+              </div>
+
+              {jaPago && (
+                <div>
+                  <Label className="text-xs">Data Pagamento</Label>
+                  <Input
+                    type="date"
+                    value={dataPagamento}
+                    onChange={(e) => setDataPagamento(e.target.value)}
+                  />
+                </div>
+              )}
+
               <Button onClick={handleCreate} disabled={saving} className="w-full gap-2">
                 {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />}
-                Criar Conta
+                {jaPago ? "Criar e Baixar" : "Criar Conta"}
               </Button>
             </CardContent>
           </Card>
