@@ -10,6 +10,7 @@ import Login from "./pages/Login";
 import NotFound from "./pages/NotFound";
 import Vendas from "./pages/Vendas";
 import Cotacoes from "./pages/Cotacoes";
+import MobileContas from "./pages/MobileContas";
 
 const queryClient = new QueryClient();
 
