@@ -7,6 +7,7 @@ import CadastroFornecedores from "@/components/CadastroFornecedores";
 import CadastroTiposServico from "@/components/CadastroTiposServico";
 import CadastroUsuarios from "@/components/CadastroUsuarios";
 import CadastroMensagens from "@/components/CadastroMensagens";
+import MobileTokenManager from "@/components/MobileTokenManager";
 import CadastroCentrosCusto from "@/components/CadastroCentrosCusto";
 import CadastroCentrosReceita from "@/components/CadastroCentrosReceita";
 import logo from "@/assets/logo-executive-service.png";
