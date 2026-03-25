@@ -56,6 +56,33 @@ const EditServicoDialog = ({ open, onOpenChange, item, onSaved }: EditServicoDia
   
   const [passageiros, setPassageiros] = useState<Passageiro[]>([]);
   const [outrosDespesas, setOutrosDespesas] = useState<OutraDespesa[]>([]);
+  const [motoristaDiariaMsg, setMotoristaDiariaMsg] = useState("");
+
+  // Check if selected motorista already has "diaria" on the same date (excluding current item)
+  useEffect(() => {
+    const checkMotoristaDiaria = async () => {
+      if (!form.motorista || !form.data || !item) {
+        setMotoristaDiariaMsg("");
+        return;
+      }
+      const { supabase } = await import("@/integrations/supabase/client");
+      const { data } = await supabase
+        .from("agenda_items")
+        .select("id, forma_contratacao")
+        .eq("data", form.data)
+        .eq("motorista", form.motorista)
+        .eq("forma_contratacao", "diaria")
+        .neq("id", item.id)
+        .limit(1);
+      if (data && data.length > 0) {
+        setMotoristaDiariaMsg(`Motorista ${form.motorista} já está em Diária nesta data`);
+        update("formaContratacao", "diaria");
+      } else {
+        setMotoristaDiariaMsg("");
+      }
+    };
+    checkMotoristaDiaria();
+  }, [form.motorista, form.data, item]);
 
   useEffect(() => {
     if (open) {
@@ -352,14 +379,20 @@ const EditServicoDialog = ({ open, onOpenChange, item, onSaved }: EditServicoDia
 
           <div className="space-y-1.5">
             <Label>Forma de Contratação</Label>
-            <Select value={form.formaContratacao || "_empty"} onValueChange={(v) => update("formaContratacao", v === "_empty" ? "" : v)}>
-              <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
-              <SelectContent>
-                <SelectItem value="_empty">-- Nenhuma --</SelectItem>
-                <SelectItem value="transfer">Transfer</SelectItem>
-                <SelectItem value="diaria">Diária</SelectItem>
-              </SelectContent>
-            </Select>
+            {motoristaDiariaMsg ? (
+              <div className="rounded-md border border-amber-300 bg-amber-50 px-3 py-2 text-sm text-amber-800 dark:border-amber-600 dark:bg-amber-900/30 dark:text-amber-300">
+                {motoristaDiariaMsg}
+              </div>
+            ) : (
+              <Select value={form.formaContratacao || "_empty"} onValueChange={(v) => update("formaContratacao", v === "_empty" ? "" : v)}>
+                <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="_empty">-- Nenhuma --</SelectItem>
+                  <SelectItem value="transfer">Transfer</SelectItem>
+                  <SelectItem value="diaria">Diária</SelectItem>
+                </SelectContent>
+              </Select>
+            )}
           </div>
 
           <div className="space-y-1.5">
