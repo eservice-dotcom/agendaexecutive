@@ -1603,6 +1603,34 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
     return filtered;
   }, [contasReceberList, filtroOsReceber, filtroClienteReceber, filtroStatusReceber, filtroVencimentoInicioReceber, filtroVencimentoFimReceber, vendaOsMap]);
 
+  const filteredVendas = useMemo(() => {
+    let filtered = vendas;
+    const clienteSearch = filtroClienteVendas.trim().toLowerCase();
+    const osSearch = filtroOsVendas.trim().toLowerCase();
+    if (clienteSearch) {
+      filtered = filtered.filter((v) => {
+        const cliente = vendaOsMap[v.id]?.cliente || v.cliente || "";
+        return cliente.toLowerCase().includes(clienteSearch);
+      });
+    }
+    if (osSearch) {
+      filtered = filtered.filter((v) => {
+        const cots = vendaOsMap[v.id]?.cots || [];
+        return cots.some((c) => c.toLowerCase().includes(osSearch)) || String(v.numero_venda).includes(osSearch);
+      });
+    }
+    if (filtroStatusVendas) {
+      filtered = filtered.filter((v) => v.status === filtroStatusVendas);
+    }
+    if (filtroDataInicioVendas) {
+      filtered = filtered.filter((v) => v.data_venda >= filtroDataInicioVendas);
+    }
+    if (filtroDataFimVendas) {
+      filtered = filtered.filter((v) => v.data_venda <= filtroDataFimVendas);
+    }
+    return filtered;
+  }, [vendas, filtroClienteVendas, filtroOsVendas, filtroStatusVendas, filtroDataInicioVendas, filtroDataFimVendas, vendaOsMap]);
+
   const totalPagarPendente = contasPagarList.filter(c => c.status === "pendente" || c.status === "parcial").reduce((s, c) => s + (Number(c.valor) - Number(c.valor_pago || 0)), 0);
   const totalReceberPendente = contasReceberList.filter(c => c.status === "pendente" || c.status === "parcial").reduce((s, c) => s + (Number(c.valor) - Number(c.valor_pago || 0)), 0);
 
