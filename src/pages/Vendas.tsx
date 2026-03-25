@@ -292,6 +292,13 @@ const Vendas = () => {
   const [filtroVencimentoInicioReceber, setFiltroVencimentoInicioReceber] = useState("");
   const [filtroVencimentoFimReceber, setFiltroVencimentoFimReceber] = useState("");
 
+  // Filtro aba Vendas
+  const [filtroClienteVendas, setFiltroClienteVendas] = useState("");
+  const [filtroOsVendas, setFiltroOsVendas] = useState("");
+  const [filtroStatusVendas, setFiltroStatusVendas] = useState("");
+  const [filtroDataInicioVendas, setFiltroDataInicioVendas] = useState("");
+  const [filtroDataFimVendas, setFiltroDataFimVendas] = useState("");
+
   // WhatsApp pagamento
   const [whatsappPagamento, setWhatsappPagamento] = useState<{ conta: any; contas?: any[]; vendaInfo: any } | null>(null);
   const [selectedContasPagar, setSelectedContasPagar] = useState<Set<string>>(new Set());
