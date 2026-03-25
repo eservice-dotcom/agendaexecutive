@@ -15,6 +15,7 @@ interface FiltersState {
   motorista: string;
   pax: string;
   receptivo: string;
+  statusFaturamento: string;
 }
 
 interface AgendaFiltersProps {
@@ -43,6 +44,7 @@ const AgendaFilters = ({ filters, onFilterChange, motoristas, tipos, fornecedore
       motorista: "",
       pax: "",
       receptivo: "",
+      statusFaturamento: "",
     });
   };
 
@@ -178,8 +180,22 @@ const AgendaFilters = ({ filters, onFilterChange, motoristas, tipos, fornecedore
               ))}
             </SelectContent>
           </Select>
+        <div className="space-y-1">
+          <label className="text-xs font-medium text-muted-foreground">Status Faturamento</label>
+          <Select value={filters.statusFaturamento || "all"} onValueChange={(v) => updateFilter("statusFaturamento", v === "all" ? "" : v)}>
+            <SelectTrigger>
+              <SelectValue placeholder="Status Fat." />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">Todos</SelectItem>
+              <SelectItem value="sem_status">Sem status</SelectItem>
+              <SelectItem value="faturado">Faturado</SelectItem>
+              <SelectItem value="enviado">Enviado</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
       </div>
+    </div>
     </div>
   );
 };
