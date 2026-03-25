@@ -1,0 +1,1 @@
+ALTER TABLE public.agenda_items ADD COLUMN forma_contratacao text DEFAULT '' NOT NULL;

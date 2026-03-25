@@ -24,6 +24,7 @@ export type Database = {
           data: string
           destino: string
           estacionamento: number | null
+          forma_contratacao: string
           fornecedor: string
           hora: string
           hora_extra: string | null
@@ -60,6 +61,7 @@ export type Database = {
           data: string
           destino: string
           estacionamento?: number | null
+          forma_contratacao?: string
           fornecedor: string
           hora: string
           hora_extra?: string | null
@@ -96,6 +98,7 @@ export type Database = {
           data?: string
           destino?: string
           estacionamento?: number | null
+          forma_contratacao?: string
           fornecedor?: string
           hora?: string
           hora_extra?: string | null
