@@ -135,7 +135,7 @@ const Index = () => {
         }
         if (filters.receptivo && !(item.receptivo || "").toLowerCase().includes(filters.receptivo.toLowerCase())) return false;
         if (filters.statusFaturamento) {
-          const sf = item.status_faturamento || "";
+          const sf = item.statusFaturamento || item.status_faturamento || "";
           if (filters.statusFaturamento === "sem_status" && sf !== "") return false;
           if (filters.statusFaturamento !== "sem_status" && sf !== filters.statusFaturamento) return false;
         }
