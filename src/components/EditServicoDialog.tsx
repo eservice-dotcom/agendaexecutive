@@ -51,6 +51,7 @@ const EditServicoDialog = ({ open, onOpenChange, item, onSaved }: EditServicoDia
     horaFim: "",
     estacionamento: "",
     horaExtra: "",
+    formaContratacao: "",
   });
   
   const [passageiros, setPassageiros] = useState<Passageiro[]>([]);
@@ -102,6 +103,7 @@ const EditServicoDialog = ({ open, onOpenChange, item, onSaved }: EditServicoDia
         horaFim: item.horaFim || "",
         estacionamento: (item.estacionamento || 0).toString(),
         horaExtra: item.horaExtra || "",
+        formaContratacao: (item as any).formaContratacao || "",
       });
       setPassageiros(item.passageiros || []);
       setOutrosDespesas(item.outrosDespesas || []);
@@ -200,6 +202,7 @@ const EditServicoDialog = ({ open, onOpenChange, item, onSaved }: EditServicoDia
         estacionamento: parseFloat(form.estacionamento) || 0,
         horaExtra: form.horaExtra || "",
         outrosDespesas: outrosDespesas,
+        formaContratacao: form.formaContratacao || "",
       });
 
       toast.success("Serviço atualizado com sucesso!");
@@ -345,6 +348,18 @@ const EditServicoDialog = ({ open, onOpenChange, item, onSaved }: EditServicoDia
             {(!currentFornecedorId) && (
               <Input value={form.fornecedor} onChange={(e) => update("fornecedor", e.target.value)} placeholder="Nome do fornecedor" className="mt-1" />
             )}
+          </div>
+
+          <div className="space-y-1.5">
+            <Label>Forma de Contratação</Label>
+            <Select value={form.formaContratacao || "_empty"} onValueChange={(v) => update("formaContratacao", v === "_empty" ? "" : v)}>
+              <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="_empty">-- Nenhuma --</SelectItem>
+                <SelectItem value="transfer">Transfer</SelectItem>
+                <SelectItem value="diaria">Diária</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
 
           <div className="space-y-1.5">

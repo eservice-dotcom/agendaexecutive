@@ -342,6 +342,7 @@ export const getAgendaItems = async (): Promise<AgendaItem[]> => {
     estacionamento: Number((item as any).estacionamento) || 0,
     horaExtra: (item as any).hora_extra || "",
     outrosDespesas: ((item as any).outros_despesas || []) as { descricao: string; valor: number }[],
+    formaContratacao: (item as any).forma_contratacao || "",
   }));
 };
 
@@ -378,6 +379,7 @@ export const saveAgendaItem = async (item: Omit<AgendaItem, "id">) => {
     estacionamento: item.estacionamento || 0,
     hora_extra: item.horaExtra || "",
     outros_despesas: item.outrosDespesas || [],
+    forma_contratacao: item.formaContratacao || "",
   } as any);
   
   if (error) throw error;
@@ -415,6 +417,7 @@ export const updateAgendaItem = async (updated: AgendaItem) => {
       estacionamento: updated.estacionamento || 0,
       hora_extra: updated.horaExtra || "",
       outros_despesas: updated.outrosDespesas || [],
+      forma_contratacao: updated.formaContratacao || "",
     } as any)
     .eq("id", updated.id);
   

@@ -48,6 +48,7 @@ const NovoServicoDialog = ({ open, onOpenChange, onSaved, initialData }: NovoSer
     horaFim: "",
     estacionamento: "",
     horaExtra: "",
+    formaContratacao: "",
   });
   
   const [passageiros, setPassageiros] = useState<Passageiro[]>([]);
@@ -171,6 +172,7 @@ const NovoServicoDialog = ({ open, onOpenChange, onSaved, initialData }: NovoSer
             horaFim: initialData.horaFim || "",
             estacionamento: String(initialData.estacionamento || ""),
             horaExtra: initialData.horaExtra || "",
+            formaContratacao: (initialData as any).formaContratacao || "",
           });
           setPassageiros(initialData.passageiros || []);
           setOutrosDespesas(initialData.outrosDespesas || []);
@@ -221,6 +223,7 @@ const NovoServicoDialog = ({ open, onOpenChange, onSaved, initialData }: NovoSer
         estacionamento: parseFloat(form.estacionamento) || 0,
         horaExtra: form.horaExtra || "",
         outrosDespesas: outrosDespesas,
+        formaContratacao: form.formaContratacao || "",
       });
 
       toast.success("Serviço adicionado com sucesso!");
@@ -229,7 +232,7 @@ const NovoServicoDialog = ({ open, onOpenChange, onSaved, initialData }: NovoSer
         origem: "", destino: "", veiculoId: "", motoristaId: "", valor: "",
         fornecedorId: "", custo: "", observacoes: "", receptivo: "",
         kmIn: "", kmFim: "", kmExtra: "", horaIn: "", horaFim: "",
-        estacionamento: "", horaExtra: "",
+        estacionamento: "", horaExtra: "", formaContratacao: "",
       });
       setPassageiros([]);
       setOutrosDespesas([]);
@@ -417,6 +420,18 @@ const NovoServicoDialog = ({ open, onOpenChange, onSaved, initialData }: NovoSer
                 </SelectContent>
               </Select>
             )}
+           </div>
+
+          <div className="space-y-1.5">
+            <Label>Forma de Contratação</Label>
+            <Select value={form.formaContratacao || "_empty"} onValueChange={(v) => update("formaContratacao", v === "_empty" ? "" : v)}>
+              <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="_empty">-- Nenhuma --</SelectItem>
+                <SelectItem value="transfer">Transfer</SelectItem>
+                <SelectItem value="diaria">Diária</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
 
           <div className="space-y-1.5">
