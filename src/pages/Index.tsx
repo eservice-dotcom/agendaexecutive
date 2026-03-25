@@ -281,7 +281,9 @@ const Index = () => {
 
   const handleGerarFechamento = async (format: "print" | "excel" = "print") => {
     if (!fechamentoCliente || !session?.user?.id) return;
-    const selectedItems = fechamentoItems.filter((_: any, i: number) => fechamentoSelected.has(i));
+    // Only include items that are both selected AND visible (filtered)
+    const visibleIndices = new Set(fechamentoFilteredItems.map(({ idx }) => idx));
+    const selectedItems = fechamentoItems.filter((_: any, i: number) => fechamentoSelected.has(i) && visibleIndices.has(i));
     const selectedExtras = fechamentoExtras.filter((_, i) => fechamentoExtrasSelected.has(i));
 
     // Update status_faturamento to "enviado" for selected items
