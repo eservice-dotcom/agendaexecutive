@@ -1758,14 +1758,14 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {vendas.length === 0 ? (
+                  {filteredVendas.length === 0 ? (
                     <TableRow>
                       <TableCell colSpan={9} className="text-center text-muted-foreground py-8">
-                        Nenhuma venda registrada
+                        Nenhuma venda encontrada
                       </TableCell>
                     </TableRow>
                   ) : (
-                    vendas.map((v) => (
+                    filteredVendas.map((v) => (
                       <TableRow key={v.id}>
                         <TableCell className="font-mono text-sm font-bold">{v.numero_venda}</TableCell>
                         <TableCell className="font-mono text-sm">{formatDate(v.data_venda)}</TableCell>
