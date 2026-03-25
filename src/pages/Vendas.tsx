@@ -50,6 +50,10 @@ interface AgendaItem {
   cot: string;
   fornecedor: string;
   status_faturamento: string | null;
+  placa?: string;
+  estacionamento?: number;
+  outros?: number;
+  outros_despesas?: any;
 }
 
 interface ExtraItem {
@@ -161,7 +165,11 @@ const buildAgendaExtrasFromItems = (items: any[]) => {
     const outrosValor = parseMoneyValue(item?.outros);
     const outrosExtra = outrosValor > 0 ? [{ descricao: `Outros ${osLabel}`, valor: outrosValor }] : [];
 
-    return [...despesasExtras, ...outrosExtra];
+    // Include estacionamento as an automatic extra
+    const estacValor = parseMoneyValue(item?.estacionamento);
+    const estacExtra = estacValor > 0 ? [{ descricao: `Estacionamento ${osLabel}`, valor: estacValor }] : [];
+
+    return [...estacExtra, ...despesasExtras, ...outrosExtra];
   });
 };
 
@@ -492,7 +500,7 @@ const Vendas = () => {
     const load = async () => {
       const { data } = await supabase
         .from("agenda_items")
-        .select("id, cliente, data, hora, tipo, origem, destino, valor, custo, motorista, veiculo, pax, cot, fornecedor, status_faturamento")
+        .select("id, cliente, data, hora, tipo, origem, destino, valor, custo, motorista, veiculo, placa, pax, cot, fornecedor, status_faturamento, estacionamento, outros, outros_despesas")
         .eq("cliente", cliente)
         .order("data", { ascending: true });
       if (data) setAgendaItems(data as AgendaItem[]);
