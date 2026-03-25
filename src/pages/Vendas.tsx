@@ -1683,6 +1683,65 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
 
           {/* ===== VENDAS TAB ===== */}
           <TabsContent value="vendas">
+            {/* Filtros da aba Vendas */}
+            <div className="flex flex-wrap items-end gap-3 mb-3">
+              <div className="flex flex-col gap-0.5">
+                <span className="text-xs font-medium text-muted-foreground">O.S.</span>
+                <Input
+                  placeholder="Nº da O.S."
+                  value={filtroOsVendas}
+                  onChange={(e) => setFiltroOsVendas(e.target.value)}
+                  className="w-32 h-8 text-sm"
+                />
+              </div>
+              <div className="flex flex-col gap-0.5">
+                <span className="text-xs font-medium text-muted-foreground">Cliente</span>
+                <Input
+                  placeholder="Nome do cliente"
+                  value={filtroClienteVendas}
+                  onChange={(e) => setFiltroClienteVendas(e.target.value)}
+                  className="w-40 h-8 text-sm"
+                />
+              </div>
+              <div className="flex flex-col gap-0.5">
+                <span className="text-xs font-medium text-muted-foreground">Status</span>
+                <Select value={filtroStatusVendas || "all"} onValueChange={(v) => setFiltroStatusVendas(v === "all" ? "" : v)}>
+                  <SelectTrigger className="w-36 h-8 text-sm">
+                    <SelectValue placeholder="Todos" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">Todos</SelectItem>
+                    <SelectItem value="pendente">Pendente</SelectItem>
+                    <SelectItem value="pago">Pago</SelectItem>
+                    <SelectItem value="parcial">Parcial</SelectItem>
+                    <SelectItem value="cancelado">Cancelado</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="flex flex-col gap-0.5">
+                <span className="text-xs font-medium text-muted-foreground">Data Início</span>
+                <Input
+                  type="date"
+                  value={filtroDataInicioVendas}
+                  onChange={(e) => setFiltroDataInicioVendas(e.target.value)}
+                  className="w-36 h-8 text-sm"
+                />
+              </div>
+              <div className="flex flex-col gap-0.5">
+                <span className="text-xs font-medium text-muted-foreground">Data Fim</span>
+                <Input
+                  type="date"
+                  value={filtroDataFimVendas}
+                  onChange={(e) => setFiltroDataFimVendas(e.target.value)}
+                  className="w-36 h-8 text-sm"
+                />
+              </div>
+              {(filtroOsVendas || filtroClienteVendas || filtroStatusVendas || filtroDataInicioVendas || filtroDataFimVendas) && (
+                <Button variant="ghost" size="sm" className="h-8" onClick={() => { setFiltroOsVendas(""); setFiltroClienteVendas(""); setFiltroStatusVendas(""); setFiltroDataInicioVendas(""); setFiltroDataFimVendas(""); }}>
+                  <X className="h-3 w-3 mr-1" /> Limpar
+                </Button>
+              )}
+            </div>
             <div className="rounded-lg border border-border bg-card shadow-sm">
               <Table>
                 <TableHeader>
