@@ -139,6 +139,8 @@ const AgendaFilters = ({ filters, onFilterChange, motoristas, tipos, fornecedore
             onChange={(e) => updateFilter("receptivo", e.target.value)}
           />
         </div>
+      </div>
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-10 mt-3">
         <div className="space-y-1">
           <label className="text-xs font-medium text-muted-foreground">Tipo</label>
           <Select value={filters.tipo || "all"} onValueChange={(v) => updateFilter("tipo", v === "all" ? "" : v)}>
@@ -180,6 +182,7 @@ const AgendaFilters = ({ filters, onFilterChange, motoristas, tipos, fornecedore
               ))}
             </SelectContent>
           </Select>
+        </div>
         <div className="space-y-1">
           <label className="text-xs font-medium text-muted-foreground">Status Faturamento</label>
           <Select value={filters.statusFaturamento || "all"} onValueChange={(v) => updateFilter("statusFaturamento", v === "all" ? "" : v)}>
@@ -195,7 +198,6 @@ const AgendaFilters = ({ filters, onFilterChange, motoristas, tipos, fornecedore
           </Select>
         </div>
       </div>
-    </div>
     </div>
   );
 };
