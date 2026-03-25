@@ -292,6 +292,13 @@ const Vendas = () => {
   const [filtroVencimentoInicioReceber, setFiltroVencimentoInicioReceber] = useState("");
   const [filtroVencimentoFimReceber, setFiltroVencimentoFimReceber] = useState("");
 
+  // Filtro aba Vendas
+  const [filtroClienteVendas, setFiltroClienteVendas] = useState("");
+  const [filtroOsVendas, setFiltroOsVendas] = useState("");
+  const [filtroStatusVendas, setFiltroStatusVendas] = useState("");
+  const [filtroDataInicioVendas, setFiltroDataInicioVendas] = useState("");
+  const [filtroDataFimVendas, setFiltroDataFimVendas] = useState("");
+
   // WhatsApp pagamento
   const [whatsappPagamento, setWhatsappPagamento] = useState<{ conta: any; contas?: any[]; vendaInfo: any } | null>(null);
   const [selectedContasPagar, setSelectedContasPagar] = useState<Set<string>>(new Set());
@@ -1596,6 +1603,34 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
     return filtered;
   }, [contasReceberList, filtroOsReceber, filtroClienteReceber, filtroStatusReceber, filtroVencimentoInicioReceber, filtroVencimentoFimReceber, vendaOsMap]);
 
+  const filteredVendas = useMemo(() => {
+    let filtered = vendas;
+    const clienteSearch = filtroClienteVendas.trim().toLowerCase();
+    const osSearch = filtroOsVendas.trim().toLowerCase();
+    if (clienteSearch) {
+      filtered = filtered.filter((v) => {
+        const cliente = vendaOsMap[v.id]?.cliente || v.cliente || "";
+        return cliente.toLowerCase().includes(clienteSearch);
+      });
+    }
+    if (osSearch) {
+      filtered = filtered.filter((v) => {
+        const cots = vendaOsMap[v.id]?.cots || [];
+        return cots.some((c) => c.toLowerCase().includes(osSearch)) || String(v.numero_venda).includes(osSearch);
+      });
+    }
+    if (filtroStatusVendas) {
+      filtered = filtered.filter((v) => v.status === filtroStatusVendas);
+    }
+    if (filtroDataInicioVendas) {
+      filtered = filtered.filter((v) => v.data_venda >= filtroDataInicioVendas);
+    }
+    if (filtroDataFimVendas) {
+      filtered = filtered.filter((v) => v.data_venda <= filtroDataFimVendas);
+    }
+    return filtered;
+  }, [vendas, filtroClienteVendas, filtroOsVendas, filtroStatusVendas, filtroDataInicioVendas, filtroDataFimVendas, vendaOsMap]);
+
   const totalPagarPendente = contasPagarList.filter(c => c.status === "pendente" || c.status === "parcial").reduce((s, c) => s + (Number(c.valor) - Number(c.valor_pago || 0)), 0);
   const totalReceberPendente = contasReceberList.filter(c => c.status === "pendente" || c.status === "parcial").reduce((s, c) => s + (Number(c.valor) - Number(c.valor_pago || 0)), 0);
 
@@ -1648,6 +1683,65 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
 
           {/* ===== VENDAS TAB ===== */}
           <TabsContent value="vendas">
+            {/* Filtros da aba Vendas */}
+            <div className="flex flex-wrap items-end gap-3 mb-3">
+              <div className="flex flex-col gap-0.5">
+                <span className="text-xs font-medium text-muted-foreground">O.S.</span>
+                <Input
+                  placeholder="Nº da O.S."
+                  value={filtroOsVendas}
+                  onChange={(e) => setFiltroOsVendas(e.target.value)}
+                  className="w-32 h-8 text-sm"
+                />
+              </div>
+              <div className="flex flex-col gap-0.5">
+                <span className="text-xs font-medium text-muted-foreground">Cliente</span>
+                <Input
+                  placeholder="Nome do cliente"
+                  value={filtroClienteVendas}
+                  onChange={(e) => setFiltroClienteVendas(e.target.value)}
+                  className="w-40 h-8 text-sm"
+                />
+              </div>
+              <div className="flex flex-col gap-0.5">
+                <span className="text-xs font-medium text-muted-foreground">Status</span>
+                <Select value={filtroStatusVendas || "all"} onValueChange={(v) => setFiltroStatusVendas(v === "all" ? "" : v)}>
+                  <SelectTrigger className="w-36 h-8 text-sm">
+                    <SelectValue placeholder="Todos" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">Todos</SelectItem>
+                    <SelectItem value="pendente">Pendente</SelectItem>
+                    <SelectItem value="pago">Pago</SelectItem>
+                    <SelectItem value="parcial">Parcial</SelectItem>
+                    <SelectItem value="cancelado">Cancelado</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="flex flex-col gap-0.5">
+                <span className="text-xs font-medium text-muted-foreground">Data Início</span>
+                <Input
+                  type="date"
+                  value={filtroDataInicioVendas}
+                  onChange={(e) => setFiltroDataInicioVendas(e.target.value)}
+                  className="w-36 h-8 text-sm"
+                />
+              </div>
+              <div className="flex flex-col gap-0.5">
+                <span className="text-xs font-medium text-muted-foreground">Data Fim</span>
+                <Input
+                  type="date"
+                  value={filtroDataFimVendas}
+                  onChange={(e) => setFiltroDataFimVendas(e.target.value)}
+                  className="w-36 h-8 text-sm"
+                />
+              </div>
+              {(filtroOsVendas || filtroClienteVendas || filtroStatusVendas || filtroDataInicioVendas || filtroDataFimVendas) && (
+                <Button variant="ghost" size="sm" className="h-8" onClick={() => { setFiltroOsVendas(""); setFiltroClienteVendas(""); setFiltroStatusVendas(""); setFiltroDataInicioVendas(""); setFiltroDataFimVendas(""); }}>
+                  <X className="h-3 w-3 mr-1" /> Limpar
+                </Button>
+              )}
+            </div>
             <div className="rounded-lg border border-border bg-card shadow-sm">
               <Table>
                 <TableHeader>
@@ -1664,14 +1758,14 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {vendas.length === 0 ? (
+                  {filteredVendas.length === 0 ? (
                     <TableRow>
                       <TableCell colSpan={9} className="text-center text-muted-foreground py-8">
-                        Nenhuma venda registrada
+                        Nenhuma venda encontrada
                       </TableCell>
                     </TableRow>
                   ) : (
-                    vendas.map((v) => (
+                    filteredVendas.map((v) => (
                       <TableRow key={v.id}>
                         <TableCell className="font-mono text-sm font-bold">{v.numero_venda}</TableCell>
                         <TableCell className="font-mono text-sm">{formatDate(v.data_venda)}</TableCell>
