@@ -533,6 +533,13 @@ const Vendas = () => {
   const [totalSelectedManual, setTotalSelectedManual] = useState<number | null>(null);
   const totalSelected = totalSelectedManual !== null ? totalSelectedManual : totalSelectedCalc;
 
+  // Auto-populate extras from selected agenda items (estacionamento + outros_despesas)
+  useEffect(() => {
+    const selected = agendaItems.filter((i) => selectedItems.has(i.id));
+    const autoExtras = buildAgendaExtrasFromItems(selected);
+    setExtras(autoExtras);
+  }, [agendaItems, selectedItems]);
+
   // Reset manual override when selection or extras change
   useEffect(() => {
     setTotalSelectedManual(null);
