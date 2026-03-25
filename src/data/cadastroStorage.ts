@@ -378,6 +378,7 @@ export const saveAgendaItem = async (item: Omit<AgendaItem, "id">) => {
     estacionamento: item.estacionamento || 0,
     hora_extra: item.horaExtra || "",
     outros_despesas: item.outrosDespesas || [],
+    forma_contratacao: item.formaContratacao || "",
   } as any);
   
   if (error) throw error;
@@ -415,6 +416,7 @@ export const updateAgendaItem = async (updated: AgendaItem) => {
       estacionamento: updated.estacionamento || 0,
       hora_extra: updated.horaExtra || "",
       outros_despesas: updated.outrosDespesas || [],
+      forma_contratacao: updated.formaContratacao || "",
     } as any)
     .eq("id", updated.id);
   
