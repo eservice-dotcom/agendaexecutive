@@ -46,6 +46,7 @@ const MobileContas = () => {
   const [saving, setSaving] = useState(false);
 
   const [fornecedores, setFornecedores] = useState<string[]>([]);
+  const [fornecedoresPixMap, setFornecedoresPixMap] = useState<Record<string, string>>({});
   const [centrosCusto, setCentrosCusto] = useState<{ id: string; nome: string }[]>([]);
   const [subgrupos, setSubgrupos] = useState<{ id: string; nome: string; centro_custo_id: string }[]>([]);
   const [veiculos, setVeiculos] = useState<{ placa: string; modelo: string }[]>([]);
@@ -79,12 +80,15 @@ const MobileContas = () => {
 
   const loadSelects = useCallback(async () => {
     const [f, c, s, v] = await Promise.all([
-      supabase.from("fornecedores").select("razao_social").order("razao_social"),
+      supabase.from("fornecedores").select("razao_social, pix").order("razao_social"),
       supabase.from("centros_custo").select("id, nome").order("nome"),
       supabase.from("subgrupos_custo").select("id, nome, centro_custo_id").order("nome"),
       supabase.from("veiculos").select("placa, modelo").order("placa"),
     ]);
     setFornecedores(f.data?.map((x) => x.razao_social) || []);
+    const pixMap: Record<string, string> = {};
+    f.data?.forEach((x) => { if (x.razao_social && x.pix) pixMap[x.razao_social] = x.pix; });
+    setFornecedoresPixMap(pixMap);
     setCentrosCusto(c.data || []);
     setSubgrupos(s.data || []);
     setVeiculos(v.data || []);
@@ -232,6 +236,9 @@ const MobileContas = () => {
                   <div className="flex items-start justify-between">
                     <div className="flex-1 min-w-0">
                       <p className="font-semibold text-sm truncate">{conta.fornecedor}</p>
+                      {fornecedoresPixMap[conta.fornecedor] && (
+                        <p className="text-[10px] text-muted-foreground truncate">PIX: {fornecedoresPixMap[conta.fornecedor]}</p>
+                      )}
                       {conta.descritivo && (
                         <p className="text-xs text-muted-foreground truncate">{conta.descritivo}</p>
                       )}
@@ -394,6 +401,9 @@ const MobileContas = () => {
             <div className="space-y-3">
               <div className="text-sm space-y-1">
                 <p><strong>{selectedConta.fornecedor}</strong></p>
+                {fornecedoresPixMap[selectedConta.fornecedor] && (
+                  <p className="text-xs text-muted-foreground">PIX: {fornecedoresPixMap[selectedConta.fornecedor]}</p>
+                )}
                 {selectedConta.descritivo && <p className="text-xs text-muted-foreground">{selectedConta.descritivo}</p>}
                 <p>Valor: {formatCurrency(selectedConta.valor)}</p>
                 {selectedConta.valor_pago > 0 && (

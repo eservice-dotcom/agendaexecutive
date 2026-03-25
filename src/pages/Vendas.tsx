@@ -219,6 +219,7 @@ const Vendas = () => {
   const [searchAgenda, setSearchAgenda] = useState("");
   const [contasPagar, setContasPagar] = useState<ContaPagar[]>([]);
   const [fornecedores, setFornecedores] = useState<string[]>([]);
+  const [fornecedoresPixMap, setFornecedoresPixMap] = useState<Record<string, string>>({});
   const [extras, setExtras] = useState<ExtraItem[]>([]);
 
   // Contas lists
@@ -331,10 +332,13 @@ const Vendas = () => {
   const loadFornecedores = useCallback(async () => {
     const { data } = await supabase
       .from("fornecedores")
-      .select("razao_social")
+      .select("razao_social, pix")
       .order("razao_social");
     if (data) {
       setFornecedores(data.map((f) => f.razao_social).filter(Boolean));
+      const pixMap: Record<string, string> = {};
+      data.forEach((f) => { if (f.razao_social && f.pix) pixMap[f.razao_social] = f.pix; });
+      setFornecedoresPixMap(pixMap);
     }
   }, []);
 
@@ -2021,7 +2025,12 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
                         </TableCell>
                         <TableCell className="font-mono text-xs font-bold">{vendaOsMap[cp.venda_id]?.numero_venda || "—"}</TableCell>
                         <TableCell className="font-mono text-xs">{formatDate(cp.data)}</TableCell>
-                        <TableCell className="font-medium text-sm">{cp.fornecedor}</TableCell>
+                        <TableCell className="font-medium text-sm">
+                          <div>{cp.fornecedor}</div>
+                          {fornecedoresPixMap[cp.fornecedor] && (
+                            <div className="text-[10px] text-muted-foreground truncate max-w-[200px]">PIX: {fornecedoresPixMap[cp.fornecedor]}</div>
+                          )}
+                        </TableCell>
                         <TableCell className="font-medium text-sm">{vendaOsMap[cp.venda_id]?.cliente || "—"}</TableCell>
                         <TableCell className="font-mono text-xs">{vendaOsMap[cp.venda_id]?.cots?.join(", ") || "—"}</TableCell>
                         <TableCell className="text-sm">{cp.centro_custo || "—"}</TableCell>
