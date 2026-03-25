@@ -342,6 +342,7 @@ export const getAgendaItems = async (): Promise<AgendaItem[]> => {
     estacionamento: Number((item as any).estacionamento) || 0,
     horaExtra: (item as any).hora_extra || "",
     outrosDespesas: ((item as any).outros_despesas || []) as { descricao: string; valor: number }[],
+    formaContratacao: (item as any).forma_contratacao || "",
   }));
 };
 
