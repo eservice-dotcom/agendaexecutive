@@ -1034,6 +1034,7 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
       .from("agenda_items")
       .select("id, cot, data, hora, tipo, origem, destino, pax, motorista, veiculo, placa, fornecedor, valor, custo, km_in, km_fim, km_extra, hora_in, hora_fim, hora_extra, estacionamento, outros, outros_despesas, cliente, receptivo")
       .eq("cliente", cli)
+      .eq("status_faturamento", "enviado")
       .order("data", { ascending: true });
 
     const items = data || [];
