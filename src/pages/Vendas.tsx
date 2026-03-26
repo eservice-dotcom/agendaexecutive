@@ -1679,6 +1679,9 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
             <DollarSign className="h-6 w-6" /> Financeiro
           </h1>
           <div className="flex gap-2">
+            <Button variant="outline" onClick={() => window.open('https://querofaturar.com.br', '_blank')} className="gap-2">
+              <ExternalLink className="h-4 w-4" /> Quero Faturar
+            </Button>
             <Button variant="outline" onClick={handleOpenFechamentoAvulso} className="gap-2">
               <ClipboardList className="h-4 w-4" /> Relatório de Fechamento
             </Button>
