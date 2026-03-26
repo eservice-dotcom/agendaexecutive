@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo, useCallback, useRef } from "react";
 import { Link, useSearchParams } from "react-router-dom";
-import { ArrowLeft, Plus, Trash2, ShoppingCart, Search, Check, FileText, XCircle, DollarSign, CheckCircle, Download, Pencil, ClipboardList, X, Printer, MessageCircle, FileSpreadsheet, RefreshCw } from "lucide-react";
+import { ArrowLeft, Plus, Trash2, ShoppingCart, Search, Check, FileText, XCircle, DollarSign, CheckCircle, Download, Pencil, ClipboardList, X, Printer, MessageCircle, FileSpreadsheet, RefreshCw, ExternalLink } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
@@ -1679,6 +1679,9 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
             <DollarSign className="h-6 w-6" /> Financeiro
           </h1>
           <div className="flex gap-2">
+            <Button variant="outline" onClick={() => window.open('https://querofaturar.com.br', '_blank')} className="gap-2">
+              <ExternalLink className="h-4 w-4" /> Quero Faturar
+            </Button>
             <Button variant="outline" onClick={handleOpenFechamentoAvulso} className="gap-2">
               <ClipboardList className="h-4 w-4" /> Relatório de Fechamento
             </Button>
