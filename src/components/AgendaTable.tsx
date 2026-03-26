@@ -554,6 +554,7 @@ const AgendaTable = ({ items, onEdited, hideFinancials, onClone }: AgendaTablePr
       </AlertDialogContent>
     </AlertDialog>
     </>
+    </TooltipProvider>
   );
 };
 
