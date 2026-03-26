@@ -1,0 +1,1 @@
+UPDATE public.agenda_items SET status_faturamento = 'faturado' WHERE cot = '261060';
