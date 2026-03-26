@@ -175,6 +175,7 @@ const AgendaTable = ({ items, onEdited, hideFinancials, onClone }: AgendaTablePr
   }
 
   return (
+    <TooltipProvider delayDuration={200}>
     <>
     <WhatsAppDialog open={!!whatsappItem} onOpenChange={(v) => { if (!v) setWhatsappItem(null); }} item={whatsappItem} allItems={items} />
     <WhatsAppFornecedorDialog
@@ -247,7 +248,12 @@ const AgendaTable = ({ items, onEdited, hideFinancials, onClone }: AgendaTablePr
             <TableRow key={item.id} className={`transition-colors hover:bg-primary/10 ${!item.corManual ? (idx % 2 === 1 ? 'bg-yellow-50/60 dark:bg-yellow-900/10' : tipoRowColor(item.tipo)) : ''}`} style={item.corManual ? { backgroundColor: item.corManual } : undefined}>
               <TableCell className={`px-0.5 py-0 font-mono text-[9px] truncate sticky left-0 z-10`} style={item.corManual ? { backgroundColor: item.corManual } : undefined} >{formatDate(item.data)}</TableCell>
               <TableCell className={`px-0.5 py-0 font-mono text-[9px] font-medium truncate sticky left-[58px] z-10`} style={item.corManual ? { backgroundColor: item.corManual } : undefined}>{item.hora}</TableCell>
-              <TableCell className="px-0.5 py-0 font-medium text-[9px] truncate">{item.cliente}</TableCell>
+              <TableCell className="px-0.5 py-0 font-medium text-[9px] truncate">
+                <Tooltip>
+                  <TooltipTrigger asChild><span className="truncate cursor-default">{item.cliente}</span></TooltipTrigger>
+                  <TooltipContent side="top" className="text-xs">{item.cliente}</TooltipContent>
+                </Tooltip>
+              </TableCell>
               <TableCell className="px-0.5 py-0 text-center">
                 <span className="inline-flex h-4 w-4 items-center justify-center rounded-full bg-primary/10 text-[8px] font-bold text-primary">
                   {item.pax}
@@ -284,32 +290,60 @@ const AgendaTable = ({ items, onEdited, hideFinancials, onClone }: AgendaTablePr
                 )}
               </TableCell>
               <TableCell className="px-0.5 py-0 font-mono text-[8px] text-muted-foreground truncate">
-                {item.passageiros.length > 0 ? item.passageiros[0].voo : "—"}
+                <Tooltip>
+                  <TooltipTrigger asChild><span className="truncate cursor-default">{item.passageiros.length > 0 ? item.passageiros[0].voo : "—"}</span></TooltipTrigger>
+                  {item.passageiros.length > 0 && item.passageiros[0].voo && <TooltipContent side="top" className="text-xs">{item.passageiros[0].voo}</TooltipContent>}
+                </Tooltip>
               </TableCell>
-              <TableCell className="px-0.5 py-0 font-mono text-[8px] text-muted-foreground truncate">{item.cot}</TableCell>
+              <TableCell className="px-0.5 py-0 font-mono text-[8px] text-muted-foreground truncate">
+                <Tooltip>
+                  <TooltipTrigger asChild><span className="truncate cursor-default">{item.cot}</span></TooltipTrigger>
+                  <TooltipContent side="top" className="text-xs">{item.cot}</TooltipContent>
+                </Tooltip>
+              </TableCell>
               <TableCell className="px-0.5 py-0">
                 <Badge variant={tipoBadgeVariant(item.tipo) as any} className="text-[7px] px-0.5 py-0">
                   {item.tipo}
                 </Badge>
               </TableCell>
-              <TableCell className="px-0.5 py-0 truncate text-[9px]" title={item.origem}>
-                <span className="flex items-center gap-0.5">
-                  <MapPin className="h-2 w-2 shrink-0 text-accent" />
-                  <span className="truncate">{item.origem}</span>
-                </span>
+              <TableCell className="px-0.5 py-0 truncate text-[9px]">
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <span className="flex items-center gap-0.5 cursor-default">
+                      <MapPin className="h-2 w-2 shrink-0 text-accent" />
+                      <span className="truncate">{item.origem}</span>
+                    </span>
+                  </TooltipTrigger>
+                  <TooltipContent side="top" className="text-xs">{item.origem}</TooltipContent>
+                </Tooltip>
               </TableCell>
-              <TableCell className="px-0.5 py-0 truncate text-[9px]" title={item.destino}>
-                <span className="flex items-center gap-0.5">
-                  <MapPin className="h-2 w-2 shrink-0 text-destructive" />
-                  <span className="truncate">{item.destino}</span>
-                </span>
+              <TableCell className="px-0.5 py-0 truncate text-[9px]">
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <span className="flex items-center gap-0.5 cursor-default">
+                      <MapPin className="h-2 w-2 shrink-0 text-destructive" />
+                      <span className="truncate">{item.destino}</span>
+                    </span>
+                  </TooltipTrigger>
+                  <TooltipContent side="top" className="text-xs">{item.destino}</TooltipContent>
+                </Tooltip>
               </TableCell>
-              <TableCell className="px-0.5 py-0 font-mono text-[8px] truncate">{item.placa}</TableCell>
+              <TableCell className="px-0.5 py-0 font-mono text-[8px] truncate">
+                <Tooltip>
+                  <TooltipTrigger asChild><span className="truncate cursor-default">{item.placa}</span></TooltipTrigger>
+                  <TooltipContent side="top" className="text-xs">{item.placa}</TooltipContent>
+                </Tooltip>
+              </TableCell>
               <TableCell className="px-0.5 py-0 text-[9px] truncate">
-                <span className="flex items-center gap-0.5">
-                  <Truck className="h-2 w-2 text-muted-foreground shrink-0" />
-                  <span className="truncate">{item.veiculo}</span>
-                </span>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <span className="flex items-center gap-0.5 cursor-default">
+                      <Truck className="h-2 w-2 text-muted-foreground shrink-0" />
+                      <span className="truncate">{item.veiculo}</span>
+                    </span>
+                  </TooltipTrigger>
+                  <TooltipContent side="top" className="text-xs">{item.veiculo}</TooltipContent>
+                </Tooltip>
               </TableCell>
               <TableCell className={`px-0.5 py-0 text-[9px] ${!item.motorista ? 'bg-blue-200 dark:bg-blue-900/40' : ''}`}>
                 <Tooltip>
@@ -351,8 +385,10 @@ const AgendaTable = ({ items, onEdited, hideFinancials, onClone }: AgendaTablePr
                 </TableCell>
               )}
               <TableCell className="px-0.5 py-0 text-[9px] truncate">
-                <span className="flex items-center gap-0.5">
-                  <span className="truncate">{item.fornecedor}</span>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <span className="flex items-center gap-0.5 cursor-default">
+                      <span className="truncate">{item.fornecedor}</span>
                   {item.fornecedor && (
                     <Button
                       variant="ghost"
@@ -369,16 +405,27 @@ const AgendaTable = ({ items, onEdited, hideFinancials, onClone }: AgendaTablePr
                       <MessageCircle className="h-2.5 w-2.5" />
                     </Button>
                   )}
-                </span>
+                    </span>
+                  </TooltipTrigger>
+                  <TooltipContent side="top" className="text-xs">{item.fornecedor}</TooltipContent>
+                </Tooltip>
               </TableCell>
               {canViewFinancials && (
                 <TableCell className={`px-0.5 py-0 text-right font-mono text-[9px] text-muted-foreground truncate ${!item.custo ? 'bg-orange-200 dark:bg-orange-900/40' : ''}`}>
                   {formatCurrency(item.custo)}
                 </TableCell>
               )}
-              <TableCell className="px-0.5 py-0 text-[9px] truncate">{item.receptivo || "—"}</TableCell>
-              <TableCell className="px-0.5 py-0 truncate text-[9px] text-muted-foreground" title={item.observacoes}>
-                {item.observacoes || "—"}
+              <TableCell className="px-0.5 py-0 text-[9px] truncate">
+                <Tooltip>
+                  <TooltipTrigger asChild><span className="truncate cursor-default">{item.receptivo || "—"}</span></TooltipTrigger>
+                  {item.receptivo && <TooltipContent side="top" className="text-xs">{item.receptivo}</TooltipContent>}
+                </Tooltip>
+              </TableCell>
+              <TableCell className="px-0.5 py-0 truncate text-[9px] text-muted-foreground">
+                <Tooltip>
+                  <TooltipTrigger asChild><span className="truncate cursor-default">{item.observacoes || "—"}</span></TooltipTrigger>
+                  {item.observacoes && <TooltipContent side="top" className="text-xs max-w-sm whitespace-pre-wrap">{item.observacoes}</TooltipContent>}
+                </Tooltip>
               </TableCell>
               <TableCell className="px-0.5 py-0 text-center">
                 <TooltipProvider>
@@ -507,6 +554,7 @@ const AgendaTable = ({ items, onEdited, hideFinancials, onClone }: AgendaTablePr
       </AlertDialogContent>
     </AlertDialog>
     </>
+    </TooltipProvider>
   );
 };
 
