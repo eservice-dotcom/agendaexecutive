@@ -595,10 +595,13 @@ const Vendas = () => {
       const { error: itemsError } = await supabase.from("venda_items").insert(items);
       if (itemsError) throw itemsError;
 
-      await supabase
+      const { error: statusError } = await supabase
         .from("agenda_items")
         .update({ status_faturamento: "faturado" })
         .in("id", Array.from(selectedItems));
+      if (statusError) {
+        console.error("Erro ao atualizar status de faturamento:", statusError);
+      }
 
       // Auto-generate conta a receber (client owes)
       const { error: crError } = await supabase.from("contas_receber").insert({
