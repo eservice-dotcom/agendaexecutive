@@ -238,7 +238,7 @@ const NovoServicoDialog = ({ open, onOpenChange, onSaved, initialData }: NovoSer
         telefone: motorista?.telefone || "",
         valor: parseFloat(form.valor) || 0,
         fornecedor: fornecedor?.razaoSocial || "",
-        custo: parseFloat(form.custo) || 0,
+        custo: fornecedor?.razaoSocial.toLowerCase().includes("executive") ? 0 : (parseFloat(form.custo) || 0),
         observacoes: form.observacoes,
         receptivo: form.receptivo,
         statusFaturamento: "",

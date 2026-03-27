@@ -217,7 +217,7 @@ const EditServicoDialog = ({ open, onOpenChange, item, onSaved }: EditServicoDia
         telefone: form.telefone,
         valor: parseFloat(form.valor) || 0,
         fornecedor: form.fornecedor,
-        custo: parseFloat(form.custo) || 0,
+        custo: form.fornecedor.toLowerCase().includes("executive") ? 0 : (parseFloat(form.custo) || 0),
         observacoes: form.observacoes,
         receptivo: form.receptivo,
         statusFaturamento: form.statusFaturamento,
