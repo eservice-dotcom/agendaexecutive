@@ -107,27 +107,61 @@ const AgendaFilters = ({ filters, onFilterChange, motoristas, tipos, fornecedore
         </div>
         <div className="space-y-1">
           <label className="text-xs font-medium text-muted-foreground">Data Início</label>
-          <div className="relative">
-            <Calendar className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-            <Input
-              type="date"
-              value={filters.dataInicio}
-              onChange={(e) => updateFilter("dataInicio", e.target.value)}
-              className="pl-9"
-            />
-          </div>
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button
+                variant="outline"
+                className={cn(
+                  "w-full justify-start text-left font-normal h-10",
+                  !filters.dataInicio && "text-muted-foreground"
+                )}
+              >
+                <CalendarIcon className="mr-2 h-4 w-4" />
+                {filters.dataInicio
+                  ? format(parse(filters.dataInicio, "yyyy-MM-dd", new Date()), "dd/MM/yyyy")
+                  : "Selecione"}
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-auto p-0" align="start">
+              <Calendar
+                mode="single"
+                selected={filters.dataInicio ? parse(filters.dataInicio, "yyyy-MM-dd", new Date()) : undefined}
+                onSelect={(date) => updateFilter("dataInicio", date ? format(date, "yyyy-MM-dd") : "")}
+                locale={ptBR}
+                initialFocus
+                className={cn("p-3 pointer-events-auto")}
+              />
+            </PopoverContent>
+          </Popover>
         </div>
         <div className="space-y-1">
           <label className="text-xs font-medium text-muted-foreground">Data Fim</label>
-          <div className="relative">
-            <Calendar className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-            <Input
-              type="date"
-              value={filters.dataFim}
-              onChange={(e) => updateFilter("dataFim", e.target.value)}
-              className="pl-9"
-            />
-          </div>
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button
+                variant="outline"
+                className={cn(
+                  "w-full justify-start text-left font-normal h-10",
+                  !filters.dataFim && "text-muted-foreground"
+                )}
+              >
+                <CalendarIcon className="mr-2 h-4 w-4" />
+                {filters.dataFim
+                  ? format(parse(filters.dataFim, "yyyy-MM-dd", new Date()), "dd/MM/yyyy")
+                  : "Selecione"}
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-auto p-0" align="start">
+              <Calendar
+                mode="single"
+                selected={filters.dataFim ? parse(filters.dataFim, "yyyy-MM-dd", new Date()) : undefined}
+                onSelect={(date) => updateFilter("dataFim", date ? format(date, "yyyy-MM-dd") : "")}
+                locale={ptBR}
+                initialFocus
+                className={cn("p-3 pointer-events-auto")}
+              />
+            </PopoverContent>
+          </Popover>
         </div>
         <div className="space-y-1">
           <label className="text-xs font-medium text-muted-foreground">Passageiro/Voo</label>
