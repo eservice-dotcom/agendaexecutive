@@ -397,7 +397,7 @@ const EditServicoDialog = ({ open, onOpenChange, item, onSaved }: EditServicoDia
 
           <div className="space-y-1.5">
             <Label>Custo (R$)</Label>
-            <Input type="number" min={0} step="0.01" value={form.custo} onChange={(e) => update("custo", e.target.value)} placeholder="0,00" />
+            <Input type="number" min={0} step="0.01" value={form.fornecedor.toLowerCase().includes("executive") ? "0" : form.custo} onChange={(e) => update("custo", e.target.value)} placeholder="0,00" disabled={form.fornecedor.toLowerCase().includes("executive")} />
           </div>
 
           <div className="space-y-1.5">
