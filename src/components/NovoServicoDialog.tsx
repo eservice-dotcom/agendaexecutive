@@ -238,7 +238,7 @@ const NovoServicoDialog = ({ open, onOpenChange, onSaved, initialData }: NovoSer
         telefone: motorista?.telefone || "",
         valor: parseFloat(form.valor) || 0,
         fornecedor: fornecedor?.razaoSocial || "",
-        custo: parseFloat(form.custo) || 0,
+        custo: fornecedor?.razaoSocial.toLowerCase().includes("executive") ? 0 : (parseFloat(form.custo) || 0),
         observacoes: form.observacoes,
         receptivo: form.receptivo,
         statusFaturamento: "",
@@ -469,7 +469,7 @@ const NovoServicoDialog = ({ open, onOpenChange, onSaved, initialData }: NovoSer
 
           <div className="space-y-1.5">
             <Label>Custo (R$)</Label>
-            <Input type="number" min={0} step="0.01" value={form.custo} onChange={(e) => update("custo", e.target.value)} placeholder="0,00" />
+            <Input type="number" min={0} step="0.01" value={(() => { const f = fornecedores.find((f) => f.id === form.fornecedorId); return f && f.razaoSocial.toLowerCase().includes("executive") ? "0" : form.custo; })()} onChange={(e) => update("custo", e.target.value)} placeholder="0,00" disabled={(() => { const f = fornecedores.find((f) => f.id === form.fornecedorId); return !!(f && f.razaoSocial.toLowerCase().includes("executive")); })()} />
           </div>
 
           <div className="space-y-1.5">
