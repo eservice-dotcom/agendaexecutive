@@ -494,6 +494,82 @@ const DashboardFinanceiro = () => {
           </CardContent>
         </Card>
       </div>
+
+      {/* Print Filters Dialog */}
+      <Dialog open={printOpen} onOpenChange={setPrintOpen}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Imprimir Relatório Financeiro</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <Label className="text-xs">Data Início</Label>
+                <Input type="date" value={printDataInicio} onChange={(e) => setPrintDataInicio(e.target.value)} className="h-9" />
+              </div>
+              <div>
+                <Label className="text-xs">Data Fim</Label>
+                <Input type="date" value={printDataFim} onChange={(e) => setPrintDataFim(e.target.value)} className="h-9" />
+              </div>
+            </div>
+            <div>
+              <Label className="text-xs">Cliente</Label>
+              <Select value={printCliente || "all"} onValueChange={(v) => setPrintCliente(v === "all" ? "" : v)}>
+                <SelectTrigger className="h-9">
+                  <SelectValue placeholder="Todos os clientes" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Todos os clientes</SelectItem>
+                  {allClientes.map((c) => (
+                    <SelectItem key={c} value={c}>{c}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <Label className="text-xs">Fornecedor</Label>
+              <Select value={printFornecedor || "all"} onValueChange={(v) => setPrintFornecedor(v === "all" ? "" : v)}>
+                <SelectTrigger className="h-9">
+                  <SelectValue placeholder="Todos os fornecedores" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Todos os fornecedores</SelectItem>
+                  {allFornecedores.map((f) => (
+                    <SelectItem key={f} value={f}>{f}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <Label className="text-xs mb-2 block">Seções do Relatório</Label>
+              <div className="space-y-2">
+                {([
+                  { key: "receitasDespesas", label: "Receitas vs Despesas Mensal" },
+                  { key: "dre", label: "DRE Simplificado" },
+                  { key: "faturamentoClientes", label: "Faturamento por Cliente" },
+                  { key: "projetadoEfetivado", label: "Projetado vs Efetivado" },
+                ] as const).map((s) => (
+                  <div key={s.key} className="flex items-center gap-2">
+                    <Checkbox
+                      id={`print-${s.key}`}
+                      checked={printSections[s.key]}
+                      onCheckedChange={(checked) => setPrintSections((prev) => ({ ...prev, [s.key]: !!checked }))}
+                    />
+                    <label htmlFor={`print-${s.key}`} className="text-sm cursor-pointer">{s.label}</label>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setPrintOpen(false)}>Cancelar</Button>
+            <Button onClick={handlePrint}>
+              <Printer className="h-4 w-4 mr-1" />
+              Imprimir
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
