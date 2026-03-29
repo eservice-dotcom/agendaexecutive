@@ -6,7 +6,9 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell,
 } from "recharts";
-import { TrendingUp, TrendingDown, DollarSign, BarChart3 } from "lucide-react";
+import { TrendingUp, TrendingDown, DollarSign, BarChart3, Printer } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { printDashboardFinanceiro } from "@/lib/printUtils";
 
 const formatCurrency = (v: number) =>
   new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(v);
@@ -145,6 +147,18 @@ const DashboardFinanceiro = () => {
 
   const totalFatClientes = faturamentoClientes.reduce((s, c) => s + c.valor, 0);
 
+  const handlePrint = () => {
+    const logoEl = document.querySelector('img[alt="Logo"]') as HTMLImageElement;
+    const logoUrl = logoEl?.src || "";
+    printDashboardFinanceiro({
+      year,
+      dre,
+      receitasDespesas: receitasDespesasData,
+      projetado: projetadoEfetivado,
+      faturamentoClientes,
+    }, logoUrl);
+  };
+
   return (
     <div className="space-y-6">
       {/* Year selector + KPIs */}
@@ -159,6 +173,11 @@ const DashboardFinanceiro = () => {
             ))}
           </SelectContent>
         </Select>
+
+        <Button variant="outline" size="sm" onClick={handlePrint}>
+          <Printer className="h-4 w-4 mr-1" />
+          Imprimir Relatório
+        </Button>
 
         <div className="grid flex-1 grid-cols-2 gap-3 sm:grid-cols-4">
           <KPICard icon={TrendingUp} label="Receitas" value={formatCurrency(dre.totalReceitas)} variant="success" />
