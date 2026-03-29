@@ -174,6 +174,11 @@ const DashboardFinanceiro = () => {
           </SelectContent>
         </Select>
 
+        <Button variant="outline" size="sm" onClick={handlePrint}>
+          <Printer className="h-4 w-4 mr-1" />
+          Imprimir Relatório
+        </Button>
+
         <div className="grid flex-1 grid-cols-2 gap-3 sm:grid-cols-4">
           <KPICard icon={TrendingUp} label="Receitas" value={formatCurrency(dre.totalReceitas)} variant="success" />
           <KPICard icon={TrendingDown} label="Despesas" value={formatCurrency(dre.totalDespesas)} variant="destructive" />
