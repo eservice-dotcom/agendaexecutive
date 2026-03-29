@@ -492,33 +492,90 @@ export const printDashboardFinanceiro = (
     receitasDespesas: { mes: string; Receitas: number; Despesas: number }[];
     projetado: { recPago: number; recPendente: number; despPago: number; despPendente: number; resultadoEfetivado: number; resultadoProjetado: number; monthly: { mes: string; Efetivado: number; Projetado: number }[] };
     faturamentoClientes: { cliente: string; valor: number }[];
+    sections?: { receitasDespesas: boolean; dre: boolean; faturamentoClientes: boolean; projetadoEfetivado: boolean };
+    filterDescription?: string;
   },
   logoUrl = ""
 ) => {
   const fc = (v: number) => formatCurrency(v);
+  const sec = data.sections || { receitasDespesas: true, dre: true, faturamentoClientes: true, projetadoEfetivado: true };
+
+  const filterLine = data.filterDescription ? `<p style="font-size:10px;color:#444;margin-bottom:12px;padding:6px 10px;background:#f0f4f8;border-radius:4px;border-left:3px solid #c8a456"><b>Filtros:</b> ${data.filterDescription}</p>` : "";
 
   // Receitas vs Despesas table
-  const rdRows = data.receitasDespesas
-    .filter(m => m.Receitas > 0 || m.Despesas > 0)
-    .map(m => `<tr><td>${m.mes}</td><td class="r">${fc(m.Receitas)}</td><td class="r">${fc(m.Despesas)}</td><td class="r b">${fc(m.Receitas - m.Despesas)}</td></tr>`)
-    .join("");
+  let receitasDespesasHtml = "";
+  if (sec.receitasDespesas) {
+    const rdRows = data.receitasDespesas
+      .filter(m => m.Receitas > 0 || m.Despesas > 0)
+      .map(m => `<tr><td>${m.mes}</td><td class="r">${fc(m.Receitas)}</td><td class="r">${fc(m.Despesas)}</td><td class="r b">${fc(m.Receitas - m.Despesas)}</td></tr>`)
+      .join("");
+    receitasDespesasHtml = `<div class="section">
+      <div class="section-title">Receitas vs Despesas Mensal</div>
+      <table><thead><tr><th>Mês</th><th class="r">Receitas</th><th class="r">Despesas</th><th class="r">Resultado</th></tr></thead>
+      <tbody>${rdRows}</tbody></table>
+    </div>`;
+  }
 
   // DRE
-  const dreRecRows = data.dre.centrosRec.map(c => `<tr><td style="padding-left:24px" class="text-sm">${c.nome}</td><td class="r">${fc(c.valor)}</td></tr>`).join("");
-  const dreDespRows = data.dre.centros.map(c => `<tr><td style="padding-left:24px" class="text-sm">${c.nome}</td><td class="r">${fc(c.valor)}</td></tr>`).join("");
+  let dreHtml = "";
+  if (sec.dre) {
+    const dreRecRows = data.dre.centrosRec.map(c => `<tr><td style="padding-left:24px" class="text-sm">${c.nome}</td><td class="r">${fc(c.valor)}</td></tr>`).join("");
+    const dreDespRows = data.dre.centros.map(c => `<tr><td style="padding-left:24px" class="text-sm">${c.nome}</td><td class="r">${fc(c.valor)}</td></tr>`).join("");
+    dreHtml = `<div class="section">
+      <div class="section-title">DRE Simplificado</div>
+      <table><tbody>
+        <tr style="background:#e8f5e9"><td class="b">RECEITA BRUTA</td><td class="r b" style="color:#16a34a">${fc(data.dre.totalReceitas)}</td></tr>
+        ${dreRecRows}
+        <tr style="background:#fce4ec"><td class="b">(-) DESPESAS</td><td class="r b" style="color:#dc2626">${fc(data.dre.totalDespesas)}</td></tr>
+        ${dreDespRows}
+        <tr style="background:#1a3a5c;color:#fff"><td class="b">(=) RESULTADO</td><td class="r b">${fc(data.dre.resultado)}</td></tr>
+        <tr><td class="b">Margem Líquida</td><td class="r b" style="color:${data.dre.margem >= 0 ? '#16a34a' : '#dc2626'}">${data.dre.margem.toFixed(1)}%</td></tr>
+      </tbody></table>
+    </div>`;
+  }
 
   // Faturamento por Cliente
-  const totalFat = data.faturamentoClientes.reduce((s, c) => s + c.valor, 0);
-  const clienteRows = data.faturamentoClientes.map(c => {
-    const pct = totalFat > 0 ? ((c.valor / totalFat) * 100).toFixed(1) : "0";
-    return `<tr><td>${c.cliente}</td><td class="r">${fc(c.valor)}</td><td class="r">${pct}%</td></tr>`;
-  }).join("");
+  let clientesHtml = "";
+  if (sec.faturamentoClientes) {
+    const totalFat = data.faturamentoClientes.reduce((s, c) => s + c.valor, 0);
+    const clienteRows = data.faturamentoClientes.map(c => {
+      const pct = totalFat > 0 ? ((c.valor / totalFat) * 100).toFixed(1) : "0";
+      return `<tr><td>${c.cliente}</td><td class="r">${fc(c.valor)}</td><td class="r">${pct}%</td></tr>`;
+    }).join("");
+    clientesHtml = `<div class="section">
+      <div class="section-title">Faturamento por Cliente</div>
+      <table><thead><tr><th>Cliente</th><th class="r">Valor</th><th class="r">%</th></tr></thead>
+      <tbody>${clienteRows}</tbody></table>
+    </div>`;
+  }
 
   // Projetado vs Efetivado
-  const peRows = data.projetado.monthly
-    .filter(m => m.Efetivado !== 0 || m.Projetado !== 0)
-    .map(m => `<tr><td>${m.mes}</td><td class="r">${fc(m.Efetivado)}</td><td class="r">${fc(m.Projetado)}</td></tr>`)
-    .join("");
+  let projetadoHtml = "";
+  if (sec.projetadoEfetivado) {
+    const peRows = data.projetado.monthly
+      .filter(m => m.Efetivado !== 0 || m.Projetado !== 0)
+      .map(m => `<tr><td>${m.mes}</td><td class="r">${fc(m.Efetivado)}</td><td class="r">${fc(m.Projetado)}</td></tr>`)
+      .join("");
+    projetadoHtml = `<div class="section">
+      <div class="section-title">Resultado: Projetado vs Efetivado</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:8px">
+        <div style="border:1px solid #ddd;border-radius:4px;padding:6px;text-align:center">
+          <div style="font-size:9px;color:#666">Efetivado</div>
+          <div style="font-size:14px;font-weight:700;color:${data.projetado.resultadoEfetivado >= 0 ? '#16a34a' : '#dc2626'}">${fc(data.projetado.resultadoEfetivado)}</div>
+        </div>
+        <div style="border:1px solid #ddd;border-radius:4px;padding:6px;text-align:center">
+          <div style="font-size:9px;color:#666">Projetado</div>
+          <div style="font-size:14px;font-weight:700;color:${data.projetado.resultadoProjetado >= 0 ? '#2563eb' : '#dc2626'}">${fc(data.projetado.resultadoProjetado)}</div>
+        </div>
+      </div>
+      <table><thead><tr><th>Mês</th><th class="r">Efetivado</th><th class="r">Projetado</th></tr></thead>
+      <tbody>${peRows}</tbody></table>
+    </div>`;
+  }
+
+  // Layout: pair sections in two-col grids
+  const topPair = (receitasDespesasHtml || dreHtml) ? `<div class="two-col">${receitasDespesasHtml}${dreHtml}</div>` : "";
+  const bottomPair = (clientesHtml || projetadoHtml) ? `<div class="two-col">${clientesHtml}${projetadoHtml}</div>` : "";
 
   const w = window.open("", "_blank");
   if (!w) return;
@@ -538,6 +595,7 @@ ${brandedStyles()}
 </head><body>
 <div class="page">
   ${brandedHeader(logoUrl, `Dashboard Financeiro — ${data.year}`)}
+  ${filterLine}
 
   <div class="kpi-grid">
     <div class="kpi"><div class="label">Receitas</div><div class="value green">${fc(data.dre.totalReceitas)}</div></div>
@@ -546,49 +604,8 @@ ${brandedStyles()}
     <div class="kpi"><div class="label">Margem</div><div class="value ${data.dre.margem >= 0 ? 'green' : 'red'}">${data.dre.margem.toFixed(1)}%</div></div>
   </div>
 
-  <div class="two-col">
-    <div class="section">
-      <div class="section-title">Receitas vs Despesas Mensal</div>
-      <table><thead><tr><th>Mês</th><th class="r">Receitas</th><th class="r">Despesas</th><th class="r">Resultado</th></tr></thead>
-      <tbody>${rdRows}</tbody></table>
-    </div>
-
-    <div class="section">
-      <div class="section-title">DRE Simplificado</div>
-      <table><tbody>
-        <tr style="background:#e8f5e9"><td class="b">RECEITA BRUTA</td><td class="r b" style="color:#16a34a">${fc(data.dre.totalReceitas)}</td></tr>
-        ${dreRecRows}
-        <tr style="background:#fce4ec"><td class="b">(-) DESPESAS</td><td class="r b" style="color:#dc2626">${fc(data.dre.totalDespesas)}</td></tr>
-        ${dreDespRows}
-        <tr style="background:#1a3a5c;color:#fff"><td class="b">(=) RESULTADO</td><td class="r b">${fc(data.dre.resultado)}</td></tr>
-        <tr><td class="b">Margem Líquida</td><td class="r b ${data.dre.margem >= 0 ? '' : ''}" style="color:${data.dre.margem >= 0 ? '#16a34a' : '#dc2626'}">${data.dre.margem.toFixed(1)}%</td></tr>
-      </tbody></table>
-    </div>
-  </div>
-
-  <div class="two-col">
-    <div class="section">
-      <div class="section-title">Faturamento por Cliente</div>
-      <table><thead><tr><th>Cliente</th><th class="r">Valor</th><th class="r">%</th></tr></thead>
-      <tbody>${clienteRows}</tbody></table>
-    </div>
-
-    <div class="section">
-      <div class="section-title">Resultado: Projetado vs Efetivado</div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:8px">
-        <div style="border:1px solid #ddd;border-radius:4px;padding:6px;text-align:center">
-          <div style="font-size:9px;color:#666">Efetivado</div>
-          <div style="font-size:14px;font-weight:700;color:${data.projetado.resultadoEfetivado >= 0 ? '#16a34a' : '#dc2626'}">${fc(data.projetado.resultadoEfetivado)}</div>
-        </div>
-        <div style="border:1px solid #ddd;border-radius:4px;padding:6px;text-align:center">
-          <div style="font-size:9px;color:#666">Projetado</div>
-          <div style="font-size:14px;font-weight:700;color:${data.projetado.resultadoProjetado >= 0 ? '#2563eb' : '#dc2626'}">${fc(data.projetado.resultadoProjetado)}</div>
-        </div>
-      </div>
-      <table><thead><tr><th>Mês</th><th class="r">Efetivado</th><th class="r">Projetado</th></tr></thead>
-      <tbody>${peRows}</tbody></table>
-    </div>
-  </div>
+  ${topPair}
+  ${bottomPair}
 
   <div class="footer">
     <span>Documento gerado em ${new Date().toLocaleString("pt-BR")}</span>
