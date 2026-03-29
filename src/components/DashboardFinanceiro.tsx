@@ -147,6 +147,18 @@ const DashboardFinanceiro = () => {
 
   const totalFatClientes = faturamentoClientes.reduce((s, c) => s + c.valor, 0);
 
+  const handlePrint = () => {
+    const logoEl = document.querySelector('img[alt="Logo"]') as HTMLImageElement;
+    const logoUrl = logoEl?.src || "";
+    printDashboardFinanceiro({
+      year,
+      dre,
+      receitasDespesas: receitasDespesasData,
+      projetado: projetadoEfetivado,
+      faturamentoClientes,
+    }, logoUrl);
+  };
+
   return (
     <div className="space-y-6">
       {/* Year selector + KPIs */}
