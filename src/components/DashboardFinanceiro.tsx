@@ -3,6 +3,10 @@ import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell,
 } from "recharts";
@@ -147,16 +151,132 @@ const DashboardFinanceiro = () => {
 
   const totalFatClientes = faturamentoClientes.reduce((s, c) => s + c.valor, 0);
 
+  // Print dialog state
+  const [printOpen, setPrintOpen] = useState(false);
+  const [printDataInicio, setPrintDataInicio] = useState("");
+  const [printDataFim, setPrintDataFim] = useState("");
+  const [printCliente, setPrintCliente] = useState("");
+  const [printFornecedor, setPrintFornecedor] = useState("");
+  const [printSections, setPrintSections] = useState({
+    receitasDespesas: true,
+    dre: true,
+    faturamentoClientes: true,
+    projetadoEfetivado: true,
+  });
+
+  const allClientes = useMemo(() => {
+    return [...new Set(contasReceber.map(c => (c as any).cliente).filter(Boolean))].sort();
+  }, [contasReceber]);
+
+  const allFornecedores = useMemo(() => {
+    return [...new Set(contasPagar.map(c => (c as any).fornecedor).filter(Boolean))].sort();
+  }, [contasPagar]);
+
+  const openPrintDialog = () => {
+    setPrintDataInicio("");
+    setPrintDataFim("");
+    setPrintCliente("");
+    setPrintFornecedor("");
+    setPrintSections({ receitasDespesas: true, dre: true, faturamentoClientes: true, projetadoEfetivado: true });
+    setPrintOpen(true);
+  };
+
   const handlePrint = () => {
+    // Apply print filters
+    let filteredCP = cpYear;
+    let filteredCR = crYear;
+
+    if (printDataInicio) {
+      filteredCP = filteredCP.filter(c => c.data >= printDataInicio);
+      filteredCR = filteredCR.filter(c => c.data >= printDataInicio);
+    }
+    if (printDataFim) {
+      filteredCP = filteredCP.filter(c => c.data <= printDataFim);
+      filteredCR = filteredCR.filter(c => c.data <= printDataFim);
+    }
+    if (printCliente) {
+      filteredCR = filteredCR.filter(c => (c as any).cliente === printCliente);
+    }
+    if (printFornecedor) {
+      filteredCP = filteredCP.filter(c => (c as any).fornecedor === printFornecedor);
+    }
+
+    // Recalculate all data with filtered values
+    const filteredReceitasDespesas = MONTHS.map((label, i) => {
+      const m = String(i + 1).padStart(2, "0");
+      const prefix = `${year}-${m}`;
+      const receitas = filteredCR.filter(c => c.data?.startsWith(prefix)).reduce((s, c) => s + Number(c.valor), 0);
+      const despesas = filteredCP.filter(c => c.data?.startsWith(prefix)).reduce((s, c) => s + Number(c.valor), 0);
+      return { mes: label, Receitas: receitas, Despesas: despesas };
+    });
+
+    const totalReceitas = filteredCR.reduce((s, c) => s + Number(c.valor), 0);
+    const totalDespesas = filteredCP.reduce((s, c) => s + Number(c.valor), 0);
+    const resultado = totalReceitas - totalDespesas;
+    const margem = totalReceitas > 0 ? (resultado / totalReceitas) * 100 : 0;
+
+    const centrosMap = new Map<string, number>();
+    filteredCP.forEach(c => {
+      const key = (c as any).centro_custo || "Sem centro";
+      centrosMap.set(key, (centrosMap.get(key) || 0) + Number(c.valor));
+    });
+    const centros = Array.from(centrosMap.entries()).map(([nome, valor]) => ({ nome, valor })).sort((a, b) => b.valor - a.valor);
+
+    const centrosRecMap = new Map<string, number>();
+    filteredCR.forEach(c => {
+      const key = (c as any).centro_receita || "Sem centro";
+      centrosRecMap.set(key, (centrosRecMap.get(key) || 0) + Number(c.valor));
+    });
+    const centrosRec = Array.from(centrosRecMap.entries()).map(([nome, valor]) => ({ nome, valor })).sort((a, b) => b.valor - a.valor);
+
+    const recPago = filteredCR.filter(c => c.status === "pago").reduce((s, c) => s + Number(c.valor), 0);
+    const recPendente = filteredCR.filter(c => c.status !== "pago").reduce((s, c) => s + Number(c.valor), 0);
+    const despPago = filteredCP.filter(c => c.status === "pago").reduce((s, c) => s + Number(c.valor), 0);
+    const despPendente = filteredCP.filter(c => c.status !== "pago").reduce((s, c) => s + Number(c.valor), 0);
+    const resultadoEfetivado = recPago - despPago;
+    const resultadoProjetado = (recPago + recPendente) - (despPago + despPendente);
+
+    const monthly = MONTHS.map((label, i) => {
+      const m = String(i + 1).padStart(2, "0");
+      const prefix = `${year}-${m}`;
+      const mCr = filteredCR.filter(c => c.data?.startsWith(prefix));
+      const mCp = filteredCP.filter(c => c.data?.startsWith(prefix));
+      const efetivado = mCr.filter(c => c.status === "pago").reduce((s, c) => s + Number(c.valor), 0) - mCp.filter(c => c.status === "pago").reduce((s, c) => s + Number(c.valor), 0);
+      const projetado = mCr.reduce((s, c) => s + Number(c.valor), 0) - mCp.reduce((s, c) => s + Number(c.valor), 0);
+      return { mes: label, Efetivado: efetivado, Projetado: projetado };
+    });
+
+    const fatClientes = new Map<string, number>();
+    filteredCR.forEach(c => {
+      const key = (c as any).cliente || "Sem cliente";
+      fatClientes.set(key, (fatClientes.get(key) || 0) + Number(c.valor));
+    });
+    const filteredFatClientes = Array.from(fatClientes.entries()).map(([cliente, valor]) => ({ cliente, valor })).sort((a, b) => b.valor - a.valor);
+
+    // Build filter description
+    const filterParts: string[] = [];
+    if (printDataInicio || printDataFim) {
+      const fmtD = (d: string) => { const [y, m, day] = d.split("-"); return `${day}/${m}/${y}`; };
+      if (printDataInicio && printDataFim) filterParts.push(`Período: ${fmtD(printDataInicio)} a ${fmtD(printDataFim)}`);
+      else if (printDataInicio) filterParts.push(`A partir de: ${fmtD(printDataInicio)}`);
+      else filterParts.push(`Até: ${fmtD(printDataFim)}`);
+    }
+    if (printCliente) filterParts.push(`Cliente: ${printCliente}`);
+    if (printFornecedor) filterParts.push(`Fornecedor: ${printFornecedor}`);
+
     const logoEl = document.querySelector('img[alt="Logo"]') as HTMLImageElement;
     const logoUrl = logoEl?.src || "";
     printDashboardFinanceiro({
       year,
-      dre,
-      receitasDespesas: receitasDespesasData,
-      projetado: projetadoEfetivado,
-      faturamentoClientes,
+      dre: { totalReceitas, totalDespesas, resultado, margem, centros, centrosRec },
+      receitasDespesas: filteredReceitasDespesas,
+      projetado: { recPago, recPendente, despPago, despPendente, resultadoEfetivado, resultadoProjetado, monthly },
+      faturamentoClientes: filteredFatClientes,
+      sections: printSections,
+      filterDescription: filterParts.length > 0 ? filterParts.join(" | ") : undefined,
     }, logoUrl);
+
+    setPrintOpen(false);
   };
 
   return (
@@ -174,7 +294,7 @@ const DashboardFinanceiro = () => {
           </SelectContent>
         </Select>
 
-        <Button variant="outline" size="sm" onClick={handlePrint}>
+        <Button variant="outline" size="sm" onClick={openPrintDialog}>
           <Printer className="h-4 w-4 mr-1" />
           Imprimir Relatório
         </Button>
@@ -374,6 +494,82 @@ const DashboardFinanceiro = () => {
           </CardContent>
         </Card>
       </div>
+
+      {/* Print Filters Dialog */}
+      <Dialog open={printOpen} onOpenChange={setPrintOpen}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Imprimir Relatório Financeiro</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <Label className="text-xs">Data Início</Label>
+                <Input type="date" value={printDataInicio} onChange={(e) => setPrintDataInicio(e.target.value)} className="h-9" />
+              </div>
+              <div>
+                <Label className="text-xs">Data Fim</Label>
+                <Input type="date" value={printDataFim} onChange={(e) => setPrintDataFim(e.target.value)} className="h-9" />
+              </div>
+            </div>
+            <div>
+              <Label className="text-xs">Cliente</Label>
+              <Select value={printCliente || "all"} onValueChange={(v) => setPrintCliente(v === "all" ? "" : v)}>
+                <SelectTrigger className="h-9">
+                  <SelectValue placeholder="Todos os clientes" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Todos os clientes</SelectItem>
+                  {allClientes.map((c) => (
+                    <SelectItem key={c} value={c}>{c}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <Label className="text-xs">Fornecedor</Label>
+              <Select value={printFornecedor || "all"} onValueChange={(v) => setPrintFornecedor(v === "all" ? "" : v)}>
+                <SelectTrigger className="h-9">
+                  <SelectValue placeholder="Todos os fornecedores" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Todos os fornecedores</SelectItem>
+                  {allFornecedores.map((f) => (
+                    <SelectItem key={f} value={f}>{f}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <Label className="text-xs mb-2 block">Seções do Relatório</Label>
+              <div className="space-y-2">
+                {([
+                  { key: "receitasDespesas", label: "Receitas vs Despesas Mensal" },
+                  { key: "dre", label: "DRE Simplificado" },
+                  { key: "faturamentoClientes", label: "Faturamento por Cliente" },
+                  { key: "projetadoEfetivado", label: "Projetado vs Efetivado" },
+                ] as const).map((s) => (
+                  <div key={s.key} className="flex items-center gap-2">
+                    <Checkbox
+                      id={`print-${s.key}`}
+                      checked={printSections[s.key]}
+                      onCheckedChange={(checked) => setPrintSections((prev) => ({ ...prev, [s.key]: !!checked }))}
+                    />
+                    <label htmlFor={`print-${s.key}`} className="text-sm cursor-pointer">{s.label}</label>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setPrintOpen(false)}>Cancelar</Button>
+            <Button onClick={handlePrint}>
+              <Printer className="h-4 w-4 mr-1" />
+              Imprimir
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
