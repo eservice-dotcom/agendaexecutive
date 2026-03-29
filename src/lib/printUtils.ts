@@ -484,3 +484,118 @@ export const printFatFornecedor = (items: any[], includeFinancials = true) => {
 </tr></thead><tbody>${rows}</tbody></table>
 ${totals}`);
 };
+
+export const printDashboardFinanceiro = (
+  data: {
+    year: string;
+    dre: { totalReceitas: number; totalDespesas: number; resultado: number; margem: number; centros: { nome: string; valor: number }[]; centrosRec: { nome: string; valor: number }[] };
+    receitasDespesas: { mes: string; Receitas: number; Despesas: number }[];
+    projetado: { recPago: number; recPendente: number; despPago: number; despPendente: number; resultadoEfetivado: number; resultadoProjetado: number; monthly: { mes: string; Efetivado: number; Projetado: number }[] };
+    faturamentoClientes: { cliente: string; valor: number }[];
+  },
+  logoUrl = ""
+) => {
+  const fc = (v: number) => formatCurrency(v);
+
+  // Receitas vs Despesas table
+  const rdRows = data.receitasDespesas
+    .filter(m => m.Receitas > 0 || m.Despesas > 0)
+    .map(m => `<tr><td>${m.mes}</td><td class="r">${fc(m.Receitas)}</td><td class="r">${fc(m.Despesas)}</td><td class="r b">${fc(m.Receitas - m.Despesas)}</td></tr>`)
+    .join("");
+
+  // DRE
+  const dreRecRows = data.dre.centrosRec.map(c => `<tr><td style="padding-left:24px" class="text-sm">${c.nome}</td><td class="r">${fc(c.valor)}</td></tr>`).join("");
+  const dreDespRows = data.dre.centros.map(c => `<tr><td style="padding-left:24px" class="text-sm">${c.nome}</td><td class="r">${fc(c.valor)}</td></tr>`).join("");
+
+  // Faturamento por Cliente
+  const totalFat = data.faturamentoClientes.reduce((s, c) => s + c.valor, 0);
+  const clienteRows = data.faturamentoClientes.map(c => {
+    const pct = totalFat > 0 ? ((c.valor / totalFat) * 100).toFixed(1) : "0";
+    return `<tr><td>${c.cliente}</td><td class="r">${fc(c.valor)}</td><td class="r">${pct}%</td></tr>`;
+  }).join("");
+
+  // Projetado vs Efetivado
+  const peRows = data.projetado.monthly
+    .filter(m => m.Efetivado !== 0 || m.Projetado !== 0)
+    .map(m => `<tr><td>${m.mes}</td><td class="r">${fc(m.Efetivado)}</td><td class="r">${fc(m.Projetado)}</td></tr>`)
+    .join("");
+
+  const w = window.open("", "_blank");
+  if (!w) return;
+  w.document.write(`<!DOCTYPE html><html><head><title>Dashboard Financeiro — ${data.year}</title>
+${brandedStyles()}
+<style>
+.section{margin-bottom:20px}
+.section-title{font-size:13px;font-weight:700;color:#1a3a5c;border-bottom:2px solid #1a3a5c;padding-bottom:4px;margin-bottom:8px}
+.kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:16px}
+.kpi{border:1px solid #ddd;border-radius:6px;padding:8px 12px;text-align:center}
+.kpi .label{font-size:9px;color:#666;text-transform:uppercase}
+.kpi .value{font-size:16px;font-weight:700;margin-top:2px}
+.kpi .green{color:#16a34a}
+.kpi .red{color:#dc2626}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+</style>
+</head><body>
+<div class="page">
+  ${brandedHeader(logoUrl, `Dashboard Financeiro — ${data.year}`)}
+
+  <div class="kpi-grid">
+    <div class="kpi"><div class="label">Receitas</div><div class="value green">${fc(data.dre.totalReceitas)}</div></div>
+    <div class="kpi"><div class="label">Despesas</div><div class="value red">${fc(data.dre.totalDespesas)}</div></div>
+    <div class="kpi"><div class="label">Resultado</div><div class="value ${data.dre.resultado >= 0 ? 'green' : 'red'}">${fc(data.dre.resultado)}</div></div>
+    <div class="kpi"><div class="label">Margem</div><div class="value ${data.dre.margem >= 0 ? 'green' : 'red'}">${data.dre.margem.toFixed(1)}%</div></div>
+  </div>
+
+  <div class="two-col">
+    <div class="section">
+      <div class="section-title">Receitas vs Despesas Mensal</div>
+      <table><thead><tr><th>Mês</th><th class="r">Receitas</th><th class="r">Despesas</th><th class="r">Resultado</th></tr></thead>
+      <tbody>${rdRows}</tbody></table>
+    </div>
+
+    <div class="section">
+      <div class="section-title">DRE Simplificado</div>
+      <table><tbody>
+        <tr style="background:#e8f5e9"><td class="b">RECEITA BRUTA</td><td class="r b" style="color:#16a34a">${fc(data.dre.totalReceitas)}</td></tr>
+        ${dreRecRows}
+        <tr style="background:#fce4ec"><td class="b">(-) DESPESAS</td><td class="r b" style="color:#dc2626">${fc(data.dre.totalDespesas)}</td></tr>
+        ${dreDespRows}
+        <tr style="background:#1a3a5c;color:#fff"><td class="b">(=) RESULTADO</td><td class="r b">${fc(data.dre.resultado)}</td></tr>
+        <tr><td class="b">Margem Líquida</td><td class="r b ${data.dre.margem >= 0 ? '' : ''}" style="color:${data.dre.margem >= 0 ? '#16a34a' : '#dc2626'}">${data.dre.margem.toFixed(1)}%</td></tr>
+      </tbody></table>
+    </div>
+  </div>
+
+  <div class="two-col">
+    <div class="section">
+      <div class="section-title">Faturamento por Cliente</div>
+      <table><thead><tr><th>Cliente</th><th class="r">Valor</th><th class="r">%</th></tr></thead>
+      <tbody>${clienteRows}</tbody></table>
+    </div>
+
+    <div class="section">
+      <div class="section-title">Resultado: Projetado vs Efetivado</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:8px">
+        <div style="border:1px solid #ddd;border-radius:4px;padding:6px;text-align:center">
+          <div style="font-size:9px;color:#666">Efetivado</div>
+          <div style="font-size:14px;font-weight:700;color:${data.projetado.resultadoEfetivado >= 0 ? '#16a34a' : '#dc2626'}">${fc(data.projetado.resultadoEfetivado)}</div>
+        </div>
+        <div style="border:1px solid #ddd;border-radius:4px;padding:6px;text-align:center">
+          <div style="font-size:9px;color:#666">Projetado</div>
+          <div style="font-size:14px;font-weight:700;color:${data.projetado.resultadoProjetado >= 0 ? '#2563eb' : '#dc2626'}">${fc(data.projetado.resultadoProjetado)}</div>
+        </div>
+      </div>
+      <table><thead><tr><th>Mês</th><th class="r">Efetivado</th><th class="r">Projetado</th></tr></thead>
+      <tbody>${peRows}</tbody></table>
+    </div>
+  </div>
+
+  <div class="footer">
+    <span>Documento gerado em ${new Date().toLocaleString("pt-BR")}</span>
+    <span>Executive Service — Transporte Executivo</span>
+  </div>
+</div>
+</body></html>`);
+  w.document.close();
+  w.onload = () => w.print();
+};
