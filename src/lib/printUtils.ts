@@ -688,7 +688,13 @@ body{font-family:'Segoe UI',Arial,sans-serif;color:#1a1a1a;font-size:11px;paddin
         <div class="field"><div class="label">E-mail</div><div class="value">${c.contratante_email || ""}</div></div>
         <div class="field"><div class="label">Contato</div><div class="value">${c.contratante_contato || ""}</div></div>
       </div>
-      <p style="margin-top:8px"><b>CONTRATADA:</b> Executive Service — Transporte Executivo</p>
+      <p style="margin-top:10px"><b>CONTRATADA:</b></p>
+      <div class="field-grid">
+        <div class="field"><div class="label">Razão Social</div><div class="value">Executive Service Transporte e Turismo Ltda</div></div>
+        <div class="field"><div class="label">CNPJ</div><div class="value">03.143.672/0001-44</div></div>
+        <div class="field"><div class="label">Endereço</div><div class="value">QE 26 Cj. O Casa 33 — CEP 71060-151 — Brasília-DF</div></div>
+        <div class="field"><div class="label">Representante Legal</div><div class="value">Rafael Silva da Cunha — CPF: 899.744.500-63</div></div>
+      </div>
     </div>
   </div>
 
@@ -813,13 +819,13 @@ body{font-family:'Segoe UI',Arial,sans-serif;color:#1a1a1a;font-size:11px;paddin
       <div class="sig-line">CONTRATANTE<br/>${c.contratante_nome || ""}<br/>CPF/CNPJ: ${c.contratante_cnpj_cpf || ""}</div>
     </div>
     <div>
-      <div class="sig-line">CONTRATADA<br/>Executive Service<br/>Transporte Executivo</div>
+      <div class="sig-line">CONTRATADA<br/>Executive Service Transporte e Turismo Ltda<br/>CNPJ: 03.143.672/0001-44<br/>Rafael Silva da Cunha — CPF: 899.744.500-63</div>
     </div>
   </div>
 
   <div class="footer">
     <span>Contrato Nº ${c.numero_contrato} — Emitido em ${new Date().toLocaleString("pt-BR")}</span>
-    <span>Executive Service — Transporte Executivo</span>
+    <span>Executive Service Transporte e Turismo Ltda — CNPJ: 03.143.672/0001-44</span>
   </div>
 </div>
 </body></html>`);
