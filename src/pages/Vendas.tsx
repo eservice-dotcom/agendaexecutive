@@ -225,6 +225,8 @@ const Vendas = () => {
   const [dataVencimento, setDataVencimento] = useState("");
   const [formaPagamento, setFormaPagamento] = useState("");
   const [searchAgenda, setSearchAgenda] = useState("");
+  const [periodoInicio, setPeriodoInicio] = useState("");
+  const [periodoFim, setPeriodoFim] = useState("");
   const [contasPagar, setContasPagar] = useState<ContaPagar[]>([]);
   const [fornecedores, setFornecedores] = useState<string[]>([]);
   const [fornecedoresPixMap, setFornecedoresPixMap] = useState<Record<string, string>>({});
@@ -509,9 +511,16 @@ const Vendas = () => {
   }, [cliente]);
 
   const filteredAgendaItems = useMemo(() => {
-    if (!searchAgenda) return agendaItems;
+    let items = agendaItems;
+    if (periodoInicio) {
+      items = items.filter((i) => i.data >= periodoInicio);
+    }
+    if (periodoFim) {
+      items = items.filter((i) => i.data <= periodoFim);
+    }
+    if (!searchAgenda) return items;
     const s = searchAgenda.toLowerCase();
-    return agendaItems.filter(
+    return items.filter(
       (i) =>
         i.cot.toLowerCase().includes(s) ||
         i.origem.toLowerCase().includes(s) ||
@@ -519,7 +528,7 @@ const Vendas = () => {
         i.motorista.toLowerCase().includes(s) ||
         i.data.includes(s)
     );
-  }, [agendaItems, searchAgenda]);
+  }, [agendaItems, searchAgenda, periodoInicio, periodoFim]);
 
   const extrasTotal = useMemo(() => extras.reduce((s, e) => s + e.valor, 0), [extras]);
 
@@ -695,6 +704,8 @@ const Vendas = () => {
     setDataVenda(new Date().toISOString().split("T")[0]);
     setDataVencimento("");
     setSearchAgenda("");
+    setPeriodoInicio("");
+    setPeriodoFim("");
     setContasPagar([]);
     setExtras([]);
     setFormaPagamento("");
@@ -2254,9 +2265,27 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
 
               {cliente && (
                 <div className="space-y-2">
-                  <div className="flex items-center justify-between">
+                  <div className="flex flex-wrap items-center justify-between gap-2">
                     <Label>Serviços da Agenda</Label>
-                    <div className="flex items-center gap-2">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <div className="flex items-center gap-1">
+                        <Label className="text-xs whitespace-nowrap">De:</Label>
+                        <Input
+                          type="date"
+                          value={periodoInicio}
+                          onChange={(e) => setPeriodoInicio(e.target.value)}
+                          className="h-9 w-36"
+                        />
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <Label className="text-xs whitespace-nowrap">Até:</Label>
+                        <Input
+                          type="date"
+                          value={periodoFim}
+                          onChange={(e) => setPeriodoFim(e.target.value)}
+                          className="h-9 w-36"
+                        />
+                      </div>
                       <div className="relative">
                         <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
                         <Input
