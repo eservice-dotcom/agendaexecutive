@@ -1,3 +1,5 @@
+import { RAFAEL_SIGNATURE_BASE64 } from "./signatureData";
+
 const formatCurrency = (value: number) =>
   new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(value);
 
