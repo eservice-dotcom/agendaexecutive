@@ -190,3 +190,121 @@ export const generateClosingReportExcel = (
   const fileName = `fechamento${numeroFechamento ? `-${numeroFechamento}` : ""}.xlsx`;
   XLSX.writeFile(wb, fileName);
 };
+
+interface BatchFechamento {
+  numero_fechamento: number;
+  cliente: string;
+  items: any[];
+  extras: { descricao: string; valor: number }[];
+  observacoes?: string | null;
+  valor_total: number;
+  extras_total: number;
+}
+
+export const generateBatchClosingReportExcel = (fechamentos: BatchFechamento[]) => {
+  const wb = XLSX.utils.book_new();
+
+  // Sheet 1: All services consolidated
+  const allRows: any[] = [];
+  fechamentos.forEach((f) => {
+    const sorted = [...(f.items || [])].sort((a: any, b: any) => {
+      const da = a.data || "", db = b.data || "";
+      if (da !== db) return da.localeCompare(db);
+      return (a.hora || "").localeCompare(b.hora || "");
+    });
+
+    sorted.forEach((ai: any, idx: number) => {
+      const kmTotal = (Number(ai.km_fim) || 0) - (Number(ai.km_in) || 0);
+      const outrosDespesas = ai.outros_despesas
+        ? Array.isArray(ai.outros_despesas) ? ai.outros_despesas : JSON.parse(ai.outros_despesas)
+        : [];
+      const outrosTotal =
+        outrosDespesas.reduce((s: number, d: any) => s + parseAmount(d.valor), 0) +
+        parseAmount(ai.outros);
+
+      allRows.push({
+        "Fechamento": f.numero_fechamento,
+        "Cliente": f.cliente,
+        "#": idx + 1,
+        "O.S.": ai.cot || "",
+        "Data": ai.data ? formatDate(ai.data) : "",
+        "Hora": ai.hora || "",
+        "Tipo": ai.tipo || "",
+        "Origem": ai.origem || "",
+        "Destino": ai.destino || "",
+        "Motorista": ai.motorista || "",
+        "Veículo": ai.veiculo || "",
+        "Placa": ai.placa || "",
+        "KM Total": kmTotal,
+        "KM Extra": Number(ai.km_extra) || 0,
+        "Estacionamento": Number(ai.estacionamento) || 0,
+        "Outros": outrosTotal,
+        "Valor": Number(ai.valor) || 0,
+      });
+    });
+
+    // Extras inline
+    (f.extras || []).forEach((extra, idx) => {
+      allRows.push({
+        "Fechamento": f.numero_fechamento,
+        "Cliente": f.cliente,
+        "#": sorted.length + idx + 1,
+        "O.S.": "EXTRA",
+        "Data": "",
+        "Hora": "",
+        "Tipo": "Extra",
+        "Origem": extra.descricao,
+        "Destino": "",
+        "Motorista": "",
+        "Veículo": "",
+        "Placa": "",
+        "KM Total": 0,
+        "KM Extra": 0,
+        "Estacionamento": 0,
+        "Outros": 0,
+        "Valor": parseAmount(extra.valor),
+      });
+    });
+  });
+
+  const ws = XLSX.utils.json_to_sheet(allRows);
+  ws["!cols"] = [
+    { wch: 12 }, { wch: 20 }, { wch: 4 }, { wch: 10 }, { wch: 12 }, { wch: 8 },
+    { wch: 18 }, { wch: 20 }, { wch: 18 }, { wch: 14 }, { wch: 10 }, { wch: 10 },
+    { wch: 10 }, { wch: 10 }, { wch: 14 }, { wch: 12 }, { wch: 14 },
+  ];
+  XLSX.utils.book_append_sheet(wb, ws, "Serviços");
+
+  // Sheet 2: Resumo per fechamento
+  const resumoRows: any[] = [];
+  let grandTotal = 0;
+  fechamentos.forEach((f) => {
+    const servTotal = (f.items || []).reduce((s: number, ai: any) => s + parseAmount(ai.valor), 0);
+    const extTotal = (f.extras || []).reduce((s: number, e: any) => s + parseAmount(e.valor), 0);
+    const total = servTotal + extTotal;
+    grandTotal += total;
+    resumoRows.push({
+      "Fechamento Nº": f.numero_fechamento,
+      "Cliente": f.cliente,
+      "Qtd Serviços": (f.items || []).length,
+      "Valor Serviços": servTotal,
+      "Extras": extTotal,
+      "Total": total,
+    });
+  });
+  resumoRows.push({
+    "Fechamento Nº": "",
+    "Cliente": "TOTAL GERAL",
+    "Qtd Serviços": fechamentos.reduce((s, f) => s + (f.items || []).length, 0),
+    "Valor Serviços": fechamentos.reduce((s, f) => s + (f.items || []).reduce((ss: number, ai: any) => ss + parseAmount(ai.valor), 0), 0),
+    "Extras": fechamentos.reduce((s, f) => s + (f.extras || []).reduce((ss: number, e: any) => ss + parseAmount(e.valor), 0), 0),
+    "Total": grandTotal,
+  });
+
+  const wsResumo = XLSX.utils.json_to_sheet(resumoRows);
+  wsResumo["!cols"] = [{ wch: 14 }, { wch: 25 }, { wch: 14 }, { wch: 16 }, { wch: 14 }, { wch: 16 }];
+  XLSX.utils.book_append_sheet(wb, wsResumo, "Resumo");
+
+  const nums = fechamentos.map((f) => f.numero_fechamento).join("-");
+  XLSX.writeFile(wb, `fechamentos-${nums}.xlsx`);
+};
