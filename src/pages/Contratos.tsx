@@ -93,6 +93,7 @@ const formatCurrency = (v: number) =>
 
 const Contratos = () => {
   const { session, signOut } = useAuth();
+  const location = useLocation();
   const [contratos, setContratos] = useState<Contrato[]>([]);
   const [loading, setLoading] = useState(true);
   const [dialogOpen, setDialogOpen] = useState(false);
