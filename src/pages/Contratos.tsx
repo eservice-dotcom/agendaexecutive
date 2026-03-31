@@ -79,7 +79,7 @@ const emptyContrato: Omit<Contrato, "id" | "numero_contrato"> = {
   estacionamento_pedagio: "", alimentacao_motorista: "", outros_extras: "",
   forma_faturamento: "", condicao_pagamento: "", data_vencimento: "", dados_faturamento: "",
   antecedencia_cancelamento: "24", multa_cancelamento: "50",
-  observacoes: "", foro_comarca: "",
+  observacoes: "", foro_comarca: "", arquivo_assinado_url: "",
 };
 
 const formatDate = (d: string) => {
