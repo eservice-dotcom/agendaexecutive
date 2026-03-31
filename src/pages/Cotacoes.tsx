@@ -190,7 +190,9 @@ const Cotacoes = () => {
         const { error } = await supabase
           .from("cotacoes")
           .update({
-            nome,
+            nome: empresa,
+            empresa,
+            destinatario,
             data,
             forma_pagamento: formaPagamento,
             validade_proposta: validadeProposta || null,
