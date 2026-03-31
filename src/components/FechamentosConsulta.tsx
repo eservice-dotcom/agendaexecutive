@@ -10,6 +10,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Printer, Search, Pencil, Trash2, Save, X, FileSpreadsheet, Plus } from "lucide-react";
 import { toast } from "sonner";
 
@@ -39,6 +40,7 @@ const formatDate = (d: string) => {
 const FechamentosConsulta = () => {
   const [fechamentos, setFechamentos] = useState<Fechamento[]>([]);
   const [loading, setLoading] = useState(false);
+  const [selected, setSelected] = useState<Set<string>>(new Set());
 
   // Filters
   const [searchText, setSearchText] = useState("");
@@ -197,6 +199,36 @@ const FechamentosConsulta = () => {
     }
   };
 
+  const toggleSelect = (id: string) => {
+    setSelected((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id); else next.add(id);
+      return next;
+    });
+  };
+
+  const toggleSelectAll = () => {
+    if (selected.size === filtered.length) {
+      setSelected(new Set());
+    } else {
+      setSelected(new Set(filtered.map((f) => f.id)));
+    }
+  };
+
+  const handleBatchPrint = () => {
+    const items = filtered.filter((f) => selected.has(f.id));
+    if (items.length === 0) { toast.error("Selecione ao menos um fechamento"); return; }
+    items.forEach((f) => handleReimprimir(f));
+    toast.success(`${items.length} fechamento(s) enviado(s) para impressão`);
+  };
+
+  const handleBatchExcel = () => {
+    const items = filtered.filter((f) => selected.has(f.id));
+    if (items.length === 0) { toast.error("Selecione ao menos um fechamento"); return; }
+    items.forEach((f) => handleExportExcel(f));
+    toast.success(`${items.length} fechamento(s) exportado(s) para Excel`);
+  };
+
   return (
     <div className="space-y-4">
       {/* Filters */}
@@ -237,15 +269,36 @@ const FechamentosConsulta = () => {
         />
       </div>
 
-      <p className="text-sm text-muted-foreground">
-        {filtered.length} fechamento{filtered.length !== 1 ? "s" : ""} encontrado{filtered.length !== 1 ? "s" : ""}
-      </p>
+      <div className="flex items-center justify-between">
+        <p className="text-sm text-muted-foreground">
+          {filtered.length} fechamento{filtered.length !== 1 ? "s" : ""} encontrado{filtered.length !== 1 ? "s" : ""}
+          {selected.size > 0 && ` · ${selected.size} selecionado${selected.size !== 1 ? "s" : ""}`}
+        </p>
+        {selected.size > 0 && (
+          <div className="flex gap-2">
+            <Button variant="outline" size="sm" onClick={handleBatchPrint}>
+              <Printer className="h-4 w-4 mr-1" />
+              Imprimir ({selected.size})
+            </Button>
+            <Button variant="outline" size="sm" onClick={handleBatchExcel}>
+              <FileSpreadsheet className="h-4 w-4 mr-1" />
+              Excel ({selected.size})
+            </Button>
+          </div>
+        )}
+      </div>
 
       {/* Table */}
       <div className="rounded-md border overflow-x-auto">
         <Table>
           <TableHeader>
             <TableRow>
+              <TableHead className="w-[40px]">
+                <Checkbox
+                  checked={filtered.length > 0 && selected.size === filtered.length}
+                  onCheckedChange={toggleSelectAll}
+                />
+              </TableHead>
               <TableHead className="w-[80px]">Nº</TableHead>
               <TableHead>Cliente</TableHead>
               <TableHead>O.S.</TableHead>
@@ -260,17 +313,23 @@ const FechamentosConsulta = () => {
           <TableBody>
             {loading ? (
               <TableRow>
-                <TableCell colSpan={9} className="text-center py-8 text-muted-foreground">Carregando...</TableCell>
+                <TableCell colSpan={10} className="text-center py-8 text-muted-foreground">Carregando...</TableCell>
               </TableRow>
             ) : filtered.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={9} className="text-center py-8 text-muted-foreground">Nenhum fechamento encontrado</TableCell>
+                <TableCell colSpan={10} className="text-center py-8 text-muted-foreground">Nenhum fechamento encontrado</TableCell>
               </TableRow>
             ) : (
               filtered.map((f) => {
                 const osList = Array.isArray(f.items) ? [...new Set(f.items.map((i: any) => i.cot).filter(Boolean))].join(", ") : "";
                 return (
                 <TableRow key={f.id}>
+                  <TableCell>
+                    <Checkbox
+                      checked={selected.has(f.id)}
+                      onCheckedChange={() => toggleSelect(f.id)}
+                    />
+                  </TableCell>
                   <TableCell>
                     <Badge variant="outline" className="font-mono text-xs">
                       {f.numero_fechamento}
