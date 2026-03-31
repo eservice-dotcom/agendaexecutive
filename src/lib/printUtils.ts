@@ -1,3 +1,5 @@
+import { RAFAEL_SIGNATURE_BASE64 } from "./signatureData";
+
 const formatCurrency = (value: number) =>
   new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(value);
 
@@ -439,8 +441,11 @@ tr:nth-child(even){background:#f8f9fa}
   ${cotacao.observacoes ? `<div class="obs-section"><div class="obs-title">Observações</div><div>${cotacao.observacoes}</div></div>` : ""}
 
   <div class="signature-area">
-    <div class="signature-line">Executive Service</div>
-    <div class="signature-line">${cotacao.nome}</div>
+    <div class="signature-line">
+      <img src="${RAFAEL_SIGNATURE_BASE64}" alt="Assinatura" style="height:60px;margin:0 auto 8px;display:block" />
+      Executive Service Transporte e Turismo Ltda<br/>CNPJ: 03.143.672/0001-44<br/>Rafael Silva da Cunha — CPF: 899.744.500-63
+    </div>
+    <div class="signature-line">${cotacao.empresa || cotacao.nome}</div>
   </div>
 
   <div class="footer">
@@ -819,7 +824,10 @@ body{font-family:'Segoe UI',Arial,sans-serif;color:#1a1a1a;font-size:11px;paddin
       <div class="sig-line">CONTRATANTE<br/>${c.contratante_nome || ""}<br/>CPF/CNPJ: ${c.contratante_cnpj_cpf || ""}</div>
     </div>
     <div>
-      <div class="sig-line">CONTRATADA<br/>Executive Service Transporte e Turismo Ltda<br/>CNPJ: 03.143.672/0001-44<br/>Rafael Silva da Cunha — CPF: 899.744.500-63</div>
+      <div class="sig-line">
+        <img src="${RAFAEL_SIGNATURE_BASE64}" alt="Assinatura" style="height:60px;margin:0 auto 8px;display:block" />
+        CONTRATADA<br/>Executive Service Transporte e Turismo Ltda<br/>CNPJ: 03.143.672/0001-44<br/>Rafael Silva da Cunha — CPF: 899.744.500-63
+      </div>
     </div>
   </div>
 
