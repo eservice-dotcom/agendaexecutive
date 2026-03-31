@@ -632,6 +632,47 @@ const Contratos = () => {
                 </div>
               </div>
             </div>
+
+            {/* Arquivo Assinado */}
+            {editingContrato && (
+              <div>
+                <h3 className="text-sm font-semibold text-primary mb-2 border-b pb-1">Contrato Assinado</h3>
+                <div className="flex items-center gap-3">
+                  {form.arquivo_assinado_url ? (
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <Badge variant="secondary" className="gap-1">
+                        <FileText className="h-3 w-3" /> Arquivo anexado
+                      </Badge>
+                      <Button variant="outline" size="sm" asChild>
+                        <a href={form.arquivo_assinado_url} target="_blank" rel="noopener noreferrer">
+                          <Eye className="h-4 w-4 mr-1" /> Visualizar
+                        </a>
+                      </Button>
+                      <Button variant="outline" size="sm" className="text-destructive" onClick={handleFileRemove}>
+                        <X className="h-4 w-4 mr-1" /> Remover
+                      </Button>
+                    </div>
+                  ) : (
+                    <div className="flex items-center gap-2">
+                      <Label htmlFor="file-upload" className="cursor-pointer">
+                        <div className="flex items-center gap-2 rounded-md border border-dashed border-muted-foreground/50 px-4 py-3 text-sm text-muted-foreground hover:border-primary hover:text-primary transition-colors">
+                          <Upload className="h-4 w-4" />
+                          {uploading ? "Enviando..." : "Clique para enviar o contrato assinado (PDF, imagem)"}
+                        </div>
+                      </Label>
+                      <Input
+                        id="file-upload"
+                        type="file"
+                        accept=".pdf,.jpg,.jpeg,.png,.webp"
+                        className="hidden"
+                        onChange={handleFileUpload}
+                        disabled={uploading}
+                      />
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
           </div>
 
           <DialogFooter>
