@@ -49,6 +49,7 @@ const formasPagamento = ["", "Dinheiro", "PIX", "Cartão de Crédito", "Cartão 
 
 const Cotacoes = () => {
   const { session, signOut } = useAuth();
+  const navigate = useNavigate();
   const [cotacoes, setCotacoes] = useState<Cotacao[]>([]);
   const [loading, setLoading] = useState(true);
   const [dialogOpen, setDialogOpen] = useState(false);
