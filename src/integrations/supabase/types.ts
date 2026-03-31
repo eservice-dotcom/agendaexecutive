@@ -342,6 +342,159 @@ export type Database = {
           },
         ]
       }
+      contratos: {
+        Row: {
+          alimentacao_motorista: string
+          antecedencia_cancelamento: string
+          condicao_pagamento: string
+          contratante_cep: string
+          contratante_cidade: string
+          contratante_cnpj_cpf: string
+          contratante_contato: string
+          contratante_email: string
+          contratante_endereco: string
+          contratante_inscricao: string
+          contratante_nome: string
+          contratante_telefone: string
+          contratante_uf: string
+          created_at: string
+          dados_faturamento: string
+          data_emissao: string
+          data_fim: string | null
+          data_inicio: string | null
+          data_vencimento: string | null
+          destino: string
+          duracao_estimada: string
+          estacionamento_pedagio: string
+          forma_contratacao: string
+          forma_faturamento: string
+          foro_comarca: string
+          hora_extra: string
+          hora_fim: string
+          hora_inicio: string
+          id: string
+          km_excedente: string
+          multa_cancelamento: string
+          numero_contrato: number
+          observacoes: string
+          origem: string
+          outros_extras: string
+          paradas: string
+          tipo_servico: string
+          updated_at: string
+          user_id: string
+          valor_total: number
+          valor_unitario: string
+          veiculo_acessorios: string
+          veiculo_ano: string
+          veiculo_capacidade: string
+          veiculo_cor: string
+          veiculo_modelo: string
+          veiculo_placa: string
+          veiculo_tipo: string
+        }
+        Insert: {
+          alimentacao_motorista?: string
+          antecedencia_cancelamento?: string
+          condicao_pagamento?: string
+          contratante_cep?: string
+          contratante_cidade?: string
+          contratante_cnpj_cpf?: string
+          contratante_contato?: string
+          contratante_email?: string
+          contratante_endereco?: string
+          contratante_inscricao?: string
+          contratante_nome?: string
+          contratante_telefone?: string
+          contratante_uf?: string
+          created_at?: string
+          dados_faturamento?: string
+          data_emissao?: string
+          data_fim?: string | null
+          data_inicio?: string | null
+          data_vencimento?: string | null
+          destino?: string
+          duracao_estimada?: string
+          estacionamento_pedagio?: string
+          forma_contratacao?: string
+          forma_faturamento?: string
+          foro_comarca?: string
+          hora_extra?: string
+          hora_fim?: string
+          hora_inicio?: string
+          id?: string
+          km_excedente?: string
+          multa_cancelamento?: string
+          numero_contrato?: number
+          observacoes?: string
+          origem?: string
+          outros_extras?: string
+          paradas?: string
+          tipo_servico?: string
+          updated_at?: string
+          user_id: string
+          valor_total?: number
+          valor_unitario?: string
+          veiculo_acessorios?: string
+          veiculo_ano?: string
+          veiculo_capacidade?: string
+          veiculo_cor?: string
+          veiculo_modelo?: string
+          veiculo_placa?: string
+          veiculo_tipo?: string
+        }
+        Update: {
+          alimentacao_motorista?: string
+          antecedencia_cancelamento?: string
+          condicao_pagamento?: string
+          contratante_cep?: string
+          contratante_cidade?: string
+          contratante_cnpj_cpf?: string
+          contratante_contato?: string
+          contratante_email?: string
+          contratante_endereco?: string
+          contratante_inscricao?: string
+          contratante_nome?: string
+          contratante_telefone?: string
+          contratante_uf?: string
+          created_at?: string
+          dados_faturamento?: string
+          data_emissao?: string
+          data_fim?: string | null
+          data_inicio?: string | null
+          data_vencimento?: string | null
+          destino?: string
+          duracao_estimada?: string
+          estacionamento_pedagio?: string
+          forma_contratacao?: string
+          forma_faturamento?: string
+          foro_comarca?: string
+          hora_extra?: string
+          hora_fim?: string
+          hora_inicio?: string
+          id?: string
+          km_excedente?: string
+          multa_cancelamento?: string
+          numero_contrato?: number
+          observacoes?: string
+          origem?: string
+          outros_extras?: string
+          paradas?: string
+          tipo_servico?: string
+          updated_at?: string
+          user_id?: string
+          valor_total?: number
+          valor_unitario?: string
+          veiculo_acessorios?: string
+          veiculo_ano?: string
+          veiculo_capacidade?: string
+          veiculo_cor?: string
+          veiculo_modelo?: string
+          veiculo_placa?: string
+          veiculo_tipo?: string
+        }
+        Relationships: []
+      }
       cotacao_items: {
         Row: {
           cotacao_id: string
