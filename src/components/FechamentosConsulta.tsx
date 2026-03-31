@@ -40,6 +40,7 @@ const formatDate = (d: string) => {
 const FechamentosConsulta = () => {
   const [fechamentos, setFechamentos] = useState<Fechamento[]>([]);
   const [loading, setLoading] = useState(false);
+  const [selected, setSelected] = useState<Set<string>>(new Set());
 
   // Filters
   const [searchText, setSearchText] = useState("");
