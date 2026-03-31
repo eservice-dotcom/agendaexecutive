@@ -225,6 +225,8 @@ const Vendas = () => {
   const [dataVencimento, setDataVencimento] = useState("");
   const [formaPagamento, setFormaPagamento] = useState("");
   const [searchAgenda, setSearchAgenda] = useState("");
+  const [periodoInicio, setPeriodoInicio] = useState("");
+  const [periodoFim, setPeriodoFim] = useState("");
   const [contasPagar, setContasPagar] = useState<ContaPagar[]>([]);
   const [fornecedores, setFornecedores] = useState<string[]>([]);
   const [fornecedoresPixMap, setFornecedoresPixMap] = useState<Record<string, string>>({});
