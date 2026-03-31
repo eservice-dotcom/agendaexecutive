@@ -409,17 +409,7 @@ const Contratos = () => {
               <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                 <div>
                   <Label>Placa</Label>
-                  <div className="flex gap-2">
-                    <Input value={form.veiculo_placa} onChange={e => setField("veiculo_placa", e.target.value)} />
-                    {veiculos.length > 0 && (
-                      <Select onValueChange={handleVeiculoSelect}>
-                        <SelectTrigger className="w-[160px]"><SelectValue placeholder="Importar veículo" /></SelectTrigger>
-                        <SelectContent>
-                          {veiculos.map(v => <SelectItem key={v.id} value={v.placa}>{v.placa} - {v.modelo}</SelectItem>)}
-                        </SelectContent>
-                      </Select>
-                    )}
-                  </div>
+                  <Input value={form.veiculo_placa} onChange={e => setField("veiculo_placa", e.target.value)} />
                 </div>
                 <div>
                   <Label>Tipo</Label>
