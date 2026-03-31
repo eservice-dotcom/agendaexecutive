@@ -2265,9 +2265,27 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
 
               {cliente && (
                 <div className="space-y-2">
-                  <div className="flex items-center justify-between">
+                  <div className="flex flex-wrap items-center justify-between gap-2">
                     <Label>Serviços da Agenda</Label>
-                    <div className="flex items-center gap-2">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <div className="flex items-center gap-1">
+                        <Label className="text-xs whitespace-nowrap">De:</Label>
+                        <Input
+                          type="date"
+                          value={periodoInicio}
+                          onChange={(e) => setPeriodoInicio(e.target.value)}
+                          className="h-9 w-36"
+                        />
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <Label className="text-xs whitespace-nowrap">Até:</Label>
+                        <Input
+                          type="date"
+                          value={periodoFim}
+                          onChange={(e) => setPeriodoFim(e.target.value)}
+                          className="h-9 w-36"
+                        />
+                      </div>
                       <div className="relative">
                         <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
                         <Input
