@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -93,6 +93,7 @@ const formatCurrency = (v: number) =>
 
 const Contratos = () => {
   const { session, signOut } = useAuth();
+  const location = useLocation();
   const [contratos, setContratos] = useState<Contrato[]>([]);
   const [loading, setLoading] = useState(true);
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -142,6 +143,38 @@ const Contratos = () => {
       setHasPermission(!!data);
     });
   }, [session]);
+
+  // Handle navigation from Cotações → Gerar Contrato
+  useEffect(() => {
+    const state = location.state as any;
+    if (state?.fromCotacao) {
+      const cot = state.fromCotacao;
+      // Find client data if exists
+      const cliente = clientes.find(c => c.nome === cot.empresa);
+      const descritivo = cot.items?.map((i: any) => i.descritivo).filter(Boolean).join("; ") || "";
+      
+      setForm({
+        ...emptyContrato,
+        contratante_nome: cot.empresa || "",
+        contratante_contato: cot.destinatario || "",
+        contratante_cnpj_cpf: cliente?.cnpj_cpf || "",
+        contratante_email: cliente?.email || "",
+        contratante_telefone: cliente?.telefone || "",
+        contratante_endereco: cliente?.endereco || "",
+        contratante_cidade: cliente?.cidade || "",
+        contratante_uf: cliente?.uf || "",
+        contratante_cep: cliente?.cep || "",
+        condicao_pagamento: cot.forma_pagamento || "",
+        observacoes: `Ref. Cotação nº ${cot.numero_cotacao}${cot.observacoes ? ". " + cot.observacoes : ""}`,
+        valor_total: cot.valor_total || 0,
+        tipo_servico: descritivo,
+      });
+      setEditingContrato(null);
+      setDialogOpen(true);
+      // Clear state to avoid re-opening on re-render
+      window.history.replaceState({}, document.title);
+    }
+  }, [location.state, clientes]);
 
   const setField = (field: string, value: any) => setForm(prev => ({ ...prev, [field]: value }));
 

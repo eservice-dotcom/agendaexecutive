@@ -1,10 +1,10 @@
 import { useState, useEffect, useCallback } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import logo from "@/assets/logo-executive-service.png";
-import { Plus, Trash2, Save, Pencil, FileText, CalendarDays, ClipboardList, ShoppingCart, Printer } from "lucide-react";
+import { Plus, Trash2, Save, Pencil, FileText, CalendarDays, ClipboardList, ShoppingCart, Printer, FileSignature } from "lucide-react";
 import { printCotacao } from "@/lib/printUtils";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -49,6 +49,7 @@ const formasPagamento = ["", "Dinheiro", "PIX", "Cartão de Crédito", "Cartão 
 
 const Cotacoes = () => {
   const { session, signOut } = useAuth();
+  const navigate = useNavigate();
   const [cotacoes, setCotacoes] = useState<Cotacao[]>([]);
   const [loading, setLoading] = useState(true);
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -378,6 +379,23 @@ const Cotacoes = () => {
                       <div className="flex gap-1" onClick={(e) => e.stopPropagation()}>
                         <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => openEdit(c)}>
                           <Pencil className="h-4 w-4" />
+                        </Button>
+                        <Button variant="ghost" size="icon" className="h-8 w-8" title="Gerar Contrato" onClick={() => {
+                          navigate("/contratos", {
+                            state: {
+                              fromCotacao: {
+                                empresa: c.empresa || c.nome,
+                                destinatario: c.destinatario,
+                                forma_pagamento: c.forma_pagamento,
+                                observacoes: c.observacoes,
+                                valor_total: c.valor_total,
+                                items: c.items,
+                                numero_cotacao: c.numero_cotacao,
+                              }
+                            }
+                          });
+                        }}>
+                          <FileSignature className="h-4 w-4" />
                         </Button>
                         <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => {
                           const logoUrl = new URL(logo, window.location.origin).href;
