@@ -147,6 +147,8 @@ const Cotacoes = () => {
   const openEdit = (c: Cotacao) => {
     setEditingCotacao(c);
     setNome(c.nome);
+    setEmpresa(c.empresa);
+    setDestinatario(c.destinatario);
     setData(c.data);
     setFormaPagamento(c.forma_pagamento);
     setValidadeProposta(c.validade_proposta);
