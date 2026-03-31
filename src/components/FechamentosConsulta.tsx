@@ -293,6 +293,12 @@ const FechamentosConsulta = () => {
         <Table>
           <TableHeader>
             <TableRow>
+              <TableHead className="w-[40px]">
+                <Checkbox
+                  checked={filtered.length > 0 && selected.size === filtered.length}
+                  onCheckedChange={toggleSelectAll}
+                />
+              </TableHead>
               <TableHead className="w-[80px]">Nº</TableHead>
               <TableHead>Cliente</TableHead>
               <TableHead>O.S.</TableHead>
