@@ -313,17 +313,23 @@ const FechamentosConsulta = () => {
           <TableBody>
             {loading ? (
               <TableRow>
-                <TableCell colSpan={9} className="text-center py-8 text-muted-foreground">Carregando...</TableCell>
+                <TableCell colSpan={10} className="text-center py-8 text-muted-foreground">Carregando...</TableCell>
               </TableRow>
             ) : filtered.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={9} className="text-center py-8 text-muted-foreground">Nenhum fechamento encontrado</TableCell>
+                <TableCell colSpan={10} className="text-center py-8 text-muted-foreground">Nenhum fechamento encontrado</TableCell>
               </TableRow>
             ) : (
               filtered.map((f) => {
                 const osList = Array.isArray(f.items) ? [...new Set(f.items.map((i: any) => i.cot).filter(Boolean))].join(", ") : "";
                 return (
                 <TableRow key={f.id}>
+                  <TableCell>
+                    <Checkbox
+                      checked={selected.has(f.id)}
+                      onCheckedChange={() => toggleSelect(f.id)}
+                    />
+                  </TableCell>
                   <TableCell>
                     <Badge variant="outline" className="font-mono text-xs">
                       {f.numero_fechamento}
