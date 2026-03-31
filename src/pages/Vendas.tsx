@@ -511,9 +511,16 @@ const Vendas = () => {
   }, [cliente]);
 
   const filteredAgendaItems = useMemo(() => {
-    if (!searchAgenda) return agendaItems;
+    let items = agendaItems;
+    if (periodoInicio) {
+      items = items.filter((i) => i.data >= periodoInicio);
+    }
+    if (periodoFim) {
+      items = items.filter((i) => i.data <= periodoFim);
+    }
+    if (!searchAgenda) return items;
     const s = searchAgenda.toLowerCase();
-    return agendaItems.filter(
+    return items.filter(
       (i) =>
         i.cot.toLowerCase().includes(s) ||
         i.origem.toLowerCase().includes(s) ||
@@ -521,7 +528,7 @@ const Vendas = () => {
         i.motorista.toLowerCase().includes(s) ||
         i.data.includes(s)
     );
-  }, [agendaItems, searchAgenda]);
+  }, [agendaItems, searchAgenda, periodoInicio, periodoFim]);
 
   const extrasTotal = useMemo(() => extras.reduce((s, e) => s + e.valor, 0), [extras]);
 
