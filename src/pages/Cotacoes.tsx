@@ -380,6 +380,23 @@ const Cotacoes = () => {
                         <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => openEdit(c)}>
                           <Pencil className="h-4 w-4" />
                         </Button>
+                        <Button variant="ghost" size="icon" className="h-8 w-8" title="Gerar Contrato" onClick={() => {
+                          navigate("/contratos", {
+                            state: {
+                              fromCotacao: {
+                                empresa: c.empresa || c.nome,
+                                destinatario: c.destinatario,
+                                forma_pagamento: c.forma_pagamento,
+                                observacoes: c.observacoes,
+                                valor_total: c.valor_total,
+                                items: c.items,
+                                numero_cotacao: c.numero_cotacao,
+                              }
+                            }
+                          });
+                        }}>
+                          <FileSignature className="h-4 w-4" />
+                        </Button>
                         <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => {
                           const logoUrl = new URL(logo, window.location.origin).href;
                           printCotacao(c, logoUrl);
