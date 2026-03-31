@@ -619,3 +619,210 @@ ${brandedStyles()}
   w.document.close();
   w.onload = () => w.print();
 };
+
+export const printContrato = (contrato: any, logoUrl?: string) => {
+  const fd = (d: string) => {
+    if (!d) return "___/___/______";
+    const [y, m, day] = d.split("-");
+    return `${day}/${m}/${y}`;
+  };
+  const fc = (v: number) =>
+    new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(v || 0);
+
+  const c = contrato;
+
+  const w = window.open("", "_blank");
+  if (!w) return;
+  w.document.write(`<!DOCTYPE html><html><head><title>Contrato Nº ${c.numero_contrato}</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Segoe UI',Arial,sans-serif;color:#1a1a1a;font-size:11px;padding:0}
+.page{max-width:210mm;margin:0 auto;padding:15mm 20mm}
+.header-brand{display:flex;align-items:center;justify-content:space-between;border-bottom:3px solid #c8a456;padding-bottom:12px;margin-bottom:20px}
+.header-left{display:flex;align-items:center;gap:12px}
+.header-left img{height:60px;width:60px;object-fit:contain}
+.header-left .company{font-size:18px;font-weight:700;color:#1a3a5c}
+.header-right{text-align:right}
+.header-right .doc-title{font-size:14px;font-weight:700;color:#1a3a5c}
+.header-right .doc-info{font-size:10px;color:#666;margin-top:2px}
+.clause{margin-bottom:14px}
+.clause-title{font-size:11px;font-weight:700;color:#1a3a5c;margin-bottom:6px;border-bottom:1px solid #ddd;padding-bottom:3px}
+.clause-body{font-size:10px;line-height:1.6;text-align:justify}
+.clause-body p{margin-bottom:4px}
+.field-grid{display:grid;grid-template-columns:1fr 1fr;gap:4px 16px;margin:6px 0}
+.field-grid.three{grid-template-columns:1fr 1fr 1fr}
+.field{font-size:10px}
+.field .label{color:#666;font-size:9px}
+.field .value{font-weight:600;border-bottom:1px solid #ccc;min-height:14px;padding-bottom:1px}
+.signatures{margin-top:40px;display:grid;grid-template-columns:1fr 1fr;gap:40px;text-align:center}
+.sig-line{border-top:1px solid #333;padding-top:4px;font-size:10px;margin-top:30px}
+.footer{margin-top:30px;border-top:2px solid #c8a456;padding-top:8px;display:flex;justify-content:space-between;font-size:9px;color:#888}
+@media print{body{padding:0}.page{padding:10mm 15mm}@page{size:A4 portrait;margin:0}}
+</style>
+</head><body>
+<div class="page">
+  <div class="header-brand">
+    <div class="header-left">
+      ${logoUrl ? `<img src="${logoUrl}" alt="Logo" />` : ""}
+      <span class="company">Executive Service</span>
+    </div>
+    <div class="header-right">
+      <div class="doc-title">CONTRATO DE LOCAÇÃO Nº ${c.numero_contrato}</div>
+      <div class="doc-info">Data de Emissão: ${fd(c.data_emissao)}</div>
+    </div>
+  </div>
+
+  <div class="clause">
+    <div class="clause-title">CLÁUSULA 1 — DAS PARTES</div>
+    <div class="clause-body">
+      <p><b>CONTRATANTE:</b></p>
+      <div class="field-grid">
+        <div class="field"><div class="label">Nome / Razão Social</div><div class="value">${c.contratante_nome || ""}</div></div>
+        <div class="field"><div class="label">CNPJ / CPF</div><div class="value">${c.contratante_cnpj_cpf || ""}</div></div>
+        <div class="field"><div class="label">Inscrição Estadual</div><div class="value">${c.contratante_inscricao || ""}</div></div>
+        <div class="field"><div class="label">Endereço</div><div class="value">${c.contratante_endereco || ""}</div></div>
+        <div class="field"><div class="label">Cidade</div><div class="value">${c.contratante_cidade || ""}</div></div>
+        <div class="field"><div class="label">UF</div><div class="value">${c.contratante_uf || ""}</div></div>
+        <div class="field"><div class="label">CEP</div><div class="value">${c.contratante_cep || ""}</div></div>
+        <div class="field"><div class="label">Telefone</div><div class="value">${c.contratante_telefone || ""}</div></div>
+        <div class="field"><div class="label">E-mail</div><div class="value">${c.contratante_email || ""}</div></div>
+        <div class="field"><div class="label">Contato</div><div class="value">${c.contratante_contato || ""}</div></div>
+      </div>
+      <p style="margin-top:8px"><b>CONTRATADA:</b> Executive Service — Transporte Executivo</p>
+    </div>
+  </div>
+
+  <div class="clause">
+    <div class="clause-title">CLÁUSULA 2 — DO OBJETO</div>
+    <div class="clause-body">
+      <p>O presente contrato tem por objeto a locação de veículo com motorista para prestação de serviço de transporte, conforme especificações abaixo:</p>
+      <div class="field-grid three">
+        <div class="field"><div class="label">Tipo de Veículo</div><div class="value">${c.veiculo_tipo || ""}</div></div>
+        <div class="field"><div class="label">Modelo</div><div class="value">${c.veiculo_modelo || ""}</div></div>
+        <div class="field"><div class="label">Placa</div><div class="value">${c.veiculo_placa || ""}</div></div>
+        <div class="field"><div class="label">Ano</div><div class="value">${c.veiculo_ano || ""}</div></div>
+        <div class="field"><div class="label">Cor</div><div class="value">${c.veiculo_cor || ""}</div></div>
+        <div class="field"><div class="label">Capacidade</div><div class="value">${c.veiculo_capacidade || ""}</div></div>
+      </div>
+      ${c.veiculo_acessorios ? `<div class="field"><div class="label">Acessórios / Itens Inclusos</div><div class="value">${c.veiculo_acessorios}</div></div>` : ""}
+    </div>
+  </div>
+
+  <div class="clause">
+    <div class="clause-title">CLÁUSULA 3 — DO SERVIÇO</div>
+    <div class="clause-body">
+      <div class="field-grid three">
+        <div class="field"><div class="label">Tipo de Serviço</div><div class="value">${c.tipo_servico || ""}</div></div>
+        <div class="field"><div class="label">Forma de Contratação</div><div class="value">${c.forma_contratacao || ""}</div></div>
+        <div class="field"><div class="label">Duração Estimada</div><div class="value">${c.duracao_estimada || ""}</div></div>
+        <div class="field"><div class="label">Origem</div><div class="value">${c.origem || ""}</div></div>
+        <div class="field"><div class="label">Destino</div><div class="value">${c.destino || ""}</div></div>
+        <div class="field"><div class="label">Paradas</div><div class="value">${c.paradas || ""}</div></div>
+        <div class="field"><div class="label">Data Início</div><div class="value">${fd(c.data_inicio)}</div></div>
+        <div class="field"><div class="label">Hora Início</div><div class="value">${c.hora_inicio || ""}</div></div>
+        <div class="field"><div class="label">Data Fim</div><div class="value">${fd(c.data_fim)}</div></div>
+        <div class="field"><div class="label">Hora Fim</div><div class="value">${c.hora_fim || ""}</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="clause">
+    <div class="clause-title">CLÁUSULA 4 — DO VALOR E FORMA DE PAGAMENTO</div>
+    <div class="clause-body">
+      <div class="field-grid three">
+        <div class="field"><div class="label">Valor Total</div><div class="value">${fc(c.valor_total)}</div></div>
+        <div class="field"><div class="label">Valor Unitário</div><div class="value">${c.valor_unitario || ""}</div></div>
+        <div class="field"><div class="label">Forma de Faturamento</div><div class="value">${c.forma_faturamento || ""}</div></div>
+        <div class="field"><div class="label">KM Excedente</div><div class="value">${c.km_excedente || ""}</div></div>
+        <div class="field"><div class="label">Hora Extra</div><div class="value">${c.hora_extra || ""}</div></div>
+        <div class="field"><div class="label">Estacionamento / Pedágio</div><div class="value">${c.estacionamento_pedagio || ""}</div></div>
+        <div class="field"><div class="label">Alimentação Motorista</div><div class="value">${c.alimentacao_motorista || ""}</div></div>
+        <div class="field"><div class="label">Condição de Pagamento</div><div class="value">${c.condicao_pagamento || ""}</div></div>
+        <div class="field"><div class="label">Data Vencimento</div><div class="value">${fd(c.data_vencimento)}</div></div>
+      </div>
+      ${c.outros_extras ? `<div class="field"><div class="label">Outros Extras</div><div class="value">${c.outros_extras}</div></div>` : ""}
+      ${c.dados_faturamento ? `<div class="field"><div class="label">Dados para Faturamento</div><div class="value">${c.dados_faturamento}</div></div>` : ""}
+    </div>
+  </div>
+
+  <div class="clause">
+    <div class="clause-title">CLÁUSULA 5 — DAS OBRIGAÇÕES DA CONTRATADA</div>
+    <div class="clause-body">
+      <p>a) Disponibilizar o veículo nas condições acordadas, em perfeito estado de conservação e limpeza;</p>
+      <p>b) Fornecer motorista habilitado, uniformizado e com experiência compatível;</p>
+      <p>c) Arcar com todas as despesas de manutenção, seguro do veículo e encargos trabalhistas do motorista;</p>
+      <p>d) Garantir pontualidade no atendimento conforme horários pactuados;</p>
+      <p>e) Manter documentação do veículo e do motorista em dia;</p>
+      <p>f) Substituir o veículo em caso de pane mecânica, sem custo adicional ao contratante.</p>
+    </div>
+  </div>
+
+  <div class="clause">
+    <div class="clause-title">CLÁUSULA 6 — DAS OBRIGAÇÕES DO CONTRATANTE</div>
+    <div class="clause-body">
+      <p>a) Efetuar o pagamento nas condições e prazos pactuados;</p>
+      <p>b) Informar com antecedência mínima de ${c.antecedencia_cancelamento || "24"} horas eventuais alterações no roteiro ou horário;</p>
+      <p>c) Utilizar o veículo dentro das finalidades previstas neste contrato;</p>
+      <p>d) Respeitar a capacidade máxima de passageiros do veículo;</p>
+      <p>e) Zelar pela conservação do veículo durante o período de utilização.</p>
+    </div>
+  </div>
+
+  <div class="clause">
+    <div class="clause-title">CLÁUSULA 7 — DO CANCELAMENTO E MULTAS</div>
+    <div class="clause-body">
+      <p>a) O cancelamento deverá ser comunicado com antecedência mínima de ${c.antecedencia_cancelamento || "24"} horas;</p>
+      <p>b) Cancelamento sem antecedência mínima: multa de ${c.multa_cancelamento || "50"}% sobre o valor total;</p>
+      <p>c) No-show (não comparecimento): cobrança integral do serviço;</p>
+      <p>d) Atraso superior a 30 minutos do contratante: cobrança de hora extra.</p>
+    </div>
+  </div>
+
+  <div class="clause">
+    <div class="clause-title">CLÁUSULA 8 — DAS RESPONSABILIDADES</div>
+    <div class="clause-body">
+      <p>a) A CONTRATADA é responsável por danos causados a terceiros durante a prestação do serviço;</p>
+      <p>b) A CONTRATADA manterá seguro do veículo com cobertura para passageiros;</p>
+      <p>c) A CONTRATADA não se responsabiliza por atrasos causados por condições climáticas, trânsito ou eventos de força maior.</p>
+    </div>
+  </div>
+
+  <div class="clause">
+    <div class="clause-title">CLÁUSULA 9 — DA VIGÊNCIA</div>
+    <div class="clause-body">
+      <p>O presente contrato vigorará pelo período estipulado na Cláusula 3, podendo ser renovado mediante acordo entre as partes.</p>
+    </div>
+  </div>
+
+  ${c.foro_comarca ? `
+  <div class="clause">
+    <div class="clause-title">CLÁUSULA 10 — DO FORO</div>
+    <div class="clause-body">
+      <p>Fica eleito o foro da Comarca de <b>${c.foro_comarca}</b> para dirimir quaisquer dúvidas oriundas do presente contrato, com renúncia expressa a qualquer outro, por mais privilegiado que seja.</p>
+    </div>
+  </div>` : ""}
+
+  ${c.observacoes ? `
+  <div class="clause">
+    <div class="clause-title">OBSERVAÇÕES ADICIONAIS</div>
+    <div class="clause-body"><p>${c.observacoes.replace(/\n/g, "<br/>")}</p></div>
+  </div>` : ""}
+
+  <div class="signatures">
+    <div>
+      <div class="sig-line">CONTRATANTE<br/>${c.contratante_nome || ""}<br/>CPF/CNPJ: ${c.contratante_cnpj_cpf || ""}</div>
+    </div>
+    <div>
+      <div class="sig-line">CONTRATADA<br/>Executive Service<br/>Transporte Executivo</div>
+    </div>
+  </div>
+
+  <div class="footer">
+    <span>Contrato Nº ${c.numero_contrato} — Emitido em ${new Date().toLocaleString("pt-BR")}</span>
+    <span>Executive Service — Transporte Executivo</span>
+  </div>
+</div>
+</body></html>`);
+  w.document.close();
+  w.onload = () => w.print();
+};

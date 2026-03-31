@@ -10,6 +10,7 @@ import Login from "./pages/Login";
 import NotFound from "./pages/NotFound";
 import Vendas from "./pages/Vendas";
 import Cotacoes from "./pages/Cotacoes";
+import Contratos from "./pages/Contratos";
 import MobileContas from "./pages/MobileContas";
 
 const queryClient = new QueryClient();
@@ -41,6 +42,7 @@ const App = () => (
             <Route path="/cadastros" element={<ProtectedRoute><Cadastros /></ProtectedRoute>} />
             <Route path="/vendas" element={<ProtectedRoute><Vendas /></ProtectedRoute>} />
             <Route path="/cotacoes" element={<ProtectedRoute><Cotacoes /></ProtectedRoute>} />
+            <Route path="/contratos" element={<ProtectedRoute><Contratos /></ProtectedRoute>} />
             <Route path="/m" element={<MobileContas />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
