@@ -176,8 +176,8 @@ const Cotacoes = () => {
   const calcTotal = () => items.reduce((sum, i) => sum + (i.valor || 0), 0);
 
   const handleSave = async () => {
-    if (!nome.trim()) {
-      toast.error("Informe o nome da cotação.");
+    if (!empresa.trim()) {
+      toast.error("Informe o nome da empresa.");
       return;
     }
     if (!session?.user?.id) return;
