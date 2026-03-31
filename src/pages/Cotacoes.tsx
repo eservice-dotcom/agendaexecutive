@@ -407,9 +407,13 @@ const Cotacoes = () => {
           </DialogHeader>
 
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-            <div className="space-y-1.5 sm:col-span-2">
-              <Label>Nome *</Label>
-              <Input value={nome} onChange={(e) => setNome(e.target.value)} placeholder="Nome do cliente ou descrição" />
+            <div className="space-y-1.5">
+              <Label>Empresa *</Label>
+              <Input value={empresa} onChange={(e) => setEmpresa(e.target.value)} placeholder="Nome da empresa" />
+            </div>
+            <div className="space-y-1.5">
+              <Label>Destinatário</Label>
+              <Input value={destinatario} onChange={(e) => setDestinatario(e.target.value)} placeholder="Nome do destinatário" />
             </div>
 
             <div className="space-y-1.5">
