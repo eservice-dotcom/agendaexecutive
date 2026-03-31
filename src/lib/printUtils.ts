@@ -337,6 +337,8 @@ ${brandedStyles()}
 export const printCotacao = (cotacao: {
   numero_cotacao: number;
   nome: string;
+  empresa?: string;
+  destinatario?: string;
   data: string;
   forma_pagamento: string;
   validade_proposta: string;
