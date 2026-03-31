@@ -63,6 +63,7 @@ interface Contrato {
   multa_cancelamento: string;
   observacoes: string;
   foro_comarca: string;
+  arquivo_assinado_url: string;
 }
 
 const emptyContrato: Omit<Contrato, "id" | "numero_contrato"> = {
