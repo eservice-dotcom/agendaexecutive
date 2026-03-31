@@ -99,6 +99,7 @@ const Contratos = () => {
   const [editingContrato, setEditingContrato] = useState<Contrato | null>(null);
   const [form, setForm] = useState(emptyContrato);
   const [hasPermission, setHasPermission] = useState(false);
+  const [uploading, setUploading] = useState(false);
 
   // Lookup data
   const [clientes, setClientes] = useState<any[]>([]);
