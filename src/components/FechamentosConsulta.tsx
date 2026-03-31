@@ -216,17 +216,33 @@ const FechamentosConsulta = () => {
   };
 
   const handleBatchPrint = () => {
-    const items = filtered.filter((f) => selected.has(f.id));
-    if (items.length === 0) { toast.error("Selecione ao menos um fechamento"); return; }
-    items.forEach((f) => handleReimprimir(f));
-    toast.success(`${items.length} fechamento(s) enviado(s) para impressão`);
+    const selected_items = filtered.filter((f) => selected.has(f.id));
+    if (selected_items.length === 0) { toast.error("Selecione ao menos um fechamento"); return; }
+    const batch = selected_items.map((f) => ({
+      numero_fechamento: f.numero_fechamento,
+      cliente: f.cliente,
+      items: Array.isArray(f.items) ? f.items : [],
+      extras: resolveExtras(f),
+      observacoes: f.observacoes,
+    }));
+    generateBatchClosingReport(batch);
+    toast.success(`${selected_items.length} fechamento(s) consolidado(s) para impressão`);
   };
 
   const handleBatchExcel = () => {
-    const items = filtered.filter((f) => selected.has(f.id));
-    if (items.length === 0) { toast.error("Selecione ao menos um fechamento"); return; }
-    items.forEach((f) => handleExportExcel(f));
-    toast.success(`${items.length} fechamento(s) exportado(s) para Excel`);
+    const selected_items = filtered.filter((f) => selected.has(f.id));
+    if (selected_items.length === 0) { toast.error("Selecione ao menos um fechamento"); return; }
+    const batch = selected_items.map((f) => ({
+      numero_fechamento: f.numero_fechamento,
+      cliente: f.cliente,
+      items: Array.isArray(f.items) ? f.items : [],
+      extras: resolveExtras(f),
+      observacoes: f.observacoes,
+      valor_total: f.valor_total,
+      extras_total: f.extras_total,
+    }));
+    generateBatchClosingReportExcel(batch);
+    toast.success(`${selected_items.length} fechamento(s) exportado(s) em 1 arquivo Excel`);
   };
 
   return (
