@@ -199,6 +199,36 @@ const FechamentosConsulta = () => {
     }
   };
 
+  const toggleSelect = (id: string) => {
+    setSelected((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id); else next.add(id);
+      return next;
+    });
+  };
+
+  const toggleSelectAll = () => {
+    if (selected.size === filtered.length) {
+      setSelected(new Set());
+    } else {
+      setSelected(new Set(filtered.map((f) => f.id)));
+    }
+  };
+
+  const handleBatchPrint = () => {
+    const items = filtered.filter((f) => selected.has(f.id));
+    if (items.length === 0) { toast.error("Selecione ao menos um fechamento"); return; }
+    items.forEach((f) => handleReimprimir(f));
+    toast.success(`${items.length} fechamento(s) enviado(s) para impressão`);
+  };
+
+  const handleBatchExcel = () => {
+    const items = filtered.filter((f) => selected.has(f.id));
+    if (items.length === 0) { toast.error("Selecione ao menos um fechamento"); return; }
+    items.forEach((f) => handleExportExcel(f));
+    toast.success(`${items.length} fechamento(s) exportado(s) para Excel`);
+  };
+
   return (
     <div className="space-y-4">
       {/* Filters */}
@@ -239,9 +269,24 @@ const FechamentosConsulta = () => {
         />
       </div>
 
-      <p className="text-sm text-muted-foreground">
-        {filtered.length} fechamento{filtered.length !== 1 ? "s" : ""} encontrado{filtered.length !== 1 ? "s" : ""}
-      </p>
+      <div className="flex items-center justify-between">
+        <p className="text-sm text-muted-foreground">
+          {filtered.length} fechamento{filtered.length !== 1 ? "s" : ""} encontrado{filtered.length !== 1 ? "s" : ""}
+          {selected.size > 0 && ` · ${selected.size} selecionado${selected.size !== 1 ? "s" : ""}`}
+        </p>
+        {selected.size > 0 && (
+          <div className="flex gap-2">
+            <Button variant="outline" size="sm" onClick={handleBatchPrint}>
+              <Printer className="h-4 w-4 mr-1" />
+              Imprimir ({selected.size})
+            </Button>
+            <Button variant="outline" size="sm" onClick={handleBatchExcel}>
+              <FileSpreadsheet className="h-4 w-4 mr-1" />
+              Excel ({selected.size})
+            </Button>
+          </div>
+        )}
+      </div>
 
       {/* Table */}
       <div className="rounded-md border overflow-x-auto">
