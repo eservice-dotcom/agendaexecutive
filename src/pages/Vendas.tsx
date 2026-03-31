@@ -704,6 +704,8 @@ const Vendas = () => {
     setDataVenda(new Date().toISOString().split("T")[0]);
     setDataVencimento("");
     setSearchAgenda("");
+    setPeriodoInicio("");
+    setPeriodoFim("");
     setContasPagar([]);
     setExtras([]);
     setFormaPagamento("");
