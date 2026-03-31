@@ -351,7 +351,8 @@ const Cotacoes = () => {
               <TableHeader>
                 <TableRow>
                   <TableHead className="w-16">Nº</TableHead>
-                  <TableHead>Nome</TableHead>
+                    <TableHead>Empresa</TableHead>
+                    <TableHead>Destinatário</TableHead>
                   <TableHead>Data</TableHead>
                   <TableHead>Validade</TableHead>
                   <TableHead>Pgto</TableHead>
