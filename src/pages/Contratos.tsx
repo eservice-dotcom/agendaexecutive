@@ -4,7 +4,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import logo from "@/assets/logo-executive-service.png";
-import { Plus, Trash2, Save, Pencil, FileText, CalendarDays, ClipboardList, ShoppingCart, Printer, FileSignature } from "lucide-react";
+import { Plus, Trash2, Save, Pencil, FileText, CalendarDays, ClipboardList, ShoppingCart, Printer, FileSignature, Upload, Eye, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -63,6 +63,7 @@ interface Contrato {
   multa_cancelamento: string;
   observacoes: string;
   foro_comarca: string;
+  arquivo_assinado_url: string;
 }
 
 const emptyContrato: Omit<Contrato, "id" | "numero_contrato"> = {
@@ -78,7 +79,7 @@ const emptyContrato: Omit<Contrato, "id" | "numero_contrato"> = {
   estacionamento_pedagio: "", alimentacao_motorista: "", outros_extras: "",
   forma_faturamento: "", condicao_pagamento: "", data_vencimento: "", dados_faturamento: "",
   antecedencia_cancelamento: "24", multa_cancelamento: "50",
-  observacoes: "", foro_comarca: "",
+  observacoes: "", foro_comarca: "", arquivo_assinado_url: "",
 };
 
 const formatDate = (d: string) => {
@@ -98,6 +99,7 @@ const Contratos = () => {
   const [editingContrato, setEditingContrato] = useState<Contrato | null>(null);
   const [form, setForm] = useState(emptyContrato);
   const [hasPermission, setHasPermission] = useState(false);
+  const [uploading, setUploading] = useState(false);
 
   // Lookup data
   const [clientes, setClientes] = useState<any[]>([]);
@@ -240,6 +242,53 @@ const Contratos = () => {
     printContrato(c, logo);
   };
 
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !editingContrato) return;
+    setUploading(true);
+    try {
+      const ext = file.name.split(".").pop();
+      const path = `${editingContrato.id}/${Date.now()}.${ext}`;
+      const { error: uploadError } = await supabase.storage
+        .from("contratos-assinados")
+        .upload(path, file, { upsert: true });
+      if (uploadError) throw uploadError;
+
+      const { data: urlData } = supabase.storage
+        .from("contratos-assinados")
+        .getPublicUrl(path);
+
+      const publicUrl = urlData.publicUrl;
+      await supabase.from("contratos").update({ arquivo_assinado_url: publicUrl } as any).eq("id", editingContrato.id);
+      setField("arquivo_assinado_url", publicUrl);
+      setEditingContrato({ ...editingContrato, arquivo_assinado_url: publicUrl });
+      toast.success("Arquivo enviado com sucesso!");
+    } catch (err: any) {
+      toast.error("Erro ao enviar arquivo: " + err.message);
+    } finally {
+      setUploading(false);
+      e.target.value = "";
+    }
+  };
+
+  const handleFileRemove = async () => {
+    if (!editingContrato || !form.arquivo_assinado_url) return;
+    if (!confirm("Remover o arquivo assinado?")) return;
+    try {
+      const url = form.arquivo_assinado_url;
+      const bucketPath = url.split("/contratos-assinados/").pop();
+      if (bucketPath) {
+        await supabase.storage.from("contratos-assinados").remove([bucketPath]);
+      }
+      await supabase.from("contratos").update({ arquivo_assinado_url: "" } as any).eq("id", editingContrato.id);
+      setField("arquivo_assinado_url", "");
+      setEditingContrato({ ...editingContrato, arquivo_assinado_url: "" });
+      toast.success("Arquivo removido!");
+    } catch (err: any) {
+      toast.error("Erro ao remover arquivo");
+    }
+  };
+
   return (
     <div className="min-h-screen bg-background">
       <header className="bg-primary px-4 py-3 text-primary-foreground shadow-md">
@@ -308,7 +357,12 @@ const Contratos = () => {
               <TableBody>
                 {contratos.map(c => (
                   <TableRow key={c.id}>
-                    <TableCell className="font-mono">{c.numero_contrato}</TableCell>
+                    <TableCell className="font-mono">
+                      <span className="flex items-center gap-1">
+                        {c.numero_contrato}
+                        {c.arquivo_assinado_url && <span title="Contrato assinado anexado"><FileText className="h-3 w-3 text-primary" /></span>}
+                      </span>
+                    </TableCell>
                     <TableCell>{formatDate(c.data_emissao)}</TableCell>
                     <TableCell className="max-w-[200px] truncate">{c.contratante_nome}</TableCell>
                     <TableCell>{c.tipo_servico}</TableCell>
@@ -583,6 +637,47 @@ const Contratos = () => {
                 </div>
               </div>
             </div>
+
+            {/* Arquivo Assinado */}
+            {editingContrato && (
+              <div>
+                <h3 className="text-sm font-semibold text-primary mb-2 border-b pb-1">Contrato Assinado</h3>
+                <div className="flex items-center gap-3">
+                  {form.arquivo_assinado_url ? (
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <Badge variant="secondary" className="gap-1">
+                        <FileText className="h-3 w-3" /> Arquivo anexado
+                      </Badge>
+                      <Button variant="outline" size="sm" asChild>
+                        <a href={form.arquivo_assinado_url} target="_blank" rel="noopener noreferrer">
+                          <Eye className="h-4 w-4 mr-1" /> Visualizar
+                        </a>
+                      </Button>
+                      <Button variant="outline" size="sm" className="text-destructive" onClick={handleFileRemove}>
+                        <X className="h-4 w-4 mr-1" /> Remover
+                      </Button>
+                    </div>
+                  ) : (
+                    <div className="flex items-center gap-2">
+                      <Label htmlFor="file-upload" className="cursor-pointer">
+                        <div className="flex items-center gap-2 rounded-md border border-dashed border-muted-foreground/50 px-4 py-3 text-sm text-muted-foreground hover:border-primary hover:text-primary transition-colors">
+                          <Upload className="h-4 w-4" />
+                          {uploading ? "Enviando..." : "Clique para enviar o contrato assinado (PDF, imagem)"}
+                        </div>
+                      </Label>
+                      <Input
+                        id="file-upload"
+                        type="file"
+                        accept=".pdf,.jpg,.jpeg,.png,.webp"
+                        className="hidden"
+                        onChange={handleFileUpload}
+                        disabled={uploading}
+                      />
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
           </div>
 
           <DialogFooter>
