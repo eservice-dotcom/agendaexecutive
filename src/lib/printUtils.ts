@@ -819,7 +819,7 @@ body{font-family:'Segoe UI',Arial,sans-serif;color:#1a1a1a;font-size:11px;paddin
       <div class="sig-line">CONTRATANTE<br/>${c.contratante_nome || ""}<br/>CPF/CNPJ: ${c.contratante_cnpj_cpf || ""}</div>
     </div>
     <div>
-      <div class="sig-line">CONTRATADA<br/>Executive Service<br/>Transporte Executivo</div>
+      <div class="sig-line">CONTRATADA<br/>Executive Service Transporte e Turismo Ltda<br/>CNPJ: 03.143.672/0001-44<br/>Rafael Silva da Cunha — CPF: 899.744.500-63</div>
     </div>
   </div>
 
