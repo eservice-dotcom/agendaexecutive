@@ -229,7 +229,9 @@ const Cotacoes = () => {
           .from("cotacoes")
           .insert({
             user_id: session.user.id,
-            nome,
+            nome: empresa,
+            empresa,
+            destinatario,
             data,
             forma_pagamento: formaPagamento,
             validade_proposta: validadeProposta || null,
