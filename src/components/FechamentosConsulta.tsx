@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback, useMemo } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { generateClosingReport } from "@/lib/closingReport";
-import { generateClosingReportExcel } from "@/lib/closingReportExcel";
+import { generateClosingReport, generateBatchClosingReport } from "@/lib/closingReport";
+import { generateClosingReportExcel, generateBatchClosingReportExcel } from "@/lib/closingReportExcel";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
