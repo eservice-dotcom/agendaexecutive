@@ -366,7 +366,8 @@ const Cotacoes = () => {
                 {cotacoes.map((c) => (
                   <TableRow key={c.id} className="cursor-pointer hover:bg-muted/50" onClick={() => openEdit(c)}>
                     <TableCell className="font-medium">{c.numero_cotacao}</TableCell>
-                    <TableCell>{c.nome}</TableCell>
+                    <TableCell>{c.empresa || c.nome}</TableCell>
+                    <TableCell>{c.destinatario || "-"}</TableCell>
                     <TableCell>{formatDate(c.data)}</TableCell>
                     <TableCell>{c.validade_proposta ? formatDate(c.validade_proposta) : "-"}</TableCell>
                     <TableCell>{c.forma_pagamento || "-"}</TableCell>
