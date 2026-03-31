@@ -346,6 +346,7 @@ export type Database = {
         Row: {
           alimentacao_motorista: string
           antecedencia_cancelamento: string
+          arquivo_assinado_url: string | null
           condicao_pagamento: string
           contratante_cep: string
           contratante_cidade: string
@@ -396,6 +397,7 @@ export type Database = {
         Insert: {
           alimentacao_motorista?: string
           antecedencia_cancelamento?: string
+          arquivo_assinado_url?: string | null
           condicao_pagamento?: string
           contratante_cep?: string
           contratante_cidade?: string
@@ -446,6 +448,7 @@ export type Database = {
         Update: {
           alimentacao_motorista?: string
           antecedencia_cancelamento?: string
+          arquivo_assinado_url?: string | null
           condicao_pagamento?: string
           contratante_cep?: string
           contratante_cidade?: string
