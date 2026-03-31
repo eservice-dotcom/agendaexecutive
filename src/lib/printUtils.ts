@@ -825,7 +825,7 @@ body{font-family:'Segoe UI',Arial,sans-serif;color:#1a1a1a;font-size:11px;paddin
 
   <div class="footer">
     <span>Contrato Nº ${c.numero_contrato} — Emitido em ${new Date().toLocaleString("pt-BR")}</span>
-    <span>Executive Service — Transporte Executivo</span>
+    <span>Executive Service Transporte e Turismo Ltda — CNPJ: 03.143.672/0001-44</span>
   </div>
 </div>
 </body></html>`);
