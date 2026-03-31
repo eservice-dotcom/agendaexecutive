@@ -57,6 +57,8 @@ const Cotacoes = () => {
 
   // Form state
   const [nome, setNome] = useState("");
+  const [empresa, setEmpresa] = useState("");
+  const [destinatario, setDestinatario] = useState("");
   const [data, setData] = useState(new Date().toISOString().split("T")[0]);
   const [formaPagamento, setFormaPagamento] = useState("");
   const [validadeProposta, setValidadeProposta] = useState("");
