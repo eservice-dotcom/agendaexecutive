@@ -360,7 +360,7 @@ const Contratos = () => {
                     <TableCell className="font-mono">
                       <span className="flex items-center gap-1">
                         {c.numero_contrato}
-                        {c.arquivo_assinado_url && <FileText className="h-3 w-3 text-green-600" title="Contrato assinado anexado" />}
+                        {c.arquivo_assinado_url && <span title="Contrato assinado anexado"><FileText className="h-3 w-3 text-primary" /></span>}
                       </span>
                     </TableCell>
                     <TableCell>{formatDate(c.data_emissao)}</TableCell>
