@@ -357,7 +357,12 @@ const Contratos = () => {
               <TableBody>
                 {contratos.map(c => (
                   <TableRow key={c.id}>
-                    <TableCell className="font-mono">{c.numero_contrato}</TableCell>
+                    <TableCell className="font-mono">
+                      <span className="flex items-center gap-1">
+                        {c.numero_contrato}
+                        {c.arquivo_assinado_url && <FileText className="h-3 w-3 text-green-600" title="Contrato assinado anexado" />}
+                      </span>
+                    </TableCell>
                     <TableCell>{formatDate(c.data_emissao)}</TableCell>
                     <TableCell className="max-w-[200px] truncate">{c.contratante_nome}</TableCell>
                     <TableCell>{c.tipo_servico}</TableCell>
