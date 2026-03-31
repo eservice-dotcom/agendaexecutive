@@ -337,6 +337,8 @@ ${brandedStyles()}
 export const printCotacao = (cotacao: {
   numero_cotacao: number;
   nome: string;
+  empresa?: string;
+  destinatario?: string;
   data: string;
   forma_pagamento: string;
   validade_proposta: string;
@@ -407,8 +409,9 @@ tr:nth-child(even){background:#f8f9fa}
   </div>
 
   <div class="info-grid">
-    <div><span class="label">Cliente / Nome:</span> <span class="value">${cotacao.nome}</span></div>
+    <div><span class="label">Empresa:</span> <span class="value">${cotacao.empresa || cotacao.nome}</span></div>
     <div><span class="label">Data:</span> <span class="value">${fd(cotacao.data)}</span></div>
+    ${cotacao.destinatario ? `<div><span class="label">Destinatário:</span> <span class="value">${cotacao.destinatario}</span></div>` : ""}
     <div><span class="label">Forma de Pagamento:</span> <span class="value">${cotacao.forma_pagamento || "—"}</span></div>
     <div><span class="label">Status:</span> <span class="value">${statusLabel}</span></div>
   </div>

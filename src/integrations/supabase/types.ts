@@ -384,6 +384,8 @@ export type Database = {
         Row: {
           created_at: string
           data: string
+          destinatario: string
+          empresa: string
           forma_pagamento: string
           id: string
           nome: string
@@ -398,6 +400,8 @@ export type Database = {
         Insert: {
           created_at?: string
           data?: string
+          destinatario?: string
+          empresa?: string
           forma_pagamento?: string
           id?: string
           nome: string
@@ -412,6 +416,8 @@ export type Database = {
         Update: {
           created_at?: string
           data?: string
+          destinatario?: string
+          empresa?: string
           forma_pagamento?: string
           id?: string
           nome?: string

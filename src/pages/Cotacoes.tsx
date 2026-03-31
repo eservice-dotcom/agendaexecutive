@@ -28,6 +28,8 @@ interface Cotacao {
   id: string;
   numero_cotacao: number;
   nome: string;
+  empresa: string;
+  destinatario: string;
   data: string;
   forma_pagamento: string;
   validade_proposta: string;
@@ -55,6 +57,8 @@ const Cotacoes = () => {
 
   // Form state
   const [nome, setNome] = useState("");
+  const [empresa, setEmpresa] = useState("");
+  const [destinatario, setDestinatario] = useState("");
   const [data, setData] = useState(new Date().toISOString().split("T")[0]);
   const [formaPagamento, setFormaPagamento] = useState("");
   const [validadeProposta, setValidadeProposta] = useState("");
@@ -100,6 +104,8 @@ const Cotacoes = () => {
         id: c.id,
         numero_cotacao: c.numero_cotacao,
         nome: c.nome,
+        empresa: c.empresa || "",
+        destinatario: c.destinatario || "",
         data: c.data,
         forma_pagamento: c.forma_pagamento,
         validade_proposta: c.validade_proposta || "",
@@ -122,6 +128,8 @@ const Cotacoes = () => {
 
   const resetForm = () => {
     setNome("");
+    setEmpresa("");
+    setDestinatario("");
     setData(new Date().toISOString().split("T")[0]);
     setFormaPagamento("");
     setValidadeProposta("");
@@ -139,6 +147,8 @@ const Cotacoes = () => {
   const openEdit = (c: Cotacao) => {
     setEditingCotacao(c);
     setNome(c.nome);
+    setEmpresa(c.empresa);
+    setDestinatario(c.destinatario);
     setData(c.data);
     setFormaPagamento(c.forma_pagamento);
     setValidadeProposta(c.validade_proposta);
@@ -166,8 +176,8 @@ const Cotacoes = () => {
   const calcTotal = () => items.reduce((sum, i) => sum + (i.valor || 0), 0);
 
   const handleSave = async () => {
-    if (!nome.trim()) {
-      toast.error("Informe o nome da cotação.");
+    if (!empresa.trim()) {
+      toast.error("Informe o nome da empresa.");
       return;
     }
     if (!session?.user?.id) return;
@@ -180,7 +190,9 @@ const Cotacoes = () => {
         const { error } = await supabase
           .from("cotacoes")
           .update({
-            nome,
+            nome: empresa,
+            empresa,
+            destinatario,
             data,
             forma_pagamento: formaPagamento,
             validade_proposta: validadeProposta || null,
@@ -217,7 +229,9 @@ const Cotacoes = () => {
           .from("cotacoes")
           .insert({
             user_id: session.user.id,
-            nome,
+            nome: empresa,
+            empresa,
+            destinatario,
             data,
             forma_pagamento: formaPagamento,
             validade_proposta: validadeProposta || null,
@@ -337,7 +351,8 @@ const Cotacoes = () => {
               <TableHeader>
                 <TableRow>
                   <TableHead className="w-16">Nº</TableHead>
-                  <TableHead>Nome</TableHead>
+                    <TableHead>Empresa</TableHead>
+                    <TableHead>Destinatário</TableHead>
                   <TableHead>Data</TableHead>
                   <TableHead>Validade</TableHead>
                   <TableHead>Pgto</TableHead>
@@ -351,7 +366,8 @@ const Cotacoes = () => {
                 {cotacoes.map((c) => (
                   <TableRow key={c.id} className="cursor-pointer hover:bg-muted/50" onClick={() => openEdit(c)}>
                     <TableCell className="font-medium">{c.numero_cotacao}</TableCell>
-                    <TableCell>{c.nome}</TableCell>
+                    <TableCell>{c.empresa || c.nome}</TableCell>
+                    <TableCell>{c.destinatario || "-"}</TableCell>
                     <TableCell>{formatDate(c.data)}</TableCell>
                     <TableCell>{c.validade_proposta ? formatDate(c.validade_proposta) : "-"}</TableCell>
                     <TableCell>{c.forma_pagamento || "-"}</TableCell>
@@ -393,9 +409,13 @@ const Cotacoes = () => {
           </DialogHeader>
 
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-            <div className="space-y-1.5 sm:col-span-2">
-              <Label>Nome *</Label>
-              <Input value={nome} onChange={(e) => setNome(e.target.value)} placeholder="Nome do cliente ou descrição" />
+            <div className="space-y-1.5">
+              <Label>Empresa *</Label>
+              <Input value={empresa} onChange={(e) => setEmpresa(e.target.value)} placeholder="Nome da empresa" />
+            </div>
+            <div className="space-y-1.5">
+              <Label>Destinatário</Label>
+              <Input value={destinatario} onChange={(e) => setDestinatario(e.target.value)} placeholder="Nome do destinatário" />
             </div>
 
             <div className="space-y-1.5">
