@@ -104,6 +104,8 @@ const Cotacoes = () => {
         id: c.id,
         numero_cotacao: c.numero_cotacao,
         nome: c.nome,
+        empresa: c.empresa || "",
+        destinatario: c.destinatario || "",
         data: c.data,
         forma_pagamento: c.forma_pagamento,
         validade_proposta: c.validade_proposta || "",
