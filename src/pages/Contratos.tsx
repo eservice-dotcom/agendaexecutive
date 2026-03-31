@@ -242,6 +242,53 @@ const Contratos = () => {
     printContrato(c, logo);
   };
 
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !editingContrato) return;
+    setUploading(true);
+    try {
+      const ext = file.name.split(".").pop();
+      const path = `${editingContrato.id}/${Date.now()}.${ext}`;
+      const { error: uploadError } = await supabase.storage
+        .from("contratos-assinados")
+        .upload(path, file, { upsert: true });
+      if (uploadError) throw uploadError;
+
+      const { data: urlData } = supabase.storage
+        .from("contratos-assinados")
+        .getPublicUrl(path);
+
+      const publicUrl = urlData.publicUrl;
+      await supabase.from("contratos").update({ arquivo_assinado_url: publicUrl } as any).eq("id", editingContrato.id);
+      setField("arquivo_assinado_url", publicUrl);
+      setEditingContrato({ ...editingContrato, arquivo_assinado_url: publicUrl });
+      toast.success("Arquivo enviado com sucesso!");
+    } catch (err: any) {
+      toast.error("Erro ao enviar arquivo: " + err.message);
+    } finally {
+      setUploading(false);
+      e.target.value = "";
+    }
+  };
+
+  const handleFileRemove = async () => {
+    if (!editingContrato || !form.arquivo_assinado_url) return;
+    if (!confirm("Remover o arquivo assinado?")) return;
+    try {
+      const url = form.arquivo_assinado_url;
+      const bucketPath = url.split("/contratos-assinados/").pop();
+      if (bucketPath) {
+        await supabase.storage.from("contratos-assinados").remove([bucketPath]);
+      }
+      await supabase.from("contratos").update({ arquivo_assinado_url: "" } as any).eq("id", editingContrato.id);
+      setField("arquivo_assinado_url", "");
+      setEditingContrato({ ...editingContrato, arquivo_assinado_url: "" });
+      toast.success("Arquivo removido!");
+    } catch (err: any) {
+      toast.error("Erro ao remover arquivo");
+    }
+  };
+
   return (
     <div className="min-h-screen bg-background">
       <header className="bg-primary px-4 py-3 text-primary-foreground shadow-md">
