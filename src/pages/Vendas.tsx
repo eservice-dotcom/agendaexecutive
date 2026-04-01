@@ -849,10 +849,6 @@ const Vendas = () => {
           status: "pendente",
         };
       });
-          data_vencimento: venda.data_vencimento || null,
-          status: "pendente",
-        };
-      });
 
       const { error } = await supabase.from("contas_pagar").insert(novasContas);
       if (error) throw error;
