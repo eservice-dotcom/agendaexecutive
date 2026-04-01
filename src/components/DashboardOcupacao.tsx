@@ -4,6 +4,8 @@ import { Progress } from "@/components/ui/progress";
 import { Truck, TrendingUp, Users, Calendar } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from "recharts";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 
 interface VeiculoInfo {
   placa: string;
@@ -15,6 +17,7 @@ interface OcupacaoData {
   veiculo: string;
   placa: string;
   capacidade: number;
+  diasOcupados: number;
   viagens: number;
   totalPax: number;
   ocupacaoMedia: number;
@@ -23,6 +26,7 @@ interface OcupacaoData {
 const DashboardOcupacao = () => {
   const [items, setItems] = useState<any[]>([]);
   const [veiculos, setVeiculos] = useState<VeiculoInfo[]>([]);
+  const [parametroDias, setParametroDias] = useState<number>(30);
 
   useEffect(() => {
     Promise.all([
@@ -38,7 +42,7 @@ const DashboardOcupacao = () => {
     const veiculoMap = new Map<string, VeiculoInfo>();
     veiculos.forEach((v) => veiculoMap.set(v.placa, v));
 
-    const map = new Map<string, OcupacaoData>();
+    const map = new Map<string, { veiculo: string; placa: string; capacidade: number; viagens: number; totalPax: number; diasSet: Set<string> }>();
     items.forEach((item) => {
       const key = item.placa;
       const vInfo = veiculoMap.get(key);
@@ -49,22 +53,28 @@ const DashboardOcupacao = () => {
         capacidade,
         viagens: 0,
         totalPax: 0,
-        ocupacaoMedia: 0,
+        diasSet: new Set<string>(),
       };
       existing.viagens += 1;
       existing.totalPax += Number(item.pax);
+      if (item.data) existing.diasSet.add(item.data);
       map.set(key, existing);
     });
 
     return Array.from(map.values())
       .map((d) => ({
-        ...d,
-        ocupacaoMedia: d.capacidade > 0 && d.viagens > 0
-          ? (d.totalPax / (d.capacidade * d.viagens)) * 100
+        veiculo: d.veiculo,
+        placa: d.placa,
+        capacidade: d.capacidade,
+        diasOcupados: d.diasSet.size,
+        viagens: d.viagens,
+        totalPax: d.totalPax,
+        ocupacaoMedia: parametroDias > 0
+          ? (d.diasSet.size / parametroDias) * 100
           : 0,
       }))
       .sort((a, b) => b.ocupacaoMedia - a.ocupacaoMedia);
-  }, [items, veiculos]);
+  }, [items, veiculos, parametroDias]);
 
   const mediaGeral = dados.length > 0
     ? dados.reduce((s, d) => s + d.ocupacaoMedia, 0) / dados.length
@@ -86,6 +96,26 @@ const DashboardOcupacao = () => {
 
   return (
     <div className="space-y-6">
+      {/* Parâmetro de dias */}
+      <div className="flex items-end gap-3 rounded-lg border border-border bg-card p-3 shadow-sm">
+        <div className="flex items-center gap-2">
+          <Label htmlFor="parametro-dias" className="whitespace-nowrap text-sm font-medium">
+            Parâmetro de dias:
+          </Label>
+          <Input
+            id="parametro-dias"
+            type="number"
+            min={1}
+            value={parametroDias}
+            onChange={(e) => setParametroDias(Math.max(1, Number(e.target.value)))}
+            className="w-20"
+          />
+        </div>
+        <p className="text-xs text-muted-foreground">
+          Ocupação = (dias com serviço / {parametroDias}) × 100%
+        </p>
+      </div>
+
       {/* Stats */}
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
         <StatCard icon={<Truck className="h-4 w-4" />} label="Veículos" value={dados.length.toString()} />
@@ -122,11 +152,10 @@ const DashboardOcupacao = () => {
             <TableRow className="bg-muted/50 hover:bg-muted/50">
               <TableHead className="font-semibold">Veículo</TableHead>
               <TableHead className="font-semibold">Placa</TableHead>
-              <TableHead className="font-semibold text-center">Capacidade</TableHead>
               <TableHead className="font-semibold text-center">Viagens</TableHead>
+              <TableHead className="font-semibold text-center">Dias Ocupados</TableHead>
               <TableHead className="font-semibold text-center">Total PAX</TableHead>
-              <TableHead className="font-semibold text-center">Média PAX/Viagem</TableHead>
-              <TableHead className="font-semibold min-w-[180px]">Ocupação</TableHead>
+              <TableHead className="font-semibold min-w-[180px]">Ocupação ({parametroDias}d)</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -139,33 +168,26 @@ const DashboardOcupacao = () => {
                   </span>
                 </TableCell>
                 <TableCell className="font-mono text-sm">{d.placa}</TableCell>
-                <TableCell className="text-center">{d.capacidade || "—"}</TableCell>
                 <TableCell className="text-center">
                   <span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-primary/10 text-xs font-bold text-primary">
                     {d.viagens}
                   </span>
                 </TableCell>
+                <TableCell className="text-center font-mono text-sm">{d.diasOcupados}</TableCell>
                 <TableCell className="text-center">{d.totalPax}</TableCell>
-                <TableCell className="text-center font-mono text-sm">
-                  {d.viagens > 0 ? (d.totalPax / d.viagens).toFixed(1) : "0"}
-                </TableCell>
                 <TableCell>
-                  {d.capacidade > 0 ? (
-                    <div className="flex items-center gap-2">
-                      <Progress value={Math.min(d.ocupacaoMedia, 100)} className="h-2 flex-1" />
-                      <span className="min-w-[40px] text-right font-mono text-xs font-semibold">
-                        {d.ocupacaoMedia.toFixed(1)}%
-                      </span>
-                    </div>
-                  ) : (
-                    <span className="text-xs text-muted-foreground">Sem cadastro</span>
-                  )}
+                  <div className="flex items-center gap-2">
+                    <Progress value={Math.min(d.ocupacaoMedia, 100)} className="h-2 flex-1" />
+                    <span className="min-w-[40px] text-right font-mono text-xs font-semibold">
+                      {d.ocupacaoMedia.toFixed(1)}%
+                    </span>
+                  </div>
                 </TableCell>
               </TableRow>
             ))}
             {dados.length === 0 && (
               <TableRow>
-                <TableCell colSpan={7} className="py-8 text-center text-muted-foreground">
+                <TableCell colSpan={6} className="py-8 text-center text-muted-foreground">
                   Nenhum dado encontrado
                 </TableCell>
               </TableRow>
