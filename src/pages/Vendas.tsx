@@ -646,16 +646,18 @@ const Vendas = () => {
       });
 
       const autoContasPagar = Array.from(fornecedorMap.entries()).map(([fornecedor, info]) => {
-        const descLines = info.items.map((item) =>
-          `O.S. ${item.cot} - ${item.tipo} - ${item.origem} → ${item.destino} - ${item.motorista} (${formatDate(item.data)}) - ${formatCurrency(item.custo)}`
-        );
+        const descLines = info.items.map((item) => formatOsDescricao(item));
         return {
           venda_id: venda.id,
           user_id: session!.user.id,
           fornecedor,
-          descritivo: descLines.join(" | "),
+          descritivo: descLines.join("\n"),
           valor: info.total,
           data: dataVenda,
+          data_vencimento: dataVencimento || null,
+          status: "pendente",
+        };
+      });
           data_vencimento: dataVencimento || null,
           status: "pendente",
         };
