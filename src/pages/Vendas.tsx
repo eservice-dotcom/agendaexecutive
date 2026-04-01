@@ -841,16 +841,18 @@ const Vendas = () => {
       if (!user) throw new Error("Usuário não autenticado");
 
       const novasContas = Array.from(fornecedorMap.entries()).map(([fornecedor, info]) => {
-        const descLines = info.items.map((item: any) =>
-          `O.S. ${item.cot} - ${item.tipo} - ${item.origem} → ${item.destino} - ${item.motorista} (${formatDate(item.data)}) - ${formatCurrency(Number(item.custo))}`
-        );
+        const descLines = info.items.map((item: any) => formatOsDescricao(item));
         return {
           venda_id: venda.id,
           user_id: user.id,
           fornecedor,
-          descritivo: descLines.join(" | "),
+          descritivo: descLines.join("\n"),
           valor: info.total,
           data: venda.data_venda,
+          data_vencimento: venda.data_vencimento || null,
+          status: "pendente",
+        };
+      });
           data_vencimento: venda.data_vencimento || null,
           status: "pendente",
         };
