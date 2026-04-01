@@ -658,10 +658,6 @@ const Vendas = () => {
           status: "pendente",
         };
       });
-          data_vencimento: dataVencimento || null,
-          status: "pendente",
-        };
-      });
 
       // Also add manually entered contas a pagar
       const manualContas = contasPagar.map((cp) => ({
