@@ -246,7 +246,7 @@ ${vendaInfoHTML}
 </div>
 ${cards}
 ${extrasTableHTML}
-<div class="card" style="border-color:#b8860b;background:#fdf8ef">
+<div class="card totals-card" style="border-color:#b8860b;background:#fdf8ef">
   <div class="card-header" style="background:#b8860b">
     <span style="font-weight:bold;font-size:12px">TOTAIS</span>
   </div>
