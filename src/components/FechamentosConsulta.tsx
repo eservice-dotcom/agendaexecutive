@@ -337,7 +337,7 @@ const FechamentosConsulta = () => {
               </TableRow>
             ) : (
               filtered.map((f) => {
-                const osList = Array.isArray(f.items) ? [...new Set(f.items.map((i: any) => i.cot).filter(Boolean))].join(", ") : "";
+                const osItems = Array.isArray(f.items) ? f.items.filter((i: any) => i.cot) : [];
                 return (
                 <TableRow key={f.id}>
                   <TableCell>
@@ -352,7 +352,17 @@ const FechamentosConsulta = () => {
                     </Badge>
                   </TableCell>
                   <TableCell className="font-medium text-sm">{f.cliente}</TableCell>
-                  <TableCell className="text-xs text-muted-foreground font-mono max-w-[200px] truncate" title={osList}>{osList || "—"}</TableCell>
+                  <TableCell className="text-xs text-muted-foreground font-mono max-w-[300px]">
+                    {osItems.length > 0 ? (
+                      <div className="flex flex-col gap-0.5">
+                        {osItems.map((i: any, idx: number) => (
+                          <span key={idx}>
+                            O.S. {i.cot} – {i.tipo || ""} – {i.origem || ""} → {i.destino || ""} – {i.motorista || ""} ({i.data ? (() => { const [y, m, d] = i.data.split("-"); return `${d}/${m}/${y}`; })() : ""}) – {new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(Number(i.valor) || 0)}
+                          </span>
+                        ))}
+                      </div>
+                    ) : "—"}
+                  </TableCell>
                   <TableCell className="text-sm">{formatDate(f.data_emissao)}</TableCell>
                   <TableCell className="text-center text-sm">{f.quantidade_servicos}</TableCell>
                   <TableCell className="text-right font-mono text-sm">{formatCurrency(f.valor_total)}</TableCell>
