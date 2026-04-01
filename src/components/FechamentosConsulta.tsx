@@ -352,13 +352,20 @@ const FechamentosConsulta = () => {
                     </Badge>
                   </TableCell>
                   <TableCell className="font-medium text-sm">{f.cliente}</TableCell>
-                  <TableCell className="text-xs text-muted-foreground font-mono max-w-[400px] whitespace-pre-line">
-                    {osItems.length > 0
-                      ? osItems.map((i: any, idx: number) => {
-                          const line = `O.S. ${i.cot} - ${i.tipo || ""} - ${i.origem || ""} → ${i.destino || ""} - ${i.motorista || ""} (${i.data ? (() => { const [y, m, d] = i.data.split("-"); return `${d}/${m}/${y}`; })() : ""}) - ${new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(Number(i.valor) || 0)}`;
-                          return idx < osItems.length - 1 ? `${line} |` : line;
-                        }).join("\n")
-                      : "—"}
+                  <TableCell className="text-xs text-muted-foreground font-mono">
+                    {osItems.length > 0 ? (
+                      <div className="flex flex-col gap-1">
+                        {osItems.map((i: any, idx: number) => {
+                          const dt = i.data ? (() => { const [y, m, d] = i.data.split("-"); return `${d}/${m}/${y}`; })() : "";
+                          const val = new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(Number(i.valor) || 0);
+                          return (
+                            <div key={idx}>
+                              O.S. {i.cot} - {i.tipo || ""} - {i.origem || ""} → {i.destino || ""} - {i.motorista || ""} ({dt}) - {val}{idx < osItems.length - 1 ? " |" : ""}
+                            </div>
+                          );
+                        })}
+                      </div>
+                    ) : "—"}
                   </TableCell>
                   <TableCell className="text-sm">{formatDate(f.data_emissao)}</TableCell>
                   <TableCell className="text-center text-sm">{f.quantidade_servicos}</TableCell>
