@@ -23,20 +23,40 @@ interface OcupacaoData {
   ocupacaoMedia: number;
 }
 
+const getDefaultDates = () => {
+  const now = new Date();
+  const firstDay = new Date(now.getFullYear(), now.getMonth(), 1);
+  const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+  return {
+    de: firstDay.toISOString().split("T")[0],
+    ate: lastDay.toISOString().split("T")[0],
+  };
+};
+
 const DashboardOcupacao = () => {
   const [items, setItems] = useState<any[]>([]);
   const [veiculos, setVeiculos] = useState<VeiculoInfo[]>([]);
-  const [parametroDias, setParametroDias] = useState<number>(30);
+  const defaults = getDefaultDates();
+  const [dataInicio, setDataInicio] = useState(defaults.de);
+  const [dataFim, setDataFim] = useState(defaults.ate);
+
+  const parametroDias = useMemo(() => {
+    if (!dataInicio || !dataFim) return 30;
+    const d1 = new Date(dataInicio);
+    const d2 = new Date(dataFim);
+    const diff = Math.round((d2.getTime() - d1.getTime()) / (1000 * 60 * 60 * 24)) + 1;
+    return Math.max(1, diff);
+  }, [dataInicio, dataFim]);
 
   useEffect(() => {
     Promise.all([
-      supabase.from("agenda_items").select("*"),
+      supabase.from("agenda_items").select("*").gte("data", dataInicio).lte("data", dataFim),
       supabase.from("veiculos").select("placa, modelo, capacidade"),
     ]).then(([agendaRes, veiculosRes]) => {
       if (agendaRes.data) setItems(agendaRes.data);
       if (veiculosRes.data) setVeiculos(veiculosRes.data as VeiculoInfo[]);
     });
-  }, []);
+  }, [dataInicio, dataFim]);
 
   const dados = useMemo(() => {
     const veiculoMap = new Map<string, VeiculoInfo>();
