@@ -70,7 +70,7 @@ const DashboardOcupacao = () => {
         viagens: d.viagens,
         totalPax: d.totalPax,
         ocupacaoMedia: parametroDias > 0
-          ? (d.diasSet.size / parametroDias) * 100
+          ? Math.min((d.diasSet.size / parametroDias) * 100, 100)
           : 0,
       }))
       .sort((a, b) => b.ocupacaoMedia - a.ocupacaoMedia);
