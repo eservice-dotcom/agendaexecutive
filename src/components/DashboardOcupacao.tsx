@@ -116,23 +116,30 @@ const DashboardOcupacao = () => {
 
   return (
     <div className="space-y-6">
-      {/* Parâmetro de dias */}
-      <div className="flex items-end gap-3 rounded-lg border border-border bg-card p-3 shadow-sm">
+      {/* Filtro de período */}
+      <div className="flex flex-wrap items-end gap-3 rounded-lg border border-border bg-card p-3 shadow-sm">
         <div className="flex items-center gap-2">
-          <Label htmlFor="parametro-dias" className="whitespace-nowrap text-sm font-medium">
-            Parâmetro de dias:
-          </Label>
+          <Label htmlFor="data-inicio" className="whitespace-nowrap text-sm font-medium">De:</Label>
           <Input
-            id="parametro-dias"
-            type="number"
-            min={1}
-            value={parametroDias}
-            onChange={(e) => setParametroDias(Math.max(1, Number(e.target.value)))}
-            className="w-20"
+            id="data-inicio"
+            type="date"
+            value={dataInicio}
+            onChange={(e) => setDataInicio(e.target.value)}
+            className="w-40"
+          />
+        </div>
+        <div className="flex items-center gap-2">
+          <Label htmlFor="data-fim" className="whitespace-nowrap text-sm font-medium">Até:</Label>
+          <Input
+            id="data-fim"
+            type="date"
+            value={dataFim}
+            onChange={(e) => setDataFim(e.target.value)}
+            className="w-40"
           />
         </div>
         <p className="text-xs text-muted-foreground">
-          Ocupação = (dias com serviço / {parametroDias}) × 100%
+          Período: {parametroDias} dias — Ocupação = (dias locado / {parametroDias}) × 100%
         </p>
       </div>
 
