@@ -180,6 +180,14 @@ const formatDate = (d: string) => {
   return `${day}/${m}/${y}`;
 };
 
+const formatOsDescricao = (item: Pick<AgendaItem, "cot" | "tipo" | "origem" | "destino" | "motorista" | "data"> & { custo?: number | string }) =>
+  `O.S.${item.cot} - ${item.tipo || ""} - ${item.origem || ""} → ${item.destino || ""} - ${item.motorista || ""} (${formatDate(item.data)}) - ${formatCurrency(Number(item.custo) || 0)}`;
+
+const normalizeDescricaoForDisplay = (value?: string | null) => {
+  if (!value) return "—";
+  return value.replace(/\s*\|\s*/g, "\n");
+};
+
 const Vendas = () => {
   const { session, signOut } = useAuth();
   const [searchParams] = useSearchParams();
