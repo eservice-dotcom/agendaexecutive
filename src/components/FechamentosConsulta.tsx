@@ -360,7 +360,7 @@ const FechamentosConsulta = () => {
                           const val = new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(Number(i.valor) || 0);
                           return (
                             <div key={idx}>
-                              O.S. {i.cot} - {i.tipo || ""} - {i.origem || ""} → {i.destino || ""} - {i.motorista || ""} ({dt}) - {val}{idx < osItems.length - 1 ? " |" : ""}
+                              O.S.{i.cot} - {i.tipo || ""} - {i.origem || ""} → {i.destino || ""} - {i.motorista || ""} ({dt}) - {val}{idx < osItems.length - 1 ? " |" : ""}
                             </div>
                           );
                         })}
