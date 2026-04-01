@@ -240,7 +240,7 @@ const MobileContas = () => {
                         <p className="text-[10px] text-muted-foreground truncate">PIX: {fornecedoresPixMap[conta.fornecedor]}</p>
                       )}
                       {conta.descritivo && (
-                        <p className="text-xs text-muted-foreground truncate">{conta.descritivo}</p>
+                        <p className="text-xs text-muted-foreground whitespace-pre-line">{conta.descritivo.replace(/\s*\|\s*/g, "\n")}</p>
                       )}
                     </div>
                     <span className={`text-xs font-medium px-2 py-0.5 rounded-full shrink-0 ${

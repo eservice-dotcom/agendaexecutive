@@ -180,6 +180,14 @@ const formatDate = (d: string) => {
   return `${day}/${m}/${y}`;
 };
 
+const formatOsDescricao = (item: Pick<AgendaItem, "cot" | "tipo" | "origem" | "destino" | "motorista" | "data"> & { custo?: number | string }) =>
+  `O.S.${item.cot} - ${item.tipo || ""} - ${item.origem || ""} → ${item.destino || ""} - ${item.motorista || ""} (${formatDate(item.data)}) - ${formatCurrency(Number(item.custo) || 0)}`;
+
+const normalizeDescricaoForDisplay = (value?: string | null) => {
+  if (!value) return "—";
+  return value.replace(/\s*\|\s*/g, "\n");
+};
+
 const Vendas = () => {
   const { session, signOut } = useAuth();
   const [searchParams] = useSearchParams();
@@ -638,14 +646,12 @@ const Vendas = () => {
       });
 
       const autoContasPagar = Array.from(fornecedorMap.entries()).map(([fornecedor, info]) => {
-        const descLines = info.items.map((item) =>
-          `O.S. ${item.cot} - ${item.tipo} - ${item.origem} → ${item.destino} - ${item.motorista} (${formatDate(item.data)}) - ${formatCurrency(item.custo)}`
-        );
+        const descLines = info.items.map((item) => formatOsDescricao(item));
         return {
           venda_id: venda.id,
           user_id: session!.user.id,
           fornecedor,
-          descritivo: descLines.join(" | "),
+          descritivo: descLines.join("\n"),
           valor: info.total,
           data: dataVenda,
           data_vencimento: dataVencimento || null,
@@ -831,14 +837,12 @@ const Vendas = () => {
       if (!user) throw new Error("Usuário não autenticado");
 
       const novasContas = Array.from(fornecedorMap.entries()).map(([fornecedor, info]) => {
-        const descLines = info.items.map((item: any) =>
-          `O.S. ${item.cot} - ${item.tipo} - ${item.origem} → ${item.destino} - ${item.motorista} (${formatDate(item.data)}) - ${formatCurrency(Number(item.custo))}`
-        );
+        const descLines = info.items.map((item: any) => formatOsDescricao(item));
         return {
           venda_id: venda.id,
           user_id: user.id,
           fornecedor,
-          descritivo: descLines.join(" | "),
+          descritivo: descLines.join("\n"),
           valor: info.total,
           data: venda.data_venda,
           data_vencimento: venda.data_vencimento || null,
@@ -1954,7 +1958,7 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
                         <TableCell className="font-mono text-xs">{vendaOsMap[cr.venda_id]?.cots?.join(", ") || "—"}</TableCell>
                         <TableCell className="text-sm">{cr.centro_receita || "—"}</TableCell>
                         <TableCell className="text-sm">{cr.subgrupo_receita || "—"}</TableCell>
-                        <TableCell className="text-sm">{cr.descritivo}</TableCell>
+                        <TableCell className="text-sm whitespace-pre-line">{normalizeDescricaoForDisplay(cr.descritivo)}</TableCell>
                         <TableCell className="text-right font-mono">{formatCurrency(cr.valor)}</TableCell>
                         <TableCell className="text-right font-mono">{formatCurrency(cr.valor_pago || 0)}</TableCell>
                         <TableCell className="text-right font-mono">{formatCurrency(Number(cr.valor) - Number(cr.valor_pago || 0))}</TableCell>
@@ -2164,7 +2168,7 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
                         <TableCell className="font-mono text-xs">{vendaOsMap[cp.venda_id]?.cots?.join(", ") || "—"}</TableCell>
                         <TableCell className="text-sm">{cp.centro_custo || "—"}</TableCell>
                         <TableCell className="text-sm">{cp.subgrupo_custo || "—"}</TableCell>
-                        <TableCell className="text-sm">{cp.descritivo}</TableCell>
+                        <TableCell className="text-sm whitespace-pre-line">{normalizeDescricaoForDisplay(cp.descritivo)}</TableCell>
                         <TableCell className="text-right font-mono">{formatCurrency(cp.valor)}</TableCell>
                         <TableCell className="text-right font-mono">{formatCurrency(cp.valor_pago || 0)}</TableCell>
                         <TableCell className="text-right font-mono">{formatCurrency(Number(cp.valor) - Number(cp.valor_pago || 0))}</TableCell>
