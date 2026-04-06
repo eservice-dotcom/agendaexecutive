@@ -977,7 +977,7 @@ th{background:#2d3748;color:#fff;font-weight:600;font-size:10px;text-transform:u
     ${extrasRows}
     <tr class="total-row">
       <td colspan="6" class="r">TOTAL</td>
-      <td class="r">${formatCurrency(venda.valor_total)}</td>
+      <td class="r">${formatCurrency(totalCalculado)}</td>
     </tr>
   </tbody>
 </table>
