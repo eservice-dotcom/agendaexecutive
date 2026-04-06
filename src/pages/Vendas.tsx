@@ -917,6 +917,10 @@ const Vendas = () => {
       <td class="r">${formatCurrency(Number(ex.valor))}</td>
     </tr>`).join("");
 
+    // Calculate total dynamically from items + extras
+    const totalCalculado = items.reduce((sum: number, item: any) => sum + Number(item.valor || 0), 0)
+      + vendaExtras.reduce((sum: number, ex: any) => sum + Number(ex.valor || 0), 0);
+
     return `<!DOCTYPE html><html><head><title>Fatura - ${clienteNomeCompleto}</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
