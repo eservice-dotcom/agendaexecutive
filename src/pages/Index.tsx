@@ -213,7 +213,7 @@ const Index = () => {
       setFechamentoDialogOpen(false);
       return;
     }
-    const { data } = await supabase.from("agenda_items").select("cliente").order("cliente");
+    const { data } = await supabase.from("agenda_items").select("cliente").is("deleted_at", null).order("cliente");
     if (data) {
       setFechamentoAllClientes([...new Set(data.map((d) => d.cliente))].filter(Boolean).sort());
     }
