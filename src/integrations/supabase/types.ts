@@ -22,6 +22,7 @@ export type Database = {
           created_at: string
           custo: number
           data: string
+          deleted_at: string | null
           destino: string
           estacionamento: number | null
           forma_contratacao: string
@@ -59,6 +60,7 @@ export type Database = {
           created_at?: string
           custo: number
           data: string
+          deleted_at?: string | null
           destino: string
           estacionamento?: number | null
           forma_contratacao?: string
@@ -96,6 +98,7 @@ export type Database = {
           created_at?: string
           custo?: number
           data?: string
+          deleted_at?: string | null
           destino?: string
           estacionamento?: number | null
           forma_contratacao?: string

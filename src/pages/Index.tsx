@@ -19,6 +19,7 @@ import DashboardOcupacao from "@/components/DashboardOcupacao";
 import NovoServicoDialog from "@/components/NovoServicoDialog";
 import FechamentosConsulta from "@/components/FechamentosConsulta";
 import { getAgendaItems } from "@/data/cadastroStorage";
+import AgendaLixeira from "@/components/AgendaLixeira";
 import { printAgenda } from "@/lib/printUtils";
 import { generateClosingReport } from "@/lib/closingReport";
 import { generateClosingReportExcel } from "@/lib/closingReportExcel";
@@ -212,7 +213,7 @@ const Index = () => {
       setFechamentoDialogOpen(false);
       return;
     }
-    const { data } = await supabase.from("agenda_items").select("cliente").order("cliente");
+    const { data } = await supabase.from("agenda_items").select("cliente").is("deleted_at", null).order("cliente");
     if (data) {
       setFechamentoAllClientes([...new Set(data.map((d) => d.cliente))].filter(Boolean).sort());
     }
@@ -418,7 +419,7 @@ const Index = () => {
 
       <main className="mx-auto max-w-[1600px] space-y-4 px-4 py-6 sm:px-6 lg:px-8">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
-          <TabsList className={`grid w-full sm:w-auto sm:inline-grid ${canViewFinancials ? 'grid-cols-5' : 'grid-cols-2'}`}>
+          <TabsList className={`grid w-full sm:w-auto sm:inline-grid ${canViewFinancials ? 'grid-cols-6' : 'grid-cols-3'}`}>
             <TabsTrigger value="agenda" className="gap-2">
               <CalendarDays className="h-4 w-4" />
               Agenda
@@ -426,6 +427,10 @@ const Index = () => {
             <TabsTrigger value="fechamentos" className="gap-2">
               <Archive className="h-4 w-4" />
               Fechamentos
+            </TabsTrigger>
+            <TabsTrigger value="lixeira" className="gap-2">
+              <Trash2 className="h-4 w-4" />
+              Lixeira
             </TabsTrigger>
             {canViewFinancials && (
               <>
@@ -483,6 +488,10 @@ const Index = () => {
             </div>
             <AgendaTable items={filteredData} onEdited={reloadData} hideFinancials={!showFinancials} onClone={(item) => { setCloneData(item); setNovoDialogOpen(true); }} />
             <NovoServicoDialog open={novoDialogOpen} onOpenChange={(v) => { setNovoDialogOpen(v); if (!v) setCloneData(null); }} onSaved={reloadData} initialData={cloneData} />
+          </TabsContent>
+
+          <TabsContent value="lixeira" className="space-y-4">
+            <AgendaLixeira onRestored={reloadData} />
           </TabsContent>
 
           <TabsContent value="fechamentos" className="space-y-4">
