@@ -300,6 +300,7 @@ export const getAgendaItems = async (): Promise<AgendaItem[]> => {
   const { data, error } = await supabase
     .from("agenda_items")
     .select("*")
+    .is("deleted_at", null)
     .order("data", { ascending: true })
     .order("hora", { ascending: true });
   
@@ -425,6 +426,9 @@ export const updateAgendaItem = async (updated: AgendaItem) => {
 };
 
 export const deleteAgendaItem = async (id: string) => {
-  const { error } = await supabase.from("agenda_items").delete().eq("id", id);
+  const { error } = await supabase
+    .from("agenda_items")
+    .update({ deleted_at: new Date().toISOString() } as any)
+    .eq("id", id);
   if (error) throw error;
 };
