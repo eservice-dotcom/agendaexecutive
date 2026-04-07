@@ -490,6 +490,10 @@ const Index = () => {
             <NovoServicoDialog open={novoDialogOpen} onOpenChange={(v) => { setNovoDialogOpen(v); if (!v) setCloneData(null); }} onSaved={reloadData} initialData={cloneData} />
           </TabsContent>
 
+          <TabsContent value="lixeira" className="space-y-4">
+            <AgendaLixeira onRestored={reloadData} />
+          </TabsContent>
+
           <TabsContent value="fechamentos" className="space-y-4">
             <div className="flex justify-end">
               <Button onClick={handleOpenFechamento} variant={fechamentoDialogOpen ? "secondary" : "default"} className="gap-2">
