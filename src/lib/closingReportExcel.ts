@@ -97,6 +97,7 @@ export const generateClosingReportExcel = (
       parseAmount(ai.outros);
 
     const osCot = ai.cot || "";
+    const estac = Number(ai.estacionamento) || 0;
 
     return {
       "#": idx + 1,
@@ -116,9 +117,8 @@ export const generateClosingReportExcel = (
       "KM Fim": Number(ai.km_fim) || 0,
       "KM Total": kmTotal,
       "KM Extra": Number(ai.km_extra) || 0,
-      "Estacionamento": Number(ai.estacionamento) || 0,
       "Outros": outrosTotal,
-      "Valor": Number(ai.valor) || 0,
+      "Valor": (Number(ai.valor) || 0) + estac,
     };
   });
 
@@ -142,7 +142,6 @@ export const generateClosingReportExcel = (
       "KM Fim": 0,
       "KM Total": 0,
       "KM Extra": 0,
-      "Estacionamento": 0,
       "Outros": 0,
       "Valor": extra.valor,
     });
@@ -154,7 +153,6 @@ export const generateClosingReportExcel = (
   const totalKm = sortedItems.reduce((s, ai) => s + (parseAmount(ai.km_fim) - parseAmount(ai.km_in)), 0);
   const totalKmExtra = sortedItems.reduce((s, ai) => s + parseAmount(ai.km_extra), 0);
   const unmappedExtrasTotal = unmappedExtras.reduce((s, e) => s + e.valor, 0);
-  const extrasTotal = totalEstac + unmappedExtrasTotal;
 
   rows.push({
     "#": 0,
@@ -174,9 +172,8 @@ export const generateClosingReportExcel = (
     "KM Fim": 0,
     "KM Total": totalKm,
     "KM Extra": totalKmExtra,
-    "Estacionamento": totalEstac,
     "Outros": unmappedExtrasTotal,
-    "Valor": totalServicos + extrasTotal,
+    "Valor": totalServicos + totalEstac + unmappedExtrasTotal,
   });
 
   const ws = XLSX.utils.json_to_sheet(rows);
@@ -187,24 +184,8 @@ export const generateClosingReportExcel = (
   ];
   XLSX.utils.book_append_sheet(wb, ws, "Serviços");
 
-  // --- Sheet 2: Extras ---
-  if (selectedExtras.length > 0) {
-    const extrasRows = selectedExtras.map((extra, idx) => ({
-      "#": idx + 1,
-      "Descrição": extra.descricao,
-      "Valor": extra.valor,
-    }));
-    extrasRows.push({
-      "#": 0,
-      "Descrição": "TOTAL EXTRAS",
-      "Valor": extrasTotal,
-    });
-    const wsExtras = XLSX.utils.json_to_sheet(extrasRows);
-    wsExtras["!cols"] = [{ wch: 5 }, { wch: 40 }, { wch: 15 }];
-    XLSX.utils.book_append_sheet(wb, wsExtras, "Extras");
-  }
-
-  // --- Sheet 3: Resumo ---
+  // --- Sheet 2: Resumo ---
+  const totalGeral = totalServicos + totalEstac + unmappedExtrasTotal;
   const resumo = [
     { Campo: "Fechamento Nº", Valor: numeroFechamento || "" },
     { Campo: "Cliente", Valor: vendaInfo?.cliente || "" },
@@ -212,8 +193,7 @@ export const generateClosingReportExcel = (
     { Campo: "KM Total", Valor: totalKm },
     { Campo: "KM Extra", Valor: totalKmExtra },
     { Campo: "Estacionamento", Valor: totalEstac },
-    { Campo: "Extras", Valor: extrasTotal },
-    { Campo: "Valor Total", Valor: totalServicos + extrasTotal },
+    { Campo: "Valor Total", Valor: totalGeral },
   ];
 
   selectedExtras.forEach((extra, idx) => {
@@ -282,9 +262,8 @@ export const generateBatchClosingReportExcel = (fechamentos: BatchFechamento[]) 
         "Placa": ai.placa || "",
         "KM Total": kmTotal,
         "KM Extra": Number(ai.km_extra) || 0,
-        "Estacionamento": Number(ai.estacionamento) || 0,
         "Outros": outrosTotal,
-        "Valor": Number(ai.valor) || 0,
+        "Valor": (Number(ai.valor) || 0) + (Number(ai.estacionamento) || 0),
       });
     });
 
@@ -305,7 +284,6 @@ export const generateBatchClosingReportExcel = (fechamentos: BatchFechamento[]) 
         "Placa": "",
         "KM Total": 0,
         "KM Extra": 0,
-        "Estacionamento": 0,
         "Outros": 0,
         "Valor": extra.valor,
       });
