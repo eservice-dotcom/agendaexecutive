@@ -325,18 +325,18 @@ export const generateBatchClosingReportExcel = (fechamentos: BatchFechamento[]) 
   let grandTotal = 0;
   fechamentos.forEach((f) => {
     const extras = normalizeExtras(f.extras);
-    const { mapped, unmapped } = buildExtrasPerOs(extras);
+    const { unmapped } = buildExtrasPerOs(extras);
     const servTotal = (f.items || []).reduce((s: number, ai: any) => s + parseAmount(ai.valor), 0);
-    const mappedTotal = Array.from(mapped.values()).reduce((s, v) => s + v, 0);
+    const estacTotal = (f.items || []).reduce((s: number, ai: any) => s + parseAmount(ai.estacionamento), 0);
     const unmappedTotal = unmapped.reduce((s, e) => s + e.valor, 0);
-    const total = servTotal + mappedTotal + unmappedTotal;
+    const total = servTotal + estacTotal + unmappedTotal;
     grandTotal += total;
     resumoRows.push({
       "Fechamento Nº": f.numero_fechamento,
       "Cliente": f.cliente,
       "Qtd Serviços": (f.items || []).length,
       "Valor Serviços": servTotal,
-      "Extras": mappedTotal + unmappedTotal,
+      "Extras": estacTotal + unmappedTotal,
       "Total": total,
     });
   });
