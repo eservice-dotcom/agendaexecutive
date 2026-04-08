@@ -118,6 +118,7 @@ export const generateClosingReportExcel = (
       "KM Total": kmTotal,
       "KM Extra": Number(ai.km_extra) || 0,
       "Outros": outrosTotal,
+      "Estacionamento": estac,
       "Valor": (Number(ai.valor) || 0) + estac,
     };
   });
