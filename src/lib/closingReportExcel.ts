@@ -142,7 +142,7 @@ export const generateClosingReportExcel = (
       "KM Fim": 0,
       "KM Total": 0,
       "KM Extra": 0,
-      "Estacionamento": 0,
+      "Outros": 0,
       "Outros": 0,
       "Valor": extra.valor,
     });
@@ -154,7 +154,6 @@ export const generateClosingReportExcel = (
   const totalKm = sortedItems.reduce((s, ai) => s + (parseAmount(ai.km_fim) - parseAmount(ai.km_in)), 0);
   const totalKmExtra = sortedItems.reduce((s, ai) => s + parseAmount(ai.km_extra), 0);
   const unmappedExtrasTotal = unmappedExtras.reduce((s, e) => s + e.valor, 0);
-  const extrasTotal = totalEstac + unmappedExtrasTotal;
 
   rows.push({
     "#": 0,
@@ -174,9 +173,8 @@ export const generateClosingReportExcel = (
     "KM Fim": 0,
     "KM Total": totalKm,
     "KM Extra": totalKmExtra,
-    "Estacionamento": totalEstac,
     "Outros": unmappedExtrasTotal,
-    "Valor": totalServicos + extrasTotal,
+    "Valor": totalServicos + totalEstac + unmappedExtrasTotal,
   });
 
   const ws = XLSX.utils.json_to_sheet(rows);
