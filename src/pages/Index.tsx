@@ -202,7 +202,10 @@ const Index = () => {
       const outrosValor = parseMoneyValue(item?.outros);
       const outrosExtra = outrosValor > 0 ? [{ descricao: `Outros ${osLabel}`, valor: outrosValor }] : [];
 
-      return [...despesasExtras, ...outrosExtra];
+      const estacValor = parseMoneyValue(item?.estacionamento);
+      const estacExtra = estacValor > 0 ? [{ descricao: `Estacionamento ${osLabel}`, valor: estacValor }] : [];
+
+      return [...estacExtra, ...despesasExtras, ...outrosExtra];
     });
   };
 
