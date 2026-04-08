@@ -266,7 +266,6 @@ export const generateBatchClosingReportExcel = (fechamentos: BatchFechamento[]) 
         parseAmount(ai.outros);
 
       const osCot = ai.cot || "";
-      const extraValorForOs = extrasPerOs.get(osCot) || 0;
 
       allRows.push({
         "Fechamento": f.numero_fechamento,
@@ -283,7 +282,7 @@ export const generateBatchClosingReportExcel = (fechamentos: BatchFechamento[]) 
         "Placa": ai.placa || "",
         "KM Total": kmTotal,
         "KM Extra": Number(ai.km_extra) || 0,
-        "Estacionamento": (Number(ai.estacionamento) || 0) + extraValorForOs,
+        "Estacionamento": Number(ai.estacionamento) || 0,
         "Outros": outrosTotal,
         "Valor": Number(ai.valor) || 0,
       });
