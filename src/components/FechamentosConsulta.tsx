@@ -377,8 +377,8 @@ const FechamentosConsulta = () => {
                   <TableCell className="text-sm">{formatDate(f.data_emissao)}</TableCell>
                   <TableCell className="text-center text-sm">{f.quantidade_servicos}</TableCell>
                   <TableCell className="text-right font-mono text-sm">{formatCurrency(f.valor_total)}</TableCell>
-                  <TableCell className="text-right font-mono text-sm">{formatCurrency(f.extras_total)}</TableCell>
-                  <TableCell className="text-right font-mono text-sm font-bold">{formatCurrency(f.valor_total + f.extras_total)}</TableCell>
+                  <TableCell className="text-right font-mono text-sm">{formatCurrency(resolveExtras(f).reduce((s: number, e: any) => s + (Number(e.valor) || 0), 0))}</TableCell>
+                  <TableCell className="text-right font-mono text-sm font-bold">{formatCurrency(f.valor_total + resolveExtras(f).reduce((s: number, e: any) => s + (Number(e.valor) || 0), 0))}</TableCell>
                   <TableCell>
                     <div className="flex gap-1">
                       <Button
