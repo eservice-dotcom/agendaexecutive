@@ -262,9 +262,8 @@ export const generateBatchClosingReportExcel = (fechamentos: BatchFechamento[]) 
         "Placa": ai.placa || "",
         "KM Total": kmTotal,
         "KM Extra": Number(ai.km_extra) || 0,
-        "Estacionamento": Number(ai.estacionamento) || 0,
         "Outros": outrosTotal,
-        "Valor": Number(ai.valor) || 0,
+        "Valor": (Number(ai.valor) || 0) + (Number(ai.estacionamento) || 0),
       });
     });
 
@@ -285,7 +284,6 @@ export const generateBatchClosingReportExcel = (fechamentos: BatchFechamento[]) 
         "Placa": "",
         "KM Total": 0,
         "KM Extra": 0,
-        "Estacionamento": 0,
         "Outros": 0,
         "Valor": extra.valor,
       });
