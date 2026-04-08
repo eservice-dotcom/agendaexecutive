@@ -47,6 +47,29 @@ const normalizeExtras = (extras: Array<{ descricao?: unknown; valor?: unknown }>
     });
 };
 
+/** Extract O.S. number from extra description like "Estacionamento O.S. 266300" */
+const extractOsFromExtra = (descricao: string): string | null => {
+  const match = descricao.match(/O\.S\.\s*(\S+)/i);
+  return match ? match[1] : null;
+};
+
+/** Build a map: O.S. number → sum of extra values for that O.S. */
+const buildExtrasPerOs = (extras: NormalizedExtra[]): { mapped: Map<string, number>; unmapped: NormalizedExtra[] } => {
+  const mapped = new Map<string, number>();
+  const unmapped: NormalizedExtra[] = [];
+
+  for (const extra of extras) {
+    const os = extractOsFromExtra(extra.descricao);
+    if (os) {
+      mapped.set(os, (mapped.get(os) || 0) + extra.valor);
+    } else {
+      unmapped.push(extra);
+    }
+  }
+
+  return { mapped, unmapped };
+};
+
 export const generateClosingReportExcel = (
   items: ClosingReportItem[],
   title: string,
