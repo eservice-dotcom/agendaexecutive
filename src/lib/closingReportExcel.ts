@@ -25,6 +25,28 @@ const formatDate = (d: string) => {
   return `${day}/${m}/${y}`;
 };
 
+interface NormalizedExtra {
+  descricao: string;
+  valor: number;
+}
+
+const normalizeExtras = (extras: Array<{ descricao?: unknown; valor?: unknown }> | undefined): NormalizedExtra[] => {
+  const seen = new Set<string>();
+
+  return (Array.isArray(extras) ? extras : [])
+    .map((extra) => ({
+      descricao: typeof extra?.descricao === "string" ? extra.descricao.trim() : "",
+      valor: parseAmount(extra?.valor),
+    }))
+    .filter((extra) => extra.descricao && extra.valor > 0)
+    .filter((extra) => {
+      const key = `${extra.descricao.toLowerCase()}|${extra.valor.toFixed(2)}`;
+      if (seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    });
+};
+
 export const generateClosingReportExcel = (
   items: ClosingReportItem[],
   title: string,
@@ -78,7 +100,7 @@ export const generateClosingReportExcel = (
   });
 
   // Extras rows
-  const selectedExtras = vendaInfo?.extras || [];
+  const selectedExtras = normalizeExtras(vendaInfo?.extras);
   selectedExtras.forEach((extra, idx) => {
     rows.push({
       "#": sortedItems.length + idx + 1,
@@ -100,7 +122,7 @@ export const generateClosingReportExcel = (
       "KM Extra": 0,
       "Estacionamento": 0,
       "Outros": 0,
-      "Valor": parseAmount(extra.valor),
+      "Valor": extra.valor,
     });
   });
 
@@ -109,7 +131,7 @@ export const generateClosingReportExcel = (
   const totalEstac = sortedItems.reduce((s, ai) => s + parseAmount(ai.estacionamento), 0);
   const totalKm = sortedItems.reduce((s, ai) => s + (parseAmount(ai.km_fim) - parseAmount(ai.km_in)), 0);
   const totalKmExtra = sortedItems.reduce((s, ai) => s + parseAmount(ai.km_extra), 0);
-  const extrasTotal = selectedExtras.reduce((s, e) => s + parseAmount(e.valor), 0);
+  const extrasTotal = selectedExtras.reduce((s, e) => s + e.valor, 0);
 
   rows.push({
     "#": 0,
@@ -150,7 +172,7 @@ export const generateClosingReportExcel = (
     const extrasRows = selectedExtras.map((extra, idx) => ({
       "#": idx + 1,
       "Descrição": extra.descricao,
-      "Valor": parseAmount(extra.valor),
+      "Valor": extra.valor,
     }));
     extrasRows.push({
       "#": 0,
@@ -176,7 +198,7 @@ export const generateClosingReportExcel = (
 
   // Detail extras in resumo
   selectedExtras.forEach((extra, idx) => {
-    resumo.push({ Campo: `  Extra ${idx + 1}: ${extra.descricao}`, Valor: parseAmount(extra.valor) as any });
+    resumo.push({ Campo: `  Extra ${idx + 1}: ${extra.descricao}`, Valor: extra.valor as any });
   });
 
   if (vendaInfo?.observacoes) {
@@ -207,6 +229,7 @@ export const generateBatchClosingReportExcel = (fechamentos: BatchFechamento[]) 
   // Sheet 1: All services consolidated
   const allRows: any[] = [];
   fechamentos.forEach((f) => {
+    const extras = normalizeExtras(f.extras);
     const sorted = [...(f.items || [])].sort((a: any, b: any) => {
       const da = a.data || "", db = b.data || "";
       if (da !== db) return da.localeCompare(db);
@@ -244,7 +267,7 @@ export const generateBatchClosingReportExcel = (fechamentos: BatchFechamento[]) 
     });
 
     // Extras inline
-    (f.extras || []).forEach((extra, idx) => {
+    extras.forEach((extra, idx) => {
       allRows.push({
         "Fechamento": f.numero_fechamento,
         "Cliente": f.cliente,
@@ -262,7 +285,7 @@ export const generateBatchClosingReportExcel = (fechamentos: BatchFechamento[]) 
         "KM Extra": 0,
         "Estacionamento": 0,
         "Outros": 0,
-        "Valor": parseAmount(extra.valor),
+        "Valor": extra.valor,
       });
     });
   });
@@ -279,8 +302,9 @@ export const generateBatchClosingReportExcel = (fechamentos: BatchFechamento[]) 
   const resumoRows: any[] = [];
   let grandTotal = 0;
   fechamentos.forEach((f) => {
+    const extras = normalizeExtras(f.extras);
     const servTotal = (f.items || []).reduce((s: number, ai: any) => s + parseAmount(ai.valor), 0);
-    const extTotal = (f.extras || []).reduce((s: number, e: any) => s + parseAmount(e.valor), 0);
+    const extTotal = extras.reduce((s, e) => s + e.valor, 0);
     const total = servTotal + extTotal;
     grandTotal += total;
     resumoRows.push({
@@ -297,7 +321,7 @@ export const generateBatchClosingReportExcel = (fechamentos: BatchFechamento[]) 
     "Cliente": "TOTAL GERAL",
     "Qtd Serviços": fechamentos.reduce((s, f) => s + (f.items || []).length, 0),
     "Valor Serviços": fechamentos.reduce((s, f) => s + (f.items || []).reduce((ss: number, ai: any) => ss + parseAmount(ai.valor), 0), 0),
-    "Extras": fechamentos.reduce((s, f) => s + (f.extras || []).reduce((ss: number, e: any) => ss + parseAmount(e.valor), 0), 0),
+    "Extras": fechamentos.reduce((s, f) => s + normalizeExtras(f.extras).reduce((ss, e) => ss + e.valor, 0), 0),
     "Total": grandTotal,
   });
 
