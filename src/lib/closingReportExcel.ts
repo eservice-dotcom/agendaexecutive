@@ -97,6 +97,7 @@ export const generateClosingReportExcel = (
       parseAmount(ai.outros);
 
     const osCot = ai.cot || "";
+    const estac = Number(ai.estacionamento) || 0;
 
     return {
       "#": idx + 1,
@@ -116,9 +117,8 @@ export const generateClosingReportExcel = (
       "KM Fim": Number(ai.km_fim) || 0,
       "KM Total": kmTotal,
       "KM Extra": Number(ai.km_extra) || 0,
-      "Estacionamento": Number(ai.estacionamento) || 0,
       "Outros": outrosTotal,
-      "Valor": Number(ai.valor) || 0,
+      "Valor": (Number(ai.valor) || 0) + estac,
     };
   });
 
