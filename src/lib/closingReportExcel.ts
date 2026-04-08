@@ -97,7 +97,6 @@ export const generateClosingReportExcel = (
       parseAmount(ai.outros);
 
     const osCot = ai.cot || "";
-    const extraValorForOs = extrasPerOs.get(osCot) || 0;
 
     return {
       "#": idx + 1,
@@ -117,7 +116,7 @@ export const generateClosingReportExcel = (
       "KM Fim": Number(ai.km_fim) || 0,
       "KM Total": kmTotal,
       "KM Extra": Number(ai.km_extra) || 0,
-      "Estacionamento": (Number(ai.estacionamento) || 0) + extraValorForOs,
+      "Estacionamento": Number(ai.estacionamento) || 0,
       "Outros": outrosTotal,
       "Valor": Number(ai.valor) || 0,
     };
@@ -151,12 +150,11 @@ export const generateClosingReportExcel = (
 
   // Totals
   const totalServicos = sortedItems.reduce((s, ai) => s + parseAmount(ai.valor), 0);
-  const mappedExtrasTotal = Array.from(extrasPerOs.values()).reduce((s, v) => s + v, 0);
-  const totalEstac = sortedItems.reduce((s, ai) => s + parseAmount(ai.estacionamento), 0) + mappedExtrasTotal;
+  const totalEstac = sortedItems.reduce((s, ai) => s + parseAmount(ai.estacionamento), 0);
   const totalKm = sortedItems.reduce((s, ai) => s + (parseAmount(ai.km_fim) - parseAmount(ai.km_in)), 0);
   const totalKmExtra = sortedItems.reduce((s, ai) => s + parseAmount(ai.km_extra), 0);
   const unmappedExtrasTotal = unmappedExtras.reduce((s, e) => s + e.valor, 0);
-  const extrasTotal = mappedExtrasTotal + unmappedExtrasTotal;
+  const extrasTotal = totalEstac + unmappedExtrasTotal;
 
   rows.push({
     "#": 0,
