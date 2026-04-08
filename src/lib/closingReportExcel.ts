@@ -143,7 +143,6 @@ export const generateClosingReportExcel = (
       "KM Total": 0,
       "KM Extra": 0,
       "Outros": 0,
-      "Outros": 0,
       "Valor": extra.valor,
     });
   });
@@ -185,24 +184,8 @@ export const generateClosingReportExcel = (
   ];
   XLSX.utils.book_append_sheet(wb, ws, "Serviços");
 
-  // --- Sheet 2: Extras ---
-  if (selectedExtras.length > 0) {
-    const extrasRows = selectedExtras.map((extra, idx) => ({
-      "#": idx + 1,
-      "Descrição": extra.descricao,
-      "Valor": extra.valor,
-    }));
-    extrasRows.push({
-      "#": 0,
-      "Descrição": "TOTAL EXTRAS",
-      "Valor": extrasTotal,
-    });
-    const wsExtras = XLSX.utils.json_to_sheet(extrasRows);
-    wsExtras["!cols"] = [{ wch: 5 }, { wch: 40 }, { wch: 15 }];
-    XLSX.utils.book_append_sheet(wb, wsExtras, "Extras");
-  }
-
-  // --- Sheet 3: Resumo ---
+  // --- Sheet 2: Resumo ---
+  const totalGeral = totalServicos + totalEstac + unmappedExtrasTotal;
   const resumo = [
     { Campo: "Fechamento Nº", Valor: numeroFechamento || "" },
     { Campo: "Cliente", Valor: vendaInfo?.cliente || "" },
@@ -210,8 +193,7 @@ export const generateClosingReportExcel = (
     { Campo: "KM Total", Valor: totalKm },
     { Campo: "KM Extra", Valor: totalKmExtra },
     { Campo: "Estacionamento", Valor: totalEstac },
-    { Campo: "Extras", Valor: extrasTotal },
-    { Campo: "Valor Total", Valor: totalServicos + extrasTotal },
+    { Campo: "Valor Total", Valor: totalGeral },
   ];
 
   selectedExtras.forEach((extra, idx) => {
