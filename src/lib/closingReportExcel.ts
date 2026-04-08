@@ -144,6 +144,7 @@ export const generateClosingReportExcel = (
       "KM Total": 0,
       "KM Extra": 0,
       "Outros": 0,
+      "Estacionamento": 0,
       "Valor": extra.valor,
     });
   });
@@ -174,6 +175,7 @@ export const generateClosingReportExcel = (
     "KM Total": totalKm,
     "KM Extra": totalKmExtra,
     "Outros": unmappedExtrasTotal,
+    "Estacionamento": 0,
     "Valor": totalServicos + totalEstac + unmappedExtrasTotal,
   });
 
