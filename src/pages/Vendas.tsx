@@ -2126,6 +2126,7 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
                     <TableHead>Cliente</TableHead>
                     <TableHead>O.S.</TableHead>
                     <TableHead>Centro Custo</TableHead>
+                    <TableHead>Placa</TableHead>
                     <TableHead>Subgrupo</TableHead>
                     <TableHead>Descritivo</TableHead>
                     <TableHead className="text-right">Valor</TableHead>
