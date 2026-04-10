@@ -1635,10 +1635,10 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
       filtered = filtered.filter((cr) => cr.status === filtroStatusReceber);
     }
     if (filtroVencimentoInicioReceber) {
-      filtered = filtered.filter((cr) => cr.data_vencimento && cr.data_vencimento >= filtroVencimentoInicioReceber);
+      filtered = filtered.filter((cr) => !cr.data_vencimento || cr.data_vencimento >= filtroVencimentoInicioReceber);
     }
     if (filtroVencimentoFimReceber) {
-      filtered = filtered.filter((cr) => cr.data_vencimento && cr.data_vencimento <= filtroVencimentoFimReceber);
+      filtered = filtered.filter((cr) => !cr.data_vencimento || cr.data_vencimento <= filtroVencimentoFimReceber);
     }
     return filtered;
   }, [contasReceberList, filtroOsReceber, filtroClienteReceber, filtroStatusReceber, filtroVencimentoInicioReceber, filtroVencimentoFimReceber, vendaOsMap]);
