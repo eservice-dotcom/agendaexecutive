@@ -53,6 +53,7 @@ const FaturamentoVeiculo = () => {
         const { data } = await supabase
           .from("agenda_items")
           .select("placa, veiculo, valor, custo, cliente, cot, data, origem, destino, motorista, fornecedor, estacionamento, outros_despesas")
+          .is("deleted_at", null)
           .range(from, from + pageSize - 1);
         if (!data || data.length === 0) break;
         all = all.concat(data);
@@ -81,8 +82,9 @@ const FaturamentoVeiculo = () => {
   const allPlacas = useMemo(() => {
     const set = new Set<string>();
     items.forEach(i => { if (i.placa) set.add(i.placa); });
+    despesasVeiculo.forEach(d => { if (d.placa) set.add(d.placa); });
     return Array.from(set).sort();
-  }, [items]);
+  }, [items, despesasVeiculo]);
 
   const filteredItems = useMemo(() => {
     return items.filter(item => {
@@ -166,8 +168,25 @@ const FaturamentoVeiculo = () => {
       map.set(key, existing);
     });
 
+    // Include vehicles that only have despesas (no agenda items)
+    filteredDespesas.forEach((d) => {
+      if (d.placa && !map.has(d.placa)) {
+        map.set(d.placa, {
+          key: d.placa,
+          veiculo: d.placa,
+          placa: d.placa,
+          viagens: 0,
+          receita: 0,
+          custo: 0,
+          clientes: [],
+          cots: [],
+          servicos: [],
+        });
+      }
+    });
+
     return Array.from(map.values()).sort((a, b) => b.receita - a.receita);
-  }, [filteredItems]);
+  }, [filteredItems, filteredDespesas]);
 
   const totalReceita = dados.reduce((s, d) => s + d.receita, 0);
   const totalCusto = dados.reduce((s, d) => s + d.custo, 0);
