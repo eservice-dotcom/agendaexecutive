@@ -82,8 +82,9 @@ const FaturamentoVeiculo = () => {
   const allPlacas = useMemo(() => {
     const set = new Set<string>();
     items.forEach(i => { if (i.placa) set.add(i.placa); });
+    despesasVeiculo.forEach(d => { if (d.placa) set.add(d.placa); });
     return Array.from(set).sort();
-  }, [items]);
+  }, [items, despesasVeiculo]);
 
   const filteredItems = useMemo(() => {
     return items.filter(item => {
