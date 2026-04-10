@@ -53,6 +53,7 @@ const FaturamentoVeiculo = () => {
         const { data } = await supabase
           .from("agenda_items")
           .select("placa, veiculo, valor, custo, cliente, cot, data, origem, destino, motorista, fornecedor, estacionamento, outros_despesas")
+          .is("deleted_at", null)
           .range(from, from + pageSize - 1);
         if (!data || data.length === 0) break;
         all = all.concat(data);
