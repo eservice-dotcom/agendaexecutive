@@ -1610,10 +1610,10 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
       filtered = filtered.filter((cp) => (cp as any).centro_custo === filtroCentroCustoPagar);
     }
     if (filtroVencimentoInicioPagar) {
-      filtered = filtered.filter((cp) => cp.data_vencimento && cp.data_vencimento >= filtroVencimentoInicioPagar);
+      filtered = filtered.filter((cp) => !cp.data_vencimento || cp.data_vencimento >= filtroVencimentoInicioPagar);
     }
     if (filtroVencimentoFimPagar) {
-      filtered = filtered.filter((cp) => cp.data_vencimento && cp.data_vencimento <= filtroVencimentoFimPagar);
+      filtered = filtered.filter((cp) => !cp.data_vencimento || cp.data_vencimento <= filtroVencimentoFimPagar);
     }
     return filtered;
   }, [contasPagarList, filtroOsPagar, filtroFornecedorPagar, filtroStatusPagar, filtroCentroCustoPagar, filtroVencimentoInicioPagar, filtroVencimentoFimPagar, vendaOsMap]);
@@ -1635,10 +1635,10 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
       filtered = filtered.filter((cr) => cr.status === filtroStatusReceber);
     }
     if (filtroVencimentoInicioReceber) {
-      filtered = filtered.filter((cr) => cr.data_vencimento && cr.data_vencimento >= filtroVencimentoInicioReceber);
+      filtered = filtered.filter((cr) => !cr.data_vencimento || cr.data_vencimento >= filtroVencimentoInicioReceber);
     }
     if (filtroVencimentoFimReceber) {
-      filtered = filtered.filter((cr) => cr.data_vencimento && cr.data_vencimento <= filtroVencimentoFimReceber);
+      filtered = filtered.filter((cr) => !cr.data_vencimento || cr.data_vencimento <= filtroVencimentoFimReceber);
     }
     return filtered;
   }, [contasReceberList, filtroOsReceber, filtroClienteReceber, filtroStatusReceber, filtroVencimentoInicioReceber, filtroVencimentoFimReceber, vendaOsMap]);
