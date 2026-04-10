@@ -168,8 +168,25 @@ const FaturamentoVeiculo = () => {
       map.set(key, existing);
     });
 
+    // Include vehicles that only have despesas (no agenda items)
+    filteredDespesas.forEach((d) => {
+      if (d.placa && !map.has(d.placa)) {
+        map.set(d.placa, {
+          key: d.placa,
+          veiculo: d.placa,
+          placa: d.placa,
+          viagens: 0,
+          receita: 0,
+          custo: 0,
+          clientes: [],
+          cots: [],
+          servicos: [],
+        });
+      }
+    });
+
     return Array.from(map.values()).sort((a, b) => b.receita - a.receita);
-  }, [filteredItems]);
+  }, [filteredItems, filteredDespesas]);
 
   const totalReceita = dados.reduce((s, d) => s + d.receita, 0);
   const totalCusto = dados.reduce((s, d) => s + d.custo, 0);
