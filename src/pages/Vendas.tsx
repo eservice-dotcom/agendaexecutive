@@ -2172,6 +2172,7 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
                         <TableCell className="font-medium text-sm">{vendaOsMap[cp.venda_id]?.cliente || "—"}</TableCell>
                         <TableCell className="font-mono text-xs">{vendaOsMap[cp.venda_id]?.cots?.join(", ") || "—"}</TableCell>
                         <TableCell className="text-sm">{cp.centro_custo || "—"}</TableCell>
+                        <TableCell className="text-sm font-mono">{(cp as any).placa || "—"}</TableCell>
                         <TableCell className="text-sm">{cp.subgrupo_custo || "—"}</TableCell>
                         <TableCell className="text-sm whitespace-pre-line">{normalizeDescricaoForDisplay(cp.descritivo)}</TableCell>
                         <TableCell className="text-right font-mono">{formatCurrency(cp.valor)}</TableCell>
