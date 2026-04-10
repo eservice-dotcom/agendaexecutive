@@ -2126,6 +2126,7 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
                     <TableHead>Cliente</TableHead>
                     <TableHead>O.S.</TableHead>
                     <TableHead>Centro Custo</TableHead>
+                    <TableHead>Placa</TableHead>
                     <TableHead>Subgrupo</TableHead>
                     <TableHead>Descritivo</TableHead>
                     <TableHead className="text-right">Valor</TableHead>
@@ -2140,7 +2141,7 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
                 <TableBody>
                   {filteredContasPagarList.length === 0 ? (
                     <TableRow>
-                       <TableCell colSpan={16} className="text-center text-muted-foreground py-8">
+                       <TableCell colSpan={17} className="text-center text-muted-foreground py-8">
                         Nenhuma conta a pagar
                       </TableCell>
                     </TableRow>
@@ -2171,6 +2172,7 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
                         <TableCell className="font-medium text-sm">{vendaOsMap[cp.venda_id]?.cliente || "—"}</TableCell>
                         <TableCell className="font-mono text-xs">{vendaOsMap[cp.venda_id]?.cots?.join(", ") || "—"}</TableCell>
                         <TableCell className="text-sm">{cp.centro_custo || "—"}</TableCell>
+                        <TableCell className="text-sm font-mono">{(cp as any).placa || "—"}</TableCell>
                         <TableCell className="text-sm">{cp.subgrupo_custo || "—"}</TableCell>
                         <TableCell className="text-sm whitespace-pre-line">{normalizeDescricaoForDisplay(cp.descritivo)}</TableCell>
                         <TableCell className="text-right font-mono">{formatCurrency(cp.valor)}</TableCell>
