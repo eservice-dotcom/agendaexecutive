@@ -363,8 +363,8 @@ const FaturamentoVeiculo = () => {
               <TableHead className="font-semibold text-center">Viagens</TableHead>
               <TableHead className="font-semibold text-right">Receita</TableHead>
               <TableHead className="font-semibold text-right">Custo Forn.</TableHead>
-              <TableHead className="font-semibold text-right">Desp. Oper.</TableHead>
               <TableHead className="font-semibold text-right">Líquido</TableHead>
+              <TableHead className="font-semibold text-right">Desp. Oper.</TableHead>
               <TableHead className="font-semibold text-right">% Margem</TableHead>
             </TableRow>
           </TableHeader>
@@ -399,8 +399,8 @@ const FaturamentoVeiculo = () => {
                     </TableCell>
                     <TableCell className="text-right font-mono text-sm font-semibold">{formatCurrency(d.receita)}</TableCell>
                     <TableCell className="text-right font-mono text-sm text-muted-foreground">{formatCurrency(d.custo)}</TableCell>
-                    <TableCell className="text-right font-mono text-sm text-muted-foreground">{formatCurrency(despOper)}</TableCell>
                     <TableCell className={`text-right font-mono text-sm font-semibold ${liquido >= 0 ? "text-accent" : "text-destructive"}`}>{formatCurrency(liquido)}</TableCell>
+                    <TableCell className="text-right font-mono text-sm text-muted-foreground">{formatCurrency(despOper)}</TableCell>
                     <TableCell className="text-right font-mono text-sm">
                       {d.receita > 0 ? `${((liquido / d.receita) * 100).toFixed(1)}%` : "0%"}
                     </TableCell>
