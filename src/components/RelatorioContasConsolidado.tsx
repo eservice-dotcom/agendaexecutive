@@ -287,6 +287,8 @@ export default function RelatorioContasConsolidado() {
                 <tr><td colSpan={10} className="text-center text-muted-foreground py-8">Nenhum registro encontrado</td></tr>
               ) : alignedRows.map((row) => {
                 const maxLen = Math.max(row.pagar.length, row.receber.length, 1);
+                const totalDiaPagar = row.pagar.reduce((s, c) => s + c.valor, 0);
+                const totalDiaReceber = row.receber.reduce((s, c) => s + c.valor, 0);
                 const rows = [];
                 for (let i = 0; i < maxLen; i++) {
                   const p = row.pagar[i];
@@ -294,7 +296,7 @@ export default function RelatorioContasConsolidado() {
                   rows.push(
                     <tr key={`${row.date}-${i}`} className={i === 0 ? "border-t-2 border-border" : ""}>
                       {i === 0 && (
-                        <td rowSpan={maxLen} className="border px-2 py-1.5 font-semibold bg-muted/30 align-top whitespace-nowrap">
+                        <td rowSpan={maxLen + 1} className="border px-2 py-1.5 font-semibold bg-muted/30 align-top whitespace-nowrap">
                           {row.date === "sem-vencimento" ? "S/ Venc." : formatDate(row.date)}
                         </td>
                       )}
@@ -310,6 +312,18 @@ export default function RelatorioContasConsolidado() {
                     </tr>
                   );
                 }
+                // Linha de total do dia
+                rows.push(
+                  <tr key={`${row.date}-total`} className="bg-muted/40">
+                    <td colSpan={2} className="border px-2 py-1 text-right text-[10px] font-bold">Total do dia:</td>
+                    <td className="border px-2 py-1 text-right text-red-700 font-bold whitespace-nowrap">{totalDiaPagar > 0 ? formatCurrency(totalDiaPagar) : "-"}</td>
+                    <td className="border px-2 py-1"></td>
+                    <td className="border bg-muted/20 w-[2px]"></td>
+                    <td colSpan={2} className="border px-2 py-1 text-right text-[10px] font-bold">Total do dia:</td>
+                    <td className="border px-2 py-1 text-right text-green-700 font-bold whitespace-nowrap">{totalDiaReceber > 0 ? formatCurrency(totalDiaReceber) : "-"}</td>
+                    <td className="border px-2 py-1"></td>
+                  </tr>
+                );
                 return rows;
               })}
             </tbody>
