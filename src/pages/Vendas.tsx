@@ -260,6 +260,7 @@ const Vendas = () => {
   const [novaContaForm, setNovaContaForm] = useState({
     descritivo: "",
     valor: "",
+    data: new Date().toISOString().split("T")[0],
     data_vencimento: "",
     data_pagamento: "",
     fornecedor: "",
@@ -1291,7 +1292,7 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
     else loadContasReceber();
   };
   const openNovaContaDialog = (type: "pagar" | "receber") => {
-    setNovaContaForm({ descritivo: "", valor: "", data_vencimento: "", data_pagamento: "", fornecedor: "", cliente: "", centro_custo: "", centro_receita: "", subgrupo_custo: "", subgrupo_receita: "", placa: "" });
+    setNovaContaForm({ descritivo: "", valor: "", data: new Date().toISOString().split("T")[0], data_vencimento: "", data_pagamento: "", fornecedor: "", cliente: "", centro_custo: "", centro_receita: "", subgrupo_custo: "", subgrupo_receita: "", placa: "" });
     setQuickAddFornecedor(false);
     setQuickAddFornecedorNome("");
     setQuickAddCliente(false);
@@ -1380,7 +1381,7 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
 
   const handleSaveNovaConta = async () => {
     if (!novaContaDialog || !session) return;
-    const today = new Date().toISOString().split("T")[0];
+    const dataLancamento = novaContaForm.data || new Date().toISOString().split("T")[0];
 
     if (novaContaDialog === "pagar") {
       const { error } = await supabase.from("contas_pagar").insert({
@@ -1389,7 +1390,7 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
         fornecedor: novaContaForm.fornecedor,
         descritivo: novaContaForm.descritivo,
         valor: parseFloat(novaContaForm.valor) || 0,
-        data: today,
+        data: dataLancamento,
         data_vencimento: novaContaForm.data_vencimento || null,
         data_pagamento: novaContaForm.data_pagamento || null,
         status: novaContaForm.data_pagamento ? "pago" : "pendente",
@@ -1410,7 +1411,7 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
         cliente: novaContaForm.cliente,
         descritivo: novaContaForm.descritivo,
         valor: parseFloat(novaContaForm.valor) || 0,
-        data: today,
+        data: dataLancamento,
         data_vencimento: novaContaForm.data_vencimento || null,
         data_pagamento: novaContaForm.data_pagamento || null,
         status: novaContaForm.data_pagamento ? "pago" : "pendente",
@@ -3063,11 +3064,17 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
                 <Label>Descritivo</Label>
                 <Textarea value={novaContaForm.descritivo} onChange={(e) => setNovaContaForm({ ...novaContaForm, descritivo: e.target.value })} placeholder="Descrição da conta" rows={3} />
               </div>
-              <div className="grid grid-cols-3 gap-3">
+              <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-2">
                   <Label>Valor (R$)</Label>
                   <Input type="number" step="0.01" value={novaContaForm.valor} onChange={(e) => setNovaContaForm({ ...novaContaForm, valor: e.target.value })} />
                 </div>
+                <div className="space-y-2">
+                  <Label>Data do Lançamento</Label>
+                  <Input type="date" value={novaContaForm.data} onChange={(e) => setNovaContaForm({ ...novaContaForm, data: e.target.value })} />
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-2">
                   <Label>Data de Vencimento</Label>
                   <Input type="date" value={novaContaForm.data_vencimento} onChange={(e) => setNovaContaForm({ ...novaContaForm, data_vencimento: e.target.value })} />
