@@ -75,7 +75,7 @@ export const printAgenda = (items: any[], includeFinancials = true) => {
 <td>${i.cliente}</td><td>${i.tipo}</td><td class="c">${i.pax}</td>
 <td>${i.origem}</td><td>${i.destino}</td>
 <td>${i.veiculo} (${i.placa})</td><td>${i.motorista}</td>
-<td>${i.fornecedor}</td>`;
+<td>${i.telefone || ""}</td>`;
     if (includeFinancials) {
       row += `<td class="r">${formatCurrency(i.valor)}</td><td class="r">${formatCurrency(i.custo)}</td>
 <td class="r b">${formatCurrency(i.valor - i.custo)}</td>`;
