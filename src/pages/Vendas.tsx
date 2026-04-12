@@ -249,7 +249,7 @@ const Vendas = () => {
 
   // Edit conta dialog
   const [editDialog, setEditDialog] = useState<{ type: "pagar" | "receber"; item: any } | null>(null);
-  const [editForm, setEditForm] = useState({ descritivo: "", valor: "", data_vencimento: "", data_pagamento: "", centro: "", subgrupo: "", cliente: "", fornecedor: "", placa: "" });
+  const [editForm, setEditForm] = useState({ descritivo: "", valor: "", data: "", data_vencimento: "", data_pagamento: "", centro: "", subgrupo: "", cliente: "", fornecedor: "", placa: "" });
 
   // Baixa parcial dialog
   const [baixaDialog, setBaixaDialog] = useState<{ type: "pagar" | "receber"; item: any } | null>(null);
@@ -1207,6 +1207,7 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
     setEditForm({
       descritivo: item.descritivo || "",
       valor: String(item.valor),
+      data: item.data || "",
       data_vencimento: item.data_vencimento || "",
       data_pagamento: item.data_pagamento || "",
       centro: (type === "pagar" ? item.centro_custo : item.centro_receita) || "",
@@ -1225,6 +1226,7 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
     const updates: any = {
       descritivo: editForm.descritivo,
       valor: parseFloat(editForm.valor) || 0,
+      data: editForm.data || null,
       data_vencimento: editForm.data_vencimento || null,
       data_pagamento: editForm.data_pagamento || null,
       status: editForm.data_pagamento ? "pago" : "pendente",
@@ -2507,9 +2509,15 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
                 <Label>Valor</Label>
                 <Input type="number" step="0.01" value={editForm.valor} onChange={(e) => setEditForm({ ...editForm, valor: e.target.value })} />
               </div>
-              <div className="space-y-2">
-                <Label>Data de Vencimento</Label>
-                <Input type="date" value={editForm.data_vencimento} onChange={(e) => setEditForm({ ...editForm, data_vencimento: e.target.value })} />
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-2">
+                  <Label>Data do Lançamento</Label>
+                  <Input type="date" value={editForm.data} onChange={(e) => setEditForm({ ...editForm, data: e.target.value })} />
+                </div>
+                <div className="space-y-2">
+                  <Label>Data de Vencimento</Label>
+                  <Input type="date" value={editForm.data_vencimento} onChange={(e) => setEditForm({ ...editForm, data_vencimento: e.target.value })} />
+                </div>
               </div>
               <div className="space-y-2">
                 <Label>Data de Pagamento (baixa)</Label>
