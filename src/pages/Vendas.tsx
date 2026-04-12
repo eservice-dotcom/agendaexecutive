@@ -512,6 +512,8 @@ const Vendas = () => {
         .from("agenda_items")
         .select("id, cliente, data, hora, tipo, origem, destino, valor, custo, motorista, veiculo, placa, pax, cot, fornecedor, status_faturamento, estacionamento, outros, outros_despesas")
         .eq("cliente", cliente)
+        .eq("status_faturamento", "enviado")
+        .is("deleted_at", null)
         .order("data", { ascending: true });
       if (data) setAgendaItems(data as AgendaItem[]);
     };
