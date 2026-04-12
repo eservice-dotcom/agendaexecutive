@@ -19,6 +19,7 @@ import { generateClosingReport } from "@/lib/closingReport";
 import { generateClosingReportExcel } from "@/lib/closingReportExcel";
 import { printContasPagar, printContasReceber } from "@/lib/printUtils";
 import DashboardFinanceiro from "@/components/DashboardFinanceiro";
+import RelatorioContasConsolidado from "@/components/RelatorioContasConsolidado";
 import WhatsAppPagamentoDialog from "@/components/WhatsAppPagamentoDialog";
 
 interface Venda {
@@ -1727,6 +1728,9 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
             <TabsTrigger value="dashboard" className="gap-1">
               Dashboard
             </TabsTrigger>
+            <TabsTrigger value="relatorio" className="gap-1">
+              Relatório
+            </TabsTrigger>
           </TabsList>
 
           {/* ===== VENDAS TAB ===== */}
@@ -2218,6 +2222,11 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
           {/* ===== DASHBOARD TAB ===== */}
           <TabsContent value="dashboard">
             <DashboardFinanceiro />
+          </TabsContent>
+
+          {/* ===== RELATÓRIO CONSOLIDADO TAB ===== */}
+          <TabsContent value="relatorio">
+            <RelatorioContasConsolidado />
           </TabsContent>
         </Tabs>
 
