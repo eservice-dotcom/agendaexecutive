@@ -260,6 +260,7 @@ const Vendas = () => {
   const [novaContaForm, setNovaContaForm] = useState({
     descritivo: "",
     valor: "",
+    data: new Date().toISOString().split("T")[0],
     data_vencimento: "",
     data_pagamento: "",
     fornecedor: "",
@@ -1291,7 +1292,7 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
     else loadContasReceber();
   };
   const openNovaContaDialog = (type: "pagar" | "receber") => {
-    setNovaContaForm({ descritivo: "", valor: "", data_vencimento: "", data_pagamento: "", fornecedor: "", cliente: "", centro_custo: "", centro_receita: "", subgrupo_custo: "", subgrupo_receita: "", placa: "" });
+    setNovaContaForm({ descritivo: "", valor: "", data: new Date().toISOString().split("T")[0], data_vencimento: "", data_pagamento: "", fornecedor: "", cliente: "", centro_custo: "", centro_receita: "", subgrupo_custo: "", subgrupo_receita: "", placa: "" });
     setQuickAddFornecedor(false);
     setQuickAddFornecedorNome("");
     setQuickAddCliente(false);
@@ -1380,7 +1381,7 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
 
   const handleSaveNovaConta = async () => {
     if (!novaContaDialog || !session) return;
-    const today = new Date().toISOString().split("T")[0];
+    const dataLancamento = novaContaForm.data || new Date().toISOString().split("T")[0];
 
     if (novaContaDialog === "pagar") {
       const { error } = await supabase.from("contas_pagar").insert({
