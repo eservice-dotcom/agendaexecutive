@@ -1226,6 +1226,7 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
     const updates: any = {
       descritivo: editForm.descritivo,
       valor: parseFloat(editForm.valor) || 0,
+      data: editForm.data || null,
       data_vencimento: editForm.data_vencimento || null,
       data_pagamento: editForm.data_pagamento || null,
       status: editForm.data_pagamento ? "pago" : "pendente",
@@ -2504,13 +2505,15 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
                 <Label>Descritivo</Label>
                 <Textarea value={editForm.descritivo} onChange={(e) => setEditForm({ ...editForm, descritivo: e.target.value })} rows={3} />
               </div>
-              <div className="space-y-2">
-                <Label>Valor</Label>
-                <Input type="number" step="0.01" value={editForm.valor} onChange={(e) => setEditForm({ ...editForm, valor: e.target.value })} />
-              </div>
-              <div className="space-y-2">
-                <Label>Data de Vencimento</Label>
-                <Input type="date" value={editForm.data_vencimento} onChange={(e) => setEditForm({ ...editForm, data_vencimento: e.target.value })} />
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-2">
+                  <Label>Data do Lançamento</Label>
+                  <Input type="date" value={editForm.data} onChange={(e) => setEditForm({ ...editForm, data: e.target.value })} />
+                </div>
+                <div className="space-y-2">
+                  <Label>Data de Vencimento</Label>
+                  <Input type="date" value={editForm.data_vencimento} onChange={(e) => setEditForm({ ...editForm, data_vencimento: e.target.value })} />
+                </div>
               </div>
               <div className="space-y-2">
                 <Label>Data de Pagamento (baixa)</Label>
