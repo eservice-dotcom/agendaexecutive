@@ -4,6 +4,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Printer } from "lucide-react";
 
 interface ContaItem {
@@ -15,7 +16,7 @@ interface ContaItem {
   data: string;
   data_vencimento: string | null;
   status: string;
-  entidade: string; // fornecedor ou cliente
+  entidade: string;
   placa?: string;
   centro?: string;
 }
@@ -35,6 +36,7 @@ export default function RelatorioContasConsolidado() {
   const [dataInicio, setDataInicio] = useState("");
   const [dataFim, setDataFim] = useState("");
   const [busca, setBusca] = useState("");
+  const [filtroStatus, setFiltroStatus] = useState("todos");
 
   useEffect(() => {
     loadData();
@@ -85,6 +87,11 @@ export default function RelatorioContasConsolidado() {
       if (dataInicio && item.data_vencimento && item.data_vencimento < dataInicio) return false;
       if (dataFim && item.data_vencimento && item.data_vencimento > dataFim) return false;
       if (dataInicio && !item.data_vencimento) return false;
+      if (filtroStatus !== "todos") {
+        if (filtroStatus === "pendente" && item.status !== "pendente") return false;
+        if (filtroStatus === "pago" && item.status !== "pago" && item.status !== "recebido") return false;
+        if (filtroStatus === "parcial" && item.status !== "parcial") return false;
+      }
       if (busca) {
         const s = busca.toLowerCase();
         if (
@@ -98,13 +105,51 @@ export default function RelatorioContasConsolidado() {
     });
   };
 
-  const filteredPagar = useMemo(() => filterItems(processedPagar), [processedPagar, dataInicio, dataFim, busca]);
-  const filteredReceber = useMemo(() => filterItems(processedReceber), [processedReceber, dataInicio, dataFim, busca]);
+  const filteredPagar = useMemo(() => filterItems(processedPagar), [processedPagar, dataInicio, dataFim, busca, filtroStatus]);
+  const filteredReceber = useMemo(() => filterItems(processedReceber), [processedReceber, dataInicio, dataFim, busca, filtroStatus]);
 
   const totalPagar = filteredPagar.reduce((s, c) => s + c.valor, 0);
   const totalPagoPagar = filteredPagar.reduce((s, c) => s + c.valor_pago, 0);
   const totalReceber = filteredReceber.reduce((s, c) => s + c.valor, 0);
   const totalPagoReceber = filteredReceber.reduce((s, c) => s + c.valor_pago, 0);
+
+  // Agrupar por data de vencimento e alinhar lado a lado
+  const alignedRows = useMemo(() => {
+    const allDates = new Set<string>();
+    filteredPagar.forEach((c) => allDates.add(c.data_vencimento || "sem-vencimento"));
+    filteredReceber.forEach((c) => allDates.add(c.data_vencimento || "sem-vencimento"));
+
+    const sortedDates = Array.from(allDates).sort((a, b) => {
+      if (a === "sem-vencimento") return 1;
+      if (b === "sem-vencimento") return -1;
+      return a.localeCompare(b);
+    });
+
+    const pagarByDate = new Map<string, ContaItem[]>();
+    filteredPagar.forEach((c) => {
+      const key = c.data_vencimento || "sem-vencimento";
+      if (!pagarByDate.has(key)) pagarByDate.set(key, []);
+      pagarByDate.get(key)!.push(c);
+    });
+
+    const receberByDate = new Map<string, ContaItem[]>();
+    filteredReceber.forEach((c) => {
+      const key = c.data_vencimento || "sem-vencimento";
+      if (!receberByDate.has(key)) receberByDate.set(key, []);
+      receberByDate.get(key)!.push(c);
+    });
+
+    const rows: { date: string; pagar: ContaItem[]; receber: ContaItem[] }[] = [];
+    sortedDates.forEach((date) => {
+      rows.push({
+        date,
+        pagar: pagarByDate.get(date) || [],
+        receber: receberByDate.get(date) || [],
+      });
+    });
+
+    return rows;
+  }, [filteredPagar, filteredReceber]);
 
   const statusBadge = (status: string) => {
     if (status === "pago" || status === "recebido")
@@ -118,43 +163,56 @@ export default function RelatorioContasConsolidado() {
     const printWindow = window.open("", "_blank");
     if (!printWindow) return;
 
-    const renderTable = (items: ContaItem[], title: string) => {
-      if (items.length === 0) return `<p>Nenhum registro.</p>`;
-      const total = items.reduce((s, c) => s + c.valor, 0);
-      const totalPago = items.reduce((s, c) => s + c.valor_pago, 0);
-      return `
-        <h3 style="margin:8px 0 4px;font-size:13px;">${title} — Total: ${formatCurrency(total)} | Pago: ${formatCurrency(totalPago)} | Saldo: ${formatCurrency(total - totalPago)}</h3>
-        <table style="width:100%;border-collapse:collapse;font-size:10px;">
-          <thead><tr style="background:#f0f0f0;">
-            <th style="border:1px solid #ccc;padding:3px;text-align:left;">Vencimento</th>
-            <th style="border:1px solid #ccc;padding:3px;text-align:left;">${title.includes("Pagar") ? "Fornecedor" : "Cliente"}</th>
-            <th style="border:1px solid #ccc;padding:3px;text-align:left;">Descritivo</th>
-            <th style="border:1px solid #ccc;padding:3px;text-align:right;">Valor</th>
-            <th style="border:1px solid #ccc;padding:3px;text-align:right;">Pago</th>
-            <th style="border:1px solid #ccc;padding:3px;text-align:center;">Status</th>
-          </tr></thead>
-          <tbody>${items.map((c) => `
-            <tr>
-              <td style="border:1px solid #ccc;padding:3px;">${formatDate(c.data_vencimento)}</td>
-              <td style="border:1px solid #ccc;padding:3px;">${c.entidade}</td>
-              <td style="border:1px solid #ccc;padding:3px;">${c.descritivo}</td>
-              <td style="border:1px solid #ccc;padding:3px;text-align:right;">${formatCurrency(c.valor)}</td>
-              <td style="border:1px solid #ccc;padding:3px;text-align:right;">${formatCurrency(c.valor_pago)}</td>
-              <td style="border:1px solid #ccc;padding:3px;text-align:center;">${c.status}</td>
-            </tr>
-          `).join("")}</tbody>
-        </table>
-      `;
+    const renderRows = () => {
+      return alignedRows.map((row) => {
+        const maxLen = Math.max(row.pagar.length, row.receber.length, 1);
+        let html = "";
+        for (let i = 0; i < maxLen; i++) {
+          const p = row.pagar[i];
+          const r = row.receber[i];
+          const dateLabel = i === 0 ? (row.date === "sem-vencimento" ? "S/ Venc." : formatDate(row.date)) : "";
+          html += `<tr${i === 0 ? ' style="border-top:2px solid #999;"' : ""}>
+            <td style="border:1px solid #ccc;padding:3px;font-weight:${i === 0 ? "bold" : "normal"};background:${i === 0 ? "#f8f8f8" : "white"}">${dateLabel}</td>
+            <td style="border:1px solid #ccc;padding:3px;">${p ? p.entidade : ""}</td>
+            <td style="border:1px solid #ccc;padding:3px;">${p ? p.descritivo : ""}</td>
+            <td style="border:1px solid #ccc;padding:3px;text-align:right;color:red;">${p ? formatCurrency(p.valor) : ""}</td>
+            <td style="border:1px solid #ccc;padding:3px;text-align:center;">${p ? p.status : ""}</td>
+            <td style="border:1px solid #ccc;padding:3px;background:#f0f0f0;"></td>
+            <td style="border:1px solid #ccc;padding:3px;">${r ? r.entidade : ""}</td>
+            <td style="border:1px solid #ccc;padding:3px;">${r ? r.descritivo : ""}</td>
+            <td style="border:1px solid #ccc;padding:3px;text-align:right;color:green;">${r ? formatCurrency(r.valor) : ""}</td>
+            <td style="border:1px solid #ccc;padding:3px;text-align:center;">${r ? r.status : ""}</td>
+          </tr>`;
+        }
+        return html;
+      }).join("");
     };
 
     printWindow.document.write(`
       <html><head><title>Relatório Contas</title></head><body style="font-family:Arial;padding:16px;">
         <h2 style="text-align:center;font-size:15px;">Relatório Consolidado — Contas a Pagar e Receber</h2>
         ${dataInicio || dataFim ? `<p style="text-align:center;font-size:11px;">Período: ${dataInicio ? formatDate(dataInicio) : "..."} a ${dataFim ? formatDate(dataFim) : "..."}</p>` : ""}
-        <div style="display:flex;gap:16px;">
-          <div style="flex:1;">${renderTable(filteredPagar, "Contas a Pagar")}</div>
-          <div style="flex:1;">${renderTable(filteredReceber, "Contas a Receber")}</div>
-        </div>
+        <table style="width:100%;border-collapse:collapse;font-size:10px;">
+          <thead><tr style="background:#e0e0e0;">
+            <th style="border:1px solid #ccc;padding:4px;">Vencimento</th>
+            <th colspan="4" style="border:1px solid #ccc;padding:4px;background:#ffe0e0;">CONTAS A PAGAR — ${formatCurrency(totalPagar)}</th>
+            <th style="border:1px solid #ccc;padding:4px;width:4px;"></th>
+            <th colspan="4" style="border:1px solid #ccc;padding:4px;background:#e0ffe0;">CONTAS A RECEBER — ${formatCurrency(totalReceber)}</th>
+          </tr>
+          <tr style="background:#f5f5f5;">
+            <th style="border:1px solid #ccc;padding:3px;"></th>
+            <th style="border:1px solid #ccc;padding:3px;">Fornecedor</th>
+            <th style="border:1px solid #ccc;padding:3px;">Descritivo</th>
+            <th style="border:1px solid #ccc;padding:3px;">Valor</th>
+            <th style="border:1px solid #ccc;padding:3px;">Status</th>
+            <th style="border:1px solid #ccc;padding:3px;"></th>
+            <th style="border:1px solid #ccc;padding:3px;">Cliente</th>
+            <th style="border:1px solid #ccc;padding:3px;">Descritivo</th>
+            <th style="border:1px solid #ccc;padding:3px;">Valor</th>
+            <th style="border:1px solid #ccc;padding:3px;">Status</th>
+          </tr></thead>
+          <tbody>${renderRows()}</tbody>
+        </table>
         <div style="margin-top:16px;font-size:12px;font-weight:bold;text-align:center;">
           Saldo: ${formatCurrency(totalReceber - totalPagar)} (Receber - Pagar)
         </div>
@@ -176,6 +234,20 @@ export default function RelatorioContasConsolidado() {
           <Input type="date" value={dataFim} onChange={(e) => setDataFim(e.target.value)} className="w-36 h-8 text-xs" />
         </div>
         <div className="flex flex-col gap-0.5">
+          <span className="text-xs font-medium text-muted-foreground">Status</span>
+          <Select value={filtroStatus} onValueChange={setFiltroStatus}>
+            <SelectTrigger className="w-32 h-8 text-xs">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="todos">Todos</SelectItem>
+              <SelectItem value="pendente">Pendente</SelectItem>
+              <SelectItem value="parcial">Parcial</SelectItem>
+              <SelectItem value="pago">Pago</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+        <div className="flex flex-col gap-0.5">
           <span className="text-xs font-medium text-muted-foreground">Busca</span>
           <Input placeholder="Fornecedor, cliente, descritivo..." value={busca} onChange={(e) => setBusca(e.target.value)} className="w-64 h-8 text-xs" />
         </div>
@@ -184,85 +256,64 @@ export default function RelatorioContasConsolidado() {
         </Button>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        {/* CONTAS A PAGAR */}
-        <div className="border rounded-lg overflow-hidden">
-          <div className="bg-red-50 dark:bg-red-950/30 px-4 py-2 flex justify-between items-center">
-            <h3 className="font-semibold text-sm text-red-700 dark:text-red-400">Contas a Pagar</h3>
-            <div className="text-xs space-x-3">
-              <span>Total: <strong>{formatCurrency(totalPagar)}</strong></span>
-              <span>Pago: <strong>{formatCurrency(totalPagoPagar)}</strong></span>
-              <span>Saldo: <strong className="text-red-600">{formatCurrency(totalPagar - totalPagoPagar)}</strong></span>
-            </div>
-          </div>
-          <div className="max-h-[60vh] overflow-auto">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead className="text-xs">Vencimento</TableHead>
-                  <TableHead className="text-xs">Fornecedor</TableHead>
-                  <TableHead className="text-xs">Descritivo</TableHead>
-                  <TableHead className="text-xs text-right">Valor</TableHead>
-                  <TableHead className="text-xs text-right">Pago</TableHead>
-                  <TableHead className="text-xs text-center">Status</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {filteredPagar.length === 0 ? (
-                  <TableRow><TableCell colSpan={6} className="text-center text-xs text-muted-foreground py-8">Nenhum registro</TableCell></TableRow>
-                ) : filteredPagar.map((c) => (
-                  <TableRow key={c.id}>
-                    <TableCell className="text-xs py-1.5">{formatDate(c.data_vencimento)}</TableCell>
-                    <TableCell className="text-xs py-1.5 max-w-[120px] truncate">{c.entidade}</TableCell>
-                    <TableCell className="text-xs py-1.5 max-w-[150px] truncate">{c.descritivo}</TableCell>
-                    <TableCell className="text-xs py-1.5 text-right">{formatCurrency(c.valor)}</TableCell>
-                    <TableCell className="text-xs py-1.5 text-right">{formatCurrency(c.valor_pago)}</TableCell>
-                    <TableCell className="text-xs py-1.5 text-center">{statusBadge(c.status)}</TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </div>
-        </div>
-
-        {/* CONTAS A RECEBER */}
-        <div className="border rounded-lg overflow-hidden">
-          <div className="bg-green-50 dark:bg-green-950/30 px-4 py-2 flex justify-between items-center">
-            <h3 className="font-semibold text-sm text-green-700 dark:text-green-400">Contas a Receber</h3>
-            <div className="text-xs space-x-3">
-              <span>Total: <strong>{formatCurrency(totalReceber)}</strong></span>
-              <span>Recebido: <strong>{formatCurrency(totalPagoReceber)}</strong></span>
-              <span>Saldo: <strong className="text-green-600">{formatCurrency(totalReceber - totalPagoReceber)}</strong></span>
-            </div>
-          </div>
-          <div className="max-h-[60vh] overflow-auto">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead className="text-xs">Vencimento</TableHead>
-                  <TableHead className="text-xs">Cliente</TableHead>
-                  <TableHead className="text-xs">Descritivo</TableHead>
-                  <TableHead className="text-xs text-right">Valor</TableHead>
-                  <TableHead className="text-xs text-right">Recebido</TableHead>
-                  <TableHead className="text-xs text-center">Status</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {filteredReceber.length === 0 ? (
-                  <TableRow><TableCell colSpan={6} className="text-center text-xs text-muted-foreground py-8">Nenhum registro</TableCell></TableRow>
-                ) : filteredReceber.map((c) => (
-                  <TableRow key={c.id}>
-                    <TableCell className="text-xs py-1.5">{formatDate(c.data_vencimento)}</TableCell>
-                    <TableCell className="text-xs py-1.5 max-w-[120px] truncate">{c.entidade}</TableCell>
-                    <TableCell className="text-xs py-1.5 max-w-[150px] truncate">{c.descritivo}</TableCell>
-                    <TableCell className="text-xs py-1.5 text-right">{formatCurrency(c.valor)}</TableCell>
-                    <TableCell className="text-xs py-1.5 text-right">{formatCurrency(c.valor_pago)}</TableCell>
-                    <TableCell className="text-xs py-1.5 text-center">{statusBadge(c.status)}</TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </div>
+      {/* TABELA CONSOLIDADA ALINHADA POR DATA */}
+      <div className="border rounded-lg overflow-hidden">
+        <div className="max-h-[65vh] overflow-auto">
+          <table className="w-full text-xs border-collapse">
+            <thead className="sticky top-0 z-10">
+              <tr>
+                <th rowSpan={2} className="border bg-muted px-2 py-2 text-left font-semibold w-[90px]">Vencimento</th>
+                <th colSpan={4} className="border bg-red-50 dark:bg-red-950/30 px-2 py-1.5 text-center font-semibold text-red-700 dark:text-red-400">
+                  Contas a Pagar — {formatCurrency(totalPagar)}
+                </th>
+                <th rowSpan={2} className="border bg-muted w-[2px]"></th>
+                <th colSpan={4} className="border bg-green-50 dark:bg-green-950/30 px-2 py-1.5 text-center font-semibold text-green-700 dark:text-green-400">
+                  Contas a Receber — {formatCurrency(totalReceber)}
+                </th>
+              </tr>
+              <tr>
+                <th className="border bg-muted/50 px-2 py-1 text-left">Fornecedor</th>
+                <th className="border bg-muted/50 px-2 py-1 text-left">Descritivo</th>
+                <th className="border bg-muted/50 px-2 py-1 text-right">Valor</th>
+                <th className="border bg-muted/50 px-2 py-1 text-center">Status</th>
+                <th className="border bg-muted/50 px-2 py-1 text-left">Cliente</th>
+                <th className="border bg-muted/50 px-2 py-1 text-left">Descritivo</th>
+                <th className="border bg-muted/50 px-2 py-1 text-right">Valor</th>
+                <th className="border bg-muted/50 px-2 py-1 text-center">Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              {alignedRows.length === 0 ? (
+                <tr><td colSpan={10} className="text-center text-muted-foreground py-8">Nenhum registro encontrado</td></tr>
+              ) : alignedRows.map((row) => {
+                const maxLen = Math.max(row.pagar.length, row.receber.length, 1);
+                const rows = [];
+                for (let i = 0; i < maxLen; i++) {
+                  const p = row.pagar[i];
+                  const r = row.receber[i];
+                  rows.push(
+                    <tr key={`${row.date}-${i}`} className={i === 0 ? "border-t-2 border-border" : ""}>
+                      {i === 0 && (
+                        <td rowSpan={maxLen} className="border px-2 py-1.5 font-semibold bg-muted/30 align-top whitespace-nowrap">
+                          {row.date === "sem-vencimento" ? "S/ Venc." : formatDate(row.date)}
+                        </td>
+                      )}
+                      <td className="border px-2 py-1 max-w-[120px] truncate">{p?.entidade || ""}</td>
+                      <td className="border px-2 py-1 max-w-[140px] truncate">{p?.descritivo || ""}</td>
+                      <td className="border px-2 py-1 text-right text-red-600 font-medium whitespace-nowrap">{p ? formatCurrency(p.valor) : ""}</td>
+                      <td className="border px-2 py-1 text-center">{p ? statusBadge(p.status) : ""}</td>
+                      <td className="border bg-muted/20 w-[2px]"></td>
+                      <td className="border px-2 py-1 max-w-[120px] truncate">{r?.entidade || ""}</td>
+                      <td className="border px-2 py-1 max-w-[140px] truncate">{r?.descritivo || ""}</td>
+                      <td className="border px-2 py-1 text-right text-green-600 font-medium whitespace-nowrap">{r ? formatCurrency(r.valor) : ""}</td>
+                      <td className="border px-2 py-1 text-center">{r ? statusBadge(r.status) : ""}</td>
+                    </tr>
+                  );
+                }
+                return rows;
+              })}
+            </tbody>
+          </table>
         </div>
       </div>
 
