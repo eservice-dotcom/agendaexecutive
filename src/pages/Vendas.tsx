@@ -249,7 +249,7 @@ const Vendas = () => {
 
   // Edit conta dialog
   const [editDialog, setEditDialog] = useState<{ type: "pagar" | "receber"; item: any } | null>(null);
-  const [editForm, setEditForm] = useState({ descritivo: "", valor: "", data_vencimento: "", data_pagamento: "", centro: "", subgrupo: "", cliente: "", fornecedor: "", placa: "" });
+  const [editForm, setEditForm] = useState({ descritivo: "", valor: "", data: "", data_vencimento: "", data_pagamento: "", centro: "", subgrupo: "", cliente: "", fornecedor: "", placa: "" });
 
   // Baixa parcial dialog
   const [baixaDialog, setBaixaDialog] = useState<{ type: "pagar" | "receber"; item: any } | null>(null);
