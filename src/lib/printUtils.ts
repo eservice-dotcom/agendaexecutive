@@ -355,7 +355,7 @@ export const printCotacao = (cotacao: {
   const rows = cotacao.items.map((item, idx) => `<tr>
     <td class="c">${idx + 1}</td>
     <td>${item.descritivo}</td>
-    ${showTotal ? `<td class="r">${fc(item.valor)}</td>` : ''}
+    <td class="r">${fc(item.valor)}</td>
     <td class="c">${item.hora_extra || "—"}</td>
     <td class="c">${item.km_extra || "—"}</td>
   </tr>`).join("");
@@ -422,7 +422,7 @@ tr:nth-child(even){background:#f8f9fa}
     <thead><tr>
       <th class="c" style="width:40px">Nº</th>
       <th>Descritivo</th>
-      ${showTotal ? '<th class="r" style="width:110px">Valor</th>' : ''}
+      <th class="r" style="width:110px">Valor</th>
       <th class="c" style="width:80px">Hora Extra</th>
       <th class="c" style="width:80px">KM Extra</th>
     </tr></thead>
