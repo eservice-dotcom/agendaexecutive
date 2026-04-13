@@ -66,6 +66,7 @@ const Cotacoes = () => {
   const [observacoes, setObservacoes] = useState("");
   const [status, setStatus] = useState("pendente");
   const [items, setItems] = useState<CotacaoItem[]>([{ descritivo: "", valor: 0, hora_extra: "", km_extra: 0 }]);
+  const [mostrarValorTotal, setMostrarValorTotal] = useState(true);
 
   useEffect(() => {
     if (session?.user?.id) {
@@ -399,7 +400,7 @@ const Cotacoes = () => {
                         </Button>
                         <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => {
                           const logoUrl = new URL(logo, window.location.origin).href;
-                          printCotacao(c, logoUrl);
+                          printCotacao(c, logoUrl, true);
                         }}>
                           <Printer className="h-4 w-4" />
                         </Button>
@@ -474,6 +475,17 @@ const Cotacoes = () => {
             <div className="space-y-1.5 sm:col-span-2">
               <Label>Observações</Label>
               <Textarea value={observacoes} onChange={(e) => setObservacoes(e.target.value)} placeholder="Observações gerais" rows={3} />
+            </div>
+
+            <div className="sm:col-span-2 flex items-center gap-2">
+              <input
+                type="checkbox"
+                id="mostrarValorTotal"
+                checked={mostrarValorTotal}
+                onChange={(e) => setMostrarValorTotal(e.target.checked)}
+                className="h-4 w-4 rounded border-primary text-primary focus:ring-primary"
+              />
+              <Label htmlFor="mostrarValorTotal" className="cursor-pointer text-sm">Exibir valor total na impressão</Label>
             </div>
 
             {/* Itens */}
