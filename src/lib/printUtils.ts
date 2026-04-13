@@ -422,7 +422,7 @@ tr:nth-child(even){background:#f8f9fa}
     <thead><tr>
       <th class="c" style="width:40px">Nº</th>
       <th>Descritivo</th>
-      ${showTotal ? '<th class="r" style="width:110px">Valor</th>' : ''}
+      <th class="r" style="width:110px">Valor</th>
       <th class="c" style="width:80px">Hora Extra</th>
       <th class="c" style="width:80px">KM Extra</th>
     </tr></thead>
