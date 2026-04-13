@@ -348,14 +348,14 @@ export const printCotacao = (cotacao: {
   valor_total: number;
   status: string;
   items: { descritivo: string; valor: number; hora_extra: string; km_extra: number }[];
-}, logoUrl: string) => {
+}, logoUrl: string, showTotal: boolean = true) => {
   const fc = (v: number) => new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(v);
   const fd = (d: string) => { if (!d) return ""; const [y, m, day] = d.split("-"); return `${day}/${m}/${y}`; };
 
   const rows = cotacao.items.map((item, idx) => `<tr>
     <td class="c">${idx + 1}</td>
     <td>${item.descritivo}</td>
-    <td class="r">${fc(item.valor)}</td>
+    ${showTotal ? `<td class="r">${fc(item.valor)}</td>` : ''}
     <td class="c">${item.hora_extra || "—"}</td>
     <td class="c">${item.km_extra || "—"}</td>
   </tr>`).join("");
@@ -422,17 +422,17 @@ tr:nth-child(even){background:#f8f9fa}
     <thead><tr>
       <th class="c" style="width:40px">Nº</th>
       <th>Descritivo</th>
-      <th class="r" style="width:110px">Valor</th>
+      ${showTotal ? '<th class="r" style="width:110px">Valor</th>' : ''}
       <th class="c" style="width:80px">Hora Extra</th>
       <th class="c" style="width:80px">KM Extra</th>
     </tr></thead>
     <tbody>
       ${rows}
-      <tr class="total-row">
+      ${showTotal ? `<tr class="total-row">
         <td colspan="2" class="r">VALOR TOTAL</td>
         <td class="r">${fc(cotacao.valor_total)}</td>
         <td colspan="2"></td>
-      </tr>
+      </tr>` : ''}
     </tbody>
   </table>
 
