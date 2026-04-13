@@ -564,6 +564,14 @@ const Cotacoes = () => {
 
           <DialogFooter className="mt-4">
             <Button variant="outline" onClick={() => setDialogOpen(false)}>Cancelar</Button>
+            {editingCotacao && (
+              <Button variant="outline" onClick={() => {
+                const logoUrl = new URL(logo, window.location.origin).href;
+                printCotacao(editingCotacao, logoUrl, mostrarValorTotal);
+              }} className="gap-2">
+                <Printer className="h-4 w-4" /> Imprimir
+              </Button>
+            )}
             <Button onClick={handleSave} className="gap-2">
               <Save className="h-4 w-4" /> {editingCotacao ? "Salvar Alterações" : "Criar Cotação"}
             </Button>
