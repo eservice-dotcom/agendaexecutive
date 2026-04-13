@@ -355,7 +355,7 @@ export const printCotacao = (cotacao: {
   const rows = cotacao.items.map((item, idx) => `<tr>
     <td class="c">${idx + 1}</td>
     <td>${item.descritivo}</td>
-    ${showTotal ? `<td class="r">${fc(item.valor)}</td>` : ''}
+    <td class="r">${fc(item.valor)}</td>
     <td class="c">${item.hora_extra || "—"}</td>
     <td class="c">${item.km_extra || "—"}</td>
   </tr>`).join("");
