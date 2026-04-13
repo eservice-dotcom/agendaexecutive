@@ -485,7 +485,7 @@ const Cotacoes = () => {
                 onChange={(e) => setMostrarValorTotal(e.target.checked)}
                 className="h-4 w-4 rounded border-primary text-primary focus:ring-primary"
               />
-              <Label htmlFor="mostrarValorTotal" className="cursor-pointer text-sm">Exibir valor total na impressão</Label>
+              <Label htmlFor="mostrarValorTotal" className="cursor-pointer text-sm">Exibir VALOR TOTAL na impressão (valores unitários sempre aparecem)</Label>
             </div>
 
             {/* Itens */}
