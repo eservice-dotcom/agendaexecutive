@@ -438,7 +438,7 @@ tr:nth-child(even){background:#f8f9fa}
 
   ${cotacao.validade_proposta ? `<div class="validity">⏰ <strong>Validade da Proposta:</strong> ${fd(cotacao.validade_proposta)}</div>` : ""}
 
-  ${cotacao.observacoes ? `<div class="obs-section"><div class="obs-title">Observações</div><div>${cotacao.observacoes}</div></div>` : ""}
+  ${cotacao.observacoes ? `<div class="obs-section"><div class="obs-title">Observações</div><div>${cotacao.observacoes.replace(/\n/g, "<br/>")}</div></div>` : ""}
 
   <div class="signature-area">
     <div style="flex:1;text-align:center">

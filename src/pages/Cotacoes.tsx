@@ -449,15 +449,7 @@ const Cotacoes = () => {
 
             <div className="space-y-1.5">
               <Label>Forma de Pagamento</Label>
-              <Select value={formaPagamento || "_empty"} onValueChange={(v) => setFormaPagamento(v === "_empty" ? "" : v)}>
-                <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="_empty">-- Selecione --</SelectItem>
-                  {formasPagamento.filter(Boolean).map((f) => (
-                    <SelectItem key={f} value={f}>{f}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <Input value={formaPagamento} onChange={(e) => setFormaPagamento(e.target.value)} placeholder="Ex: PIX, Boleto, Faturado..." />
             </div>
 
             <div className="space-y-1.5">
