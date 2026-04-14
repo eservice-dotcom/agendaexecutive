@@ -211,7 +211,7 @@ body{font-family:Arial,sans-serif;padding:20px;color:#1a1a1a;font-size:11px}
 .summary-box{background:#f9f9f9;border:1px solid #e0e0e0;border-radius:4px;padding:8px;text-align:center}
 .summary-box .label{font-size:9px;text-transform:uppercase;color:#888;margin-bottom:2px}
 .summary-box .value{font-size:13px;font-weight:bold;color:#1a1a1a}
-.card{border:1px solid #ddd;border-radius:6px;margin-bottom:10px;overflow:hidden;page-break-after:always}
+.card{border:1px solid #ddd;border-radius:6px;margin-bottom:10px;overflow:hidden;page-break-inside:avoid}
 .card-header{background:#2d3748;color:#fff;padding:6px 10px;display:flex;align-items:center;gap:10px;font-size:11px}
 .card-num{background:#b8860b;color:#fff;border-radius:50%;width:22px;height:22px;display:flex;align-items:center;justify-content:center;font-weight:bold;font-size:10px;flex-shrink:0}
 .card-os{font-weight:bold;font-family:monospace;font-size:11px}
@@ -225,7 +225,7 @@ body{font-family:Arial,sans-serif;padding:20px;color:#1a1a1a;font-size:11px}
 .val{font-size:10px;font-weight:500}
 .val.money{font-weight:bold;font-family:monospace}
 .footer{margin-top:16px;padding-top:8px;border-top:2px solid #b8860b;text-align:center;font-size:9px;color:#888}
-@media print{body{padding:10px}@page{size:portrait;margin:10mm}.card{break-after:always}.card:last-child,.card.totals-card{break-after:auto}}
+@media print{body{padding:10px}@page{size:portrait;margin:10mm}.card{break-inside:avoid}.card:last-child,.card.totals-card{break-after:auto}}
 </style></head><body>
 <div class="header">
   <img src="${logoUrl}" alt="Executive Service" />
@@ -309,7 +309,7 @@ body{font-family:Arial,sans-serif;padding:20px;color:#1a1a1a;font-size:11px}
 .summary-box{background:#f9f9f9;border:1px solid #e0e0e0;border-radius:4px;padding:8px;text-align:center}
 .summary-box .label{font-size:9px;text-transform:uppercase;color:#888;margin-bottom:2px}
 .summary-box .value{font-size:13px;font-weight:bold;color:#1a1a1a}
-.card{border:1px solid #ddd;border-radius:6px;margin-bottom:10px;overflow:hidden;page-break-after:always}
+.card{border:1px solid #ddd;border-radius:6px;margin-bottom:10px;overflow:hidden;page-break-inside:avoid}
 .card-header{background:#2d3748;color:#fff;padding:6px 10px;display:flex;align-items:center;gap:10px;font-size:11px}
 .card-num{background:#b8860b;color:#fff;border-radius:50%;width:22px;height:22px;display:flex;align-items:center;justify-content:center;font-weight:bold;font-size:10px;flex-shrink:0}
 .card-os{font-weight:bold;font-family:monospace;font-size:11px}
@@ -323,7 +323,7 @@ body{font-family:Arial,sans-serif;padding:20px;color:#1a1a1a;font-size:11px}
 .val{font-size:10px;font-weight:500}
 .val.money{font-weight:bold;font-family:monospace}
 .footer{margin-top:16px;padding-top:8px;border-top:2px solid #b8860b;text-align:center;font-size:9px;color:#888}
-@media print{body{padding:10px}@page{size:portrait;margin:10mm}.card{break-after:always}.card:last-child,.card.totals-card{break-after:auto}}
+@media print{body{padding:10px}@page{size:portrait;margin:10mm}.card{break-inside:avoid}.card:last-child,.card.totals-card{break-after:auto}}
 </style></head><body>
 ${sections}
 </body></html>`;
