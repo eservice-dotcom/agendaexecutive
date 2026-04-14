@@ -47,6 +47,9 @@ const FechamentosConsulta = () => {
   const [filterCliente, setFilterCliente] = useState("");
   const [filterDataInicio, setFilterDataInicio] = useState("");
   const [filterDataFim, setFilterDataFim] = useState("");
+  const [filterOS, setFilterOS] = useState("");
+  const [filterReceptivo, setFilterReceptivo] = useState("");
+  const [filterStatusFat, setFilterStatusFat] = useState("");
 
   // Edit dialog
   const [editOpen, setEditOpen] = useState(false);
@@ -91,9 +94,29 @@ const FechamentosConsulta = () => {
         const matchCliente = f.cliente.toLowerCase().includes(s);
         if (!matchNum && !matchCliente) return false;
       }
+      const items = Array.isArray(f.items) ? f.items : [];
+      if (filterOS) {
+        const s = filterOS.toLowerCase();
+        const matchOS = items.some((i: any) => String(i.cot || "").toLowerCase().includes(s));
+        if (!matchOS) return false;
+      }
+      if (filterReceptivo) {
+        const s = filterReceptivo.toLowerCase();
+        const matchReceptivo = items.some((i: any) => String(i.receptivo || "").toLowerCase().includes(s));
+        if (!matchReceptivo) return false;
+      }
+      if (filterStatusFat) {
+        if (filterStatusFat === "sem_status") {
+          const allHaveStatus = items.every((i: any) => i.status_faturamento && i.status_faturamento !== "");
+          if (allHaveStatus && items.length > 0) return false;
+        } else {
+          const matchStatus = items.some((i: any) => i.status_faturamento === filterStatusFat);
+          if (!matchStatus) return false;
+        }
+      }
       return true;
     });
-  }, [fechamentos, filterCliente, filterDataInicio, filterDataFim, searchText]);
+  }, [fechamentos, filterCliente, filterDataInicio, filterDataFim, searchText, filterOS, filterReceptivo, filterStatusFat]);
 
   const resolveExtras = (f: Fechamento) => {
     const extras = Array.isArray(f.extras) ? f.extras.filter((e: any) => e && e.descricao) : [];
@@ -290,6 +313,31 @@ const FechamentosConsulta = () => {
           placeholder="Data fim"
           className="h-9"
         />
+      </div>
+      <div className="grid grid-cols-1 sm:grid-cols-4 gap-3">
+        <Input
+          placeholder="Filtrar por O.S."
+          value={filterOS}
+          onChange={(e) => setFilterOS(e.target.value)}
+          className="h-9"
+        />
+        <Input
+          placeholder="Filtrar por Receptivo"
+          value={filterReceptivo}
+          onChange={(e) => setFilterReceptivo(e.target.value)}
+          className="h-9"
+        />
+        <Select value={filterStatusFat} onValueChange={(v) => setFilterStatusFat(v === "all" ? "" : v)}>
+          <SelectTrigger className="h-9">
+            <SelectValue placeholder="Status Faturamento" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">Todos os status</SelectItem>
+            <SelectItem value="sem_status">Sem status</SelectItem>
+            <SelectItem value="enviado">Enviado</SelectItem>
+            <SelectItem value="faturado">Faturado</SelectItem>
+          </SelectContent>
+        </Select>
       </div>
 
       <div className="flex items-center justify-between">
