@@ -314,6 +314,31 @@ const FechamentosConsulta = () => {
           className="h-9"
         />
       </div>
+      <div className="grid grid-cols-1 sm:grid-cols-4 gap-3">
+        <Input
+          placeholder="Filtrar por O.S."
+          value={filterOS}
+          onChange={(e) => setFilterOS(e.target.value)}
+          className="h-9"
+        />
+        <Input
+          placeholder="Filtrar por Receptivo"
+          value={filterReceptivo}
+          onChange={(e) => setFilterReceptivo(e.target.value)}
+          className="h-9"
+        />
+        <Select value={filterStatusFat} onValueChange={(v) => setFilterStatusFat(v === "all" ? "" : v)}>
+          <SelectTrigger className="h-9">
+            <SelectValue placeholder="Status Faturamento" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">Todos os status</SelectItem>
+            <SelectItem value="sem_status">Sem status</SelectItem>
+            <SelectItem value="enviado">Enviado</SelectItem>
+            <SelectItem value="faturado">Faturado</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
 
       <div className="flex items-center justify-between">
         <p className="text-sm text-muted-foreground">
