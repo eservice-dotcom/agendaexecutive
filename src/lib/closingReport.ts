@@ -323,7 +323,7 @@ body{font-family:Arial,sans-serif;padding:20px;color:#1a1a1a;font-size:11px}
 .val{font-size:10px;font-weight:500}
 .val.money{font-weight:bold;font-family:monospace}
 .footer{margin-top:16px;padding-top:8px;border-top:2px solid #b8860b;text-align:center;font-size:9px;color:#888}
-@media print{body{padding:10px}@page{size:portrait;margin:10mm}.card{break-after:always}.card:last-child,.card.totals-card{break-after:auto}}
+@media print{body{padding:10px}@page{size:portrait;margin:10mm}.card{break-inside:avoid}.card:last-child,.card.totals-card{break-after:auto}}
 </style></head><body>
 ${sections}
 </body></html>`;
