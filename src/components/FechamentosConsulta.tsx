@@ -94,9 +94,29 @@ const FechamentosConsulta = () => {
         const matchCliente = f.cliente.toLowerCase().includes(s);
         if (!matchNum && !matchCliente) return false;
       }
+      const items = Array.isArray(f.items) ? f.items : [];
+      if (filterOS) {
+        const s = filterOS.toLowerCase();
+        const matchOS = items.some((i: any) => String(i.cot || "").toLowerCase().includes(s));
+        if (!matchOS) return false;
+      }
+      if (filterReceptivo) {
+        const s = filterReceptivo.toLowerCase();
+        const matchReceptivo = items.some((i: any) => String(i.receptivo || "").toLowerCase().includes(s));
+        if (!matchReceptivo) return false;
+      }
+      if (filterStatusFat) {
+        if (filterStatusFat === "sem_status") {
+          const allHaveStatus = items.every((i: any) => i.status_faturamento && i.status_faturamento !== "");
+          if (allHaveStatus && items.length > 0) return false;
+        } else {
+          const matchStatus = items.some((i: any) => i.status_faturamento === filterStatusFat);
+          if (!matchStatus) return false;
+        }
+      }
       return true;
     });
-  }, [fechamentos, filterCliente, filterDataInicio, filterDataFim, searchText]);
+  }, [fechamentos, filterCliente, filterDataInicio, filterDataFim, searchText, filterOS, filterReceptivo, filterStatusFat]);
 
   const resolveExtras = (f: Fechamento) => {
     const extras = Array.isArray(f.extras) ? f.extras.filter((e: any) => e && e.descricao) : [];
