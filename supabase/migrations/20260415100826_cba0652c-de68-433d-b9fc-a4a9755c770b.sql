@@ -1,0 +1,1 @@
+ALTER TABLE public.contratos ADD COLUMN dados_bancarios text NOT NULL DEFAULT ''::text;

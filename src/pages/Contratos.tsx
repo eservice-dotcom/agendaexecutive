@@ -79,6 +79,7 @@ interface Contrato {
   observacoes: string;
   foro_comarca: string;
   arquivo_assinado_url: string;
+  dados_bancarios: string;
   contrato_items: ContratoItem[];
   contrato_veiculos: ContratoVeiculo[];
 }
@@ -100,7 +101,7 @@ const emptyContrato: Omit<Contrato, "id" | "numero_contrato"> = {
   estacionamento_pedagio: "", alimentacao_motorista: "", outros_extras: "",
   forma_faturamento: "", condicao_pagamento: "", data_vencimento: "", dados_faturamento: "",
   antecedencia_cancelamento: "24", multa_cancelamento: "50",
-  observacoes: "", foro_comarca: "", arquivo_assinado_url: "",
+  observacoes: "", foro_comarca: "", arquivo_assinado_url: "", dados_bancarios: "",
   contrato_items: [{ descritivo: "", valor: 0 }],
   contrato_veiculos: [{ ...emptyVeiculo }],
 };
@@ -794,6 +795,10 @@ const Contratos = () => {
                 <div className="md:col-span-3">
                   <Label>Dados para Faturamento (se diferente)</Label>
                   <Input value={form.dados_faturamento} onChange={e => setField("dados_faturamento", e.target.value)} />
+                </div>
+                <div className="md:col-span-3">
+                  <Label>Dados Bancários</Label>
+                  <Textarea value={form.dados_bancarios} onChange={e => setField("dados_bancarios", e.target.value)} rows={2} placeholder="Banco, Agência, Conta, PIX..." />
                 </div>
               </div>
             </div>

@@ -782,6 +782,7 @@ body{font-family:'Segoe UI',Arial,sans-serif;color:#1a1a1a;font-size:11px;paddin
       </div>
       ${c.outros_extras ? `<div class="field"><div class="label">Outros Extras</div><div class="value">${c.outros_extras}</div></div>` : ""}
       ${c.dados_faturamento ? `<div class="field"><div class="label">Dados para Faturamento</div><div class="value">${c.dados_faturamento}</div></div>` : ""}
+      ${c.dados_bancarios ? `<div class="field"><div class="label">Dados Bancários</div><div class="value">${c.dados_bancarios.replace(/\n/g, "<br/>")}</div></div>` : ""}
     </div>
   </div>
 
