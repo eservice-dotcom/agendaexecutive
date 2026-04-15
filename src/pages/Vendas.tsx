@@ -873,10 +873,12 @@ const Vendas = () => {
         })
         .filter(Boolean);
 
-      const { error } = await supabase.from("contas_pagar").insert(novasContas);
-      if (error) throw error;
+      if (novasContas.length > 0) {
+        const { error } = await supabase.from("contas_pagar").insert(novasContas);
+        if (error) throw error;
+      }
 
-      toast({ title: "Contas a pagar regeradas com sucesso", description: `${novasContas.length} registro(s) criado(s).` });
+      toast({ title: "Contas a pagar regeradas com sucesso", description: `${novasContas.length} novo(s) registro(s) criado(s). ${pagosPorFornecedor.size > 0 ? `${pagosPorFornecedor.size} fornecedor(es) já pago(s) mantido(s).` : ""}` });
       loadContasPagar();
     } catch (err: any) {
       toast({ title: "Erro ao regerar contas a pagar", description: err.message, variant: "destructive" });
