@@ -783,7 +783,7 @@ body{font-family:'Segoe UI',Arial,sans-serif;color:#1a1a1a;font-size:11px;paddin
         if (items.length > 0) {
           return `
             <table style="margin-bottom:8px">
-              <thead><tr><th style="text-align:left">Descritivo</th><th style="text-align:right;width:120px">Valor Unitário</th></tr></thead>
+              <thead><tr><th style="text-align:left">Descritivo</th><th style="text-align:right;width:120px">Valor</th></tr></thead>
               <tbody>
                 ${items.map((i: any) => `<tr><td>${i.descritivo || ""}</td><td style="text-align:right">${fc(i.valor || 0)}</td></tr>`).join("")}
                 <tr style="font-weight:700;border-top:2px solid #1a3a5c"><td>VALOR TOTAL</td><td style="text-align:right">${fc(c.valor_total)}</td></tr>
@@ -792,7 +792,6 @@ body{font-family:'Segoe UI',Arial,sans-serif;color:#1a1a1a;font-size:11px;paddin
         }
         return `<div class="field-grid three">
           <div class="field"><div class="label">Valor Total</div><div class="value">${fc(c.valor_total)}</div></div>
-          <div class="field"><div class="label">Valor Unitário</div><div class="value">${c.valor_unitario || ""}</div></div>
         </div>`;
       })()}
       <div class="field-grid three">
