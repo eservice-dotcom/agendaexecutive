@@ -322,7 +322,7 @@ const NovoServicoDialog = ({ open, onOpenChange, onSaved, initialData }: NovoSer
           </div>
 
           <div className="space-y-1.5">
-            <Label>PAX</Label>
+            <Label>SHT</Label>
             <Input type="number" min={0} value={form.pax} onChange={(e) => update("pax", e.target.value)} placeholder="0" />
           </div>
 
