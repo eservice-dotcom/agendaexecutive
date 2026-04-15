@@ -811,13 +811,9 @@ const Contratos = () => {
             <div>
               <h3 className="text-sm font-semibold text-primary mb-2 border-b pb-1">Cancelamento e Observações</h3>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                <div>
-                  <Label>Antecedência Cancelamento (horas)</Label>
-                  <Input value={form.antecedencia_cancelamento} onChange={e => setField("antecedencia_cancelamento", e.target.value)} />
-                </div>
-                <div>
-                  <Label>Multa Cancelamento (%)</Label>
-                  <Input value={form.multa_cancelamento} onChange={e => setField("multa_cancelamento", e.target.value)} />
+                <div className="md:col-span-3">
+                  <Label>Cancelamento</Label>
+                  <Textarea value={form.antecedencia_cancelamento} onChange={e => setField("antecedencia_cancelamento", e.target.value)} rows={3} placeholder="Ex: Cancelamento com 24h de antecedência, multa de 50%..." />
                 </div>
                 <div>
                   <Label>Foro (Comarca)</Label>
