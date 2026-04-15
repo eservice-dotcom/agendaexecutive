@@ -197,9 +197,10 @@ const Contratos = () => {
       const cot = state.fromCotacao;
       const cliente = clientes.find(c => c.nome === cot.empresa);
       const cotItems: ContratoItem[] = cot.items?.map((i: any) => ({
+        ...emptyItem,
         descritivo: i.descritivo || "",
         valor: i.valor || 0,
-      })) || [{ descritivo: "", valor: 0 }];
+      })) || [{ ...emptyItem }];
 
       setForm({
         ...emptyContrato,
@@ -299,8 +300,8 @@ const Contratos = () => {
     setForm({
       ...rest as any,
       contrato_items: Array.isArray(c.contrato_items) && c.contrato_items.length > 0
-        ? c.contrato_items
-        : [{ descritivo: "", valor: 0 }],
+        ? c.contrato_items.map((i: any) => ({ ...emptyItem, ...i }))
+        : [{ ...emptyItem }],
       contrato_veiculos: Array.isArray(c.contrato_veiculos) && c.contrato_veiculos.length > 0
         ? c.contrato_veiculos
         : [{ ...emptyVeiculo }],
