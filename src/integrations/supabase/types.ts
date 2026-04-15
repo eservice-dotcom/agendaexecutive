@@ -364,6 +364,7 @@ export type Database = {
           contrato_items: Json | null
           contrato_veiculos: Json | null
           created_at: string
+          dados_bancarios: string
           dados_faturamento: string
           data_emissao: string
           data_fim: string | null
@@ -417,6 +418,7 @@ export type Database = {
           contrato_items?: Json | null
           contrato_veiculos?: Json | null
           created_at?: string
+          dados_bancarios?: string
           dados_faturamento?: string
           data_emissao?: string
           data_fim?: string | null
@@ -470,6 +472,7 @@ export type Database = {
           contrato_items?: Json | null
           contrato_veiculos?: Json | null
           created_at?: string
+          dados_bancarios?: string
           dados_faturamento?: string
           data_emissao?: string
           data_fim?: string | null
