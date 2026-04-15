@@ -232,7 +232,7 @@ const Contratos = () => {
 
   const addItem = () => setForm(prev => ({
     ...prev,
-    contrato_items: [...prev.contrato_items, { descritivo: "", valor: 0 }],
+    contrato_items: [...prev.contrato_items, { ...emptyItem }],
   }));
 
   const removeItem = (idx: number) => setForm(prev => ({
