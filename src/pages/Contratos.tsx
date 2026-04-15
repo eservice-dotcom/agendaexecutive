@@ -20,6 +20,16 @@ import { printContrato } from "@/lib/printUtils";
 interface ContratoItem {
   descritivo: string;
   valor: number;
+  tipo_servico: string;
+  forma_contratacao: string;
+  origem: string;
+  destino: string;
+  paradas: string;
+  data_inicio: string;
+  hora_inicio: string;
+  data_fim: string;
+  hora_fim: string;
+  duracao_estimada: string;
 }
 
 interface ContratoVeiculo {
@@ -88,6 +98,12 @@ const emptyVeiculo: ContratoVeiculo = {
   tipo: "", modelo: "", placa: "", ano: "", cor: "", capacidade: "", acessorios: "",
 };
 
+const emptyItem: ContratoItem = {
+  descritivo: "", valor: 0, tipo_servico: "", forma_contratacao: "",
+  origem: "", destino: "", paradas: "", data_inicio: "", hora_inicio: "",
+  data_fim: "", hora_fim: "", duracao_estimada: "",
+};
+
 const emptyContrato: Omit<Contrato, "id" | "numero_contrato"> = {
   data_emissao: new Date().toISOString().split("T")[0],
   contratante_nome: "", contratante_cnpj_cpf: "", contratante_inscricao: "",
@@ -102,7 +118,7 @@ const emptyContrato: Omit<Contrato, "id" | "numero_contrato"> = {
   forma_faturamento: "", condicao_pagamento: "", data_vencimento: "", dados_faturamento: "",
   antecedencia_cancelamento: "24", multa_cancelamento: "50",
   observacoes: "", foro_comarca: "", arquivo_assinado_url: "", dados_bancarios: "",
-  contrato_items: [{ descritivo: "", valor: 0 }],
+  contrato_items: [{ ...emptyItem }],
   contrato_veiculos: [{ ...emptyVeiculo }],
 };
 
