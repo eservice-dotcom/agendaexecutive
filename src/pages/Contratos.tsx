@@ -20,6 +20,16 @@ import { printContrato } from "@/lib/printUtils";
 interface ContratoItem {
   descritivo: string;
   valor: number;
+  tipo_servico: string;
+  forma_contratacao: string;
+  origem: string;
+  destino: string;
+  paradas: string;
+  data_inicio: string;
+  hora_inicio: string;
+  data_fim: string;
+  hora_fim: string;
+  duracao_estimada: string;
 }
 
 interface ContratoVeiculo {
@@ -88,6 +98,12 @@ const emptyVeiculo: ContratoVeiculo = {
   tipo: "", modelo: "", placa: "", ano: "", cor: "", capacidade: "", acessorios: "",
 };
 
+const emptyItem: ContratoItem = {
+  descritivo: "", valor: 0, tipo_servico: "", forma_contratacao: "",
+  origem: "", destino: "", paradas: "", data_inicio: "", hora_inicio: "",
+  data_fim: "", hora_fim: "", duracao_estimada: "",
+};
+
 const emptyContrato: Omit<Contrato, "id" | "numero_contrato"> = {
   data_emissao: new Date().toISOString().split("T")[0],
   contratante_nome: "", contratante_cnpj_cpf: "", contratante_inscricao: "",
@@ -102,7 +118,7 @@ const emptyContrato: Omit<Contrato, "id" | "numero_contrato"> = {
   forma_faturamento: "", condicao_pagamento: "", data_vencimento: "", dados_faturamento: "",
   antecedencia_cancelamento: "24", multa_cancelamento: "50",
   observacoes: "", foro_comarca: "", arquivo_assinado_url: "", dados_bancarios: "",
-  contrato_items: [{ descritivo: "", valor: 0 }],
+  contrato_items: [{ ...emptyItem }],
   contrato_veiculos: [{ ...emptyVeiculo }],
 };
 
@@ -181,9 +197,10 @@ const Contratos = () => {
       const cot = state.fromCotacao;
       const cliente = clientes.find(c => c.nome === cot.empresa);
       const cotItems: ContratoItem[] = cot.items?.map((i: any) => ({
+        ...emptyItem,
         descritivo: i.descritivo || "",
         valor: i.valor || 0,
-      })) || [{ descritivo: "", valor: 0 }];
+      })) || [{ ...emptyItem }];
 
       setForm({
         ...emptyContrato,
@@ -216,7 +233,7 @@ const Contratos = () => {
 
   const addItem = () => setForm(prev => ({
     ...prev,
-    contrato_items: [...prev.contrato_items, { descritivo: "", valor: 0 }],
+    contrato_items: [...prev.contrato_items, { ...emptyItem }],
   }));
 
   const removeItem = (idx: number) => setForm(prev => ({
@@ -283,8 +300,8 @@ const Contratos = () => {
     setForm({
       ...rest as any,
       contrato_items: Array.isArray(c.contrato_items) && c.contrato_items.length > 0
-        ? c.contrato_items
-        : [{ descritivo: "", valor: 0 }],
+        ? c.contrato_items.map((i: any) => ({ ...emptyItem, ...i }))
+        : [{ ...emptyItem }],
       contrato_veiculos: Array.isArray(c.contrato_veiculos) && c.contrato_veiculos.length > 0
         ? c.contrato_veiculos
         : [{ ...emptyVeiculo }],
@@ -651,110 +668,97 @@ const Contratos = () => {
               ))}
             </div>
 
-            {/* Serviço */}
-            <div>
-              <h3 className="text-sm font-semibold text-primary mb-2 border-b pb-1">Dados do Serviço</h3>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                <div>
-                  <Label>Tipo de Serviço</Label>
-                  <Select value={form.tipo_servico} onValueChange={v => setField("tipo_servico", v)}>
-                    <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
-                    <SelectContent>
-                      {tiposServico.map(t => <SelectItem key={t} value={t}>{t}</SelectItem>)}
-                      <SelectItem value="Outro">Outro</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div>
-                  <Label>Forma de Contratação</Label>
-                  <Select value={form.forma_contratacao} onValueChange={v => setField("forma_contratacao", v)}>
-                    <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="Por hora">Por hora</SelectItem>
-                      <SelectItem value="Por km">Por km</SelectItem>
-                      <SelectItem value="Diária">Diária</SelectItem>
-                      <SelectItem value="Pacote">Pacote</SelectItem>
-                      <SelectItem value="Transfer">Transfer</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div>
-                  <Label>Duração Estimada</Label>
-                  <Input value={form.duracao_estimada} onChange={e => setField("duracao_estimada", e.target.value)} placeholder="Ex: 5 dias" />
-                </div>
-                <div>
-                  <Label>Origem</Label>
-                  <Input value={form.origem} onChange={e => setField("origem", e.target.value)} />
-                </div>
-                <div>
-                  <Label>Destino</Label>
-                  <Input value={form.destino} onChange={e => setField("destino", e.target.value)} />
-                </div>
-                <div>
-                  <Label>Paradas Intermediárias</Label>
-                  <Input value={form.paradas} onChange={e => setField("paradas", e.target.value)} />
-                </div>
-                <div>
-                  <Label>Data Início</Label>
-                  <Input type="date" value={form.data_inicio} onChange={e => setField("data_inicio", e.target.value)} />
-                </div>
-                <div>
-                  <Label>Hora Início</Label>
-                  <Input value={form.hora_inicio} onChange={e => setField("hora_inicio", e.target.value)} placeholder="08:00" />
-                </div>
-                <div>
-                  <Label>Data Fim</Label>
-                  <Input type="date" value={form.data_fim} onChange={e => setField("data_fim", e.target.value)} />
-                </div>
-                <div>
-                  <Label>Hora Fim</Label>
-                  <Input value={form.hora_fim} onChange={e => setField("hora_fim", e.target.value)} placeholder="18:00" />
-                </div>
-              </div>
-            </div>
-
-            {/* Itens do Contrato */}
+            {/* Itens do Contrato / Serviços (unificado) */}
             <div>
               <div className="flex items-center justify-between mb-2 border-b pb-1">
-                <h3 className="text-sm font-semibold text-primary">Itens do Contrato</h3>
+                <h3 className="text-sm font-semibold text-primary">Itens do Contrato / Serviços</h3>
                 <Button type="button" variant="outline" size="sm" onClick={addItem}>
                   <Plus className="h-3 w-3 mr-1" /> Adicionar Item
                 </Button>
               </div>
-              <div className="space-y-2">
-                {form.contrato_items.map((item, idx) => (
-                  <div key={idx} className="flex gap-2 items-end">
-                    <div className="flex-1">
-                      {idx === 0 && <Label className="text-xs">Descritivo</Label>}
-                      <Input
-                        value={item.descritivo}
-                        onChange={e => updateItem(idx, "descritivo", e.target.value)}
-                        placeholder="Descrição do item"
-                        className="h-8 text-xs"
-                      />
+              {form.contrato_items.map((item, idx) => (
+                <div key={idx} className="mb-4 p-3 border rounded-md relative">
+                  {form.contrato_items.length > 1 && (
+                    <Button type="button" variant="ghost" size="icon" className="absolute top-1 right-1 h-6 w-6" onClick={() => removeItem(idx)}>
+                      <Trash2 className="h-3 w-3 text-destructive" />
+                    </Button>
+                  )}
+                  {form.contrato_items.length > 1 && (
+                    <span className="text-xs font-semibold text-muted-foreground mb-2 block">Item {idx + 1}</span>
+                  )}
+                  <div className="grid grid-cols-1 md:grid-cols-4 gap-2">
+                    <div className="md:col-span-3">
+                      <Label className="text-xs">Descritivo</Label>
+                      <Input value={item.descritivo} onChange={e => updateItem(idx, "descritivo", e.target.value)} placeholder="Descrição do item/serviço" className="h-8 text-xs" />
                     </div>
-                    <div className="w-32">
-                      {idx === 0 && <Label className="text-xs">Valor (R$)</Label>}
-                      <Input
-                        type="number"
-                        step="0.01"
-                        value={item.valor || ""}
-                        onChange={e => updateItem(idx, "valor", Number(e.target.value))}
-                        className="h-8 text-xs"
-                      />
+                    <div>
+                      <Label className="text-xs">Valor (R$)</Label>
+                      <Input type="number" step="0.01" value={item.valor || ""} onChange={e => updateItem(idx, "valor", Number(e.target.value))} className="h-8 text-xs" />
                     </div>
-                    {form.contrato_items.length > 1 && (
-                      <Button type="button" variant="ghost" size="icon" className="h-8 w-8" onClick={() => removeItem(idx)}>
-                        <Trash2 className="h-3 w-3 text-destructive" />
-                      </Button>
-                    )}
+                    <div>
+                      <Label className="text-xs">Tipo de Serviço</Label>
+                      <Select value={item.tipo_servico} onValueChange={v => updateItem(idx, "tipo_servico", v)}>
+                        <SelectTrigger className="h-8 text-xs"><SelectValue placeholder="Selecione" /></SelectTrigger>
+                        <SelectContent>
+                          {tiposServico.map(t => <SelectItem key={t} value={t}>{t}</SelectItem>)}
+                          <SelectItem value="Outro">Outro</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div>
+                      <Label className="text-xs">Forma de Contratação</Label>
+                      <Select value={item.forma_contratacao} onValueChange={v => updateItem(idx, "forma_contratacao", v)}>
+                        <SelectTrigger className="h-8 text-xs"><SelectValue placeholder="Selecione" /></SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="Por hora">Por hora</SelectItem>
+                          <SelectItem value="Por km">Por km</SelectItem>
+                          <SelectItem value="Diária">Diária</SelectItem>
+                          <SelectItem value="Pacote">Pacote</SelectItem>
+                          <SelectItem value="Transfer">Transfer</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div>
+                      <Label className="text-xs">Duração Estimada</Label>
+                      <Input value={item.duracao_estimada} onChange={e => updateItem(idx, "duracao_estimada", e.target.value)} placeholder="Ex: 5 dias" className="h-8 text-xs" />
+                    </div>
+                    <div>
+                      <Label className="text-xs">Origem</Label>
+                      <Input value={item.origem} onChange={e => updateItem(idx, "origem", e.target.value)} className="h-8 text-xs" />
+                    </div>
+                    <div>
+                      <Label className="text-xs">Destino</Label>
+                      <Input value={item.destino} onChange={e => updateItem(idx, "destino", e.target.value)} className="h-8 text-xs" />
+                    </div>
+                    <div>
+                      <Label className="text-xs">Paradas</Label>
+                      <Input value={item.paradas} onChange={e => updateItem(idx, "paradas", e.target.value)} className="h-8 text-xs" />
+                    </div>
+                    <div>
+                      <Label className="text-xs">Data Início</Label>
+                      <Input type="date" value={item.data_inicio} onChange={e => updateItem(idx, "data_inicio", e.target.value)} className="h-8 text-xs" />
+                    </div>
+                    <div>
+                      <Label className="text-xs">Hora Início</Label>
+                      <Input value={item.hora_inicio} onChange={e => updateItem(idx, "hora_inicio", e.target.value)} placeholder="08:00" className="h-8 text-xs" />
+                    </div>
+                    <div>
+                      <Label className="text-xs">Data Fim</Label>
+                      <Input type="date" value={item.data_fim} onChange={e => updateItem(idx, "data_fim", e.target.value)} className="h-8 text-xs" />
+                    </div>
+                    <div>
+                      <Label className="text-xs">Hora Fim</Label>
+                      <Input value={item.hora_fim} onChange={e => updateItem(idx, "hora_fim", e.target.value)} placeholder="18:00" className="h-8 text-xs" />
+                    </div>
                   </div>
-                ))}
-              </div>
+                </div>
+              ))}
               <div className="mt-2 text-right text-sm font-semibold">
                 Valor Total: {formatCurrency(itemsTotal)}
               </div>
             </div>
+
+
 
             {/* Valores e Faturamento */}
             <div>

@@ -734,18 +734,42 @@ body{font-family:'Segoe UI',Arial,sans-serif;color:#1a1a1a;font-size:11px;paddin
   <div class="clause">
     <div class="clause-title">CLÁUSULA 3 — DO SERVIÇO</div>
     <div class="clause-body">
-      <div class="field-grid three">
-        <div class="field"><div class="label">Tipo de Serviço</div><div class="value">${c.tipo_servico || ""}</div></div>
-        <div class="field"><div class="label">Forma de Contratação</div><div class="value">${c.forma_contratacao || ""}</div></div>
-        <div class="field"><div class="label">Duração Estimada</div><div class="value">${c.duracao_estimada || ""}</div></div>
-        <div class="field"><div class="label">Origem</div><div class="value">${c.origem || ""}</div></div>
-        <div class="field"><div class="label">Destino</div><div class="value">${c.destino || ""}</div></div>
-        <div class="field"><div class="label">Paradas</div><div class="value">${c.paradas || ""}</div></div>
-        <div class="field"><div class="label">Data Início</div><div class="value">${fd(c.data_inicio)}</div></div>
-        <div class="field"><div class="label">Hora Início</div><div class="value">${c.hora_inicio || ""}</div></div>
-        <div class="field"><div class="label">Data Fim</div><div class="value">${fd(c.data_fim)}</div></div>
-        <div class="field"><div class="label">Hora Fim</div><div class="value">${c.hora_fim || ""}</div></div>
-      </div>
+      ${(() => {
+        const items = Array.isArray(c.contrato_items) && c.contrato_items.length > 0
+          ? c.contrato_items.filter((i: any) => i.descritivo || i.valor || i.tipo_servico || i.origem)
+          : [];
+        if (items.length > 0) {
+          return items.map((item: any, idx: number) => `
+            ${items.length > 1 ? `<p style="margin-top:8px;font-weight:700;font-size:10px">Item ${idx + 1}${item.descritivo ? ' — ' + item.descritivo : ''}</p>` : (item.descritivo ? `<p style="margin-bottom:4px"><b>${item.descritivo}</b></p>` : '')}
+            <div class="field-grid three">
+              <div class="field"><div class="label">Tipo de Serviço</div><div class="value">${item.tipo_servico || c.tipo_servico || ""}</div></div>
+              <div class="field"><div class="label">Forma de Contratação</div><div class="value">${item.forma_contratacao || c.forma_contratacao || ""}</div></div>
+              <div class="field"><div class="label">Duração Estimada</div><div class="value">${item.duracao_estimada || c.duracao_estimada || ""}</div></div>
+              <div class="field"><div class="label">Origem</div><div class="value">${item.origem || c.origem || ""}</div></div>
+              <div class="field"><div class="label">Destino</div><div class="value">${item.destino || c.destino || ""}</div></div>
+              <div class="field"><div class="label">Paradas</div><div class="value">${item.paradas || c.paradas || ""}</div></div>
+              <div class="field"><div class="label">Data Início</div><div class="value">${fd(item.data_inicio || c.data_inicio)}</div></div>
+              <div class="field"><div class="label">Hora Início</div><div class="value">${item.hora_inicio || c.hora_inicio || ""}</div></div>
+              <div class="field"><div class="label">Data Fim</div><div class="value">${fd(item.data_fim || c.data_fim)}</div></div>
+              <div class="field"><div class="label">Hora Fim</div><div class="value">${item.hora_fim || c.hora_fim || ""}</div></div>
+              <div class="field"><div class="label">Valor</div><div class="value">${fc(item.valor || 0)}</div></div>
+            </div>
+          `).join('');
+        }
+        // Fallback for old contracts without items
+        return `<div class="field-grid three">
+          <div class="field"><div class="label">Tipo de Serviço</div><div class="value">${c.tipo_servico || ""}</div></div>
+          <div class="field"><div class="label">Forma de Contratação</div><div class="value">${c.forma_contratacao || ""}</div></div>
+          <div class="field"><div class="label">Duração Estimada</div><div class="value">${c.duracao_estimada || ""}</div></div>
+          <div class="field"><div class="label">Origem</div><div class="value">${c.origem || ""}</div></div>
+          <div class="field"><div class="label">Destino</div><div class="value">${c.destino || ""}</div></div>
+          <div class="field"><div class="label">Paradas</div><div class="value">${c.paradas || ""}</div></div>
+          <div class="field"><div class="label">Data Início</div><div class="value">${fd(c.data_inicio)}</div></div>
+          <div class="field"><div class="label">Hora Início</div><div class="value">${c.hora_inicio || ""}</div></div>
+          <div class="field"><div class="label">Data Fim</div><div class="value">${fd(c.data_fim)}</div></div>
+          <div class="field"><div class="label">Hora Fim</div><div class="value">${c.hora_fim || ""}</div></div>
+        </div>`;
+      })()}
     </div>
   </div>
 
@@ -759,7 +783,7 @@ body{font-family:'Segoe UI',Arial,sans-serif;color:#1a1a1a;font-size:11px;paddin
         if (items.length > 0) {
           return `
             <table style="margin-bottom:8px">
-              <thead><tr><th style="text-align:left">Descritivo</th><th style="text-align:right;width:120px">Valor Unitário</th></tr></thead>
+              <thead><tr><th style="text-align:left">Descritivo</th><th style="text-align:right;width:120px">Valor</th></tr></thead>
               <tbody>
                 ${items.map((i: any) => `<tr><td>${i.descritivo || ""}</td><td style="text-align:right">${fc(i.valor || 0)}</td></tr>`).join("")}
                 <tr style="font-weight:700;border-top:2px solid #1a3a5c"><td>VALOR TOTAL</td><td style="text-align:right">${fc(c.valor_total)}</td></tr>
@@ -768,7 +792,6 @@ body{font-family:'Segoe UI',Arial,sans-serif;color:#1a1a1a;font-size:11px;paddin
         }
         return `<div class="field-grid three">
           <div class="field"><div class="label">Valor Total</div><div class="value">${fc(c.valor_total)}</div></div>
-          <div class="field"><div class="label">Valor Unitário</div><div class="value">${c.valor_unitario || ""}</div></div>
         </div>`;
       })()}
       <div class="field-grid three">
