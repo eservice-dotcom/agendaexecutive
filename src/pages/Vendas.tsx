@@ -821,6 +821,20 @@ const Vendas = () => {
         .eq("venda_id", venda.id)
         .in("status", ["pendente", "cancelado"]);
 
+      // Fetch already paid/partial contas to avoid duplicates
+      const { data: existingPagas } = await supabase
+        .from("contas_pagar")
+        .select("fornecedor, valor, valor_pago, status")
+        .eq("venda_id", venda.id)
+        .in("status", ["pago", "parcial"]);
+
+      // Sum already paid amounts per fornecedor
+      const pagosPorFornecedor = new Map<string, number>();
+      (existingPagas || []).forEach((c: any) => {
+        const prev = pagosPorFornecedor.get(c.fornecedor) || 0;
+        pagosPorFornecedor.set(c.fornecedor, prev + Number(c.valor));
+      });
+
       // Group by fornecedor (same logic as original creation)
       const fornecedorMap = new Map<string, { total: number; items: any[] }>();
       agendaItems.forEach((item) => {
@@ -840,19 +854,24 @@ const Vendas = () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error("Usuário não autenticado");
 
-      const novasContas = Array.from(fornecedorMap.entries()).map(([fornecedor, info]) => {
-        const descLines = info.items.map((item: any) => formatOsDescricao(item));
-        return {
-          venda_id: venda.id,
-          user_id: user.id,
-          fornecedor,
-          descritivo: descLines.join("\n"),
-          valor: info.total,
-          data: venda.data_venda,
-          data_vencimento: venda.data_vencimento || null,
-          status: "pendente",
-        };
-      });
+      const novasContas = Array.from(fornecedorMap.entries())
+        .map(([fornecedor, info]) => {
+          const jaPago = pagosPorFornecedor.get(fornecedor) || 0;
+          const valorRestante = Math.round((info.total - jaPago) * 100) / 100;
+          if (valorRestante <= 0) return null; // já totalmente pago
+          const descLines = info.items.map((item: any) => formatOsDescricao(item));
+          return {
+            venda_id: venda.id,
+            user_id: user.id,
+            fornecedor,
+            descritivo: descLines.join("\n"),
+            valor: valorRestante,
+            data: venda.data_venda,
+            data_vencimento: venda.data_vencimento || null,
+            status: "pendente",
+          };
+        })
+        .filter(Boolean);
 
       const { error } = await supabase.from("contas_pagar").insert(novasContas);
       if (error) throw error;
