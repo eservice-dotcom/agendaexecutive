@@ -361,6 +361,8 @@ export type Database = {
           contratante_nome: string
           contratante_telefone: string
           contratante_uf: string
+          contrato_items: Json | null
+          contrato_veiculos: Json | null
           created_at: string
           dados_faturamento: string
           data_emissao: string
@@ -412,6 +414,8 @@ export type Database = {
           contratante_nome?: string
           contratante_telefone?: string
           contratante_uf?: string
+          contrato_items?: Json | null
+          contrato_veiculos?: Json | null
           created_at?: string
           dados_faturamento?: string
           data_emissao?: string
@@ -463,6 +467,8 @@ export type Database = {
           contratante_nome?: string
           contratante_telefone?: string
           contratante_uf?: string
+          contrato_items?: Json | null
+          contrato_veiculos?: Json | null
           created_at?: string
           dados_faturamento?: string
           data_emissao?: string

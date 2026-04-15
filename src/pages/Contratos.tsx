@@ -17,6 +17,21 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { getClientes, getVeiculos, getTiposServico } from "@/data/cadastroStorage";
 import { printContrato } from "@/lib/printUtils";
 
+interface ContratoItem {
+  descritivo: string;
+  valor: number;
+}
+
+interface ContratoVeiculo {
+  tipo: string;
+  modelo: string;
+  placa: string;
+  ano: string;
+  cor: string;
+  capacidade: string;
+  acessorios: string;
+}
+
 interface Contrato {
   id: string;
   numero_contrato: number;
@@ -64,7 +79,13 @@ interface Contrato {
   observacoes: string;
   foro_comarca: string;
   arquivo_assinado_url: string;
+  contrato_items: ContratoItem[];
+  contrato_veiculos: ContratoVeiculo[];
 }
+
+const emptyVeiculo: ContratoVeiculo = {
+  tipo: "", modelo: "", placa: "", ano: "", cor: "", capacidade: "", acessorios: "",
+};
 
 const emptyContrato: Omit<Contrato, "id" | "numero_contrato"> = {
   data_emissao: new Date().toISOString().split("T")[0],
@@ -80,6 +101,8 @@ const emptyContrato: Omit<Contrato, "id" | "numero_contrato"> = {
   forma_faturamento: "", condicao_pagamento: "", data_vencimento: "", dados_faturamento: "",
   antecedencia_cancelamento: "24", multa_cancelamento: "50",
   observacoes: "", foro_comarca: "", arquivo_assinado_url: "",
+  contrato_items: [{ descritivo: "", valor: 0 }],
+  contrato_veiculos: [{ ...emptyVeiculo }],
 };
 
 const formatDate = (d: string) => {
@@ -123,6 +146,12 @@ const Contratos = () => {
         data_inicio: c.data_inicio || "",
         data_fim: c.data_fim || "",
         data_vencimento: c.data_vencimento || "",
+        contrato_items: Array.isArray(c.contrato_items) && c.contrato_items.length > 0
+          ? c.contrato_items
+          : [],
+        contrato_veiculos: Array.isArray(c.contrato_veiculos) && c.contrato_veiculos.length > 0
+          ? c.contrato_veiculos
+          : [],
       })));
     }
     setLoading(false);
@@ -149,10 +178,12 @@ const Contratos = () => {
     const state = location.state as any;
     if (state?.fromCotacao) {
       const cot = state.fromCotacao;
-      // Find client data if exists
       const cliente = clientes.find(c => c.nome === cot.empresa);
-      const descritivo = cot.items?.map((i: any) => i.descritivo).filter(Boolean).join("; ") || "";
-      
+      const cotItems: ContratoItem[] = cot.items?.map((i: any) => ({
+        descritivo: i.descritivo || "",
+        valor: i.valor || 0,
+      })) || [{ descritivo: "", valor: 0 }];
+
       setForm({
         ...emptyContrato,
         contratante_nome: cot.empresa || "",
@@ -167,16 +198,77 @@ const Contratos = () => {
         condicao_pagamento: cot.forma_pagamento || "",
         observacoes: `Ref. Cotação nº ${cot.numero_cotacao}${cot.observacoes ? ". " + cot.observacoes : ""}`,
         valor_total: cot.valor_total || 0,
-        tipo_servico: descritivo,
+        tipo_servico: "",
+        contrato_items: cotItems,
+        contrato_veiculos: [{ ...emptyVeiculo }],
       });
       setEditingContrato(null);
       setDialogOpen(true);
-      // Clear state to avoid re-opening on re-render
       window.history.replaceState({}, document.title);
     }
   }, [location.state, clientes]);
 
   const setField = (field: string, value: any) => setForm(prev => ({ ...prev, [field]: value }));
+
+  // Items helpers
+  const itemsTotal = form.contrato_items.reduce((sum, i) => sum + (Number(i.valor) || 0), 0);
+
+  const addItem = () => setForm(prev => ({
+    ...prev,
+    contrato_items: [...prev.contrato_items, { descritivo: "", valor: 0 }],
+  }));
+
+  const removeItem = (idx: number) => setForm(prev => ({
+    ...prev,
+    contrato_items: prev.contrato_items.filter((_, i) => i !== idx),
+  }));
+
+  const updateItem = (idx: number, field: keyof ContratoItem, value: any) => {
+    setForm(prev => {
+      const items = [...prev.contrato_items];
+      items[idx] = { ...items[idx], [field]: value };
+      const total = items.reduce((sum, i) => sum + (Number(i.valor) || 0), 0);
+      return { ...prev, contrato_items: items, valor_total: total };
+    });
+  };
+
+  // Veículos helpers
+  const addVeiculo = () => setForm(prev => ({
+    ...prev,
+    contrato_veiculos: [...prev.contrato_veiculos, { ...emptyVeiculo }],
+  }));
+
+  const removeVeiculo = (idx: number) => setForm(prev => ({
+    ...prev,
+    contrato_veiculos: prev.contrato_veiculos.filter((_, i) => i !== idx),
+  }));
+
+  const updateVeiculo = (idx: number, field: keyof ContratoVeiculo, value: string) => {
+    setForm(prev => {
+      const veics = [...prev.contrato_veiculos];
+      veics[idx] = { ...veics[idx], [field]: value };
+      return { ...prev, contrato_veiculos: veics };
+    });
+  };
+
+  const handleVeiculoSelectForIndex = (placa: string, idx: number) => {
+    const v = veiculos.find(ve => ve.placa === placa);
+    if (v) {
+      setForm(prev => {
+        const veics = [...prev.contrato_veiculos];
+        veics[idx] = {
+          placa: v.placa,
+          modelo: v.modelo || "",
+          tipo: v.tipo || "",
+          ano: String(v.ano || ""),
+          capacidade: String(v.capacidade || ""),
+          cor: "",
+          acessorios: "",
+        };
+        return { ...prev, contrato_veiculos: veics };
+      });
+    }
+  };
 
   const openNew = () => {
     setEditingContrato(null);
@@ -187,7 +279,15 @@ const Contratos = () => {
   const openEdit = (c: Contrato) => {
     setEditingContrato(c);
     const { id, numero_contrato, ...rest } = c;
-    setForm(rest as any);
+    setForm({
+      ...rest as any,
+      contrato_items: Array.isArray(c.contrato_items) && c.contrato_items.length > 0
+        ? c.contrato_items
+        : [{ descritivo: "", valor: 0 }],
+      contrato_veiculos: Array.isArray(c.contrato_veiculos) && c.contrato_veiculos.length > 0
+        ? c.contrato_veiculos
+        : [{ ...emptyVeiculo }],
+    });
     setDialogOpen(true);
   };
 
@@ -208,35 +308,33 @@ const Contratos = () => {
     }
   };
 
-  const handleVeiculoSelect = (placa: string) => {
-    const v = veiculos.find(ve => ve.placa === placa);
-    if (v) {
-      setForm(prev => ({
-        ...prev,
-        veiculo_placa: v.placa,
-        veiculo_modelo: v.modelo || "",
-        veiculo_tipo: v.tipo || "",
-        veiculo_ano: String(v.ano || ""),
-        veiculo_capacidade: String(v.capacidade || ""),
-      }));
-    }
-  };
-
   const handleSave = async () => {
     if (!form.contratante_nome.trim()) {
       toast.error("Informe o nome do contratante");
       return;
     }
     try {
+      const payload = {
+        ...form,
+        data_inicio: form.data_inicio || null,
+        data_fim: form.data_fim || null,
+        data_vencimento: form.data_vencimento || null,
+        contrato_items: form.contrato_items,
+        contrato_veiculos: form.contrato_veiculos,
+        // Sync legacy single vehicle fields from first vehicle for backwards compat
+        veiculo_tipo: form.contrato_veiculos[0]?.tipo || form.veiculo_tipo,
+        veiculo_modelo: form.contrato_veiculos[0]?.modelo || form.veiculo_modelo,
+        veiculo_placa: form.contrato_veiculos[0]?.placa || form.veiculo_placa,
+        veiculo_ano: form.contrato_veiculos[0]?.ano || form.veiculo_ano,
+        veiculo_cor: form.contrato_veiculos[0]?.cor || form.veiculo_cor,
+        veiculo_capacidade: form.contrato_veiculos[0]?.capacidade || form.veiculo_capacidade,
+        veiculo_acessorios: form.contrato_veiculos[0]?.acessorios || form.veiculo_acessorios,
+      };
+
       if (editingContrato) {
         const { error } = await supabase
           .from("contratos")
-          .update({
-            ...form,
-            data_inicio: form.data_inicio || null,
-            data_fim: form.data_fim || null,
-            data_vencimento: form.data_vencimento || null,
-          } as any)
+          .update(payload as any)
           .eq("id", editingContrato.id);
         if (error) throw error;
         toast.success("Contrato atualizado!");
@@ -245,10 +343,7 @@ const Contratos = () => {
           .from("contratos")
           .insert({
             user_id: session!.user.id,
-            ...form,
-            data_inicio: form.data_inicio || null,
-            data_fim: form.data_fim || null,
-            data_vencimento: form.data_vencimento || null,
+            ...payload,
           } as any);
         if (error) throw error;
         toast.success("Contrato criado!");
@@ -490,39 +585,69 @@ const Contratos = () => {
               </div>
             </div>
 
-            {/* Veículo */}
+            {/* Veículos (múltiplos) */}
             <div>
-              <h3 className="text-sm font-semibold text-primary mb-2 border-b pb-1">Dados do Veículo</h3>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                <div>
-                  <Label>Placa</Label>
-                  <Input value={form.veiculo_placa} onChange={e => setField("veiculo_placa", e.target.value)} />
-                </div>
-                <div>
-                  <Label>Tipo</Label>
-                  <Input value={form.veiculo_tipo} onChange={e => setField("veiculo_tipo", e.target.value)} />
-                </div>
-                <div>
-                  <Label>Modelo</Label>
-                  <Input value={form.veiculo_modelo} onChange={e => setField("veiculo_modelo", e.target.value)} />
-                </div>
-                <div>
-                  <Label>Ano</Label>
-                  <Input value={form.veiculo_ano} onChange={e => setField("veiculo_ano", e.target.value)} />
-                </div>
-                <div>
-                  <Label>Cor</Label>
-                  <Input value={form.veiculo_cor} onChange={e => setField("veiculo_cor", e.target.value)} />
-                </div>
-                <div>
-                  <Label>Capacidade</Label>
-                  <Input value={form.veiculo_capacidade} onChange={e => setField("veiculo_capacidade", e.target.value)} />
-                </div>
-                <div className="md:col-span-3">
-                  <Label>Acessórios / Itens inclusos</Label>
-                  <Input value={form.veiculo_acessorios} onChange={e => setField("veiculo_acessorios", e.target.value)} />
-                </div>
+              <div className="flex items-center justify-between mb-2 border-b pb-1">
+                <h3 className="text-sm font-semibold text-primary">Veículos</h3>
+                <Button type="button" variant="outline" size="sm" onClick={addVeiculo}>
+                  <Plus className="h-3 w-3 mr-1" /> Adicionar Veículo
+                </Button>
               </div>
+              {form.contrato_veiculos.map((v, idx) => (
+                <div key={idx} className="mb-3 p-3 border rounded-md relative">
+                  {form.contrato_veiculos.length > 1 && (
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      className="absolute top-1 right-1 h-6 w-6"
+                      onClick={() => removeVeiculo(idx)}
+                    >
+                      <Trash2 className="h-3 w-3 text-destructive" />
+                    </Button>
+                  )}
+                  <div className="grid grid-cols-1 md:grid-cols-4 gap-2">
+                    <div>
+                      <Label className="text-xs">Placa</Label>
+                      <div className="flex gap-1">
+                        <Input value={v.placa} onChange={e => updateVeiculo(idx, "placa", e.target.value)} className="h-8 text-xs" />
+                        {veiculos.length > 0 && (
+                          <Select onValueChange={(val) => handleVeiculoSelectForIndex(val, idx)}>
+                            <SelectTrigger className="w-[100px] h-8 text-xs"><SelectValue placeholder="Buscar" /></SelectTrigger>
+                            <SelectContent>
+                              {veiculos.map(ve => <SelectItem key={ve.id} value={ve.placa}>{ve.placa} - {ve.modelo}</SelectItem>)}
+                            </SelectContent>
+                          </Select>
+                        )}
+                      </div>
+                    </div>
+                    <div>
+                      <Label className="text-xs">Tipo</Label>
+                      <Input value={v.tipo} onChange={e => updateVeiculo(idx, "tipo", e.target.value)} className="h-8 text-xs" />
+                    </div>
+                    <div>
+                      <Label className="text-xs">Modelo</Label>
+                      <Input value={v.modelo} onChange={e => updateVeiculo(idx, "modelo", e.target.value)} className="h-8 text-xs" />
+                    </div>
+                    <div>
+                      <Label className="text-xs">Ano</Label>
+                      <Input value={v.ano} onChange={e => updateVeiculo(idx, "ano", e.target.value)} className="h-8 text-xs" />
+                    </div>
+                    <div>
+                      <Label className="text-xs">Cor</Label>
+                      <Input value={v.cor} onChange={e => updateVeiculo(idx, "cor", e.target.value)} className="h-8 text-xs" />
+                    </div>
+                    <div>
+                      <Label className="text-xs">Capacidade</Label>
+                      <Input value={v.capacidade} onChange={e => updateVeiculo(idx, "capacidade", e.target.value)} className="h-8 text-xs" />
+                    </div>
+                    <div className="md:col-span-2">
+                      <Label className="text-xs">Acessórios</Label>
+                      <Input value={v.acessorios} onChange={e => updateVeiculo(idx, "acessorios", e.target.value)} className="h-8 text-xs" />
+                    </div>
+                  </div>
+                </div>
+              ))}
             </div>
 
             {/* Serviço */}
@@ -587,18 +712,53 @@ const Contratos = () => {
               </div>
             </div>
 
-            {/* Valores */}
+            {/* Itens do Contrato */}
             <div>
-              <h3 className="text-sm font-semibold text-primary mb-2 border-b pb-1">Valores e Faturamento</h3>
+              <div className="flex items-center justify-between mb-2 border-b pb-1">
+                <h3 className="text-sm font-semibold text-primary">Itens do Contrato</h3>
+                <Button type="button" variant="outline" size="sm" onClick={addItem}>
+                  <Plus className="h-3 w-3 mr-1" /> Adicionar Item
+                </Button>
+              </div>
+              <div className="space-y-2">
+                {form.contrato_items.map((item, idx) => (
+                  <div key={idx} className="flex gap-2 items-end">
+                    <div className="flex-1">
+                      {idx === 0 && <Label className="text-xs">Descritivo</Label>}
+                      <Input
+                        value={item.descritivo}
+                        onChange={e => updateItem(idx, "descritivo", e.target.value)}
+                        placeholder="Descrição do item"
+                        className="h-8 text-xs"
+                      />
+                    </div>
+                    <div className="w-32">
+                      {idx === 0 && <Label className="text-xs">Valor (R$)</Label>}
+                      <Input
+                        type="number"
+                        step="0.01"
+                        value={item.valor || ""}
+                        onChange={e => updateItem(idx, "valor", Number(e.target.value))}
+                        className="h-8 text-xs"
+                      />
+                    </div>
+                    {form.contrato_items.length > 1 && (
+                      <Button type="button" variant="ghost" size="icon" className="h-8 w-8" onClick={() => removeItem(idx)}>
+                        <Trash2 className="h-3 w-3 text-destructive" />
+                      </Button>
+                    )}
+                  </div>
+                ))}
+              </div>
+              <div className="mt-2 text-right text-sm font-semibold">
+                Valor Total: {formatCurrency(itemsTotal)}
+              </div>
+            </div>
+
+            {/* Valores e Faturamento */}
+            <div>
+              <h3 className="text-sm font-semibold text-primary mb-2 border-b pb-1">Extras e Faturamento</h3>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                <div>
-                  <Label>Valor Total (R$)</Label>
-                  <Input type="number" step="0.01" value={form.valor_total || ""} onChange={e => setField("valor_total", Number(e.target.value))} />
-                </div>
-                <div>
-                  <Label>Valor Unitário (Diária/Hora/KM)</Label>
-                  <Input value={form.valor_unitario} onChange={e => setField("valor_unitario", e.target.value)} placeholder="R$ ___" />
-                </div>
                 <div>
                   <Label>KM Excedente</Label>
                   <Input value={form.km_excedente} onChange={e => setField("km_excedente", e.target.value)} placeholder="R$ ___/km" />
@@ -621,17 +781,7 @@ const Contratos = () => {
                 </div>
                 <div>
                   <Label>Forma de Faturamento</Label>
-                  <Select value={form.forma_faturamento} onValueChange={v => setField("forma_faturamento", v)}>
-                    <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="Boleto">Boleto</SelectItem>
-                      <SelectItem value="Transferência">Transferência</SelectItem>
-                      <SelectItem value="PIX">PIX</SelectItem>
-                      <SelectItem value="Cartão">Cartão</SelectItem>
-                      <SelectItem value="Faturado">Faturado</SelectItem>
-                      <SelectItem value="Outro">Outro</SelectItem>
-                    </SelectContent>
-                  </Select>
+                  <Input value={form.forma_faturamento} onChange={e => setField("forma_faturamento", e.target.value)} placeholder="Ex: PIX, Boleto..." />
                 </div>
                 <div>
                   <Label>Condição de Pagamento</Label>
