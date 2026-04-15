@@ -835,10 +835,11 @@ body{font-family:'Segoe UI',Arial,sans-serif;color:#1a1a1a;font-size:11px;paddin
   <div class="clause">
     <div class="clause-title">CLÁUSULA 7 — DO CANCELAMENTO E MULTAS</div>
     <div class="clause-body">
-      <p>a) O cancelamento deverá ser comunicado com antecedência mínima de ${c.antecedencia_cancelamento || "24"} horas;</p>
-      <p>b) Cancelamento sem antecedência mínima: multa de ${c.multa_cancelamento || "50"}% sobre o valor total;</p>
+      ${c.antecedencia_cancelamento ? `<p>${c.antecedencia_cancelamento.replace(/\n/g, "<br/>")}</p>` : `
+      <p>a) O cancelamento deverá ser comunicado com antecedência mínima de 24 horas;</p>
+      <p>b) Cancelamento sem antecedência mínima: multa de 50% sobre o valor total;</p>
       <p>c) No-show (não comparecimento): cobrança integral do serviço;</p>
-      <p>d) Atraso superior a 30 minutos do contratante: cobrança de hora extra.</p>
+      <p>d) Atraso superior a 30 minutos do contratante: cobrança de hora extra.</p>`}
     </div>
   </div>
 
