@@ -711,15 +711,23 @@ body{font-family:'Segoe UI',Arial,sans-serif;color:#1a1a1a;font-size:11px;paddin
     <div class="clause-title">CLÁUSULA 2 — DO OBJETO</div>
     <div class="clause-body">
       <p>O presente contrato tem por objeto a locação de veículo com motorista para prestação de serviço de transporte, conforme especificações abaixo:</p>
-      <div class="field-grid three">
-        <div class="field"><div class="label">Tipo de Veículo</div><div class="value">${c.veiculo_tipo || ""}</div></div>
-        <div class="field"><div class="label">Modelo</div><div class="value">${c.veiculo_modelo || ""}</div></div>
-        <div class="field"><div class="label">Placa</div><div class="value">${c.veiculo_placa || ""}</div></div>
-        <div class="field"><div class="label">Ano</div><div class="value">${c.veiculo_ano || ""}</div></div>
-        <div class="field"><div class="label">Cor</div><div class="value">${c.veiculo_cor || ""}</div></div>
-        <div class="field"><div class="label">Capacidade</div><div class="value">${c.veiculo_capacidade || ""}</div></div>
-      </div>
-      ${c.veiculo_acessorios ? `<div class="field"><div class="label">Acessórios / Itens Inclusos</div><div class="value">${c.veiculo_acessorios}</div></div>` : ""}
+      ${(() => {
+        const veics = Array.isArray(c.contrato_veiculos) && c.contrato_veiculos.length > 0
+          ? c.contrato_veiculos
+          : [{ tipo: c.veiculo_tipo, modelo: c.veiculo_modelo, placa: c.veiculo_placa, ano: c.veiculo_ano, cor: c.veiculo_cor, capacidade: c.veiculo_capacidade, acessorios: c.veiculo_acessorios }];
+        return veics.map((v: any, i: number) => `
+          ${veics.length > 1 ? `<p style="margin-top:8px;font-weight:600;font-size:10px">Veículo ${i + 1}</p>` : ""}
+          <div class="field-grid three">
+            <div class="field"><div class="label">Tipo de Veículo</div><div class="value">${v.tipo || ""}</div></div>
+            <div class="field"><div class="label">Modelo</div><div class="value">${v.modelo || ""}</div></div>
+            <div class="field"><div class="label">Placa</div><div class="value">${v.placa || ""}</div></div>
+            <div class="field"><div class="label">Ano</div><div class="value">${v.ano || ""}</div></div>
+            <div class="field"><div class="label">Cor</div><div class="value">${v.cor || ""}</div></div>
+            <div class="field"><div class="label">Capacidade</div><div class="value">${v.capacidade || ""}</div></div>
+          </div>
+          ${v.acessorios ? `<div class="field"><div class="label">Acessórios / Itens Inclusos</div><div class="value">${v.acessorios}</div></div>` : ""}
+        `).join("");
+      })()}
     </div>
   </div>
 
@@ -744,9 +752,26 @@ body{font-family:'Segoe UI',Arial,sans-serif;color:#1a1a1a;font-size:11px;paddin
   <div class="clause">
     <div class="clause-title">CLÁUSULA 4 — DO VALOR E FORMA DE PAGAMENTO</div>
     <div class="clause-body">
+      ${(() => {
+        const items = Array.isArray(c.contrato_items) && c.contrato_items.length > 0
+          ? c.contrato_items.filter((i: any) => i.descritivo || i.valor)
+          : [];
+        if (items.length > 0) {
+          return `
+            <table style="margin-bottom:8px">
+              <thead><tr><th style="text-align:left">Descritivo</th><th style="text-align:right;width:120px">Valor Unitário</th></tr></thead>
+              <tbody>
+                ${items.map((i: any) => `<tr><td>${i.descritivo || ""}</td><td style="text-align:right">${fc(i.valor || 0)}</td></tr>`).join("")}
+                <tr style="font-weight:700;border-top:2px solid #1a3a5c"><td>VALOR TOTAL</td><td style="text-align:right">${fc(c.valor_total)}</td></tr>
+              </tbody>
+            </table>`;
+        }
+        return `<div class="field-grid three">
+          <div class="field"><div class="label">Valor Total</div><div class="value">${fc(c.valor_total)}</div></div>
+          <div class="field"><div class="label">Valor Unitário</div><div class="value">${c.valor_unitario || ""}</div></div>
+        </div>`;
+      })()}
       <div class="field-grid three">
-        <div class="field"><div class="label">Valor Total</div><div class="value">${fc(c.valor_total)}</div></div>
-        <div class="field"><div class="label">Valor Unitário</div><div class="value">${c.valor_unitario || ""}</div></div>
         <div class="field"><div class="label">Forma de Faturamento</div><div class="value">${c.forma_faturamento || ""}</div></div>
         <div class="field"><div class="label">KM Excedente</div><div class="value">${c.km_excedente || ""}</div></div>
         <div class="field"><div class="label">Hora Extra</div><div class="value">${c.hora_extra || ""}</div></div>
