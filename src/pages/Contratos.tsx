@@ -757,8 +757,8 @@ const Contratos = () => {
                 Valor Total: {formatCurrency(itemsTotal)}
               </div>
             </div>
-                  <Select value={form.tipo_servico} onValueChange={v => setField("tipo_servico", v)}>
-                    <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
+
+
                     <SelectContent>
                       {tiposServico.map(t => <SelectItem key={t} value={t}>{t}</SelectItem>)}
                       <SelectItem value="Outro">Outro</SelectItem>
