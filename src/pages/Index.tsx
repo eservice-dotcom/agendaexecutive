@@ -74,7 +74,7 @@ const Index = () => {
   const [fechamentoAllClientes, setFechamentoAllClientes] = useState<string[]>([]);
   const [fechamentoItems, setFechamentoItems] = useState<any[]>([]);
   const [fechamentoSelected, setFechamentoSelected] = useState<Set<number>>(new Set());
-  const [fechamentoExtras, setFechamentoExtras] = useState<{ descricao: string; valor: number }[]>([]);
+  const [fechamentoExtras, setFechamentoExtras] = useState<{ descricao: string; valor: number; auto?: boolean; sourceId?: string }[]>([]);
   const [fechamentoExtrasSelected, setFechamentoExtrasSelected] = useState<Set<number>>(new Set());
   const [fechamentoNovoExtra, setFechamentoNovoExtra] = useState({ descricao: "", valor: "" });
   const [fechamentoSearch, setFechamentoSearch] = useState("");
@@ -175,9 +175,10 @@ const Index = () => {
     return Number.isFinite(parsed) ? parsed : 0;
   };
 
-  const buildAgendaExtrasFromItems = (items: any[]) => {
+  const buildAgendaExtrasFromItems = (items: any[]): { descricao: string; valor: number; auto?: boolean; sourceId?: string }[] => {
     return items.flatMap((item: any) => {
       const osLabel = item?.cot ? `O.S. ${item.cot}` : "Serviço";
+      const sourceId = item?.id || item?.cot || osLabel;
       const rawDespesas = item?.outros_despesas;
       let despesas: any[] = [];
 
@@ -193,17 +194,19 @@ const Index = () => {
       }
 
       const despesasExtras = despesas
-        .map((d: any) => ({
+        .map((d: any, i: number) => ({
           descricao: (d?.descricao || "").trim() || `Outros ${osLabel}`,
           valor: parseMoneyValue(d?.valor),
+          auto: true,
+          sourceId: `${sourceId}::despesa::${i}`,
         }))
         .filter((d) => d.valor > 0);
 
       const outrosValor = parseMoneyValue(item?.outros);
-      const outrosExtra = outrosValor > 0 ? [{ descricao: `Outros ${osLabel}`, valor: outrosValor }] : [];
+      const outrosExtra = outrosValor > 0 ? [{ descricao: `Outros ${osLabel}`, valor: outrosValor, auto: true, sourceId: `${sourceId}::outros` }] : [];
 
       const estacValor = parseMoneyValue(item?.estacionamento);
-      const estacExtra = estacValor > 0 ? [{ descricao: `Estacionamento ${osLabel}`, valor: estacValor }] : [];
+      const estacExtra = estacValor > 0 ? [{ descricao: `Estacionamento ${osLabel}`, valor: estacValor, auto: true, sourceId: `${sourceId}::estac` }] : [];
 
       return [...estacExtra, ...despesasExtras, ...outrosExtra];
     });
@@ -284,6 +287,34 @@ const Index = () => {
       return true;
     });
   }, [fechamentoItems, fechamentoSearch, fechamentoDataInicio, fechamentoDataFim, fechamentoReceptivo]);
+
+  // Recompute auto extras based on items currently visible AND selected (preserve manual extras + user deselections)
+  useEffect(() => {
+    const visibleIdxs = new Set(fechamentoFilteredItems.map(({ idx }: any) => idx));
+    const activeItems = fechamentoItems.filter((_: any, i: number) => visibleIdxs.has(i) && fechamentoSelected.has(i));
+    const newAutoExtras = buildAgendaExtrasFromItems(activeItems);
+
+    setFechamentoExtras((prev) => {
+      const manuais = prev.filter((e) => !e.auto);
+      setFechamentoExtrasSelected((prevSel) => {
+        const prevAutoExistedIds = new Set(prev.filter((e) => e.auto).map((e) => e.sourceId));
+        const prevAutoSelectedIds = new Set(
+          prev.map((e, i) => ({ e, i })).filter(({ e, i }) => e.auto && prevSel.has(i)).map(({ e }) => e.sourceId)
+        );
+        const prevManuaisIdxs = prev.map((_e, i) => i).filter((i) => !prev[i].auto);
+        const next = new Set<number>();
+        newAutoExtras.forEach((e, i) => {
+          const wasDeselected = prevAutoExistedIds.has(e.sourceId) && !prevAutoSelectedIds.has(e.sourceId);
+          if (!wasDeselected) next.add(i);
+        });
+        prevManuaisIdxs.forEach((origIdx, manualOrder) => {
+          if (prevSel.has(origIdx)) next.add(newAutoExtras.length + manualOrder);
+        });
+        return next;
+      });
+      return [...newAutoExtras, ...manuais];
+    });
+  }, [fechamentoItems, fechamentoSelected, fechamentoFilteredItems]);
 
   const handleGerarFechamento = async (format: "print" | "excel" = "print") => {
     if (!fechamentoCliente || !session?.user?.id) return;
@@ -675,7 +706,7 @@ const Index = () => {
                           disabled={!fechamentoNovoExtra.descricao.trim() || !fechamentoNovoExtra.valor}
                           onClick={() => {
                             const newIdx = fechamentoExtras.length;
-                            setFechamentoExtras(prev => [...prev, { descricao: fechamentoNovoExtra.descricao.trim(), valor: parseMoneyValue(fechamentoNovoExtra.valor) }]);
+                            setFechamentoExtras(prev => [...prev, { descricao: fechamentoNovoExtra.descricao.trim(), valor: parseMoneyValue(fechamentoNovoExtra.valor), auto: false }]);
                             setFechamentoExtrasSelected(prev => new Set([...prev, newIdx]));
                             setFechamentoNovoExtra({ descricao: "", valor: "" });
                           }}
