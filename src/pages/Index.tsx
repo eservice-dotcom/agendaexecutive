@@ -581,6 +581,8 @@ const Index = () => {
                         <span className="text-xs text-muted-foreground whitespace-nowrap">Selecionar todos</span>
                       </div>
                     </div>
+                      );
+                    })()}
 
                     <div className="border rounded-md divide-y max-h-[40vh] overflow-y-auto">
                       {fechamentoFilteredItems.length === 0 ? (
