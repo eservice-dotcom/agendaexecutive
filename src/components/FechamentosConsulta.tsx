@@ -49,6 +49,7 @@ const FechamentosConsulta = () => {
   const [filterDataFim, setFilterDataFim] = useState("");
   const [filterOS, setFilterOS] = useState("");
   const [filterReceptivo, setFilterReceptivo] = useState("");
+  const [filterPlaca, setFilterPlaca] = useState("");
   const [filterStatusFat, setFilterStatusFat] = useState("");
 
   // Edit dialog
