@@ -288,6 +288,34 @@ const Index = () => {
     });
   }, [fechamentoItems, fechamentoSearch, fechamentoDataInicio, fechamentoDataFim, fechamentoReceptivo]);
 
+  // Recompute auto extras based on items currently visible AND selected (preserve manual extras + user deselections)
+  useEffect(() => {
+    const visibleIdxs = new Set(fechamentoFilteredItems.map(({ idx }: any) => idx));
+    const activeItems = fechamentoItems.filter((_: any, i: number) => visibleIdxs.has(i) && fechamentoSelected.has(i));
+    const newAutoExtras = buildAgendaExtrasFromItems(activeItems);
+
+    setFechamentoExtras((prev) => {
+      const manuais = prev.filter((e) => !e.auto);
+      setFechamentoExtrasSelected((prevSel) => {
+        const prevAutoExistedIds = new Set(prev.filter((e) => e.auto).map((e) => e.sourceId));
+        const prevAutoSelectedIds = new Set(
+          prev.map((e, i) => ({ e, i })).filter(({ e, i }) => e.auto && prevSel.has(i)).map(({ e }) => e.sourceId)
+        );
+        const prevManuaisIdxs = prev.map((_e, i) => i).filter((i) => !prev[i].auto);
+        const next = new Set<number>();
+        newAutoExtras.forEach((e, i) => {
+          const wasDeselected = prevAutoExistedIds.has(e.sourceId) && !prevAutoSelectedIds.has(e.sourceId);
+          if (!wasDeselected) next.add(i);
+        });
+        prevManuaisIdxs.forEach((origIdx, manualOrder) => {
+          if (prevSel.has(origIdx)) next.add(newAutoExtras.length + manualOrder);
+        });
+        return next;
+      });
+      return [...newAutoExtras, ...manuais];
+    });
+  }, [fechamentoItems, fechamentoSelected, fechamentoFilteredItems]);
+
   const handleGerarFechamento = async (format: "print" | "excel" = "print") => {
     if (!fechamentoCliente || !session?.user?.id) return;
     // Only include items that are both selected AND visible (filtered)
