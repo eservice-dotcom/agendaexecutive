@@ -378,6 +378,12 @@ const Index = () => {
 
   const totalValor = filteredData.reduce((s, i) => s + i.valor, 0);
   const totalCusto = filteredData.reduce((s, i) => s + i.custo, 0);
+  const totalExtras = filteredData.reduce((s, i) => {
+    const estac = Number(i.estacionamento) || 0;
+    const outros = (i.outrosDespesas || []).reduce((a, o) => a + (Number(o.valor) || 0), 0);
+    return s + estac + outros;
+  }, 0);
+  const totalReceitaGeral = totalValor + totalExtras;
 
   return (
     <div className="min-h-screen bg-background">
