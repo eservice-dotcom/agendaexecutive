@@ -74,9 +74,8 @@ const Index = () => {
   const [fechamentoAllClientes, setFechamentoAllClientes] = useState<string[]>([]);
   const [fechamentoItems, setFechamentoItems] = useState<any[]>([]);
   const [fechamentoSelected, setFechamentoSelected] = useState<Set<number>>(new Set());
-  const [fechamentoExtrasManuais, setFechamentoExtrasManuais] = useState<{ descricao: string; valor: number }[]>([]);
-  const [fechamentoExtrasManuaisDeselected, setFechamentoExtrasManuaisDeselected] = useState<Set<number>>(new Set());
-  const [fechamentoExtrasAutoDeselected, setFechamentoExtrasAutoDeselected] = useState<Set<string>>(new Set());
+  const [fechamentoExtras, setFechamentoExtras] = useState<{ descricao: string; valor: number; auto?: boolean; sourceId?: string }[]>([]);
+  const [fechamentoExtrasSelected, setFechamentoExtrasSelected] = useState<Set<number>>(new Set());
   const [fechamentoNovoExtra, setFechamentoNovoExtra] = useState({ descricao: "", valor: "" });
   const [fechamentoSearch, setFechamentoSearch] = useState("");
   const [fechamentoDataInicio, setFechamentoDataInicio] = useState("");
