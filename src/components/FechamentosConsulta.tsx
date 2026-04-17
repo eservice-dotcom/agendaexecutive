@@ -106,6 +106,11 @@ const FechamentosConsulta = () => {
         const matchReceptivo = items.some((i: any) => String(i.receptivo || "").toLowerCase().includes(s));
         if (!matchReceptivo) return false;
       }
+      if (filterPlaca) {
+        const s = filterPlaca.toLowerCase();
+        const matchPlaca = items.some((i: any) => String(i.placa || "").toLowerCase().includes(s));
+        if (!matchPlaca) return false;
+      }
       if (filterStatusFat) {
         if (filterStatusFat === "sem_status") {
           const allHaveStatus = items.every((i: any) => i.status_faturamento && i.status_faturamento !== "");
@@ -117,7 +122,7 @@ const FechamentosConsulta = () => {
       }
       return true;
     });
-  }, [fechamentos, filterCliente, filterDataInicio, filterDataFim, searchText, filterOS, filterReceptivo, filterStatusFat]);
+  }, [fechamentos, filterCliente, filterDataInicio, filterDataFim, searchText, filterOS, filterReceptivo, filterPlaca, filterStatusFat]);
 
   const resolveExtras = (f: Fechamento) => {
     const extras = Array.isArray(f.extras) ? f.extras.filter((e: any) => e && e.descricao) : [];
