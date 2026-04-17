@@ -129,12 +129,12 @@ const FechamentosConsulta = () => {
     if (extras.length === 0 && f.extras_total > 0) {
       return [{ descricao: "Extras", valor: f.extras_total }];
     }
-    // Deduplicate extras by descricao+valor
+    // Deduplicate extras by sourceId only (mantém duplicados legítimos com mesma descrição/valor)
     const seen = new Set<string>();
     return extras.filter((e: any) => {
-      const key = `${e.descricao}|${e.valor}`;
-      if (seen.has(key)) return false;
-      seen.add(key);
+      if (!e.sourceId) return true;
+      if (seen.has(e.sourceId)) return false;
+      seen.add(e.sourceId);
       return true;
     });
   };
