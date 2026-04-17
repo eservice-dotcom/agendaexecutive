@@ -378,6 +378,12 @@ const Index = () => {
 
   const totalValor = filteredData.reduce((s, i) => s + i.valor, 0);
   const totalCusto = filteredData.reduce((s, i) => s + i.custo, 0);
+  const totalExtras = filteredData.reduce((s, i) => {
+    const estac = Number(i.estacionamento) || 0;
+    const outros = (i.outrosDespesas || []).reduce((a, o) => a + (Number(o.valor) || 0), 0);
+    return s + estac + outros;
+  }, 0);
+  const totalReceitaGeral = totalValor + totalExtras;
 
   return (
     <div className="min-h-screen bg-background">
@@ -486,13 +492,15 @@ const Index = () => {
           </TabsList>
 
           <TabsContent value="agenda" className="space-y-4">
-            <div className={`grid gap-3 ${canViewFinancials ? 'grid-cols-2 sm:grid-cols-4' : 'grid-cols-2'}`}>
+            <div className={`grid gap-3 ${canViewFinancials ? 'grid-cols-2 sm:grid-cols-3 lg:grid-cols-6' : 'grid-cols-2'}`}>
               <StatCard label="Registros" value={filteredData.length.toString()} />
               <StatCard label="Total PAX" value={filteredData.reduce((s, i) => s + i.pax, 0).toString()} />
               {canViewFinancials && (
                 <>
                   <StatCard label="Receita" value={new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(totalValor)} accent />
-                  <StatCard label="Margem" value={new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(totalValor - totalCusto)} />
+                  <StatCard label="Extras" value={new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(totalExtras)} />
+                  <StatCard label="Total" value={new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(totalReceitaGeral)} accent />
+                  <StatCard label="Margem" value={new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(totalReceitaGeral - totalCusto)} />
                 </>
               )}
             </div>
