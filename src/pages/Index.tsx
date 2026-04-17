@@ -250,6 +250,7 @@ const Index = () => {
       .select("id, cot, data, hora, tipo, origem, destino, pax, motorista, veiculo, placa, fornecedor, valor, custo, km_in, km_fim, km_extra, hora_in, hora_fim, hora_extra, estacionamento, outros, outros_despesas, cliente, receptivo")
       .eq("cliente", cli)
       .eq("status_faturamento", "enviado")
+      .is("deleted_at", null)
       .order("data", { ascending: true });
 
     const items = data || [];
@@ -560,13 +561,21 @@ const Index = () => {
 
                 {fechamentoCliente && (
                   <>
+                    {(() => {
+                      const visibleIdxs = fechamentoFilteredItems.map(({ idx }: any) => idx);
+                      const visibleSelectedCount = visibleIdxs.filter((i: number) => fechamentoSelected.has(i)).length;
+                      const allVisibleSelected = visibleIdxs.length > 0 && visibleIdxs.every((i: number) => fechamentoSelected.has(i));
+                      return (
                     <div className="flex items-center justify-between">
-                      <p className="text-sm text-muted-foreground">{fechamentoSelected.size} de {fechamentoItems.length} serviços selecionados</p>
+                      <p className="text-sm text-muted-foreground">{visibleSelectedCount} de {visibleIdxs.length} serviços selecionados</p>
                       <div className="flex items-center gap-2">
                         <Checkbox
-                          checked={fechamentoSelected.size === fechamentoItems.length && fechamentoItems.length > 0}
+                          checked={allVisibleSelected}
                           onCheckedChange={(checked) => {
-                            setFechamentoSelected(checked ? new Set(fechamentoItems.map((_: any, i: number) => i)) : new Set());
+                            const next = new Set(fechamentoSelected);
+                            if (checked) visibleIdxs.forEach((i: number) => next.add(i));
+                            else visibleIdxs.forEach((i: number) => next.delete(i));
+                            setFechamentoSelected(next);
                           }}
                         />
                         <span className="text-xs text-muted-foreground whitespace-nowrap">Selecionar todos</span>
