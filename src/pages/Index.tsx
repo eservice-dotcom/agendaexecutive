@@ -175,9 +175,10 @@ const Index = () => {
     return Number.isFinite(parsed) ? parsed : 0;
   };
 
-  const buildAgendaExtrasFromItems = (items: any[]) => {
+  const buildAgendaExtrasFromItems = (items: any[]): { descricao: string; valor: number; auto?: boolean; sourceId?: string }[] => {
     return items.flatMap((item: any) => {
       const osLabel = item?.cot ? `O.S. ${item.cot}` : "Serviço";
+      const sourceId = item?.id || item?.cot || osLabel;
       const rawDespesas = item?.outros_despesas;
       let despesas: any[] = [];
 
@@ -193,17 +194,19 @@ const Index = () => {
       }
 
       const despesasExtras = despesas
-        .map((d: any) => ({
+        .map((d: any, i: number) => ({
           descricao: (d?.descricao || "").trim() || `Outros ${osLabel}`,
           valor: parseMoneyValue(d?.valor),
+          auto: true,
+          sourceId: `${sourceId}::despesa::${i}`,
         }))
         .filter((d) => d.valor > 0);
 
       const outrosValor = parseMoneyValue(item?.outros);
-      const outrosExtra = outrosValor > 0 ? [{ descricao: `Outros ${osLabel}`, valor: outrosValor }] : [];
+      const outrosExtra = outrosValor > 0 ? [{ descricao: `Outros ${osLabel}`, valor: outrosValor, auto: true, sourceId: `${sourceId}::outros` }] : [];
 
       const estacValor = parseMoneyValue(item?.estacionamento);
-      const estacExtra = estacValor > 0 ? [{ descricao: `Estacionamento ${osLabel}`, valor: estacValor }] : [];
+      const estacExtra = estacValor > 0 ? [{ descricao: `Estacionamento ${osLabel}`, valor: estacValor, auto: true, sourceId: `${sourceId}::estac` }] : [];
 
       return [...estacExtra, ...despesasExtras, ...outrosExtra];
     });
