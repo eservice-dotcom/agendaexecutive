@@ -706,7 +706,7 @@ const Index = () => {
                           disabled={!fechamentoNovoExtra.descricao.trim() || !fechamentoNovoExtra.valor}
                           onClick={() => {
                             const newIdx = fechamentoExtras.length;
-                            setFechamentoExtras(prev => [...prev, { descricao: fechamentoNovoExtra.descricao.trim(), valor: parseMoneyValue(fechamentoNovoExtra.valor) }]);
+                            setFechamentoExtras(prev => [...prev, { descricao: fechamentoNovoExtra.descricao.trim(), valor: parseMoneyValue(fechamentoNovoExtra.valor), auto: false }]);
                             setFechamentoExtrasSelected(prev => new Set([...prev, newIdx]));
                             setFechamentoNovoExtra({ descricao: "", valor: "" });
                           }}
