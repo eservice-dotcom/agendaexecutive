@@ -333,6 +333,12 @@ const FechamentosConsulta = () => {
           onChange={(e) => setFilterReceptivo(e.target.value)}
           className="h-9"
         />
+        <Input
+          placeholder="Filtrar por Placa Receptivo"
+          value={filterPlaca}
+          onChange={(e) => setFilterPlaca(e.target.value)}
+          className="h-9"
+        />
         <Select value={filterStatusFat} onValueChange={(v) => setFilterStatusFat(v === "all" ? "" : v)}>
           <SelectTrigger className="h-9">
             <SelectValue placeholder="Status Faturamento" />
