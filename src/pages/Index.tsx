@@ -37,6 +37,7 @@ interface FiltersState {
   fornecedor: string;
   motorista: string;
   pax: string;
+  sht: string;
   receptivo: string;
   statusFaturamento: string;
 }
@@ -52,6 +53,7 @@ const initialFilters: FiltersState = {
   fornecedor: "",
   motorista: "",
   pax: "",
+  sht: "",
   receptivo: "",
   statusFaturamento: "",
 };
@@ -134,6 +136,7 @@ const Index = () => {
           );
           if (!hasMatch) return false;
         }
+        if (filters.sht && !String(item.pax ?? "").includes(filters.sht.trim())) return false;
         if (filters.receptivo && !(item.receptivo || "").toLowerCase().includes(filters.receptivo.toLowerCase())) return false;
         if (filters.statusFaturamento) {
           const sf = item.statusFaturamento || item.status_faturamento || "";

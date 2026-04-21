@@ -20,6 +20,7 @@ interface FiltersState {
   fornecedor: string;
   motorista: string;
   pax: string;
+  sht: string;
   receptivo: string;
   statusFaturamento: string;
 }
@@ -49,6 +50,7 @@ const AgendaFilters = ({ filters, onFilterChange, motoristas, tipos, fornecedore
       fornecedor: "",
       motorista: "",
       pax: "",
+      sht: "",
       receptivo: "",
       statusFaturamento: "",
     });
@@ -169,6 +171,14 @@ const AgendaFilters = ({ filters, onFilterChange, motoristas, tipos, fornecedore
             placeholder="Passageiro ou Voo"
             value={filters.pax}
             onChange={(e) => updateFilter("pax", e.target.value)}
+          />
+        </div>
+        <div className="space-y-1">
+          <label className="text-xs font-medium text-muted-foreground">SHT</label>
+          <Input
+            placeholder="SHT"
+            value={filters.sht}
+            onChange={(e) => updateFilter("sht", e.target.value)}
           />
         </div>
         <div className="space-y-1">
