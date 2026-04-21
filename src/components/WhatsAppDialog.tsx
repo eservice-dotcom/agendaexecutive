@@ -59,7 +59,7 @@ const buildConsolidatedMessage = (items: AgendaItem[]) => {
       msg += `\n*Serviço ${idx + 1}*\n`;
       msg += `⏰ Hora: ${item.hora}\n`;
       msg += `🏢 Cliente: ${item.cliente}\n`;
-      msg += `👥 PAX: ${item.pax}\n`;
+      msg += `👥 SHT: ${item.pax}\n`;
       msg += `👤 Passageiros: ${passageiros}\n`;
       msg += `✈️ Voo: ${voos}\n`;
       msg += `📍 Origem: ${item.origem}\n`;
