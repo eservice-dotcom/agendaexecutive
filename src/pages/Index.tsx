@@ -37,6 +37,7 @@ interface FiltersState {
   fornecedor: string;
   motorista: string;
   pax: string;
+  sht: string;
   receptivo: string;
   statusFaturamento: string;
 }
@@ -52,6 +53,7 @@ const initialFilters: FiltersState = {
   fornecedor: "",
   motorista: "",
   pax: "",
+  sht: "",
   receptivo: "",
   statusFaturamento: "",
 };
