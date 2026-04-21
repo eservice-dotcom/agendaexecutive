@@ -77,11 +77,14 @@ const formatPassageiros = (passageiros: any): string => {
 };
 
 export const printAgenda = (items: any[], includeFinancials = true) => {
+  const showSht = items.length > 0 && items.every(i => (i.cliente || "").toLowerCase().includes("shift"));
+
   const rows = items.map(i => {
     let row = `<tr>
 <td>${formatDate(i.data)}</td><td>${i.hora}</td><td>${i.cot}</td>
-<td>${i.cliente}</td><td>${i.tipo}</td><td class="c">${i.pax}</td>
-<td>${formatPassageiros(i.passageiros)}</td>
+<td>${i.cliente}</td><td>${i.tipo}</td>`;
+    if (showSht) row += `<td class="c">${i.pax}</td>`;
+    row += `<td>${formatPassageiros(i.passageiros)}</td>
 <td>${i.origem}</td><td>${i.destino}</td>
 <td>${i.veiculo} (${i.placa})</td><td>${i.motorista}</td>
 <td>${i.telefone || ""}</td>`;
@@ -94,6 +97,7 @@ export const printAgenda = (items: any[], includeFinancials = true) => {
   }).join("");
 
   const finHeaders = includeFinancials ? `<th class="r">Valor</th><th class="r">Custo</th><th class="r">Margem</th>` : "";
+  const shtHeader = showSht ? `<th class="c">SHT</th>` : "";
 
   let totals = "";
   if (includeFinancials) {
@@ -111,7 +115,7 @@ export const printAgenda = (items: any[], includeFinancials = true) => {
 <table>
 <thead><tr>
 <th>Data</th><th>Hora</th><th>O.S.</th><th>Cliente</th><th>Tipo</th>
-<th class="c">SHT</th><th>Passageiros</th><th>Origem</th><th>Destino</th><th>Veículo</th>
+${shtHeader}<th>Passageiros</th><th>Origem</th><th>Destino</th><th>Veículo</th>
 <th>Motorista</th><th>Telefone</th>${finHeaders}<th>Obs</th>
 </tr></thead>
 <tbody>${rows}</tbody>
