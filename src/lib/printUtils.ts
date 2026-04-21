@@ -71,11 +71,7 @@ ${body}
 const formatPassageiros = (passageiros: any): string => {
   if (!Array.isArray(passageiros) || passageiros.length === 0) return "";
   return passageiros
-    .map((p: any) => {
-      const parts = [p?.nome, p?.voo ? `Voo: ${p.voo}` : "", p?.telefone ? `Tel: ${p.telefone}` : ""]
-        .filter(Boolean);
-      return parts.join(" • ");
-    })
+    .map((p: any) => p?.nome)
     .filter(Boolean)
     .join("<br/>");
 };
