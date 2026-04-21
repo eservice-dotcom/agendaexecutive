@@ -68,11 +68,24 @@ ${body}
   w.onload = () => w.print();
 };
 
+const formatPassageiros = (passageiros: any): string => {
+  if (!Array.isArray(passageiros) || passageiros.length === 0) return "";
+  return passageiros
+    .map((p: any) => {
+      const parts = [p?.nome, p?.voo ? `Voo: ${p.voo}` : "", p?.telefone ? `Tel: ${p.telefone}` : ""]
+        .filter(Boolean);
+      return parts.join(" • ");
+    })
+    .filter(Boolean)
+    .join("<br/>");
+};
+
 export const printAgenda = (items: any[], includeFinancials = true) => {
   const rows = items.map(i => {
     let row = `<tr>
 <td>${formatDate(i.data)}</td><td>${i.hora}</td><td>${i.cot}</td>
 <td>${i.cliente}</td><td>${i.tipo}</td><td class="c">${i.pax}</td>
+<td>${formatPassageiros(i.passageiros)}</td>
 <td>${i.origem}</td><td>${i.destino}</td>
 <td>${i.veiculo} (${i.placa})</td><td>${i.motorista}</td>
 <td>${i.telefone || ""}</td>`;
@@ -102,7 +115,7 @@ export const printAgenda = (items: any[], includeFinancials = true) => {
 <table>
 <thead><tr>
 <th>Data</th><th>Hora</th><th>O.S.</th><th>Cliente</th><th>Tipo</th>
-<th class="c">SHT</th><th>Origem</th><th>Destino</th><th>Veículo</th>
+<th class="c">SHT</th><th>Passageiros</th><th>Origem</th><th>Destino</th><th>Veículo</th>
 <th>Motorista</th><th>Telefone</th>${finHeaders}<th>Obs</th>
 </tr></thead>
 <tbody>${rows}</tbody>
