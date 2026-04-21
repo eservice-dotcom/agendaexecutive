@@ -139,9 +139,28 @@ const FechamentosConsulta = () => {
     });
   };
 
-  const handleReimprimir = (f: Fechamento) => {
+  const lookupVendaNumero = async (items: any[]): Promise<number | undefined> => {
+    const ids = items.map((i: any) => i?.id).filter(Boolean);
+    if (ids.length === 0) return undefined;
+    const { data } = await supabase
+      .from("venda_items")
+      .select("venda_id")
+      .in("agenda_item_id", ids)
+      .limit(1);
+    const vendaId = data?.[0]?.venda_id;
+    if (!vendaId) return undefined;
+    const { data: v } = await supabase
+      .from("vendas")
+      .select("numero_venda")
+      .eq("id", vendaId)
+      .maybeSingle();
+    return v?.numero_venda;
+  };
+
+  const handleReimprimir = async (f: Fechamento) => {
     const items = Array.isArray(f.items) ? f.items : [];
     const extras = resolveExtras(f);
+    const numero_venda = await lookupVendaNumero(items);
 
     generateClosingReport(
       items,
@@ -150,14 +169,16 @@ const FechamentosConsulta = () => {
       {
         cliente: f.cliente,
         extras,
+        numero_venda,
       },
       f.numero_fechamento
     );
   };
 
-  const handleExportExcel = (f: Fechamento) => {
+  const handleExportExcel = async (f: Fechamento) => {
     const items = Array.isArray(f.items) ? f.items : [];
     const extras = resolveExtras(f);
+    const numero_venda = await lookupVendaNumero(items);
 
     generateClosingReportExcel(
       items,
@@ -166,6 +187,7 @@ const FechamentosConsulta = () => {
       {
         cliente: f.cliente,
         extras,
+        numero_venda,
       },
       f.numero_fechamento
     );
