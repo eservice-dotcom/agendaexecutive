@@ -497,7 +497,7 @@ const Index = () => {
           <TabsContent value="agenda" className="space-y-4">
             <div className={`grid gap-3 ${canViewFinancials ? 'grid-cols-2 sm:grid-cols-3 lg:grid-cols-6' : 'grid-cols-2'}`}>
               <StatCard label="Registros" value={filteredData.length.toString()} />
-              <StatCard label="Total PAX" value={filteredData.reduce((s, i) => s + i.pax, 0).toString()} />
+              <StatCard label="Total SHT" value={filteredData.reduce((s, i) => s + i.pax, 0).toString()} />
               {canViewFinancials && (
                 <>
                   <StatCard label="Receita" value={new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(totalValor)} accent />

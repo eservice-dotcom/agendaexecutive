@@ -147,7 +147,7 @@ const DashboardOcupacao = () => {
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
         <StatCard icon={<Truck className="h-4 w-4" />} label="Veículos" value={dados.length.toString()} />
         <StatCard icon={<Calendar className="h-4 w-4" />} label="Total Viagens" value={totalViagens.toString()} />
-        <StatCard icon={<Users className="h-4 w-4" />} label="Total PAX" value={totalPax.toString()} />
+        <StatCard icon={<Users className="h-4 w-4" />} label="Total SHT" value={totalPax.toString()} />
         <StatCard icon={<TrendingUp className="h-4 w-4" />} label="Ocupação Média" value={`${mediaGeral.toFixed(1)}%`} accent />
       </div>
 
@@ -181,7 +181,7 @@ const DashboardOcupacao = () => {
               <TableHead className="font-semibold">Placa</TableHead>
               <TableHead className="font-semibold text-center">Viagens</TableHead>
               <TableHead className="font-semibold text-center">Dias Ocupados</TableHead>
-              <TableHead className="font-semibold text-center">Total PAX</TableHead>
+              <TableHead className="font-semibold text-center">Total SHT</TableHead>
               <TableHead className="font-semibold min-w-[180px]">Ocupação ({parametroDias}d)</TableHead>
             </TableRow>
           </TableHeader>

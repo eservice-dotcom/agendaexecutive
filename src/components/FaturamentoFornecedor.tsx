@@ -105,7 +105,7 @@ const FaturamentoFornecedor = () => {
               <TableHead className="font-semibold">Cliente(s)</TableHead>
               <TableHead className="font-semibold">O.S.</TableHead>
               <TableHead className="font-semibold text-center">Viagens</TableHead>
-              <TableHead className="font-semibold text-center">PAX</TableHead>
+              <TableHead className="font-semibold text-center">SHT</TableHead>
               <TableHead className="font-semibold text-right">Receita</TableHead>
               <TableHead className="font-semibold text-right">Custo</TableHead>
               <TableHead className="font-semibold text-right">Margem</TableHead>

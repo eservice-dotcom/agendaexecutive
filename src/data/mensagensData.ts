@@ -70,7 +70,7 @@ export const mensagensPadrao: MensagemTemplate[] = [
   {
     id: "13",
     titulo: "Envio de cotação",
-    texto: "Olá! Segue a cotação {cot} referente ao serviço solicitado: Tipo: {tipo} | Origem: {origem} → Destino: {destino} | PAX: {pax}. Aguardamos sua aprovação.",
+    texto: "Olá! Segue a cotação {cot} referente ao serviço solicitado: Tipo: {tipo} | Origem: {origem} → Destino: {destino} | SHT: {pax}. Aguardamos sua aprovação.",
   },
   {
     id: "14",
@@ -85,7 +85,7 @@ export const mensagensPadrao: MensagemTemplate[] = [
   {
     id: "16",
     titulo: "Dados do serviço para o motorista",
-    texto: "Olá {motorista}! Seguem os dados do serviço: Data: {data} | Hora: {hora} | PAX: {pax} | Passageiros: {passageiros} | Voo: {voos} | Origem: {origem} | Destino: {destino}. Qualquer dúvida, entre em contato.",
+    texto: "Olá {motorista}! Seguem os dados do serviço: Data: {data} | Hora: {hora} | SHT: {pax} | Passageiros: {passageiros} | Voo: {voos} | Origem: {origem} | Destino: {destino}. Qualquer dúvida, entre em contato.",
   },
 ];
 
