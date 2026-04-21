@@ -359,11 +359,22 @@ const Index = () => {
       );
     }
 
+    let numeroVenda: number | undefined;
+    if (ids.length > 0) {
+      const { data: vi } = await supabase
+        .from("venda_items").select("venda_id").in("agenda_item_id", ids).limit(1);
+      const vid = vi?.[0]?.venda_id;
+      if (vid) {
+        const { data: v } = await supabase.from("vendas").select("numero_venda").eq("id", vid).maybeSingle();
+        numeroVenda = v?.numero_venda;
+      }
+    }
+
     const reportArgs = [
       selectedItems,
       `Fechamento Nº ${numero} - ${fechamentoCliente}`,
       fechamentoCliente,
-      { cliente: fechamentoCliente, extras: selectedExtras },
+      { cliente: fechamentoCliente, extras: selectedExtras, numero_venda: numeroVenda },
       numero
     ] as const;
 
