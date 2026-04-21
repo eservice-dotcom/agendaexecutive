@@ -189,20 +189,15 @@ export const generateClosingReportExcel = (
 
   // --- Sheet 2: Resumo ---
   const totalGeral = totalServicos + totalEstac + unmappedExtrasTotal;
-  const resumo: { Campo: string; Valor: any }[] = [
+  const resumo = [
     { Campo: "Fechamento Nº", Valor: numeroFechamento || "" },
-  ];
-  if ((vendaInfo as any)?.numero_venda) {
-    resumo.push({ Campo: "SHT Nº", Valor: (vendaInfo as any).numero_venda });
-  }
-  resumo.push(
     { Campo: "Cliente", Valor: vendaInfo?.cliente || "" },
     { Campo: "Quantidade de Serviços", Valor: items.length },
     { Campo: "KM Total", Valor: totalKm },
     { Campo: "KM Extra", Valor: totalKmExtra },
     { Campo: "Estacionamento", Valor: totalEstac },
     { Campo: "Valor Total", Valor: totalGeral },
-  );
+  ];
 
   selectedExtras.forEach((extra, idx) => {
     resumo.push({ Campo: `  Extra ${idx + 1}: ${extra.descricao}`, Valor: extra.valor as any });
