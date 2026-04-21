@@ -651,6 +651,12 @@ const Vendas = () => {
 
       const autoContasPagar = Array.from(fornecedorMap.entries()).map(([fornecedor, info]) => {
         const descLines = info.items.map((item) => formatOsDescricao(item));
+        // Vencimento = data do serviço mais antigo + 30 dias
+        const datasServico = info.items.map((i) => i.data).filter(Boolean).sort();
+        const dataBase = datasServico[0] || dataVenda;
+        const vencFornecedor = new Date(`${dataBase}T00:00:00`);
+        vencFornecedor.setDate(vencFornecedor.getDate() + 30);
+        const vencFornecedorStr = vencFornecedor.toISOString().split("T")[0];
         return {
           venda_id: venda.id,
           user_id: session!.user.id,
@@ -658,7 +664,7 @@ const Vendas = () => {
           descritivo: descLines.join("\n"),
           valor: info.total,
           data: dataVenda,
-          data_vencimento: dataVencimento || null,
+          data_vencimento: vencFornecedorStr,
           status: "pendente",
         };
       });
@@ -860,6 +866,12 @@ const Vendas = () => {
           const valorRestante = Math.round((info.total - jaPago) * 100) / 100;
           if (valorRestante <= 0) return null; // já totalmente pago
           const descLines = info.items.map((item: any) => formatOsDescricao(item));
+          // Vencimento = data do serviço mais antigo + 30 dias
+          const datasServico = info.items.map((i: any) => i.data).filter(Boolean).sort();
+          const dataBase = datasServico[0] || venda.data_venda;
+          const vencFornecedor = new Date(`${dataBase}T00:00:00`);
+          vencFornecedor.setDate(vencFornecedor.getDate() + 30);
+          const vencFornecedorStr = vencFornecedor.toISOString().split("T")[0];
           return {
             venda_id: venda.id,
             user_id: user.id,
@@ -867,7 +879,7 @@ const Vendas = () => {
             descritivo: descLines.join("\n"),
             valor: valorRestante,
             data: venda.data_venda,
-            data_vencimento: venda.data_vencimento || null,
+            data_vencimento: vencFornecedorStr,
             status: "pendente",
           };
         })
