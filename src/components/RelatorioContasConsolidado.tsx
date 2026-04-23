@@ -48,8 +48,11 @@ export default function RelatorioContasConsolidado() {
       supabase.from("contas_receber").select("*").order("data_vencimento", { ascending: true, nullsFirst: false }),
     ]);
 
-    // Para cada conta a receber vinculada a uma venda, buscar descritivo completo dos serviços
-    const vendaIds = Array.from(new Set((cr || []).map((c: any) => c.venda_id).filter(Boolean)));
+    // Coletar IDs de venda de ambos
+    const vendaIdsR = (cr || []).map((c: any) => c.venda_id).filter(Boolean);
+    const vendaIdsP = (cp || []).map((c: any) => c.venda_id).filter(Boolean);
+    const vendaIds = Array.from(new Set([...vendaIdsR, ...vendaIdsP]));
+
     let descritivosPorVenda = new Map<string, string>();
     if (vendaIds.length > 0) {
       const { data: vendaItems } = await supabase
@@ -68,15 +71,15 @@ export default function RelatorioContasConsolidado() {
       grouped.forEach((arr, id) => descritivosPorVenda.set(id, arr.join(" | ")));
     }
 
-    const enriched = (cr || []).map((c: any) => {
+    const enrich = (c: any) => {
       if (c.venda_id && descritivosPorVenda.has(c.venda_id)) {
         return { ...c, descritivo: descritivosPorVenda.get(c.venda_id) };
       }
       return c;
-    });
+    };
 
-    setContasPagar(cp || []);
-    setContasReceber(enriched);
+    setContasPagar((cp || []).map(enrich));
+    setContasReceber((cr || []).map(enrich));
   };
 
   const processedPagar = useMemo((): ContaItem[] => {
