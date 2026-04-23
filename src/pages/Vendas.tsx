@@ -245,8 +245,8 @@ const Vendas = () => {
   const [contasPagarList, setContasPagarList] = useState<ContaPagarDB[]>([]);
   const [contasReceberList, setContasReceberList] = useState<ContaReceberDB[]>([]);
 
-  // Mapa venda_id -> { numero_venda, cliente, cots }
-  const [vendaOsMap, setVendaOsMap] = useState<Record<string, { numero_venda: number; cliente: string; cots: string[] }>>({});
+  // Mapa venda_id -> { numero_venda, cliente, cots, cotsByFornecedor }
+  const [vendaOsMap, setVendaOsMap] = useState<Record<string, { numero_venda: number; cliente: string; cots: string[]; cotsByFornecedor: Record<string, string[]> }>>({});
 
   // Edit conta dialog
   const [editDialog, setEditDialog] = useState<{ type: "pagar" | "receber"; item: any } | null>(null);
@@ -442,7 +442,7 @@ const Vendas = () => {
     }
 
     const agendaIds = Array.from(new Set(vendaItemsData.map((vi) => vi.agenda_item_id)));
-    const agendaCots: Record<string, string> = {};
+    const agendaInfo: Record<string, { cot: string; fornecedor: string }> = {};
 
     if (agendaIds.length > 0) {
       const chunkSize = 500;
@@ -456,34 +456,44 @@ const Vendas = () => {
         chunks.map((chunk) =>
           supabase
             .from("agenda_items")
-            .select("id, cot")
+            .select("id, cot, fornecedor")
             .in("id", chunk)
         )
       );
 
       responses.forEach(({ data }) => {
-        (data || []).forEach((a) => {
-          agendaCots[a.id] = a.cot;
+        (data || []).forEach((a: any) => {
+          agendaInfo[a.id] = { cot: a.cot, fornecedor: a.fornecedor || "" };
         });
       });
     }
 
-    const map: Record<string, { numero_venda: number; cliente: string; cots: string[] }> = {};
+    const map: Record<string, { numero_venda: number; cliente: string; cots: string[]; cotsByFornecedor: Record<string, string[]> }> = {};
     const cotSetByVenda = new Map<string, Set<string>>();
+    const cotSetByVendaForn = new Map<string, Map<string, Set<string>>>();
 
     vendasData.forEach((v) => {
-      map[v.id] = { numero_venda: v.numero_venda, cliente: v.cliente, cots: [] };
+      map[v.id] = { numero_venda: v.numero_venda, cliente: v.cliente, cots: [], cotsByFornecedor: {} };
       cotSetByVenda.set(v.id, new Set());
+      cotSetByVendaForn.set(v.id, new Map());
     });
 
     vendaItemsData.forEach((vi) => {
-      const cot = agendaCots[vi.agenda_item_id];
-      if (!map[vi.venda_id] || !cot) return;
-      cotSetByVenda.get(vi.venda_id)?.add(cot);
+      const info = agendaInfo[vi.agenda_item_id];
+      if (!map[vi.venda_id] || !info?.cot) return;
+      cotSetByVenda.get(vi.venda_id)?.add(info.cot);
+      const fornKey = (info.fornecedor || "").trim().toLowerCase();
+      const fornMap = cotSetByVendaForn.get(vi.venda_id)!;
+      if (!fornMap.has(fornKey)) fornMap.set(fornKey, new Set());
+      fornMap.get(fornKey)!.add(info.cot);
     });
 
     Object.keys(map).forEach((vendaId) => {
       map[vendaId].cots = Array.from(cotSetByVenda.get(vendaId) || []);
+      const fornMap = cotSetByVendaForn.get(vendaId) || new Map();
+      const obj: Record<string, string[]> = {};
+      fornMap.forEach((set, key) => { obj[key] = Array.from(set); });
+      map[vendaId].cotsByFornecedor = obj;
     });
 
     setVendaOsMap(map);
@@ -2216,7 +2226,7 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
                           )}
                         </TableCell>
                         <TableCell className="font-medium text-sm">{vendaOsMap[cp.venda_id]?.cliente || "—"}</TableCell>
-                        <TableCell className="font-mono text-xs">{vendaOsMap[cp.venda_id]?.cots?.join(", ") || "—"}</TableCell>
+                        <TableCell className="font-mono text-xs">{(vendaOsMap[cp.venda_id]?.cotsByFornecedor?.[(cp.fornecedor || "").trim().toLowerCase()] || vendaOsMap[cp.venda_id]?.cots || []).join(", ") || "—"}</TableCell>
                         <TableCell className="text-sm">{cp.centro_custo || "—"}</TableCell>
                         <TableCell className="text-sm font-mono">{(cp as any).placa || "—"}</TableCell>
                         <TableCell className="text-sm">{cp.subgrupo_custo || "—"}</TableCell>
