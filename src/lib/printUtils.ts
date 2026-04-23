@@ -250,7 +250,7 @@ export const printContasPagar = (items: any[], vendaOsMap: Record<string, any> =
 <td>${formatDate(cp.data)}</td>
 <td>${cp.fornecedor}</td>
 <td>${venda?.cliente || "—"}</td>
-<td>${venda?.cots?.join(", ") || "—"}</td>
+<td>${(venda?.cotsByFornecedor?.[(cp.fornecedor || "").trim().toLowerCase()] || venda?.cots || []).join(", ") || "—"}</td>
 <td>${cp.centro_custo || "—"}</td>
 <td>${cp.subgrupo_custo || "—"}</td>
 <td>${cp.descritivo}</td>
