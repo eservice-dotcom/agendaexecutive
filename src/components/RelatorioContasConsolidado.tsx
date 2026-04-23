@@ -53,33 +53,53 @@ export default function RelatorioContasConsolidado() {
     const vendaIdsP = (cp || []).map((c: any) => c.venda_id).filter(Boolean);
     const vendaIds = Array.from(new Set([...vendaIdsR, ...vendaIdsP]));
 
-    let descritivosPorVenda = new Map<string, string>();
+    // Para Contas a Receber: agrupa todos os serviços por venda (visão do cliente)
+    // Para Contas a Pagar: filtra serviços pelo fornecedor da conta (visão do fornecedor)
+    let itemsPorVendaReceber = new Map<string, string>();
+    let itemsPorVenda: { venda_id: string; a: any }[] = [];
     if (vendaIds.length > 0) {
       const { data: vendaItems } = await supabase
         .from("venda_items")
-        .select("venda_id, agenda_item_id, agenda_items(data, hora, origem, destino, tipo, veiculo, placa)")
+        .select("venda_id, agenda_item_id, agenda_items(data, hora, origem, destino, tipo, veiculo, placa, fornecedor)")
         .in("venda_id", vendaIds);
-      const grouped = new Map<string, string[]>();
+      const groupedR = new Map<string, string[]>();
       (vendaItems || []).forEach((vi: any) => {
         const a = vi.agenda_items;
         if (!a) return;
+        itemsPorVenda.push({ venda_id: vi.venda_id, a });
         const dt = a.data ? a.data.split("-").reverse().join("/") : "";
         const desc = `${dt}${a.hora ? " " + a.hora : ""} — ${a.origem || ""} → ${a.destino || ""}${a.veiculo ? " (" + a.veiculo + (a.placa ? " " + a.placa : "") + ")" : ""}${a.tipo ? " · " + a.tipo : ""}`;
-        if (!grouped.has(vi.venda_id)) grouped.set(vi.venda_id, []);
-        grouped.get(vi.venda_id)!.push(desc.trim());
+        if (!groupedR.has(vi.venda_id)) groupedR.set(vi.venda_id, []);
+        groupedR.get(vi.venda_id)!.push(desc.trim());
       });
-      grouped.forEach((arr, id) => descritivosPorVenda.set(id, arr.join(" | ")));
+      groupedR.forEach((arr, id) => itemsPorVendaReceber.set(id, arr.join(" | ")));
     }
 
-    const enrich = (c: any) => {
-      if (c.venda_id && descritivosPorVenda.has(c.venda_id)) {
-        return { ...c, descritivo: descritivosPorVenda.get(c.venda_id) };
+    const formatItem = (a: any) => {
+      const dt = a.data ? a.data.split("-").reverse().join("/") : "";
+      return `${dt}${a.hora ? " " + a.hora : ""} — ${a.origem || ""} → ${a.destino || ""}${a.veiculo ? " (" + a.veiculo + (a.placa ? " " + a.placa : "") + ")" : ""}${a.tipo ? " · " + a.tipo : ""}`.trim();
+    };
+
+    const enrichReceber = (c: any) => {
+      if (c.venda_id && itemsPorVendaReceber.has(c.venda_id)) {
+        return { ...c, descritivo: itemsPorVendaReceber.get(c.venda_id) };
       }
       return c;
     };
 
-    setContasPagar((cp || []).map(enrich));
-    setContasReceber((cr || []).map(enrich));
+    const enrichPagar = (c: any) => {
+      if (!c.venda_id) return c;
+      const fornecedorAlvo = (c.fornecedor || "").trim().toLowerCase();
+      const matches = itemsPorVenda
+        .filter((x) => x.venda_id === c.venda_id)
+        .filter((x) => (x.a.fornecedor || "").trim().toLowerCase() === fornecedorAlvo)
+        .map((x) => formatItem(x.a));
+      if (matches.length === 0) return c;
+      return { ...c, descritivo: matches.join(" | ") };
+    };
+
+    setContasPagar((cp || []).map(enrichPagar));
+    setContasReceber((cr || []).map(enrichReceber));
   };
 
   const processedPagar = useMemo((): ContaItem[] => {
