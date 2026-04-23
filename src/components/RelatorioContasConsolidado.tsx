@@ -47,8 +47,36 @@ export default function RelatorioContasConsolidado() {
       supabase.from("contas_pagar").select("*").order("data_vencimento", { ascending: true, nullsFirst: false }),
       supabase.from("contas_receber").select("*").order("data_vencimento", { ascending: true, nullsFirst: false }),
     ]);
+
+    // Para cada conta a receber vinculada a uma venda, buscar descritivo completo dos serviços
+    const vendaIds = Array.from(new Set((cr || []).map((c: any) => c.venda_id).filter(Boolean)));
+    let descritivosPorVenda = new Map<string, string>();
+    if (vendaIds.length > 0) {
+      const { data: vendaItems } = await supabase
+        .from("venda_items")
+        .select("venda_id, agenda_item_id, agenda_items(data, hora, origem, destino, tipo, veiculo, placa)")
+        .in("venda_id", vendaIds);
+      const grouped = new Map<string, string[]>();
+      (vendaItems || []).forEach((vi: any) => {
+        const a = vi.agenda_items;
+        if (!a) return;
+        const dt = a.data ? a.data.split("-").reverse().join("/") : "";
+        const desc = `${dt}${a.hora ? " " + a.hora : ""} — ${a.origem || ""} → ${a.destino || ""}${a.veiculo ? " (" + a.veiculo + (a.placa ? " " + a.placa : "") + ")" : ""}${a.tipo ? " · " + a.tipo : ""}`;
+        if (!grouped.has(vi.venda_id)) grouped.set(vi.venda_id, []);
+        grouped.get(vi.venda_id)!.push(desc.trim());
+      });
+      grouped.forEach((arr, id) => descritivosPorVenda.set(id, arr.join(" | ")));
+    }
+
+    const enriched = (cr || []).map((c: any) => {
+      if (c.venda_id && descritivosPorVenda.has(c.venda_id)) {
+        return { ...c, descritivo: descritivosPorVenda.get(c.venda_id) };
+      }
+      return c;
+    });
+
     setContasPagar(cp || []);
-    setContasReceber(cr || []);
+    setContasReceber(enriched);
   };
 
   const processedPagar = useMemo((): ContaItem[] => {
@@ -179,7 +207,7 @@ export default function RelatorioContasConsolidado() {
             <td style="border:1px solid #ccc;padding:3px;text-align:center;">${p ? p.status : ""}</td>
             <td style="border:1px solid #ccc;padding:3px;background:#f0f0f0;"></td>
             <td style="border:1px solid #ccc;padding:3px;">${r ? r.entidade : ""}</td>
-            <td style="border:1px solid #ccc;padding:3px;">${r ? r.descritivo : ""}</td>
+            <td style="border:1px solid #ccc;padding:3px;text-align:justify;">${r ? r.descritivo : ""}</td>
             <td style="border:1px solid #ccc;padding:3px;text-align:right;color:green;">${r ? formatCurrency(r.valor) : ""}</td>
             <td style="border:1px solid #ccc;padding:3px;text-align:center;">${r ? r.status : ""}</td>
           </tr>`;
@@ -306,7 +334,7 @@ export default function RelatorioContasConsolidado() {
                       <td className="border px-2 py-1 text-center">{p ? statusBadge(p.status) : ""}</td>
                       <td className="border bg-muted/20 w-[2px]"></td>
                       <td className="border px-2 py-1 max-w-[120px] truncate">{r?.entidade || ""}</td>
-                      <td className="border px-2 py-1 max-w-[140px] truncate">{r?.descritivo || ""}</td>
+                      <td className="border px-2 py-1 text-justify whitespace-normal break-words">{r?.descritivo || ""}</td>
                       <td className="border px-2 py-1 text-right text-green-600 font-medium whitespace-nowrap">{r ? formatCurrency(r.valor) : ""}</td>
                       <td className="border px-2 py-1 text-center">{r ? statusBadge(r.status) : ""}</td>
                     </tr>
