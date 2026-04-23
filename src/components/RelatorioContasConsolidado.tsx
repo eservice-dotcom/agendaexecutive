@@ -205,7 +205,7 @@ export default function RelatorioContasConsolidado() {
           html += `<tr${i === 0 ? ' style="border-top:2px solid #999;"' : ""}>
             <td style="border:1px solid #ccc;padding:3px;font-weight:${i === 0 ? "bold" : "normal"};background:${i === 0 ? "#f8f8f8" : "white"}">${dateLabel}</td>
             <td style="border:1px solid #ccc;padding:3px;">${p ? p.entidade : ""}</td>
-            <td style="border:1px solid #ccc;padding:3px;">${p ? p.descritivo : ""}</td>
+            <td style="border:1px solid #ccc;padding:3px;text-align:justify;">${p ? p.descritivo : ""}</td>
             <td style="border:1px solid #ccc;padding:3px;text-align:right;color:red;">${p ? formatCurrency(p.valor) : ""}</td>
             <td style="border:1px solid #ccc;padding:3px;text-align:center;">${p ? p.status : ""}</td>
             <td style="border:1px solid #ccc;padding:3px;background:#f0f0f0;"></td>
