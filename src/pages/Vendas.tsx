@@ -1088,12 +1088,16 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
 
     const { data } = await supabase
       .from("agenda_items")
-      .select("id, cot, data, hora, tipo, origem, destino, pax, motorista, veiculo, placa, fornecedor, valor, custo, km_in, km_fim, km_extra, hora_in, hora_fim, hora_extra, estacionamento, outros, outros_despesas, cliente, receptivo")
+      .select("id, cot, data, hora, tipo, origem, destino, pax, motorista, veiculo, placa, fornecedor, valor, custo, km_in, km_fim, km_extra, hora_in, hora_fim, hora_extra, estacionamento, outros, outros_despesas, cliente, receptivo, status_faturamento, deleted_at")
       .eq("cliente", cli)
-      .or("status_faturamento.is.null,status_faturamento.eq.")
+      .is("deleted_at", null)
       .order("data", { ascending: true });
 
-    const items = data || [];
+    // Filtrar status no client: vazio "" não é representável no PostgREST .or()
+    const items = (data || []).filter((it: any) => {
+      const sf = it.status_faturamento;
+      return sf === null || sf === undefined || sf === "";
+    });
     setFechamentoItems(items);
     setFechamentoSelected(new Set(items.map((_: any, i: number) => i)));
 
