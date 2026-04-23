@@ -207,7 +207,7 @@ export default function RelatorioContasConsolidado() {
             <td style="border:1px solid #ccc;padding:3px;text-align:center;">${p ? p.status : ""}</td>
             <td style="border:1px solid #ccc;padding:3px;background:#f0f0f0;"></td>
             <td style="border:1px solid #ccc;padding:3px;">${r ? r.entidade : ""}</td>
-            <td style="border:1px solid #ccc;padding:3px;">${r ? r.descritivo : ""}</td>
+            <td style="border:1px solid #ccc;padding:3px;text-align:justify;">${r ? r.descritivo : ""}</td>
             <td style="border:1px solid #ccc;padding:3px;text-align:right;color:green;">${r ? formatCurrency(r.valor) : ""}</td>
             <td style="border:1px solid #ccc;padding:3px;text-align:center;">${r ? r.status : ""}</td>
           </tr>`;
