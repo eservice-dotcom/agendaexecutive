@@ -397,7 +397,7 @@ const Index = () => {
           </Link>
 
           {/* Menu agrupado */}
-          <nav className="hidden lg:flex items-center gap-1">
+          <nav className="flex flex-1 items-center gap-1 flex-wrap justify-end">
             {/* Operacional */}
             <DropdownMenu>
               <DropdownMenuTrigger className="flex items-center gap-1.5 px-3 py-2 rounded-md text-sm text-primary-foreground/80 hover:text-primary hover:bg-primary/10 transition-colors outline-none">
