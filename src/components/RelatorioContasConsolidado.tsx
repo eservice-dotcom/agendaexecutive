@@ -48,8 +48,11 @@ export default function RelatorioContasConsolidado() {
       supabase.from("contas_receber").select("*").order("data_vencimento", { ascending: true, nullsFirst: false }),
     ]);
 
-    // Para cada conta a receber vinculada a uma venda, buscar descritivo completo dos serviços
-    const vendaIds = Array.from(new Set((cr || []).map((c: any) => c.venda_id).filter(Boolean)));
+    // Coletar IDs de venda de ambos
+    const vendaIdsR = (cr || []).map((c: any) => c.venda_id).filter(Boolean);
+    const vendaIdsP = (cp || []).map((c: any) => c.venda_id).filter(Boolean);
+    const vendaIds = Array.from(new Set([...vendaIdsR, ...vendaIdsP]));
+
     let descritivosPorVenda = new Map<string, string>();
     if (vendaIds.length > 0) {
       const { data: vendaItems } = await supabase
@@ -68,15 +71,15 @@ export default function RelatorioContasConsolidado() {
       grouped.forEach((arr, id) => descritivosPorVenda.set(id, arr.join(" | ")));
     }
 
-    const enriched = (cr || []).map((c: any) => {
+    const enrich = (c: any) => {
       if (c.venda_id && descritivosPorVenda.has(c.venda_id)) {
         return { ...c, descritivo: descritivosPorVenda.get(c.venda_id) };
       }
       return c;
-    });
+    };
 
-    setContasPagar(cp || []);
-    setContasReceber(enriched);
+    setContasPagar((cp || []).map(enrich));
+    setContasReceber((cr || []).map(enrich));
   };
 
   const processedPagar = useMemo((): ContaItem[] => {
@@ -202,7 +205,7 @@ export default function RelatorioContasConsolidado() {
           html += `<tr${i === 0 ? ' style="border-top:2px solid #999;"' : ""}>
             <td style="border:1px solid #ccc;padding:3px;font-weight:${i === 0 ? "bold" : "normal"};background:${i === 0 ? "#f8f8f8" : "white"}">${dateLabel}</td>
             <td style="border:1px solid #ccc;padding:3px;">${p ? p.entidade : ""}</td>
-            <td style="border:1px solid #ccc;padding:3px;">${p ? p.descritivo : ""}</td>
+            <td style="border:1px solid #ccc;padding:3px;text-align:justify;">${p ? p.descritivo : ""}</td>
             <td style="border:1px solid #ccc;padding:3px;text-align:right;color:red;">${p ? formatCurrency(p.valor) : ""}</td>
             <td style="border:1px solid #ccc;padding:3px;text-align:center;">${p ? p.status : ""}</td>
             <td style="border:1px solid #ccc;padding:3px;background:#f0f0f0;"></td>
@@ -329,7 +332,7 @@ export default function RelatorioContasConsolidado() {
                         </td>
                       )}
                       <td className="border px-2 py-1 max-w-[120px] truncate">{p?.entidade || ""}</td>
-                      <td className="border px-2 py-1 max-w-[140px] truncate">{p?.descritivo || ""}</td>
+                      <td className="border px-2 py-1 text-justify whitespace-normal break-words">{p?.descritivo || ""}</td>
                       <td className="border px-2 py-1 text-right text-red-600 font-medium whitespace-nowrap">{p ? formatCurrency(p.valor) : ""}</td>
                       <td className="border px-2 py-1 text-center">{p ? statusBadge(p.status) : ""}</td>
                       <td className="border bg-muted/20 w-[2px]"></td>
