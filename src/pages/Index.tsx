@@ -390,70 +390,122 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-background">
-       <header className="border-b border-border bg-foreground px-4 py-3 shadow-sm sm:px-6 lg:px-8">
-        <div className="mx-auto flex max-w-[1600px] items-center justify-between">
-          <img src={logo} alt="Executive Service - Transportes e Eventos" className="h-10" />
-          <div className="flex items-center gap-4">
-            
-            {hasPermission && (
-              <button
-                onClick={() => setShowFinancials(!showFinancials)}
-                className="flex items-center gap-1 text-sm text-primary-foreground/80 hover:text-primary-foreground"
-                title={showFinancials ? "Ocultar financeiro" : "Mostrar financeiro"}
-              >
-                {showFinancials ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                {showFinancials ? "Ocultar $" : "Mostrar $"}
-              </button>
-            )}
+       <header className="border-b border-primary/20 bg-foreground px-4 py-3 shadow-sm sm:px-6 lg:px-8">
+        <div className="mx-auto flex max-w-[1600px] items-center justify-between gap-6">
+          <Link to="/" className="shrink-0">
+            <img src={logo} alt="Executive Service - Transportes e Eventos" className="h-10" />
+          </Link>
+
+          {/* Menu agrupado */}
+          <nav className="hidden lg:flex items-center gap-1">
+            {/* Operacional */}
+            <DropdownMenu>
+              <DropdownMenuTrigger className="flex items-center gap-1.5 px-3 py-2 rounded-md text-sm text-primary-foreground/80 hover:text-primary hover:bg-primary/10 transition-colors outline-none">
+                <CalendarDays className="h-4 w-4" /> Operacional <ChevronDown className="h-3 w-3 opacity-60" />
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="start" className="w-52">
+                <DropdownMenuItem onClick={() => setActiveTab("agenda")} className="gap-2 cursor-pointer">
+                  <CalendarDays className="h-4 w-4" /> Agenda
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setActiveTab("fechamentos")} className="gap-2 cursor-pointer">
+                  <Archive className="h-4 w-4" /> Fechamentos
+                </DropdownMenuItem>
+                {canViewFinancials && (
+                  <DropdownMenuItem onClick={() => setActiveTab("ocupacao")} className="gap-2 cursor-pointer">
+                    <BarChart3 className="h-4 w-4" /> Ocupação
+                  </DropdownMenuItem>
+                )}
+                <DropdownMenuItem onClick={() => setActiveTab("lixeira")} className="gap-2 cursor-pointer">
+                  <Trash2 className="h-4 w-4" /> Lixeira
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+
+            {/* Comercial */}
+            <DropdownMenu>
+              <DropdownMenuTrigger className="flex items-center gap-1.5 px-3 py-2 rounded-md text-sm text-primary-foreground/80 hover:text-primary hover:bg-primary/10 transition-colors outline-none">
+                <FileText className="h-4 w-4" /> Comercial <ChevronDown className="h-3 w-3 opacity-60" />
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="start" className="w-48">
+                <DropdownMenuItem asChild>
+                  <Link to="/cotacoes" className="flex items-center gap-2 cursor-pointer">
+                    <FileText className="h-4 w-4" /> Cotações
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link to="/contratos" className="flex items-center gap-2 cursor-pointer">
+                    <FileText className="h-4 w-4" /> Contratos
+                  </Link>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+
+            {/* Financeiro */}
             {hasPermission && (
               <DropdownMenu>
-                <DropdownMenuTrigger className="flex items-center gap-1 text-sm text-primary-foreground/80 hover:text-primary-foreground outline-none">
-                  <DollarSign className="h-4 w-4" /> Financeiro <ChevronDown className="h-3 w-3" />
+                <DropdownMenuTrigger className="flex items-center gap-1.5 px-3 py-2 rounded-md text-sm text-primary-foreground/80 hover:text-primary hover:bg-primary/10 transition-colors outline-none">
+                  <DollarSign className="h-4 w-4" /> Financeiro <ChevronDown className="h-3 w-3 opacity-60" />
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
+                <DropdownMenuContent align="start" className="w-52">
+                  <DropdownMenuItem asChild>
+                    <Link to="/vendas" className="flex items-center gap-2 cursor-pointer">
+                      <ShoppingCart className="h-4 w-4" /> Vendas
+                    </Link>
+                  </DropdownMenuItem>
                   <DropdownMenuItem asChild>
                     <Link to="/vendas?tab=receber" className="flex items-center gap-2 cursor-pointer">
-                      Contas a Receber
+                      <DollarSign className="h-4 w-4" /> Contas a Receber
                     </Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem asChild>
                     <Link to="/vendas?tab=pagar" className="flex items-center gap-2 cursor-pointer">
-                      Contas a Pagar
+                      <DollarSign className="h-4 w-4" /> Contas a Pagar
                     </Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem asChild>
                     <Link to="/vendas?tab=dashboard" className="flex items-center gap-2 cursor-pointer">
-                      Dashboard
+                      <BarChart3 className="h-4 w-4" /> Dashboard
                     </Link>
                   </DropdownMenuItem>
+                  {canViewFinancials && (
+                    <>
+                      <DropdownMenuItem onClick={() => setActiveTab("fat-veiculo")} className="gap-2 cursor-pointer">
+                        <Truck className="h-4 w-4" /> Fat. Veículo
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => setActiveTab("fat-fornecedor")} className="gap-2 cursor-pointer">
+                        <Building2 className="h-4 w-4" /> Fat. Fornecedor
+                      </DropdownMenuItem>
+                    </>
+                  )}
                 </DropdownMenuContent>
               </DropdownMenu>
             )}
+
+            {/* Cadastros */}
+            <Link
+              to="/cadastros"
+              className="flex items-center gap-1.5 px-3 py-2 rounded-md text-sm text-primary-foreground/80 hover:text-primary hover:bg-primary/10 transition-colors"
+            >
+              <ClipboardList className="h-4 w-4" /> Cadastros
+            </Link>
+          </nav>
+
+          {/* Ações à direita */}
+          <div className="flex items-center gap-2">
             {hasPermission && (
-              <Link to="/vendas">
-                <span className="flex items-center gap-1 text-sm text-primary-foreground/80 hover:text-primary-foreground">
-                  <ShoppingCart className="h-4 w-4" /> Vendas
-                </span>
-              </Link>
+              <button
+                onClick={() => setShowFinancials(!showFinancials)}
+                className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-xs text-primary-foreground/70 hover:text-primary hover:bg-primary/10 transition-colors"
+                title={showFinancials ? "Ocultar financeiro" : "Mostrar financeiro"}
+              >
+                {showFinancials ? <EyeOff className="h-3.5 w-3.5" /> : <Eye className="h-3.5 w-3.5" />}
+                {showFinancials ? "Ocultar $" : "Mostrar $"}
+              </button>
             )}
-            <Link to="/cotacoes">
-              <span className="flex items-center gap-1 text-sm text-primary-foreground/80 hover:text-primary-foreground">
-                <FileText className="h-4 w-4" /> Cotações
-              </span>
-            </Link>
-            <Link to="/contratos">
-              <span className="flex items-center gap-1 text-sm text-primary-foreground/80 hover:text-primary-foreground">
-                <FileText className="h-4 w-4" /> Contratos
-              </span>
-            </Link>
-            <Link to="/cadastros">
-              <span className="flex items-center gap-1 text-sm text-primary-foreground/80 hover:text-primary-foreground">
-                <ClipboardList className="h-4 w-4" /> Cadastros
-              </span>
-            </Link>
+            <div className="hidden sm:block h-6 w-px bg-primary-foreground/20" />
             <button
               onClick={signOut}
-              className="flex items-center gap-1 text-sm text-primary-foreground/80 hover:text-primary-foreground"
+              className="px-3 py-1.5 rounded-md text-sm text-primary-foreground/80 hover:text-primary hover:bg-primary/10 transition-colors"
             >
               Sair
             </button>
