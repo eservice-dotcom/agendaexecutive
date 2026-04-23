@@ -334,7 +334,7 @@ export default function RelatorioContasConsolidado() {
                       <td className="border px-2 py-1 text-center">{p ? statusBadge(p.status) : ""}</td>
                       <td className="border bg-muted/20 w-[2px]"></td>
                       <td className="border px-2 py-1 max-w-[120px] truncate">{r?.entidade || ""}</td>
-                      <td className="border px-2 py-1 max-w-[140px] truncate">{r?.descritivo || ""}</td>
+                      <td className="border px-2 py-1 text-justify whitespace-normal break-words">{r?.descritivo || ""}</td>
                       <td className="border px-2 py-1 text-right text-green-600 font-medium whitespace-nowrap">{r ? formatCurrency(r.valor) : ""}</td>
                       <td className="border px-2 py-1 text-center">{r ? statusBadge(r.status) : ""}</td>
                     </tr>
