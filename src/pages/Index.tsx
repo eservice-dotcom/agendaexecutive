@@ -515,37 +515,6 @@ const Index = () => {
 
       <main className="mx-auto max-w-[1600px] space-y-4 px-4 py-6 sm:px-6 lg:px-8">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
-          <TabsList className={`grid w-full sm:w-auto sm:inline-grid ${canViewFinancials ? 'grid-cols-6' : 'grid-cols-3'}`}>
-            <TabsTrigger value="agenda" className="gap-2">
-              <CalendarDays className="h-4 w-4" />
-              Agenda
-            </TabsTrigger>
-            <TabsTrigger value="fechamentos" className="gap-2">
-              <Archive className="h-4 w-4" />
-              Fechamentos
-            </TabsTrigger>
-            <TabsTrigger value="lixeira" className="gap-2">
-              <Trash2 className="h-4 w-4" />
-              Lixeira
-            </TabsTrigger>
-            {canViewFinancials && (
-              <>
-                <TabsTrigger value="fat-veiculo" className="gap-2">
-                  <Truck className="h-4 w-4" />
-                  Fat. Veículo
-                </TabsTrigger>
-                <TabsTrigger value="fat-fornecedor" className="gap-2">
-                  <Building2 className="h-4 w-4" />
-                  Fat. Fornecedor
-                </TabsTrigger>
-                <TabsTrigger value="ocupacao" className="gap-2">
-                  <BarChart3 className="h-4 w-4" />
-                  Ocupação
-                </TabsTrigger>
-              </>
-            )}
-          </TabsList>
-
           <TabsContent value="agenda" className="space-y-4">
             <div className={`grid gap-3 ${canViewFinancials ? 'grid-cols-2 sm:grid-cols-3 lg:grid-cols-5' : 'grid-cols-1'}`}>
               <StatCard label="Registros" value={filteredData.length.toString()} />
