@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Switch } from "@/components/ui/switch";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
@@ -271,6 +272,8 @@ const Vendas = () => {
     subgrupo_custo: "",
     subgrupo_receita: "",
     placa: "",
+    parcelado: false,
+    num_parcelas: "2",
   });
   const [quickAddFornecedor, setQuickAddFornecedor] = useState(false);
   const [quickAddFornecedorNome, setQuickAddFornecedorNome] = useState("");
@@ -1342,7 +1345,7 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
     else loadContasReceber();
   };
   const openNovaContaDialog = (type: "pagar" | "receber") => {
-    setNovaContaForm({ descritivo: "", valor: "", data: new Date().toISOString().split("T")[0], data_vencimento: "", data_pagamento: "", fornecedor: "", cliente: "", centro_custo: "", centro_receita: "", subgrupo_custo: "", subgrupo_receita: "", placa: "" });
+    setNovaContaForm({ descritivo: "", valor: "", data: new Date().toISOString().split("T")[0], data_vencimento: "", data_pagamento: "", fornecedor: "", cliente: "", centro_custo: "", centro_receita: "", subgrupo_custo: "", subgrupo_receita: "", placa: "", parcelado: false, num_parcelas: "2" });
     setQuickAddFornecedor(false);
     setQuickAddFornecedorNome("");
     setQuickAddCliente(false);
@@ -1434,25 +1437,49 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
     const dataLancamento = novaContaForm.data || new Date().toISOString().split("T")[0];
 
     if (novaContaDialog === "pagar") {
-      const { error } = await supabase.from("contas_pagar").insert({
-        user_id: session.user.id,
-        venda_id: null as any,
-        fornecedor: novaContaForm.fornecedor,
-        descritivo: novaContaForm.descritivo,
-        valor: parseFloat(novaContaForm.valor) || 0,
-        data: dataLancamento,
-        data_vencimento: novaContaForm.data_vencimento || null,
-        data_pagamento: novaContaForm.data_pagamento || null,
-        status: novaContaForm.data_pagamento ? "pago" : "pendente",
-        centro_custo: novaContaForm.centro_custo,
-        subgrupo_custo: novaContaForm.subgrupo_custo,
-        placa: novaContaForm.placa,
+      const valorTotal = parseFloat(novaContaForm.valor) || 0;
+      const isParcelado = novaContaForm.parcelado && !novaContaForm.data_pagamento;
+      const n = isParcelado ? Math.max(1, parseInt(novaContaForm.num_parcelas) || 1) : 1;
+
+      // Distribuição: arredonda 2 casas, ajusta a última parcela
+      const valorBase = Math.floor((valorTotal / n) * 100) / 100;
+      const valorUltima = +(valorTotal - valorBase * (n - 1)).toFixed(2);
+
+      // Base do vencimento
+      const baseVenc = novaContaForm.data_vencimento || dataLancamento;
+      const [yy, mm, dd] = baseVenc.split("-").map(Number);
+
+      const rows = Array.from({ length: n }, (_, i) => {
+        // soma i meses preservando o dia (clamp ao último dia do mês)
+        const target = new Date(yy, (mm - 1) + i, 1);
+        const lastDay = new Date(target.getFullYear(), target.getMonth() + 1, 0).getDate();
+        target.setDate(Math.min(dd, lastDay));
+        const venc = `${target.getFullYear()}-${String(target.getMonth() + 1).padStart(2, "0")}-${String(target.getDate()).padStart(2, "0")}`;
+        const valorParcela = i === n - 1 ? valorUltima : valorBase;
+        const descBase = novaContaForm.descritivo || "";
+        const descritivo = n > 1 ? `${descBase}${descBase ? " " : ""}(${i + 1}/${n})` : descBase;
+        return {
+          user_id: session.user.id,
+          venda_id: null as any,
+          fornecedor: novaContaForm.fornecedor,
+          descritivo,
+          valor: valorParcela,
+          data: dataLancamento,
+          data_vencimento: venc,
+          data_pagamento: i === 0 ? (novaContaForm.data_pagamento || null) : null,
+          status: i === 0 && novaContaForm.data_pagamento ? "pago" : "pendente",
+          centro_custo: novaContaForm.centro_custo,
+          subgrupo_custo: novaContaForm.subgrupo_custo,
+          placa: novaContaForm.placa,
+        };
       });
+
+      const { error } = await supabase.from("contas_pagar").insert(rows);
       if (error) {
         toast({ title: "Erro ao salvar", description: error.message, variant: "destructive" });
         return;
       }
-      toast({ title: "Conta a pagar criada!" });
+      toast({ title: n > 1 ? `${n} parcelas criadas!` : "Conta a pagar criada!" });
       loadContasPagar();
     } else {
       const { error } = await supabase.from("contas_receber").insert({
@@ -3148,6 +3175,49 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
                   <Input type="date" value={novaContaForm.data_pagamento} onChange={(e) => setNovaContaForm({ ...novaContaForm, data_pagamento: e.target.value })} />
                 </div>
               </div>
+              {novaContaDialog === "pagar" && (
+                <div className="rounded-md border p-3 space-y-3 bg-muted/30">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <Label className="text-sm">Parcelado?</Label>
+                      <p className="text-xs text-muted-foreground">Gera as parcelas automaticamente (mensais).</p>
+                    </div>
+                    <Switch
+                      checked={novaContaForm.parcelado}
+                      onCheckedChange={(v) => setNovaContaForm({ ...novaContaForm, parcelado: v })}
+                      disabled={!!novaContaForm.data_pagamento}
+                    />
+                  </div>
+                  {novaContaForm.parcelado && (
+                    <div className="grid grid-cols-2 gap-3">
+                      <div className="space-y-1">
+                        <Label className="text-xs">Nº de Parcelas</Label>
+                        <Input
+                          type="number"
+                          min={2}
+                          max={60}
+                          value={novaContaForm.num_parcelas}
+                          onChange={(e) => setNovaContaForm({ ...novaContaForm, num_parcelas: e.target.value })}
+                        />
+                      </div>
+                      <div className="space-y-1">
+                        <Label className="text-xs">Valor por Parcela</Label>
+                        <Input
+                          readOnly
+                          value={(() => {
+                            const total = parseFloat(novaContaForm.valor) || 0;
+                            const n = Math.max(1, parseInt(novaContaForm.num_parcelas) || 1);
+                            return (total / n).toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+                          })()}
+                        />
+                      </div>
+                      <div className="col-span-2 text-xs text-muted-foreground">
+                        1ª parcela vence em <strong>{novaContaForm.data_vencimento || novaContaForm.data || "—"}</strong>. Demais parcelas vencem mensalmente, no mesmo dia.
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
               {novaContaDialog === "pagar" ? (
                 <div className="grid grid-cols-2 gap-3">
                   <div className="space-y-2">
