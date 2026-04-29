@@ -1344,7 +1344,7 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
     else loadContasReceber();
   };
   const openNovaContaDialog = (type: "pagar" | "receber") => {
-    setNovaContaForm({ descritivo: "", valor: "", data: new Date().toISOString().split("T")[0], data_vencimento: "", data_pagamento: "", fornecedor: "", cliente: "", centro_custo: "", centro_receita: "", subgrupo_custo: "", subgrupo_receita: "", placa: "" });
+    setNovaContaForm({ descritivo: "", valor: "", data: new Date().toISOString().split("T")[0], data_vencimento: "", data_pagamento: "", fornecedor: "", cliente: "", centro_custo: "", centro_receita: "", subgrupo_custo: "", subgrupo_receita: "", placa: "", parcelado: false, num_parcelas: "2" });
     setQuickAddFornecedor(false);
     setQuickAddFornecedorNome("");
     setQuickAddCliente(false);
