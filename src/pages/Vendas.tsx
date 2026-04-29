@@ -271,6 +271,8 @@ const Vendas = () => {
     subgrupo_custo: "",
     subgrupo_receita: "",
     placa: "",
+    parcelado: false,
+    num_parcelas: "2",
   });
   const [quickAddFornecedor, setQuickAddFornecedor] = useState(false);
   const [quickAddFornecedorNome, setQuickAddFornecedorNome] = useState("");
