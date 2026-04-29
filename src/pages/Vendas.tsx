@@ -1436,25 +1436,49 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
     const dataLancamento = novaContaForm.data || new Date().toISOString().split("T")[0];
 
     if (novaContaDialog === "pagar") {
-      const { error } = await supabase.from("contas_pagar").insert({
-        user_id: session.user.id,
-        venda_id: null as any,
-        fornecedor: novaContaForm.fornecedor,
-        descritivo: novaContaForm.descritivo,
-        valor: parseFloat(novaContaForm.valor) || 0,
-        data: dataLancamento,
-        data_vencimento: novaContaForm.data_vencimento || null,
-        data_pagamento: novaContaForm.data_pagamento || null,
-        status: novaContaForm.data_pagamento ? "pago" : "pendente",
-        centro_custo: novaContaForm.centro_custo,
-        subgrupo_custo: novaContaForm.subgrupo_custo,
-        placa: novaContaForm.placa,
+      const valorTotal = parseFloat(novaContaForm.valor) || 0;
+      const isParcelado = novaContaForm.parcelado && !novaContaForm.data_pagamento;
+      const n = isParcelado ? Math.max(1, parseInt(novaContaForm.num_parcelas) || 1) : 1;
+
+      // Distribuição: arredonda 2 casas, ajusta a última parcela
+      const valorBase = Math.floor((valorTotal / n) * 100) / 100;
+      const valorUltima = +(valorTotal - valorBase * (n - 1)).toFixed(2);
+
+      // Base do vencimento
+      const baseVenc = novaContaForm.data_vencimento || dataLancamento;
+      const [yy, mm, dd] = baseVenc.split("-").map(Number);
+
+      const rows = Array.from({ length: n }, (_, i) => {
+        // soma i meses preservando o dia (clamp ao último dia do mês)
+        const target = new Date(yy, (mm - 1) + i, 1);
+        const lastDay = new Date(target.getFullYear(), target.getMonth() + 1, 0).getDate();
+        target.setDate(Math.min(dd, lastDay));
+        const venc = `${target.getFullYear()}-${String(target.getMonth() + 1).padStart(2, "0")}-${String(target.getDate()).padStart(2, "0")}`;
+        const valorParcela = i === n - 1 ? valorUltima : valorBase;
+        const descBase = novaContaForm.descritivo || "";
+        const descritivo = n > 1 ? `${descBase}${descBase ? " " : ""}(${i + 1}/${n})` : descBase;
+        return {
+          user_id: session.user.id,
+          venda_id: null as any,
+          fornecedor: novaContaForm.fornecedor,
+          descritivo,
+          valor: valorParcela,
+          data: dataLancamento,
+          data_vencimento: venc,
+          data_pagamento: i === 0 ? (novaContaForm.data_pagamento || null) : null,
+          status: i === 0 && novaContaForm.data_pagamento ? "pago" : "pendente",
+          centro_custo: novaContaForm.centro_custo,
+          subgrupo_custo: novaContaForm.subgrupo_custo,
+          placa: novaContaForm.placa,
+        };
       });
+
+      const { error } = await supabase.from("contas_pagar").insert(rows);
       if (error) {
         toast({ title: "Erro ao salvar", description: error.message, variant: "destructive" });
         return;
       }
-      toast({ title: "Conta a pagar criada!" });
+      toast({ title: n > 1 ? `${n} parcelas criadas!` : "Conta a pagar criada!" });
       loadContasPagar();
     } else {
       const { error } = await supabase.from("contas_receber").insert({
