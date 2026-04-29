@@ -3175,6 +3175,49 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
                   <Input type="date" value={novaContaForm.data_pagamento} onChange={(e) => setNovaContaForm({ ...novaContaForm, data_pagamento: e.target.value })} />
                 </div>
               </div>
+              {novaContaDialog === "pagar" && (
+                <div className="rounded-md border p-3 space-y-3 bg-muted/30">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <Label className="text-sm">Parcelado?</Label>
+                      <p className="text-xs text-muted-foreground">Gera as parcelas automaticamente (mensais).</p>
+                    </div>
+                    <Switch
+                      checked={novaContaForm.parcelado}
+                      onCheckedChange={(v) => setNovaContaForm({ ...novaContaForm, parcelado: v })}
+                      disabled={!!novaContaForm.data_pagamento}
+                    />
+                  </div>
+                  {novaContaForm.parcelado && (
+                    <div className="grid grid-cols-2 gap-3">
+                      <div className="space-y-1">
+                        <Label className="text-xs">Nº de Parcelas</Label>
+                        <Input
+                          type="number"
+                          min={2}
+                          max={60}
+                          value={novaContaForm.num_parcelas}
+                          onChange={(e) => setNovaContaForm({ ...novaContaForm, num_parcelas: e.target.value })}
+                        />
+                      </div>
+                      <div className="space-y-1">
+                        <Label className="text-xs">Valor por Parcela</Label>
+                        <Input
+                          readOnly
+                          value={(() => {
+                            const total = parseFloat(novaContaForm.valor) || 0;
+                            const n = Math.max(1, parseInt(novaContaForm.num_parcelas) || 1);
+                            return (total / n).toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+                          })()}
+                        />
+                      </div>
+                      <div className="col-span-2 text-xs text-muted-foreground">
+                        1ª parcela vence em <strong>{novaContaForm.data_vencimento || novaContaForm.data || "—"}</strong>. Demais parcelas vencem mensalmente, no mesmo dia.
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
               {novaContaDialog === "pagar" ? (
                 <div className="grid grid-cols-2 gap-3">
                   <div className="space-y-2">
