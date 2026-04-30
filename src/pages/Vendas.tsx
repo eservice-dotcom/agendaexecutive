@@ -768,6 +768,17 @@ const Vendas = () => {
 
   const handleDelete = async (id: string) => {
     if (!confirm("Excluir esta venda? Os contas a pagar e a receber vinculados também serão excluídos.")) return;
+    // Reverter status_faturamento dos serviços vinculados para "enviado"
+    const { data: itemsToReset } = await supabase
+      .from("venda_items")
+      .select("agenda_item_id")
+      .eq("venda_id", id);
+    if (itemsToReset && itemsToReset.length > 0) {
+      await supabase
+        .from("agenda_items")
+        .update({ status_faturamento: "enviado" })
+        .in("id", itemsToReset.map((i) => i.agenda_item_id));
+    }
     await supabase.from("contas_pagar").delete().eq("venda_id", id);
     await supabase.from("contas_receber").delete().eq("venda_id", id);
     await supabase.from("venda_items").delete().eq("venda_id", id);
@@ -777,11 +788,11 @@ const Vendas = () => {
     loadContasPagar();
     loadContasReceber();
     loadVendaOsMap();
-    toast({ title: "Venda excluída", description: "Contas vinculadas também foram removidas." });
+    toast({ title: "Venda excluída", description: "Contas vinculadas também foram removidas e serviços voltaram para 'enviado'." });
   };
 
   const handleCancelar = async (venda: Venda) => {
-    if (!confirm("Cancelar esta venda? Os serviços vinculados voltarão ao status anterior.")) return;
+    if (!confirm("Cancelar esta venda? Os serviços vinculados voltarão para o status 'enviado'.")) return;
     try {
       const { data: items } = await supabase
         .from("venda_items")
@@ -791,7 +802,7 @@ const Vendas = () => {
       if (items && items.length > 0) {
         await supabase
           .from("agenda_items")
-          .update({ status_faturamento: "" })
+          .update({ status_faturamento: "enviado" })
           .in("id", items.map((i) => i.agenda_item_id));
       }
 
