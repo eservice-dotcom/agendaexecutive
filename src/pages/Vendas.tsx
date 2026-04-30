@@ -767,13 +767,17 @@ const Vendas = () => {
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm("Excluir esta venda?")) return;
+    if (!confirm("Excluir esta venda? Os contas a pagar e a receber vinculados também serão excluídos.")) return;
+    await supabase.from("contas_pagar").delete().eq("venda_id", id);
+    await supabase.from("contas_receber").delete().eq("venda_id", id);
+    await supabase.from("venda_items").delete().eq("venda_id", id);
+    await supabase.from("venda_extras").delete().eq("venda_id", id);
     await supabase.from("vendas").delete().eq("id", id);
     loadVendas();
     loadContasPagar();
     loadContasReceber();
     loadVendaOsMap();
-    toast({ title: "Venda excluída" });
+    toast({ title: "Venda excluída", description: "Contas vinculadas também foram removidas." });
   };
 
   const handleCancelar = async (venda: Venda) => {
