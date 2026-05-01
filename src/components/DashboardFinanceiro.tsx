@@ -173,6 +173,11 @@ const DashboardFinanceiro = () => {
     return { recPago, recPendente, despPago, despPendente, resultadoEfetivado, resultadoProjetado, monthly };
   }, [cpPeriod, crPeriod, cpYear, crYear, year]);
 
+  // Estado de expansão dos centros de custo na DRE
+  const [expandedCentros, setExpandedCentros] = useState<Record<string, boolean>>({});
+  const toggleCentro = (nome: string) =>
+    setExpandedCentros((prev) => ({ ...prev, [nome]: !prev[nome] }));
+
   // ========== Faturamento por Cliente (respeita ano + mês) ==========
   const faturamentoClientes = useMemo(() => {
     const map = new Map<string, number>();
