@@ -840,10 +840,22 @@ const KPIDetailDialog = ({ open, onClose, tipo, year, month, items, onUpdated }:
                 </div>
                 <div className="col-span-2">
                   <Label className="text-xs">{isReceita ? "Centro de Receita" : "Centro de Custo"}</Label>
-                  <Input
+                  <Select
                     value={editing[groupKey] || ""}
-                    onChange={(e) => setEditing({ ...editing, [groupKey]: e.target.value })}
-                  />
+                    onValueChange={(v) => setEditing({ ...editing, [groupKey]: v })}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Selecione um centro..." />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {centros.map((nome) => (
+                        <SelectItem key={nome} value={nome}>{nome}</SelectItem>
+                      ))}
+                      {editing[groupKey] && !centros.includes(editing[groupKey]) && (
+                        <SelectItem value={editing[groupKey]}>{editing[groupKey]} (atual)</SelectItem>
+                      )}
+                    </SelectContent>
+                  </Select>
                 </div>
               </div>
             )}
