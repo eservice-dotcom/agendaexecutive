@@ -339,6 +339,13 @@ const DashboardFinanceiro = () => {
         year={year}
         month={month}
         items={detailOpen === "receitas" ? crPeriod : cpPeriod}
+        onUpdated={(updated) => {
+          if (detailOpen === "receitas") {
+            setContasReceber((prev) => prev.map((c: any) => (c.id === updated.id ? { ...c, ...updated } : c)));
+          } else {
+            setContasPagar((prev) => prev.map((c: any) => (c.id === updated.id ? { ...c, ...updated } : c)));
+          }
+        }}
       />
 
       {/* Receitas vs Despesas Chart */}
