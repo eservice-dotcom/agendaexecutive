@@ -99,7 +99,8 @@ const FaturamentoVeiculo = () => {
 
   const filteredDespesas = useMemo(() => {
     return despesasVeiculo.filter(d => {
-      const dateRef = d.data_pagamento || d.data;
+      // Contabilizar pelo mês de COMPETÊNCIA (vencimento), não pelo lançamento
+      const dateRef = d.data_vencimento || d.data;
       if (!dateRef) return true;
       if (dataInicio && dateRef < format(dataInicio, "yyyy-MM-dd")) return false;
       if (dataFim && dateRef > format(dataFim, "yyyy-MM-dd")) return false;
