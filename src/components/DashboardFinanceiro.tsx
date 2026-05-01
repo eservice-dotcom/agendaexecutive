@@ -45,6 +45,7 @@ const DashboardFinanceiro = () => {
   const [contasPagar, setContasPagar] = useState<ContaDB[]>([]);
   const [contasReceber, setContasReceber] = useState<ContaDB[]>([]);
   const [year, setYear] = useState(new Date().getFullYear().toString());
+  const [month, setMonth] = useState<string>("todos"); // "todos" | "01".."12"
 
   useEffect(() => {
     const fetchAll = async (table: "contas_pagar" | "contas_receber") => {
@@ -73,8 +74,14 @@ const DashboardFinanceiro = () => {
     return unique;
   }, [contasPagar, contasReceber]);
 
+  // Filtro por ANO (usado nos gráficos mensais que mostram o ano todo)
   const cpYear = useMemo(() => contasPagar.filter((c) => compDate(c).startsWith(year)), [contasPagar, year]);
   const crYear = useMemo(() => contasReceber.filter((c) => compDate(c).startsWith(year)), [contasReceber, year]);
+
+  // Filtro adicional por MÊS (usado nos KPIs/DRE/Faturamento por cliente)
+  const periodPrefix = month === "todos" ? year : `${year}-${month}`;
+  const cpPeriod = useMemo(() => contasPagar.filter((c) => compDate(c).startsWith(periodPrefix)), [contasPagar, periodPrefix]);
+  const crPeriod = useMemo(() => contasReceber.filter((c) => compDate(c).startsWith(periodPrefix)), [contasReceber, periodPrefix]);
 
   // ========== Receitas vs Despesas (Bar Chart by month) ==========
   const receitasDespesasData = useMemo(() => {
@@ -87,16 +94,15 @@ const DashboardFinanceiro = () => {
     });
   }, [cpYear, crYear, year]);
 
-  // ========== DRE Simplificado ==========
+  // ========== DRE Simplificado (respeita ano + mês) ==========
   const dre = useMemo(() => {
-    const totalReceitas = crYear.reduce((s, c) => s + Number(c.valor), 0);
-    const totalDespesas = cpYear.reduce((s, c) => s + Number(c.valor), 0);
+    const totalReceitas = crPeriod.reduce((s, c) => s + Number(c.valor), 0);
+    const totalDespesas = cpPeriod.reduce((s, c) => s + Number(c.valor), 0);
     const resultado = totalReceitas - totalDespesas;
     const margem = totalReceitas > 0 ? (resultado / totalReceitas) * 100 : 0;
 
-    // Group despesas by centro_custo
     const centrosMap = new Map<string, number>();
-    cpYear.forEach((c) => {
+    cpPeriod.forEach((c) => {
       const key = (c as any).centro_custo || "Sem centro";
       centrosMap.set(key, (centrosMap.get(key) || 0) + Number(c.valor));
     });
@@ -104,9 +110,8 @@ const DashboardFinanceiro = () => {
       .map(([nome, valor]) => ({ nome, valor }))
       .sort((a, b) => b.valor - a.valor);
 
-    // Group receitas by centro_receita
     const centrosRecMap = new Map<string, number>();
-    crYear.forEach((c) => {
+    crPeriod.forEach((c) => {
       const key = (c as any).centro_receita || "Sem centro";
       centrosRecMap.set(key, (centrosRecMap.get(key) || 0) + Number(c.valor));
     });
@@ -115,19 +120,19 @@ const DashboardFinanceiro = () => {
       .sort((a, b) => b.valor - a.valor);
 
     return { totalReceitas, totalDespesas, resultado, margem, centros, centrosRec };
-  }, [cpYear, crYear]);
+  }, [cpPeriod, crPeriod]);
 
-  // ========== Resultado Projetado vs Efetivado ==========
+  // ========== Resultado Projetado vs Efetivado (respeita ano + mês nos KPIs) ==========
   const projetadoEfetivado = useMemo(() => {
-    const recPago = crYear.filter((c) => c.status === "pago").reduce((s, c) => s + Number(c.valor), 0);
-    const recPendente = crYear.filter((c) => c.status !== "pago").reduce((s, c) => s + Number(c.valor), 0);
-    const despPago = cpYear.filter((c) => c.status === "pago").reduce((s, c) => s + Number(c.valor), 0);
-    const despPendente = cpYear.filter((c) => c.status !== "pago").reduce((s, c) => s + Number(c.valor), 0);
+    const recPago = crPeriod.filter((c) => c.status === "pago").reduce((s, c) => s + Number(c.valor), 0);
+    const recPendente = crPeriod.filter((c) => c.status !== "pago").reduce((s, c) => s + Number(c.valor), 0);
+    const despPago = cpPeriod.filter((c) => c.status === "pago").reduce((s, c) => s + Number(c.valor), 0);
+    const despPendente = cpPeriod.filter((c) => c.status !== "pago").reduce((s, c) => s + Number(c.valor), 0);
 
     const resultadoEfetivado = recPago - despPago;
     const resultadoProjetado = (recPago + recPendente) - (despPago + despPendente);
 
-    // Monthly breakdown
+    // Breakdown mensal sempre mostra o ano completo (visão de evolução)
     const monthly = MONTHS.map((label, i) => {
       const m = String(i + 1).padStart(2, "0");
       const prefix = `${year}-${m}`;
@@ -141,19 +146,19 @@ const DashboardFinanceiro = () => {
     });
 
     return { recPago, recPendente, despPago, despPendente, resultadoEfetivado, resultadoProjetado, monthly };
-  }, [cpYear, crYear, year]);
+  }, [cpPeriod, crPeriod, cpYear, crYear, year]);
 
-  // ========== Faturamento por Cliente ==========
+  // ========== Faturamento por Cliente (respeita ano + mês) ==========
   const faturamentoClientes = useMemo(() => {
     const map = new Map<string, number>();
-    crYear.forEach((c) => {
+    crPeriod.forEach((c) => {
       const key = (c as any).cliente || "Sem cliente";
       map.set(key, (map.get(key) || 0) + Number(c.valor));
     });
     return Array.from(map.entries())
       .map(([cliente, valor]) => ({ cliente, valor }))
       .sort((a, b) => b.valor - a.valor);
-  }, [crYear]);
+  }, [crPeriod]);
 
   const totalFatClientes = faturamentoClientes.reduce((s, c) => s + c.valor, 0);
 
@@ -296,6 +301,18 @@ const DashboardFinanceiro = () => {
           <SelectContent>
             {years.map((y) => (
               <SelectItem key={y} value={y}>{y}</SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+
+        <Select value={month} onValueChange={setMonth}>
+          <SelectTrigger className="w-[140px]">
+            <SelectValue placeholder="Mês" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="todos">Ano todo</SelectItem>
+            {MONTHS.map((label, i) => (
+              <SelectItem key={i} value={String(i + 1).padStart(2, "0")}>{label}</SelectItem>
             ))}
           </SelectContent>
         </Select>
