@@ -102,13 +102,37 @@ const DashboardFinanceiro = () => {
     const resultado = totalReceitas - totalDespesas;
     const margem = totalReceitas > 0 ? (resultado / totalReceitas) * 100 : 0;
 
-    const centrosMap = new Map<string, number>();
+    const centrosMap = new Map<string, { total: number; itens: any[] }>();
     cpPeriod.forEach((c) => {
       const key = (c as any).centro_custo || "Sem centro";
-      centrosMap.set(key, (centrosMap.get(key) || 0) + Number(c.valor));
+      const cur = centrosMap.get(key) || { total: 0, itens: [] };
+      cur.total += Number(c.valor);
+      cur.itens.push(c);
+      centrosMap.set(key, cur);
     });
     const centros = Array.from(centrosMap.entries())
-      .map(([nome, valor]) => ({ nome, valor }))
+      .map(([nome, { total, itens }]) => {
+        // Quebra por veículo se for "DESPESAS COM VEÍCULOS"; senão por fornecedor
+        const isVeiculos = /ve[ií]culo/i.test(nome);
+        const subMap = new Map<string, number>();
+        itens.forEach((c: any) => {
+          let subKey: string;
+          if (isVeiculos) {
+            const placa = (c.placa || "").trim();
+            const forn = (c.fornecedor || "").trim();
+            subKey = placa
+              ? (forn ? `${placa} — ${forn}` : placa)
+              : (forn || "Sem identificação");
+          } else {
+            subKey = (c.fornecedor || "").trim() || "Sem fornecedor";
+          }
+          subMap.set(subKey, (subMap.get(subKey) || 0) + Number(c.valor));
+        });
+        const filhos = Array.from(subMap.entries())
+          .map(([sub, valor]) => ({ nome: sub, valor }))
+          .sort((a, b) => b.valor - a.valor);
+        return { nome, valor: total, filhos };
+      })
       .sort((a, b) => b.valor - a.valor);
 
     const centrosRecMap = new Map<string, number>();
