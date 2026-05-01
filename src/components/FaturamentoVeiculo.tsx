@@ -67,7 +67,7 @@ const FaturamentoVeiculo = () => {
       while (true) {
         const { data } = await supabase
           .from("contas_pagar")
-          .select("placa, valor, valor_pago, status, descritivo, data, data_vencimento, data_pagamento")
+          .select("placa, valor, valor_pago, status, descritivo, fornecedor, data, data_vencimento, data_pagamento")
           .neq("placa", "")
           .range(fromD, fromD + pageSize - 1);
         if (!data || data.length === 0) break;
@@ -463,6 +463,7 @@ const FaturamentoVeiculo = () => {
                                   <TableHeader>
                                     <TableRow className="bg-muted/40 hover:bg-muted/40">
                                       <TableHead className="text-xs py-1.5">Vencimento</TableHead>
+                                      <TableHead className="text-xs py-1.5">Fornecedor</TableHead>
                                       <TableHead className="text-xs py-1.5">Descritivo</TableHead>
                                       <TableHead className="text-xs py-1.5">Status</TableHead>
                                       <TableHead className="text-xs py-1.5 text-right">Valor</TableHead>
@@ -472,6 +473,7 @@ const FaturamentoVeiculo = () => {
                                     {despDetalhes.map((desp: any, idx: number) => (
                                       <TableRow key={idx} className="hover:bg-primary/5">
                                         <TableCell className="text-xs py-1.5">{desp.data_vencimento || desp.data || "—"}</TableCell>
+                                        <TableCell className="text-xs py-1.5">{desp.fornecedor || "—"}</TableCell>
                                         <TableCell className="text-xs py-1.5">{desp.descritivo || "—"}</TableCell>
                                         <TableCell className="text-xs py-1.5">
                                           <span className={`inline-block rounded-full px-2 py-0.5 text-[10px] font-medium ${desp.status === "pago" ? "bg-accent/15 text-accent" : "bg-yellow-500/15 text-yellow-600"}`}>
@@ -482,7 +484,7 @@ const FaturamentoVeiculo = () => {
                                       </TableRow>
                                     ))}
                                     <TableRow className="bg-muted/40 hover:bg-muted/40 font-semibold">
-                                      <TableCell colSpan={3} className="text-xs py-1.5">Subtotal Despesas</TableCell>
+                                      <TableCell colSpan={4} className="text-xs py-1.5">Subtotal Despesas</TableCell>
                                       <TableCell className="text-xs py-1.5 text-right font-mono">{formatCurrency(despOper)}</TableCell>
                                     </TableRow>
                                   </TableBody>
