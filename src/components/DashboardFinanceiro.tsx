@@ -45,6 +45,7 @@ const DashboardFinanceiro = () => {
   const [contasPagar, setContasPagar] = useState<ContaDB[]>([]);
   const [contasReceber, setContasReceber] = useState<ContaDB[]>([]);
   const [year, setYear] = useState(new Date().getFullYear().toString());
+  const [month, setMonth] = useState<string>("todos"); // "todos" | "01".."12"
 
   useEffect(() => {
     const fetchAll = async (table: "contas_pagar" | "contas_receber") => {
@@ -73,8 +74,14 @@ const DashboardFinanceiro = () => {
     return unique;
   }, [contasPagar, contasReceber]);
 
+  // Filtro por ANO (usado nos gráficos mensais que mostram o ano todo)
   const cpYear = useMemo(() => contasPagar.filter((c) => compDate(c).startsWith(year)), [contasPagar, year]);
   const crYear = useMemo(() => contasReceber.filter((c) => compDate(c).startsWith(year)), [contasReceber, year]);
+
+  // Filtro adicional por MÊS (usado nos KPIs/DRE/Faturamento por cliente)
+  const periodPrefix = month === "todos" ? year : `${year}-${month}`;
+  const cpPeriod = useMemo(() => contasPagar.filter((c) => compDate(c).startsWith(periodPrefix)), [contasPagar, periodPrefix]);
+  const crPeriod = useMemo(() => contasReceber.filter((c) => compDate(c).startsWith(periodPrefix)), [contasReceber, periodPrefix]);
 
   // ========== Receitas vs Despesas (Bar Chart by month) ==========
   const receitasDespesasData = useMemo(() => {
