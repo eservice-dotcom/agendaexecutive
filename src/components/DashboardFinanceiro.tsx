@@ -597,11 +597,18 @@ const DashboardFinanceiro = () => {
   );
 };
 
-const KPICard = ({ icon: Icon, label, value, variant }: {
+const KPICard = ({ icon: Icon, label, value, variant, onClick }: {
   icon: React.ElementType; label: string; value: string;
   variant: "success" | "destructive";
+  onClick?: () => void;
 }) => (
-  <div className="rounded-lg border border-border bg-card p-3 shadow-sm">
+  <div
+    role={onClick ? "button" : undefined}
+    tabIndex={onClick ? 0 : undefined}
+    onClick={onClick}
+    onKeyDown={(e) => { if (onClick && (e.key === "Enter" || e.key === " ")) { e.preventDefault(); onClick(); } }}
+    className={`rounded-lg border border-border bg-card p-3 shadow-sm transition ${onClick ? "cursor-pointer hover:border-primary hover:shadow-md" : ""}`}
+  >
     <div className="flex items-center gap-2">
       <Icon className={`h-4 w-4 ${variant === "success" ? "text-emerald-500" : "text-destructive"}`} />
       <p className="text-xs font-medium text-muted-foreground">{label}</p>
