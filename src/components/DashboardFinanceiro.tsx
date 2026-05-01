@@ -10,7 +10,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell,
 } from "recharts";
-import { TrendingUp, TrendingDown, DollarSign, BarChart3, Printer } from "lucide-react";
+import { TrendingUp, TrendingDown, DollarSign, BarChart3, Printer, ChevronRight, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { printDashboardFinanceiro } from "@/lib/printUtils";
 
@@ -102,13 +102,37 @@ const DashboardFinanceiro = () => {
     const resultado = totalReceitas - totalDespesas;
     const margem = totalReceitas > 0 ? (resultado / totalReceitas) * 100 : 0;
 
-    const centrosMap = new Map<string, number>();
+    const centrosMap = new Map<string, { total: number; itens: any[] }>();
     cpPeriod.forEach((c) => {
       const key = (c as any).centro_custo || "Sem centro";
-      centrosMap.set(key, (centrosMap.get(key) || 0) + Number(c.valor));
+      const cur = centrosMap.get(key) || { total: 0, itens: [] };
+      cur.total += Number(c.valor);
+      cur.itens.push(c);
+      centrosMap.set(key, cur);
     });
     const centros = Array.from(centrosMap.entries())
-      .map(([nome, valor]) => ({ nome, valor }))
+      .map(([nome, { total, itens }]) => {
+        // Quebra por veículo se for "DESPESAS COM VEÍCULOS"; senão por fornecedor
+        const isVeiculos = /ve[ií]culo/i.test(nome);
+        const subMap = new Map<string, number>();
+        itens.forEach((c: any) => {
+          let subKey: string;
+          if (isVeiculos) {
+            const placa = (c.placa || "").trim();
+            const forn = (c.fornecedor || "").trim();
+            subKey = placa
+              ? (forn ? `${placa} — ${forn}` : placa)
+              : (forn || "Sem identificação");
+          } else {
+            subKey = (c.fornecedor || "").trim() || "Sem fornecedor";
+          }
+          subMap.set(subKey, (subMap.get(subKey) || 0) + Number(c.valor));
+        });
+        const filhos = Array.from(subMap.entries())
+          .map(([sub, valor]) => ({ nome: sub, valor }))
+          .sort((a, b) => b.valor - a.valor);
+        return { nome, valor: total, filhos };
+      })
       .sort((a, b) => b.valor - a.valor);
 
     const centrosRecMap = new Map<string, number>();
@@ -148,6 +172,11 @@ const DashboardFinanceiro = () => {
 
     return { recPago, recPendente, despPago, despPendente, resultadoEfetivado, resultadoProjetado, monthly };
   }, [cpPeriod, crPeriod, cpYear, crYear, year]);
+
+  // Estado de expansão dos centros de custo na DRE
+  const [expandedCentros, setExpandedCentros] = useState<Record<string, boolean>>({});
+  const toggleCentro = (nome: string) =>
+    setExpandedCentros((prev) => ({ ...prev, [nome]: !prev[nome] }));
 
   // ========== Faturamento por Cliente (respeita ano + mês) ==========
   const faturamentoClientes = useMemo(() => {
@@ -394,12 +423,37 @@ const DashboardFinanceiro = () => {
                     <TableCell className="font-semibold">(-) DESPESAS</TableCell>
                     <TableCell className="text-right font-mono font-bold text-destructive">{formatCurrency(dre.totalDespesas)}</TableCell>
                   </TableRow>
-                  {dre.centros.map((c) => (
-                    <TableRow key={c.nome}>
-                      <TableCell className="pl-6 text-sm text-muted-foreground">{c.nome}</TableCell>
-                      <TableCell className="text-right font-mono text-sm">{formatCurrency(c.valor)}</TableCell>
-                    </TableRow>
-                  ))}
+                  {dre.centros.map((c: any) => {
+                    const isOpen = !!expandedCentros[c.nome];
+                    const hasChildren = (c.filhos?.length || 0) > 0;
+                    return (
+                      <>
+                        <TableRow
+                          key={c.nome}
+                          className={hasChildren ? "cursor-pointer hover:bg-muted/40" : ""}
+                          onClick={() => hasChildren && toggleCentro(c.nome)}
+                        >
+                          <TableCell className="pl-6 text-sm text-muted-foreground">
+                            <span className="inline-flex items-center gap-1">
+                              {hasChildren ? (
+                                isOpen ? <ChevronDown className="h-3 w-3" /> : <ChevronRight className="h-3 w-3" />
+                              ) : (
+                                <span className="inline-block w-3" />
+                              )}
+                              {c.nome}
+                            </span>
+                          </TableCell>
+                          <TableCell className="text-right font-mono text-sm">{formatCurrency(c.valor)}</TableCell>
+                        </TableRow>
+                        {isOpen && c.filhos?.map((f: any) => (
+                          <TableRow key={`${c.nome}-${f.nome}`} className="bg-muted/10">
+                            <TableCell className="pl-12 text-xs text-muted-foreground">{f.nome}</TableCell>
+                            <TableCell className="text-right font-mono text-xs text-muted-foreground">{formatCurrency(f.valor)}</TableCell>
+                          </TableRow>
+                        ))}
+                      </>
+                    );
+                  })}
                   <TableRow className="bg-primary/10 border-t-2 border-primary">
                     <TableCell className="font-bold text-base">(=) RESULTADO</TableCell>
                     <TableCell className={`text-right font-mono text-base font-bold ${dre.resultado >= 0 ? "text-emerald-600" : "text-destructive"}`}>
