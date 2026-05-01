@@ -46,6 +46,7 @@ const DashboardFinanceiro = () => {
   const [contasReceber, setContasReceber] = useState<ContaDB[]>([]);
   const [year, setYear] = useState(new Date().getFullYear().toString());
   const [month, setMonth] = useState<string>("todos"); // "todos" | "01".."12"
+  const [detailOpen, setDetailOpen] = useState<null | "receitas" | "despesas">(null);
 
   useEffect(() => {
     const fetchAll = async (table: "contas_pagar" | "contas_receber") => {
@@ -323,12 +324,22 @@ const DashboardFinanceiro = () => {
         </Button>
 
         <div className="grid flex-1 grid-cols-2 gap-3 sm:grid-cols-4">
-          <KPICard icon={TrendingUp} label="Receitas" value={formatCurrency(dre.totalReceitas)} variant="success" />
-          <KPICard icon={TrendingDown} label="Despesas" value={formatCurrency(dre.totalDespesas)} variant="destructive" />
+          <KPICard icon={TrendingUp} label="Receitas" value={formatCurrency(dre.totalReceitas)} variant="success" onClick={() => setDetailOpen("receitas")} />
+          <KPICard icon={TrendingDown} label="Despesas" value={formatCurrency(dre.totalDespesas)} variant="destructive" onClick={() => setDetailOpen("despesas")} />
           <KPICard icon={DollarSign} label="Resultado" value={formatCurrency(dre.resultado)} variant={dre.resultado >= 0 ? "success" : "destructive"} />
           <KPICard icon={BarChart3} label="Margem" value={`${dre.margem.toFixed(1)}%`} variant={dre.margem >= 0 ? "success" : "destructive"} />
         </div>
       </div>
+
+      {/* Diálogo de detalhamento Receitas/Despesas */}
+      <KPIDetailDialog
+        open={detailOpen !== null}
+        onClose={() => setDetailOpen(null)}
+        tipo={detailOpen}
+        year={year}
+        month={month}
+        items={detailOpen === "receitas" ? crPeriod : cpPeriod}
+      />
 
       {/* Receitas vs Despesas Chart */}
       <Card>
