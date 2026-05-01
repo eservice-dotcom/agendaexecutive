@@ -686,16 +686,21 @@ const Vendas = () => {
       });
 
       // Also add manually entered contas a pagar
-      const manualContas = contasPagar.map((cp) => ({
-        venda_id: venda.id,
-        user_id: session!.user.id,
-        fornecedor: cp.fornecedor,
-        descritivo: cp.descritivo,
-        valor: cp.valor,
-        data: cp.data,
-        data_vencimento: cp.data_vencimento || null,
-        status: "pendente",
-      }));
+      const manualContas = contasPagar.map((cp) => {
+        const isMillena = /millena\s*marques/i.test(cp.fornecedor || "");
+        return {
+          venda_id: venda.id,
+          user_id: session!.user.id,
+          fornecedor: cp.fornecedor,
+          descritivo: cp.descritivo,
+          valor: cp.valor,
+          data: cp.data,
+          data_vencimento: cp.data_vencimento || null,
+          status: "pendente",
+          centro_custo: "FORCECEDORES",
+          subgrupo_custo: isMillena ? "RH" : "VEÍCULOS",
+        };
+      });
 
       const allContasPagar = [...autoContasPagar, ...manualContas];
       if (allContasPagar.length > 0) {
@@ -1489,8 +1494,8 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
           data_vencimento: venc,
           data_pagamento: i === 0 ? (novaContaForm.data_pagamento || null) : null,
           status: i === 0 && novaContaForm.data_pagamento ? "pago" : "pendente",
-          centro_custo: novaContaForm.centro_custo,
-          subgrupo_custo: novaContaForm.subgrupo_custo,
+          centro_custo: novaContaForm.centro_custo || "FORCECEDORES",
+          subgrupo_custo: novaContaForm.subgrupo_custo || (/millena\s*marques/i.test(novaContaForm.fornecedor || "") ? "RH" : "VEÍCULOS"),
           placa: novaContaForm.placa,
         };
       });
