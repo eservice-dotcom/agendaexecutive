@@ -635,22 +635,26 @@ const KPICard = ({ icon: Icon, label, value, variant, onClick }: {
   </div>
 );
 
-const KPIDetailDialog = ({ open, onClose, tipo, year, month, items }: {
+const KPIDetailDialog = ({ open, onClose, tipo, year, month, items, onUpdated }: {
   open: boolean;
   onClose: () => void;
   tipo: "receitas" | "despesas" | null;
   year: string;
   month: string;
   items: any[];
+  onUpdated: (updated: any) => void;
 }) => {
   const isReceita = tipo === "receitas";
   const groupKey = isReceita ? "centro_receita" : "centro_custo";
   const entityKey = isReceita ? "cliente" : "fornecedor";
+  const table = isReceita ? "contas_receber" : "contas_pagar";
   const periodLabel = month === "todos"
     ? year
     : `${MONTHS[parseInt(month, 10) - 1]}/${year}`;
 
-  // Agrupar por centro
+  const [editing, setEditing] = useState<any | null>(null);
+  const [saving, setSaving] = useState(false);
+
   const grupos = (() => {
     const map = new Map<string, { total: number; itens: any[] }>();
     items.forEach((c) => {
@@ -666,6 +670,28 @@ const KPIDetailDialog = ({ open, onClose, tipo, year, month, items }: {
   })();
 
   const total = items.reduce((s, c) => s + (Number(c.valor) || 0), 0);
+
+  const handleSave = async () => {
+    if (!editing?.id) return;
+    setSaving(true);
+    const payload: any = {
+      descritivo: editing.descritivo || "",
+      valor: Number(editing.valor) || 0,
+      data_vencimento: editing.data_vencimento || null,
+      data: editing.data || null,
+      status: editing.status,
+      [entityKey]: editing[entityKey] || "",
+      [groupKey]: editing[groupKey] || "",
+    };
+    const { error } = await supabase.from(table).update(payload).eq("id", editing.id);
+    setSaving(false);
+    if (error) {
+      console.error("Erro ao salvar:", error);
+      return;
+    }
+    onUpdated({ id: editing.id, ...payload });
+    setEditing(null);
+  };
 
   return (
     <Dialog open={open} onOpenChange={(o) => !o && onClose()}>
@@ -702,6 +728,7 @@ const KPIDetailDialog = ({ open, onClose, tipo, year, month, items }: {
                       <TableHead className="text-xs">Descritivo</TableHead>
                       <TableHead className="text-xs">Status</TableHead>
                       <TableHead className="text-xs text-right">Valor</TableHead>
+                      <TableHead className="text-xs text-right">Ações</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -719,6 +746,17 @@ const KPIDetailDialog = ({ open, onClose, tipo, year, month, items }: {
                             </span>
                           </TableCell>
                           <TableCell className="text-xs py-1.5 text-right font-mono">{formatCurrency(Number(c.valor) || 0)}</TableCell>
+                          <TableCell className="text-xs py-1.5 text-right">
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="h-6 px-2 text-xs"
+                              onClick={() => setEditing({ ...c })}
+                              disabled={!c.id}
+                            >
+                              Editar
+                            </Button>
+                          </TableCell>
                         </TableRow>
                       ))}
                   </TableBody>
@@ -727,6 +765,85 @@ const KPIDetailDialog = ({ open, onClose, tipo, year, month, items }: {
             ))}
           </div>
         )}
+
+        {/* Sub-dialog de edição */}
+        <Dialog open={!!editing} onOpenChange={(o) => !o && setEditing(null)}>
+          <DialogContent className="max-w-lg">
+            <DialogHeader>
+              <DialogTitle>Editar {isReceita ? "Receita" : "Despesa"}</DialogTitle>
+            </DialogHeader>
+            {editing && (
+              <div className="grid grid-cols-2 gap-3">
+                <div className="col-span-2">
+                  <Label className="text-xs">{isReceita ? "Cliente" : "Fornecedor"}</Label>
+                  <Input
+                    value={editing[entityKey] || ""}
+                    onChange={(e) => setEditing({ ...editing, [entityKey]: e.target.value })}
+                  />
+                </div>
+                <div className="col-span-2">
+                  <Label className="text-xs">Descritivo</Label>
+                  <Input
+                    value={editing.descritivo || ""}
+                    onChange={(e) => setEditing({ ...editing, descritivo: e.target.value })}
+                  />
+                </div>
+                <div>
+                  <Label className="text-xs">Vencimento</Label>
+                  <Input
+                    type="date"
+                    value={editing.data_vencimento || ""}
+                    onChange={(e) => setEditing({ ...editing, data_vencimento: e.target.value })}
+                  />
+                </div>
+                <div>
+                  <Label className="text-xs">Data Lançamento</Label>
+                  <Input
+                    type="date"
+                    value={editing.data || ""}
+                    onChange={(e) => setEditing({ ...editing, data: e.target.value })}
+                  />
+                </div>
+                <div>
+                  <Label className="text-xs">Valor</Label>
+                  <Input
+                    type="number"
+                    step="0.01"
+                    value={editing.valor ?? 0}
+                    onChange={(e) => setEditing({ ...editing, valor: e.target.value })}
+                  />
+                </div>
+                <div>
+                  <Label className="text-xs">Status</Label>
+                  <Select
+                    value={editing.status || "pendente"}
+                    onValueChange={(v) => setEditing({ ...editing, status: v })}
+                  >
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="pendente">pendente</SelectItem>
+                      <SelectItem value={isReceita ? "recebido" : "pago"}>{isReceita ? "recebido" : "pago"}</SelectItem>
+                      <SelectItem value="cancelado">cancelado</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="col-span-2">
+                  <Label className="text-xs">{isReceita ? "Centro de Receita" : "Centro de Custo"}</Label>
+                  <Input
+                    value={editing[groupKey] || ""}
+                    onChange={(e) => setEditing({ ...editing, [groupKey]: e.target.value })}
+                  />
+                </div>
+              </div>
+            )}
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setEditing(null)} disabled={saving}>Cancelar</Button>
+              <Button onClick={handleSave} disabled={saving}>{saving ? "Salvando..." : "Salvar"}</Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
       </DialogContent>
     </Dialog>
   );
