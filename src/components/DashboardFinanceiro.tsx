@@ -628,4 +628,101 @@ const KPICard = ({ icon: Icon, label, value, variant, onClick }: {
   </div>
 );
 
+const KPIDetailDialog = ({ open, onClose, tipo, year, month, items }: {
+  open: boolean;
+  onClose: () => void;
+  tipo: "receitas" | "despesas" | null;
+  year: string;
+  month: string;
+  items: any[];
+}) => {
+  const isReceita = tipo === "receitas";
+  const groupKey = isReceita ? "centro_receita" : "centro_custo";
+  const entityKey = isReceita ? "cliente" : "fornecedor";
+  const periodLabel = month === "todos"
+    ? year
+    : `${MONTHS[parseInt(month, 10) - 1]}/${year}`;
+
+  // Agrupar por centro
+  const grupos = (() => {
+    const map = new Map<string, { total: number; itens: any[] }>();
+    items.forEach((c) => {
+      const key = (c as any)[groupKey] || "Sem centro";
+      const cur = map.get(key) || { total: 0, itens: [] };
+      cur.total += Number(c.valor) || 0;
+      cur.itens.push(c);
+      map.set(key, cur);
+    });
+    return Array.from(map.entries())
+      .map(([nome, v]) => ({ nome, total: v.total, itens: v.itens }))
+      .sort((a, b) => b.total - a.total);
+  })();
+
+  const total = items.reduce((s, c) => s + (Number(c.valor) || 0), 0);
+
+  return (
+    <Dialog open={open} onOpenChange={(o) => !o && onClose()}>
+      <DialogContent className="max-w-3xl max-h-[85vh] overflow-y-auto">
+        <DialogHeader>
+          <DialogTitle className="flex items-center justify-between gap-4">
+            <span>
+              Detalhamento de {isReceita ? "Receitas" : "Despesas"} — {periodLabel}
+            </span>
+            <span className={`text-base font-bold ${isReceita ? "text-emerald-600" : "text-destructive"}`}>
+              {formatCurrency(total)}
+            </span>
+          </DialogTitle>
+        </DialogHeader>
+        {grupos.length === 0 ? (
+          <p className="py-8 text-center text-sm text-muted-foreground">
+            Nenhum lançamento neste período.
+          </p>
+        ) : (
+          <div className="space-y-4">
+            {grupos.map((g) => (
+              <div key={g.nome} className="rounded-md border border-border">
+                <div className="flex items-center justify-between bg-muted/40 px-3 py-2">
+                  <span className="text-sm font-semibold">{g.nome}</span>
+                  <span className={`text-sm font-bold ${isReceita ? "text-emerald-600" : "text-destructive"}`}>
+                    {formatCurrency(g.total)}
+                  </span>
+                </div>
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead className="text-xs">Vencimento</TableHead>
+                      <TableHead className="text-xs">{isReceita ? "Cliente" : "Fornecedor"}</TableHead>
+                      <TableHead className="text-xs">Descritivo</TableHead>
+                      <TableHead className="text-xs">Status</TableHead>
+                      <TableHead className="text-xs text-right">Valor</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {g.itens
+                      .slice()
+                      .sort((a, b) => compDate(a).localeCompare(compDate(b)))
+                      .map((c, idx) => (
+                        <TableRow key={c.id || idx}>
+                          <TableCell className="text-xs py-1.5">{compDate(c) || "—"}</TableCell>
+                          <TableCell className="text-xs py-1.5">{(c as any)[entityKey] || "—"}</TableCell>
+                          <TableCell className="text-xs py-1.5">{(c as any).descritivo || "—"}</TableCell>
+                          <TableCell className="text-xs py-1.5">
+                            <span className={`inline-block rounded-full px-2 py-0.5 text-[10px] font-medium ${c.status === "pago" || c.status === "recebido" ? "bg-emerald-500/15 text-emerald-600" : "bg-yellow-500/15 text-yellow-600"}`}>
+                              {c.status}
+                            </span>
+                          </TableCell>
+                          <TableCell className="text-xs py-1.5 text-right font-mono">{formatCurrency(Number(c.valor) || 0)}</TableCell>
+                        </TableRow>
+                      ))}
+                  </TableBody>
+                </Table>
+              </div>
+            ))}
+          </div>
+        )}
+      </DialogContent>
+    </Dialog>
+  );
+};
+
 export default DashboardFinanceiro;
