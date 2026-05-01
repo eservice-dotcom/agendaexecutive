@@ -462,7 +462,7 @@ const FaturamentoVeiculo = () => {
                                 <Table>
                                   <TableHeader>
                                     <TableRow className="bg-muted/40 hover:bg-muted/40">
-                                      <TableHead className="text-xs py-1.5">Data</TableHead>
+                                      <TableHead className="text-xs py-1.5">Vencimento</TableHead>
                                       <TableHead className="text-xs py-1.5">Descritivo</TableHead>
                                       <TableHead className="text-xs py-1.5">Status</TableHead>
                                       <TableHead className="text-xs py-1.5 text-right">Valor</TableHead>
