@@ -471,7 +471,7 @@ const FaturamentoVeiculo = () => {
                                   <TableBody>
                                     {despDetalhes.map((desp: any, idx: number) => (
                                       <TableRow key={idx} className="hover:bg-primary/5">
-                                        <TableCell className="text-xs py-1.5">{desp.data || "—"}</TableCell>
+                                        <TableCell className="text-xs py-1.5">{desp.data_vencimento || desp.data || "—"}</TableCell>
                                         <TableCell className="text-xs py-1.5">{desp.descritivo || "—"}</TableCell>
                                         <TableCell className="text-xs py-1.5">
                                           <span className={`inline-block rounded-full px-2 py-0.5 text-[10px] font-medium ${desp.status === "pago" ? "bg-accent/15 text-accent" : "bg-yellow-500/15 text-yellow-600"}`}>
