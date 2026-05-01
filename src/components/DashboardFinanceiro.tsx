@@ -28,12 +28,18 @@ const PIE_COLORS = [
 interface ContaDB {
   valor: number;
   data: string;
+  data_vencimento?: string | null;
   status: string;
   fornecedor?: string;
   cliente?: string;
   centro_custo?: string;
   centro_receita?: string;
 }
+
+// Data de COMPETÊNCIA: usa o vencimento (mês em que a despesa/receita deve ser
+// reconhecida) e cai para a data de lançamento apenas se não houver vencimento.
+const compDate = (c: { data?: string; data_vencimento?: string | null }) =>
+  c.data_vencimento || c.data || "";
 
 const DashboardFinanceiro = () => {
   const [contasPagar, setContasPagar] = useState<ContaDB[]>([]);
