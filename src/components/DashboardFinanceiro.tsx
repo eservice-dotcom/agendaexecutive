@@ -654,6 +654,15 @@ const KPIDetailDialog = ({ open, onClose, tipo, year, month, items, onUpdated }:
 
   const [editing, setEditing] = useState<any | null>(null);
   const [saving, setSaving] = useState(false);
+  const [centros, setCentros] = useState<string[]>([]);
+
+  useEffect(() => {
+    if (!open) return;
+    const tbl = isReceita ? "centros_receita" : "centros_custo";
+    supabase.from(tbl).select("nome").order("nome").then(({ data }) => {
+      setCentros((data || []).map((c: any) => c.nome).filter(Boolean));
+    });
+  }, [open, isReceita]);
 
   const grupos = (() => {
     const map = new Map<string, { total: number; itens: any[] }>();
