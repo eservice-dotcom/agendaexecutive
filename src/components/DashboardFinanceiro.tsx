@@ -305,6 +305,18 @@ const DashboardFinanceiro = () => {
           </SelectContent>
         </Select>
 
+        <Select value={month} onValueChange={setMonth}>
+          <SelectTrigger className="w-[140px]">
+            <SelectValue placeholder="Mês" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="todos">Ano todo</SelectItem>
+            {MONTHS.map((label, i) => (
+              <SelectItem key={i} value={String(i + 1).padStart(2, "0")}>{label}</SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+
         <Button variant="outline" size="sm" onClick={openPrintDialog}>
           <Printer className="h-4 w-4 mr-1" />
           Imprimir Relatório
