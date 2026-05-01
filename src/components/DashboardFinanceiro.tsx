@@ -10,7 +10,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell,
 } from "recharts";
-import { TrendingUp, TrendingDown, DollarSign, BarChart3, Printer } from "lucide-react";
+import { TrendingUp, TrendingDown, DollarSign, BarChart3, Printer, ChevronRight, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { printDashboardFinanceiro } from "@/lib/printUtils";
 
