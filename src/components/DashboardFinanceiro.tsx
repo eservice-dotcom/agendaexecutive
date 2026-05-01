@@ -654,6 +654,15 @@ const KPIDetailDialog = ({ open, onClose, tipo, year, month, items, onUpdated }:
 
   const [editing, setEditing] = useState<any | null>(null);
   const [saving, setSaving] = useState(false);
+  const [centros, setCentros] = useState<string[]>([]);
+
+  useEffect(() => {
+    if (!open) return;
+    const tbl = isReceita ? "centros_receita" : "centros_custo";
+    supabase.from(tbl).select("nome").order("nome").then(({ data }) => {
+      setCentros((data || []).map((c: any) => c.nome).filter(Boolean));
+    });
+  }, [open, isReceita]);
 
   const grupos = (() => {
     const map = new Map<string, { total: number; itens: any[] }>();
@@ -831,10 +840,22 @@ const KPIDetailDialog = ({ open, onClose, tipo, year, month, items, onUpdated }:
                 </div>
                 <div className="col-span-2">
                   <Label className="text-xs">{isReceita ? "Centro de Receita" : "Centro de Custo"}</Label>
-                  <Input
+                  <Select
                     value={editing[groupKey] || ""}
-                    onChange={(e) => setEditing({ ...editing, [groupKey]: e.target.value })}
-                  />
+                    onValueChange={(v) => setEditing({ ...editing, [groupKey]: v })}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Selecione um centro..." />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {centros.map((nome) => (
+                        <SelectItem key={nome} value={nome}>{nome}</SelectItem>
+                      ))}
+                      {editing[groupKey] && !centros.includes(editing[groupKey]) && (
+                        <SelectItem value={editing[groupKey]}>{editing[groupKey]} (atual)</SelectItem>
+                      )}
+                    </SelectContent>
+                  </Select>
                 </div>
               </div>
             )}
