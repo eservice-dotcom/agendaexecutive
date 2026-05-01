@@ -423,12 +423,37 @@ const DashboardFinanceiro = () => {
                     <TableCell className="font-semibold">(-) DESPESAS</TableCell>
                     <TableCell className="text-right font-mono font-bold text-destructive">{formatCurrency(dre.totalDespesas)}</TableCell>
                   </TableRow>
-                  {dre.centros.map((c) => (
-                    <TableRow key={c.nome}>
-                      <TableCell className="pl-6 text-sm text-muted-foreground">{c.nome}</TableCell>
-                      <TableCell className="text-right font-mono text-sm">{formatCurrency(c.valor)}</TableCell>
-                    </TableRow>
-                  ))}
+                  {dre.centros.map((c: any) => {
+                    const isOpen = !!expandedCentros[c.nome];
+                    const hasChildren = (c.filhos?.length || 0) > 0;
+                    return (
+                      <>
+                        <TableRow
+                          key={c.nome}
+                          className={hasChildren ? "cursor-pointer hover:bg-muted/40" : ""}
+                          onClick={() => hasChildren && toggleCentro(c.nome)}
+                        >
+                          <TableCell className="pl-6 text-sm text-muted-foreground">
+                            <span className="inline-flex items-center gap-1">
+                              {hasChildren ? (
+                                isOpen ? <ChevronDown className="h-3 w-3" /> : <ChevronRight className="h-3 w-3" />
+                              ) : (
+                                <span className="inline-block w-3" />
+                              )}
+                              {c.nome}
+                            </span>
+                          </TableCell>
+                          <TableCell className="text-right font-mono text-sm">{formatCurrency(c.valor)}</TableCell>
+                        </TableRow>
+                        {isOpen && c.filhos?.map((f: any) => (
+                          <TableRow key={`${c.nome}-${f.nome}`} className="bg-muted/10">
+                            <TableCell className="pl-12 text-xs text-muted-foreground">{f.nome}</TableCell>
+                            <TableCell className="text-right font-mono text-xs text-muted-foreground">{formatCurrency(f.valor)}</TableCell>
+                          </TableRow>
+                        ))}
+                      </>
+                    );
+                  })}
                   <TableRow className="bg-primary/10 border-t-2 border-primary">
                     <TableCell className="font-bold text-base">(=) RESULTADO</TableCell>
                     <TableCell className={`text-right font-mono text-base font-bold ${dre.resultado >= 0 ? "text-emerald-600" : "text-destructive"}`}>
