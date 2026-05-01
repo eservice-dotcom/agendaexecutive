@@ -1494,8 +1494,8 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
           data_vencimento: venc,
           data_pagamento: i === 0 ? (novaContaForm.data_pagamento || null) : null,
           status: i === 0 && novaContaForm.data_pagamento ? "pago" : "pendente",
-          centro_custo: novaContaForm.centro_custo || "FORCECEDORES",
-          subgrupo_custo: novaContaForm.subgrupo_custo || (/millena\s*marques/i.test(novaContaForm.fornecedor || "") ? "RH" : "VEÍCULOS"),
+          centro_custo: novaContaForm.centro_custo,
+          subgrupo_custo: novaContaForm.subgrupo_custo,
           placa: novaContaForm.placa,
         };
       });
