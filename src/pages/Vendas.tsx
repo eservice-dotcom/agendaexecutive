@@ -670,6 +670,7 @@ const Vendas = () => {
         const vencFornecedor = new Date(`${dataBase}T00:00:00`);
         vencFornecedor.setDate(vencFornecedor.getDate() + 30);
         const vencFornecedorStr = vencFornecedor.toISOString().split("T")[0];
+        const isMillena = /millena\s*marques/i.test(fornecedor);
         return {
           venda_id: venda.id,
           user_id: session!.user.id,
@@ -679,6 +680,8 @@ const Vendas = () => {
           data: dataVenda,
           data_vencimento: vencFornecedorStr,
           status: "pendente",
+          centro_custo: "FORCECEDORES",
+          subgrupo_custo: isMillena ? "RH" : "VEÍCULOS",
         };
       });
 
@@ -900,6 +903,7 @@ const Vendas = () => {
           const vencFornecedor = new Date(`${dataBase}T00:00:00`);
           vencFornecedor.setDate(vencFornecedor.getDate() + 30);
           const vencFornecedorStr = vencFornecedor.toISOString().split("T")[0];
+          const isMillena = /millena\s*marques/i.test(fornecedor);
           return {
             venda_id: venda.id,
             user_id: user.id,
@@ -909,6 +913,8 @@ const Vendas = () => {
             data: venda.data_venda,
             data_vencimento: vencFornecedorStr,
             status: "pendente",
+            centro_custo: "FORCECEDORES",
+            subgrupo_custo: isMillena ? "RH" : "VEÍCULOS",
           };
         })
         .filter(Boolean);
