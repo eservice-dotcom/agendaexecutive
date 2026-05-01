@@ -67,22 +67,22 @@ const DashboardFinanceiro = () => {
   }, []);
 
   const years = useMemo(() => {
-    const allDates = [...contasPagar, ...contasReceber].map((c) => c.data?.substring(0, 4)).filter(Boolean);
+    const allDates = [...contasPagar, ...contasReceber].map((c) => compDate(c).substring(0, 4)).filter(Boolean);
     const unique = [...new Set(allDates)].sort().reverse();
     if (unique.length === 0) unique.push(new Date().getFullYear().toString());
     return unique;
   }, [contasPagar, contasReceber]);
 
-  const cpYear = useMemo(() => contasPagar.filter((c) => c.data?.startsWith(year)), [contasPagar, year]);
-  const crYear = useMemo(() => contasReceber.filter((c) => c.data?.startsWith(year)), [contasReceber, year]);
+  const cpYear = useMemo(() => contasPagar.filter((c) => compDate(c).startsWith(year)), [contasPagar, year]);
+  const crYear = useMemo(() => contasReceber.filter((c) => compDate(c).startsWith(year)), [contasReceber, year]);
 
   // ========== Receitas vs Despesas (Bar Chart by month) ==========
   const receitasDespesasData = useMemo(() => {
     return MONTHS.map((label, i) => {
       const m = String(i + 1).padStart(2, "0");
       const prefix = `${year}-${m}`;
-      const receitas = crYear.filter((c) => c.data?.startsWith(prefix)).reduce((s, c) => s + Number(c.valor), 0);
-      const despesas = cpYear.filter((c) => c.data?.startsWith(prefix)).reduce((s, c) => s + Number(c.valor), 0);
+      const receitas = crYear.filter((c) => compDate(c).startsWith(prefix)).reduce((s, c) => s + Number(c.valor), 0);
+      const despesas = cpYear.filter((c) => compDate(c).startsWith(prefix)).reduce((s, c) => s + Number(c.valor), 0);
       return { mes: label, Receitas: receitas, Despesas: despesas };
     });
   }, [cpYear, crYear, year]);
@@ -131,8 +131,8 @@ const DashboardFinanceiro = () => {
     const monthly = MONTHS.map((label, i) => {
       const m = String(i + 1).padStart(2, "0");
       const prefix = `${year}-${m}`;
-      const mCr = crYear.filter((c) => c.data?.startsWith(prefix));
-      const mCp = cpYear.filter((c) => c.data?.startsWith(prefix));
+      const mCr = crYear.filter((c) => compDate(c).startsWith(prefix));
+      const mCp = cpYear.filter((c) => compDate(c).startsWith(prefix));
       const efetivado = mCr.filter((c) => c.status === "pago").reduce((s, c) => s + Number(c.valor), 0)
         - mCp.filter((c) => c.status === "pago").reduce((s, c) => s + Number(c.valor), 0);
       const projetado = mCr.reduce((s, c) => s + Number(c.valor), 0)
@@ -193,12 +193,12 @@ const DashboardFinanceiro = () => {
     let filteredCR = crYear;
 
     if (printDataInicio) {
-      filteredCP = filteredCP.filter(c => c.data >= printDataInicio);
-      filteredCR = filteredCR.filter(c => c.data >= printDataInicio);
+      filteredCP = filteredCP.filter(c => compDate(c) >= printDataInicio);
+      filteredCR = filteredCR.filter(c => compDate(c) >= printDataInicio);
     }
     if (printDataFim) {
-      filteredCP = filteredCP.filter(c => c.data <= printDataFim);
-      filteredCR = filteredCR.filter(c => c.data <= printDataFim);
+      filteredCP = filteredCP.filter(c => compDate(c) <= printDataFim);
+      filteredCR = filteredCR.filter(c => compDate(c) <= printDataFim);
     }
     if (printCliente) {
       filteredCR = filteredCR.filter(c => (c as any).cliente === printCliente);
@@ -211,8 +211,8 @@ const DashboardFinanceiro = () => {
     const filteredReceitasDespesas = MONTHS.map((label, i) => {
       const m = String(i + 1).padStart(2, "0");
       const prefix = `${year}-${m}`;
-      const receitas = filteredCR.filter(c => c.data?.startsWith(prefix)).reduce((s, c) => s + Number(c.valor), 0);
-      const despesas = filteredCP.filter(c => c.data?.startsWith(prefix)).reduce((s, c) => s + Number(c.valor), 0);
+      const receitas = filteredCR.filter(c => compDate(c).startsWith(prefix)).reduce((s, c) => s + Number(c.valor), 0);
+      const despesas = filteredCP.filter(c => compDate(c).startsWith(prefix)).reduce((s, c) => s + Number(c.valor), 0);
       return { mes: label, Receitas: receitas, Despesas: despesas };
     });
 
@@ -245,8 +245,8 @@ const DashboardFinanceiro = () => {
     const monthly = MONTHS.map((label, i) => {
       const m = String(i + 1).padStart(2, "0");
       const prefix = `${year}-${m}`;
-      const mCr = filteredCR.filter(c => c.data?.startsWith(prefix));
-      const mCp = filteredCP.filter(c => c.data?.startsWith(prefix));
+      const mCr = filteredCR.filter(c => compDate(c).startsWith(prefix));
+      const mCp = filteredCP.filter(c => compDate(c).startsWith(prefix));
       const efetivado = mCr.filter(c => c.status === "pago").reduce((s, c) => s + Number(c.valor), 0) - mCp.filter(c => c.status === "pago").reduce((s, c) => s + Number(c.valor), 0);
       const projetado = mCr.reduce((s, c) => s + Number(c.valor), 0) - mCp.reduce((s, c) => s + Number(c.valor), 0);
       return { mes: label, Efetivado: efetivado, Projetado: projetado };
