@@ -119,7 +119,7 @@ export const generateClosingReportExcel = (
       "KM Extra": Number(ai.km_extra) || 0,
       "Outros": outrosTotal,
       "Estacionamento": estac,
-      "Valor": (Number(ai.valor) || 0) + estac,
+      "Valor": (Number(ai.valor) || 0) + estac + outrosTotal,
     };
   });
 
@@ -187,7 +187,7 @@ export const generateClosingReportExcel = (
     "KM Extra": totalKmExtra,
     "Outros": totalOutros,
     "Estacionamento": totalEstac,
-    "Valor": totalServicos + totalEstac + unmappedExtrasTotal,
+    "Valor": totalServicos + totalEstac + totalOutros + unmappedExtrasTotal,
   });
 
   const ws = XLSX.utils.json_to_sheet(rows);
@@ -199,7 +199,7 @@ export const generateClosingReportExcel = (
   XLSX.utils.book_append_sheet(wb, ws, "Serviços");
 
   // --- Sheet 2: Resumo ---
-  const totalGeral = totalServicos + totalEstac + unmappedExtrasTotal;
+  const totalGeral = totalServicos + totalEstac + totalOutros + unmappedExtrasTotal;
   const resumo = [
     { Campo: "Fechamento Nº", Valor: numeroFechamento || "" },
     { Campo: "Cliente", Valor: vendaInfo?.cliente || "" },
@@ -278,7 +278,7 @@ export const generateBatchClosingReportExcel = (fechamentos: BatchFechamento[]) 
         "KM Extra": Number(ai.km_extra) || 0,
         "Outros": outrosTotal,
         "Estacionamento": Number(ai.estacionamento) || 0,
-        "Valor": (Number(ai.valor) || 0) + (Number(ai.estacionamento) || 0),
+        "Valor": (Number(ai.valor) || 0) + (Number(ai.estacionamento) || 0) + outrosTotal,
       });
     });
 
@@ -325,15 +325,21 @@ export const generateBatchClosingReportExcel = (fechamentos: BatchFechamento[]) 
     const { unmapped } = buildExtrasPerOs(extras);
     const servTotal = (f.items || []).reduce((s: number, ai: any) => s + parseAmount(ai.valor), 0);
     const estacTotal = (f.items || []).reduce((s: number, ai: any) => s + parseAmount(ai.estacionamento), 0);
+    const outrosTotalF = (f.items || []).reduce((s: number, ai: any) => {
+      const od = ai.outros_despesas
+        ? Array.isArray(ai.outros_despesas) ? ai.outros_despesas : JSON.parse(ai.outros_despesas)
+        : [];
+      return s + od.reduce((ss: number, d: any) => ss + parseAmount(d.valor), 0) + parseAmount(ai.outros);
+    }, 0);
     const unmappedTotal = unmapped.reduce((s, e) => s + e.valor, 0);
-    const total = servTotal + estacTotal + unmappedTotal;
+    const total = servTotal + estacTotal + outrosTotalF + unmappedTotal;
     grandTotal += total;
     resumoRows.push({
       "Fechamento Nº": f.numero_fechamento,
       "Cliente": f.cliente,
       "Qtd Serviços": (f.items || []).length,
       "Valor Serviços": servTotal,
-      "Extras": estacTotal + unmappedTotal,
+      "Extras": estacTotal + outrosTotalF + unmappedTotal,
       "Total": total,
     });
   });
