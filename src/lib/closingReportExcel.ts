@@ -149,11 +149,17 @@ export const generateClosingReportExcel = (
     });
   });
 
-  // Totals
+  // Totals — sum the actual row values so columns reconcile with what's displayed
   const totalServicos = sortedItems.reduce((s, ai) => s + parseAmount(ai.valor), 0);
   const totalEstac = sortedItems.reduce((s, ai) => s + parseAmount(ai.estacionamento), 0);
   const totalKm = sortedItems.reduce((s, ai) => s + (parseAmount(ai.km_fim) - parseAmount(ai.km_in)), 0);
   const totalKmExtra = sortedItems.reduce((s, ai) => s + parseAmount(ai.km_extra), 0);
+  const totalOutros = sortedItems.reduce((s, ai) => {
+    const od = ai.outros_despesas
+      ? Array.isArray(ai.outros_despesas) ? ai.outros_despesas : JSON.parse(ai.outros_despesas)
+      : [];
+    return s + od.reduce((ss: number, d: any) => ss + parseAmount(d.valor), 0) + parseAmount(ai.outros);
+  }, 0);
   const unmappedExtrasTotal = unmappedExtras.reduce((s, e) => s + e.valor, 0);
 
   rows.push({
@@ -174,8 +180,8 @@ export const generateClosingReportExcel = (
     "KM Fim": 0,
     "KM Total": totalKm,
     "KM Extra": totalKmExtra,
-    "Outros": unmappedExtrasTotal,
-    "Estacionamento": 0,
+    "Outros": totalOutros,
+    "Estacionamento": totalEstac,
     "Valor": totalServicos + totalEstac + unmappedExtrasTotal,
   });
 
