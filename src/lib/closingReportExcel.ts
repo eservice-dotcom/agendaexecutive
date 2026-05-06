@@ -123,15 +123,20 @@ export const generateClosingReportExcel = (
     };
   });
 
+  // Build list of all O.S. included in this closing for context on manual extras
+  const osList = sortedItems.map((ai) => ai.cot).filter(Boolean).join(", ");
+  const osContext = osList ? ` (Refere-se às O.S.: ${osList})` : "";
+
   // Only add unmapped extras (not linked to a specific O.S.) as separate rows
   unmappedExtras.forEach((extra, idx) => {
+    const desc = `${extra.descricao}${osContext}`;
     rows.push({
       "#": sortedItems.length + idx + 1,
       "O.S.": "EXTRA",
       "Data": "",
       "Hora": "",
-      "Tipo": extra.descricao,
-      "Origem": extra.descricao,
+      "Tipo": desc,
+      "Origem": desc,
       "Destino": "",
       "Motorista": "",
       "Veículo": "",
@@ -277,8 +282,11 @@ export const generateBatchClosingReportExcel = (fechamentos: BatchFechamento[]) 
       });
     });
 
-    // Only unmapped extras as separate rows
+    // Only unmapped extras as separate rows — annotate with the O.S. they relate to
+    const osList = sorted.map((ai: any) => ai.cot).filter(Boolean).join(", ");
+    const osContext = osList ? ` (Refere-se às O.S.: ${osList})` : "";
     unmappedExtras.forEach((extra, idx) => {
+      const desc = `${extra.descricao}${osContext}`;
       allRows.push({
         "Fechamento": f.numero_fechamento,
         "Cliente": f.cliente,
@@ -286,8 +294,8 @@ export const generateBatchClosingReportExcel = (fechamentos: BatchFechamento[]) 
         "O.S.": "EXTRA",
         "Data": "",
         "Hora": "",
-        "Tipo": extra.descricao,
-        "Origem": extra.descricao,
+        "Tipo": desc,
+        "Origem": desc,
         "Destino": "",
         "Motorista": "",
         "Veículo": "",
