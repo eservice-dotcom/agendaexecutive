@@ -130,7 +130,7 @@ export const generateClosingReportExcel = (
       "O.S.": "EXTRA",
       "Data": "",
       "Hora": "",
-      "Tipo": "Extra",
+      "Tipo": extra.descricao,
       "Origem": extra.descricao,
       "Destino": "",
       "Motorista": "",
