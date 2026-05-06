@@ -119,7 +119,7 @@ export const generateClosingReportExcel = (
       "KM Extra": Number(ai.km_extra) || 0,
       "Outros": outrosTotal,
       "Estacionamento": estac,
-      "Valor": (Number(ai.valor) || 0) + estac,
+      "Valor": (Number(ai.valor) || 0) + estac + outrosTotal,
     };
   });
 
@@ -187,7 +187,7 @@ export const generateClosingReportExcel = (
     "KM Extra": totalKmExtra,
     "Outros": totalOutros,
     "Estacionamento": totalEstac,
-    "Valor": totalServicos + totalEstac + unmappedExtrasTotal,
+    "Valor": totalServicos + totalEstac + totalOutros + unmappedExtrasTotal,
   });
 
   const ws = XLSX.utils.json_to_sheet(rows);
@@ -199,7 +199,7 @@ export const generateClosingReportExcel = (
   XLSX.utils.book_append_sheet(wb, ws, "Serviços");
 
   // --- Sheet 2: Resumo ---
-  const totalGeral = totalServicos + totalEstac + unmappedExtrasTotal;
+  const totalGeral = totalServicos + totalEstac + totalOutros + unmappedExtrasTotal;
   const resumo = [
     { Campo: "Fechamento Nº", Valor: numeroFechamento || "" },
     { Campo: "Cliente", Valor: vendaInfo?.cliente || "" },
