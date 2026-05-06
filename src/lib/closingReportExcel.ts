@@ -339,7 +339,7 @@ export const generateBatchClosingReportExcel = (fechamentos: BatchFechamento[]) 
       "Cliente": f.cliente,
       "Qtd Serviços": (f.items || []).length,
       "Valor Serviços": servTotal,
-      "Extras": estacTotal + unmappedTotal,
+      "Extras": estacTotal + outrosTotalF + unmappedTotal,
       "Total": total,
     });
   });
