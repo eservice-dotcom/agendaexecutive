@@ -325,8 +325,14 @@ export const generateBatchClosingReportExcel = (fechamentos: BatchFechamento[]) 
     const { unmapped } = buildExtrasPerOs(extras);
     const servTotal = (f.items || []).reduce((s: number, ai: any) => s + parseAmount(ai.valor), 0);
     const estacTotal = (f.items || []).reduce((s: number, ai: any) => s + parseAmount(ai.estacionamento), 0);
+    const outrosTotalF = (f.items || []).reduce((s: number, ai: any) => {
+      const od = ai.outros_despesas
+        ? Array.isArray(ai.outros_despesas) ? ai.outros_despesas : JSON.parse(ai.outros_despesas)
+        : [];
+      return s + od.reduce((ss: number, d: any) => ss + parseAmount(d.valor), 0) + parseAmount(ai.outros);
+    }, 0);
     const unmappedTotal = unmapped.reduce((s, e) => s + e.valor, 0);
-    const total = servTotal + estacTotal + unmappedTotal;
+    const total = servTotal + estacTotal + outrosTotalF + unmappedTotal;
     grandTotal += total;
     resumoRows.push({
       "Fechamento Nº": f.numero_fechamento,
