@@ -36,6 +36,7 @@ interface FiltersState {
   tipo: string;
   fornecedor: string;
   motorista: string;
+  veiculo: string;
   pax: string;
   sht: string;
   receptivo: string;
