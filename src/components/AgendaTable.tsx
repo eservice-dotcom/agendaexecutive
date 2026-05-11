@@ -80,6 +80,9 @@ const formatDate = (dateStr: string) => {
   return `${d}/${m}/${y}`;
 };
 
+const getStatusFaturamento = (item: AgendaItem): StatusFaturamento =>
+  (item.statusFaturamento || (item as any).status_faturamento || "") as StatusFaturamento;
+
 const mapAgendaRow = (row: any): AgendaItem => ({
   id: row.id,
   data: row.data,
@@ -163,6 +166,7 @@ const AgendaTable = ({ items, onEdited, hideFinancials, onClone }: AgendaTablePr
   const handleClone = async (item: AgendaItem) => {
     if (!session?.user) return;
     try {
+      const statusFaturamento = getStatusFaturamento(item);
       const { data: inserted, error } = await supabase
         .from("agenda_items")
         .insert({
@@ -185,7 +189,7 @@ const AgendaTable = ({ items, onEdited, hideFinancials, onClone }: AgendaTablePr
           custo: item.custo,
           observacoes: item.observacoes,
           receptivo: item.receptivo || "",
-          status_faturamento: item.statusFaturamento || "",
+          status_faturamento: statusFaturamento,
           cor_manual: item.corManual || null,
           km_in: item.kmIn || 0,
           km_fim: item.kmFim || 0,
@@ -212,7 +216,7 @@ const AgendaTable = ({ items, onEdited, hideFinancials, onClone }: AgendaTablePr
 
   const cycleStatus = (item: AgendaItem) => {
     const order: StatusFaturamento[] = ["", "enviado", "faturado"];
-    const current = order.indexOf(item.statusFaturamento || "");
+    const current = order.indexOf(getStatusFaturamento(item));
     const next = order[(current + 1) % order.length];
     updateAgendaItem({ ...item, statusFaturamento: next });
     onEdited?.();
@@ -321,7 +325,9 @@ const AgendaTable = ({ items, onEdited, hideFinancials, onClone }: AgendaTablePr
           </TableRow>
         </TableHeader>
         <TableBody>
-          {items.map((item, idx) => (
+          {items.map((item, idx) => {
+            const statusFaturamento = getStatusFaturamento(item);
+            return (
             <TableRow key={item.id} className={`transition-colors hover:bg-primary/10 ${!item.corManual ? (idx % 2 === 1 ? 'bg-yellow-50/60 dark:bg-yellow-900/10' : tipoRowColor(item.tipo)) : ''}`} style={item.corManual ? { backgroundColor: item.corManual } : undefined}>
               <TableCell className={`px-0.5 py-0 font-mono text-[9px] truncate sticky left-0 z-10`} style={item.corManual ? { backgroundColor: item.corManual } : undefined} >{formatDate(item.data)}</TableCell>
               <TableCell className={`px-0.5 py-0 font-mono text-[9px] font-medium truncate sticky left-[58px] z-10`} style={item.corManual ? { backgroundColor: item.corManual } : undefined}>{item.hora}</TableCell>
@@ -513,12 +519,12 @@ const AgendaTable = ({ items, onEdited, hideFinancials, onClone }: AgendaTablePr
                         size="sm"
                         className="h-4 w-4 p-0"
                         onClick={() => cycleStatus(item)}
-                        title={statusLabel(item.statusFaturamento || "")}
+                        title={statusLabel(statusFaturamento)}
                       >
-                        {statusIcon(item.statusFaturamento || "")}
+                        {statusIcon(statusFaturamento)}
                       </Button>
                     </TooltipTrigger>
-                    <TooltipContent>{statusLabel(item.statusFaturamento || "")}</TooltipContent>
+                    <TooltipContent>{statusLabel(statusFaturamento)}</TooltipContent>
                   </Tooltip>
                 </TooltipProvider>
               </TableCell>
@@ -610,7 +616,7 @@ const AgendaTable = ({ items, onEdited, hideFinancials, onClone }: AgendaTablePr
                 </span>
               </TableCell>
             </TableRow>
-          ))}
+          )})}
         </TableBody>
       </table>
     </div>
