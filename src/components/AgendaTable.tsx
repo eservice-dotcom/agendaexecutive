@@ -202,7 +202,6 @@ const AgendaTable = ({ items, onEdited, hideFinancials, onClone }: AgendaTablePr
       if (error) throw error;
       const newItem = mapAgendaRow(inserted);
       toast.success("Serviço clonado! Abrindo para edição...");
-      setEditItem(newItem);
       await tryEditItem(newItem);
       onEdited?.();
     } catch (e: any) {
