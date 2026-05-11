@@ -53,6 +53,7 @@ const initialFilters: FiltersState = {
   tipo: "",
   fornecedor: "",
   motorista: "",
+  veiculo: "",
   pax: "",
   sht: "",
   receptivo: "",
