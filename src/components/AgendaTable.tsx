@@ -10,7 +10,7 @@ import WhatsAppDialog from "./WhatsAppDialog";
 import WhatsAppFornecedorDialog from "./WhatsAppFornecedorDialog";
 import EditServicoDialog from "./EditServicoDialog";
 import { useAuth } from "@/contexts/AuthContext";
-import { deleteAgendaItem, updateAgendaItem } from "@/data/cadastroStorage";
+import { deleteAgendaItem, updateAgendaItem, saveAgendaItem } from "@/data/cadastroStorage";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { toast } from "sonner";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
@@ -127,9 +127,18 @@ const AgendaTable = ({ items, onEdited, hideFinancials, onClone }: AgendaTablePr
     }
   };
 
-  const handleClone = (item: AgendaItem) => {
-    if (onClone) {
-      onClone(item);
+  const handleClone = async (item: AgendaItem) => {
+    try {
+      const { id, ...rest } = item as any;
+      await saveAgendaItem({
+        ...rest,
+        statusFaturamento: "",
+      });
+      toast.success("Serviço clonado com sucesso!");
+      onEdited?.();
+    } catch (e: any) {
+      console.error("Erro ao clonar:", e);
+      toast.error("Erro ao clonar serviço: " + (e?.message || ""));
     }
   };
 
