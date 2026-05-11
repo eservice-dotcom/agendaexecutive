@@ -135,6 +135,7 @@ const Index = () => {
         if (filters.tipo && item.tipo !== filters.tipo) return false;
         if (filters.fornecedor && item.fornecedor !== filters.fornecedor) return false;
         if (filters.motorista && item.motorista !== filters.motorista) return false;
+        if (filters.veiculo && item.veiculo !== filters.veiculo) return false;
         if (filters.pax) {
           const paxSearch = filters.pax.toLowerCase();
           const hasMatch = item.passageiros.some(p => 
