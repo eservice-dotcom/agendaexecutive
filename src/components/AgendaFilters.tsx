@@ -19,6 +19,7 @@ interface FiltersState {
   tipo: string;
   fornecedor: string;
   motorista: string;
+  veiculo: string;
   pax: string;
   sht: string;
   receptivo: string;
@@ -31,9 +32,10 @@ interface AgendaFiltersProps {
   motoristas: string[];
   tipos: string[];
   fornecedores: string[];
+  veiculos: string[];
 }
 
-const AgendaFilters = ({ filters, onFilterChange, motoristas, tipos, fornecedores }: AgendaFiltersProps) => {
+const AgendaFilters = ({ filters, onFilterChange, motoristas, tipos, fornecedores, veiculos }: AgendaFiltersProps) => {
   const updateFilter = (key: keyof FiltersState, value: string) => {
     onFilterChange({ ...filters, [key]: value });
   };
