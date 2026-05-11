@@ -297,23 +297,35 @@ export const deleteTipoServico = async (tipo: string) => {
 
 // Agenda
 export const getAgendaItems = async (): Promise<AgendaItem[]> => {
-  const { data, error } = await supabase
-    .from("agenda_items")
-    .select("*")
-    .is("deleted_at", null)
-    .order("data", { ascending: true })
-    .order("hora", { ascending: true });
-  
-  if (error) {
+  const pageSize = 1000;
+  const allItems: any[] = [];
+
+  const fetchPage = async (from: number): Promise<void> => {
+    const { data, error } = await supabase
+      .from("agenda_items")
+      .select("*")
+      .is("deleted_at", null)
+      .order("data", { ascending: true })
+      .order("hora", { ascending: true })
+      .order("created_at", { ascending: true })
+      .range(from, from + pageSize - 1);
+    
+    if (error) throw error;
+    allItems.push(...(data || []));
+
+    if ((data || []).length === pageSize) {
+      await fetchPage(from + pageSize);
+    }
+  };
+
+  try {
+    await fetchPage(0);
+  } catch (error) {
     console.error("Erro ao buscar itens da agenda:", error);
     return [];
   }
   
-  if (!data || data.length === 0) {
-    return [];
-  }
-  
-  return data.map((item) => ({
+  return allItems.map((item) => ({
     id: item.id,
     data: item.data,
     hora: item.hora,
