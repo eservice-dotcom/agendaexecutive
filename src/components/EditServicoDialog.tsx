@@ -353,22 +353,42 @@ const EditServicoDialog = ({ open, onOpenChange, item, onSaved }: EditServicoDia
           </div>
 
           <div className="space-y-1.5">
-            <Label>Motorista</Label>
-            <Select value={currentMotoristaId || (form.motorista ? "_manual" : "_empty")} onValueChange={handleMotoristaChange}>
-              <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
-              <SelectContent>
-                <SelectItem value="_empty">-- Sem motorista --</SelectItem>
-                <SelectItem value="_manual">-- Digitar manualmente --</SelectItem>
-                {motoristas.map((m) => (
-                  <SelectItem key={m.id} value={m.id}>{m.nome}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            {(!currentMotoristaId && form.motorista) && (
-              <div className="mt-1 grid grid-cols-2 gap-2">
-                <Input value={form.motorista} onChange={(e) => update("motorista", e.target.value)} placeholder="Nome" />
-                <Input value={form.telefone} onChange={(e) => update("telefone", e.target.value)} placeholder="Telefone" />
+            <div className="flex items-center justify-between">
+              <Label>Motorista</Label>
+              <Button type="button" variant="ghost" size="sm" className="h-6 gap-1 text-xs px-2" onClick={() => setShowNewMotorista(!showNewMotorista)}>
+                <Plus className="h-3 w-3" /> Novo
+              </Button>
+            </div>
+            {showNewMotorista ? (
+              <div className="grid grid-cols-2 gap-2 p-2 border border-border rounded-md">
+                <Input value={newMotorista.nome} onChange={(e) => setNewMotorista({ ...newMotorista, nome: e.target.value })} placeholder="Nome *" />
+                <Input value={newMotorista.telefone} onChange={(e) => setNewMotorista({ ...newMotorista, telefone: e.target.value })} placeholder="Telefone" />
+                <Input value={newMotorista.cnh} onChange={(e) => setNewMotorista({ ...newMotorista, cnh: e.target.value })} placeholder="CNH" />
+                <Input value={newMotorista.categoria} onChange={(e) => setNewMotorista({ ...newMotorista, categoria: e.target.value })} placeholder="Categoria" />
+                <div className="col-span-2 flex gap-2">
+                  <Button type="button" size="sm" className="h-7 text-xs" onClick={handleSaveNewMotorista}>Salvar</Button>
+                  <Button type="button" variant="outline" size="sm" className="h-7 text-xs" onClick={() => setShowNewMotorista(false)}>Cancelar</Button>
+                </div>
               </div>
+            ) : (
+              <>
+                <Select value={currentMotoristaId || (form.motorista ? "_manual" : "_empty")} onValueChange={handleMotoristaChange}>
+                  <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="_empty">-- Sem motorista --</SelectItem>
+                    <SelectItem value="_manual">-- Digitar manualmente --</SelectItem>
+                    {motoristas.map((m) => (
+                      <SelectItem key={m.id} value={m.id}>{m.nome}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                {(!currentMotoristaId && form.motorista) && (
+                  <div className="mt-1 grid grid-cols-2 gap-2">
+                    <Input value={form.motorista} onChange={(e) => update("motorista", e.target.value)} placeholder="Nome" />
+                    <Input value={form.telefone} onChange={(e) => update("telefone", e.target.value)} placeholder="Telefone" />
+                  </div>
+                )}
+              </>
             )}
           </div>
 
