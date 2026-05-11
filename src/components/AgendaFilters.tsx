@@ -51,6 +51,7 @@ const AgendaFilters = ({ filters, onFilterChange, motoristas, tipos, fornecedore
       tipo: "",
       fornecedor: "",
       motorista: "",
+      veiculo: "",
       pax: "",
       sht: "",
       receptivo: "",
