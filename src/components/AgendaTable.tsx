@@ -128,14 +128,49 @@ const AgendaTable = ({ items, onEdited, hideFinancials, onClone }: AgendaTablePr
   };
 
   const handleClone = async (item: AgendaItem) => {
+    if (!session?.user) return;
     try {
-      const { id, ...rest } = item as any;
-      await saveAgendaItem({
-        ...rest,
-        statusFaturamento: "",
-      });
-      toast.success("Serviço clonado com sucesso!");
+      const { data: inserted, error } = await supabase
+        .from("agenda_items")
+        .insert({
+          user_id: session.user.id,
+          data: item.data,
+          hora: item.hora,
+          cliente: item.cliente,
+          pax: item.pax,
+          passageiros: item.passageiros as any,
+          cot: item.cot,
+          tipo: item.tipo,
+          origem: item.origem,
+          destino: item.destino,
+          placa: item.placa,
+          veiculo: item.veiculo,
+          motorista: item.motorista,
+          telefone: item.telefone,
+          valor: item.valor,
+          fornecedor: item.fornecedor,
+          custo: item.custo,
+          observacoes: item.observacoes,
+          receptivo: item.receptivo || "",
+          status_faturamento: "",
+          cor_manual: item.corManual || null,
+          km_in: item.kmIn || 0,
+          km_fim: item.kmFim || 0,
+          km_extra: item.kmExtra || 0,
+          hora_in: item.horaIn || null,
+          hora_fim: item.horaFim || null,
+          estacionamento: item.estacionamento || 0,
+          hora_extra: item.horaExtra || "",
+          outros_despesas: item.outrosDespesas || [],
+          forma_contratacao: item.formaContratacao || "",
+        } as any)
+        .select()
+        .single();
+      if (error) throw error;
+      toast.success("Serviço clonado! Abrindo para edição...");
       onEdited?.();
+      const newItem: AgendaItem = { ...item, id: (inserted as any).id, statusFaturamento: "" };
+      await tryEditItem(newItem);
     } catch (e: any) {
       console.error("Erro ao clonar:", e);
       toast.error("Erro ao clonar serviço: " + (e?.message || ""));
