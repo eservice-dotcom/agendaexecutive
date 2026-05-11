@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { AgendaItem, statusFaturamentoOptions, StatusFaturamento, Passageiro, OutraDespesa } from "@/data/agendaData";
-import { updateAgendaItem, getTiposServico, getVeiculos, getMotoristas, getClientes, getFornecedores, Veiculo, Motorista, Cliente, Fornecedor } from "@/data/cadastroStorage";
+import { updateAgendaItem, getTiposServico, getVeiculos, getMotoristas, getClientes, getFornecedores, saveMotorista, Veiculo, Motorista, Cliente, Fornecedor } from "@/data/cadastroStorage";
 import { toast } from "sonner";
 import { Pencil, Plus, Trash2 } from "lucide-react";
 import PassageirosInput from "./PassageirosInput";
