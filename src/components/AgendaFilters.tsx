@@ -237,6 +237,20 @@ const AgendaFilters = ({ filters, onFilterChange, motoristas, tipos, fornecedore
           </Select>
         </div>
         <div className="space-y-1">
+          <label className="text-xs font-medium text-muted-foreground">Veículo</label>
+          <Select value={filters.veiculo || "all"} onValueChange={(v) => updateFilter("veiculo", v === "all" ? "" : v)}>
+            <SelectTrigger>
+              <SelectValue placeholder="Veículo" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">Todos</SelectItem>
+              {veiculos.map((v) => (
+                <SelectItem key={v} value={v}>{v}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+        <div className="space-y-1">
           <label className="text-xs font-medium text-muted-foreground">Status Faturamento</label>
           <Select value={filters.statusFaturamento || "all"} onValueChange={(v) => updateFilter("statusFaturamento", v === "all" ? "" : v)}>
             <SelectTrigger>
