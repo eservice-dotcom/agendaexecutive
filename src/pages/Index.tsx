@@ -110,6 +110,11 @@ const Index = () => {
     [agendaData]
   );
 
+  const veiculosList = useMemo(
+    () => [...new Set(agendaData.map((i) => i.veiculo))].filter(Boolean).sort() as string[],
+    [agendaData]
+  );
+
   const filteredData = useMemo(() => {
     return agendaData
       .filter((item) => {
