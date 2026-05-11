@@ -122,7 +122,7 @@ const EditServicoDialog = ({ open, onOpenChange, item, onSaved }: EditServicoDia
         custo: item.custo.toString(),
         observacoes: item.observacoes || "",
         receptivo: item.receptivo || "",
-        statusFaturamento: item.statusFaturamento || "",
+        statusFaturamento: item.statusFaturamento || (item as any).status_faturamento || "",
         kmIn: (item.kmIn || 0).toString(),
         kmFim: (item.kmFim || 0).toString(),
         kmExtra: (item.kmExtra || 0).toString(),
