@@ -57,6 +57,22 @@ const EditServicoDialog = ({ open, onOpenChange, item, onSaved }: EditServicoDia
   const [passageiros, setPassageiros] = useState<Passageiro[]>([]);
   const [outrosDespesas, setOutrosDespesas] = useState<OutraDespesa[]>([]);
   const [motoristaDiariaMsg, setMotoristaDiariaMsg] = useState("");
+  const [showNewMotorista, setShowNewMotorista] = useState(false);
+  const [newMotorista, setNewMotorista] = useState({ nome: "", cnh: "", telefone: "", email: "", categoria: "" });
+
+  const handleSaveNewMotorista = async () => {
+    if (!newMotorista.nome) { toast.error("Nome do motorista é obrigatório"); return; }
+    try {
+      await saveMotorista(newMotorista);
+      const updated = await getMotoristas();
+      setMotoristas(updated);
+      update("motorista", newMotorista.nome);
+      update("telefone", newMotorista.telefone);
+      setNewMotorista({ nome: "", cnh: "", telefone: "", email: "", categoria: "" });
+      setShowNewMotorista(false);
+      toast.success("Motorista cadastrado!");
+    } catch { toast.error("Erro ao cadastrar motorista"); }
+  };
 
   // Check if selected motorista already has "diaria" on the same date (excluding current item)
   useEffect(() => {
