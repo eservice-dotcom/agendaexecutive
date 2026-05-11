@@ -80,6 +80,9 @@ const formatDate = (dateStr: string) => {
   return `${d}/${m}/${y}`;
 };
 
+const getStatusFaturamento = (item: AgendaItem): StatusFaturamento =>
+  (item.statusFaturamento || (item as any).status_faturamento || "") as StatusFaturamento;
+
 const mapAgendaRow = (row: any): AgendaItem => ({
   id: row.id,
   data: row.data,
@@ -163,6 +166,7 @@ const AgendaTable = ({ items, onEdited, hideFinancials, onClone }: AgendaTablePr
   const handleClone = async (item: AgendaItem) => {
     if (!session?.user) return;
     try {
+      const statusFaturamento = getStatusFaturamento(item);
       const { data: inserted, error } = await supabase
         .from("agenda_items")
         .insert({
@@ -185,7 +189,7 @@ const AgendaTable = ({ items, onEdited, hideFinancials, onClone }: AgendaTablePr
           custo: item.custo,
           observacoes: item.observacoes,
           receptivo: item.receptivo || "",
-          status_faturamento: item.statusFaturamento || "",
+          status_faturamento: statusFaturamento,
           cor_manual: item.corManual || null,
           km_in: item.kmIn || 0,
           km_fim: item.kmFim || 0,
@@ -212,7 +216,7 @@ const AgendaTable = ({ items, onEdited, hideFinancials, onClone }: AgendaTablePr
 
   const cycleStatus = (item: AgendaItem) => {
     const order: StatusFaturamento[] = ["", "enviado", "faturado"];
-    const current = order.indexOf(item.statusFaturamento || "");
+    const current = order.indexOf(getStatusFaturamento(item));
     const next = order[(current + 1) % order.length];
     updateAgendaItem({ ...item, statusFaturamento: next });
     onEdited?.();
