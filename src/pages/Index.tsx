@@ -36,6 +36,7 @@ interface FiltersState {
   tipo: string;
   fornecedor: string;
   motorista: string;
+  veiculo: string;
   pax: string;
   sht: string;
   receptivo: string;
@@ -52,6 +53,7 @@ const initialFilters: FiltersState = {
   tipo: "",
   fornecedor: "",
   motorista: "",
+  veiculo: "",
   pax: "",
   sht: "",
   receptivo: "",
@@ -108,6 +110,11 @@ const Index = () => {
     [agendaData]
   );
 
+  const veiculosList = useMemo(
+    () => [...new Set(agendaData.map((i) => i.veiculo))].filter(Boolean).sort() as string[],
+    [agendaData]
+  );
+
   const filteredData = useMemo(() => {
     return agendaData
       .filter((item) => {
@@ -128,6 +135,7 @@ const Index = () => {
         if (filters.tipo && item.tipo !== filters.tipo) return false;
         if (filters.fornecedor && item.fornecedor !== filters.fornecedor) return false;
         if (filters.motorista && item.motorista !== filters.motorista) return false;
+        if (filters.veiculo && item.veiculo !== filters.veiculo) return false;
         if (filters.pax) {
           const paxSearch = filters.pax.toLowerCase();
           const hasMatch = item.passageiros.some(p => 
@@ -529,7 +537,7 @@ const Index = () => {
                 </>
               )}
             </div>
-            <AgendaFilters filters={filters} onFilterChange={setFilters} motoristas={motoristas} tipos={tipos} fornecedores={fornecedoresList} />
+            <AgendaFilters filters={filters} onFilterChange={setFilters} motoristas={motoristas} tipos={tipos} fornecedores={fornecedoresList} veiculos={veiculosList} />
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2 text-sm text-muted-foreground">
                 <ListChecks className="h-4 w-4" />

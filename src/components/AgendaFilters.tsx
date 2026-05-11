@@ -19,6 +19,7 @@ interface FiltersState {
   tipo: string;
   fornecedor: string;
   motorista: string;
+  veiculo: string;
   pax: string;
   sht: string;
   receptivo: string;
@@ -31,9 +32,10 @@ interface AgendaFiltersProps {
   motoristas: string[];
   tipos: string[];
   fornecedores: string[];
+  veiculos: string[];
 }
 
-const AgendaFilters = ({ filters, onFilterChange, motoristas, tipos, fornecedores }: AgendaFiltersProps) => {
+const AgendaFilters = ({ filters, onFilterChange, motoristas, tipos, fornecedores, veiculos }: AgendaFiltersProps) => {
   const updateFilter = (key: keyof FiltersState, value: string) => {
     onFilterChange({ ...filters, [key]: value });
   };
@@ -49,6 +51,7 @@ const AgendaFilters = ({ filters, onFilterChange, motoristas, tipos, fornecedore
       tipo: "",
       fornecedor: "",
       motorista: "",
+      veiculo: "",
       pax: "",
       sht: "",
       receptivo: "",
@@ -229,6 +232,20 @@ const AgendaFilters = ({ filters, onFilterChange, motoristas, tipos, fornecedore
               <SelectItem value="all">Todos</SelectItem>
               {motoristas.map((m) => (
                 <SelectItem key={m} value={m}>{m}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+        <div className="space-y-1">
+          <label className="text-xs font-medium text-muted-foreground">Veículo</label>
+          <Select value={filters.veiculo || "all"} onValueChange={(v) => updateFilter("veiculo", v === "all" ? "" : v)}>
+            <SelectTrigger>
+              <SelectValue placeholder="Veículo" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">Todos</SelectItem>
+              {veiculos.map((v) => (
+                <SelectItem key={v} value={v}>{v}</SelectItem>
               ))}
             </SelectContent>
           </Select>
