@@ -519,12 +519,12 @@ const AgendaTable = ({ items, onEdited, hideFinancials, onClone }: AgendaTablePr
                         size="sm"
                         className="h-4 w-4 p-0"
                         onClick={() => cycleStatus(item)}
-                        title={statusLabel(item.statusFaturamento || "")}
+                        title={statusLabel(statusFaturamento)}
                       >
-                        {statusIcon(item.statusFaturamento || "")}
+                        {statusIcon(statusFaturamento)}
                       </Button>
                     </TooltipTrigger>
-                    <TooltipContent>{statusLabel(item.statusFaturamento || "")}</TooltipContent>
+                    <TooltipContent>{statusLabel(statusFaturamento)}</TooltipContent>
                   </Tooltip>
                 </TooltipProvider>
               </TableCell>
