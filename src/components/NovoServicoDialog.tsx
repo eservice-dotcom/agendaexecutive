@@ -221,6 +221,21 @@ const NovoServicoDialog = ({ open, onOpenChange, onSaved, initialData }: NovoSer
     const motorista = motoristas.find((m) => m.id === form.motoristaId);
     const fornecedor = fornecedores.find((f) => f.id === form.fornecedorId);
 
+    const kmDiff = (parseFloat(form.kmFim) || 0) - (parseFloat(form.kmIn) || 0);
+    if (kmDiff > 100) {
+      toast.warning(`Atenção: foram rodados ${kmDiff.toFixed(0)} km (acima de 100 km).`);
+    }
+    if (form.horaIn && form.horaFim) {
+      const [h1, m1] = form.horaIn.split(":").map(Number);
+      const [h2, m2] = form.horaFim.split(":").map(Number);
+      let mins = (h2 * 60 + m2) - (h1 * 60 + m1);
+      if (mins < 0) mins += 24 * 60;
+      const horas = mins / 60;
+      if (horas > 10) {
+        toast.warning(`Atenção: jornada de ${horas.toFixed(1)}h (acima de 10h trabalhadas).`);
+      }
+    }
+
     try {
       await saveAgendaItem({
         data: form.data,
