@@ -154,12 +154,18 @@ const AgendaTable = ({ items, onEdited, hideFinancials, onClone }: AgendaTablePr
     await supabase.from("editing_locks").delete().eq("item_id", itemId).eq("user_id", session.user.id);
   }, [session]);
 
-  const handleDelete = () => {
-    if (deleteItemId) {
-      deleteAgendaItem(deleteItemId);
+  const handleDelete = async () => {
+    if (!deleteItemId) return;
+
+    try {
+      const itemId = deleteItemId;
+      await deleteAgendaItem(itemId);
       setDeleteItemId(null);
       toast.success("Serviço excluído com sucesso!");
-      onEdited?.();
+      await onEdited?.();
+    } catch (e: any) {
+      console.error("Erro ao excluir serviço:", e);
+      toast.error("Erro ao excluir serviço: " + (e?.message || "tente novamente"));
     }
   };
 
