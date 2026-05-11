@@ -10,7 +10,7 @@ import WhatsAppDialog from "./WhatsAppDialog";
 import WhatsAppFornecedorDialog from "./WhatsAppFornecedorDialog";
 import EditServicoDialog from "./EditServicoDialog";
 import { useAuth } from "@/contexts/AuthContext";
-import { deleteAgendaItem, updateAgendaItem, saveAgendaItem } from "@/data/cadastroStorage";
+import { deleteAgendaItem, updateAgendaItem } from "@/data/cadastroStorage";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { toast } from "sonner";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
@@ -79,6 +79,39 @@ const formatDate = (dateStr: string) => {
   const [y, m, d] = dateStr.split("-");
   return `${d}/${m}/${y}`;
 };
+
+const mapAgendaRow = (row: any): AgendaItem => ({
+  id: row.id,
+  data: row.data,
+  hora: row.hora,
+  cliente: row.cliente,
+  pax: row.pax,
+  passageiros: row.passageiros || [],
+  cot: row.cot,
+  tipo: row.tipo,
+  origem: row.origem,
+  destino: row.destino,
+  placa: row.placa,
+  veiculo: row.veiculo,
+  motorista: row.motorista,
+  telefone: row.telefone,
+  valor: Number(row.valor) || 0,
+  fornecedor: row.fornecedor,
+  custo: Number(row.custo) || 0,
+  observacoes: row.observacoes || "",
+  receptivo: row.receptivo || "",
+  statusFaturamento: (row.status_faturamento || "") as StatusFaturamento,
+  corManual: row.cor_manual || undefined,
+  kmIn: Number(row.km_in) || 0,
+  kmFim: Number(row.km_fim) || 0,
+  kmExtra: Number(row.km_extra) || 0,
+  horaIn: row.hora_in || "",
+  horaFim: row.hora_fim || "",
+  estacionamento: Number(row.estacionamento) || 0,
+  horaExtra: row.hora_extra || "",
+  outrosDespesas: row.outros_despesas || [],
+  formaContratacao: row.forma_contratacao || "",
+});
 
 const AgendaTable = ({ items, onEdited, hideFinancials, onClone }: AgendaTableProps) => {
   const [whatsappItem, setWhatsappItem] = useState<AgendaItem | null>(null);
@@ -167,10 +200,11 @@ const AgendaTable = ({ items, onEdited, hideFinancials, onClone }: AgendaTablePr
         .select()
         .single();
       if (error) throw error;
+      const newItem = mapAgendaRow(inserted);
       toast.success("Serviço clonado! Abrindo para edição...");
-      onEdited?.();
-      const newItem: AgendaItem = { ...item, id: (inserted as any).id };
+      setEditItem(newItem);
       await tryEditItem(newItem);
+      onEdited?.();
     } catch (e: any) {
       console.error("Erro ao clonar:", e);
       toast.error("Erro ao clonar serviço: " + (e?.message || ""));
