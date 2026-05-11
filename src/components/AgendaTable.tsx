@@ -152,7 +152,7 @@ const AgendaTable = ({ items, onEdited, hideFinancials, onClone }: AgendaTablePr
           custo: item.custo,
           observacoes: item.observacoes,
           receptivo: item.receptivo || "",
-          status_faturamento: "",
+          status_faturamento: item.statusFaturamento || "",
           cor_manual: item.corManual || null,
           km_in: item.kmIn || 0,
           km_fim: item.kmFim || 0,
@@ -169,7 +169,7 @@ const AgendaTable = ({ items, onEdited, hideFinancials, onClone }: AgendaTablePr
       if (error) throw error;
       toast.success("Serviço clonado! Abrindo para edição...");
       onEdited?.();
-      const newItem: AgendaItem = { ...item, id: (inserted as any).id, statusFaturamento: "" };
+      const newItem: AgendaItem = { ...item, id: (inserted as any).id };
       await tryEditItem(newItem);
     } catch (e: any) {
       console.error("Erro ao clonar:", e);
