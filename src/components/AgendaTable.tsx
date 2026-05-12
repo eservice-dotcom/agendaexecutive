@@ -4,7 +4,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { AgendaItem, StatusFaturamento } from "@/data/agendaData";
-import { MapPin, Phone, User, Truck, MessageCircle, Pencil, Trash2, Circle, Send, CheckCircle2, Users, Copy, Palette, X, Lock, FileText } from "lucide-react";
+import { MapPin, Phone, User, Truck, MessageCircle, Pencil, Trash2, Circle, Send, CheckCircle2, Users, Copy, Palette, X, Lock, FileText, AlertTriangle } from "lucide-react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import WhatsAppDialog from "./WhatsAppDialog";
 import WhatsAppFornecedorDialog from "./WhatsAppFornecedorDialog";
@@ -333,14 +333,38 @@ const AgendaTable = ({ items, onEdited, hideFinancials, onClone }: AgendaTablePr
         <TableBody>
           {items.map((item, idx) => {
             const statusFaturamento = getStatusFaturamento(item);
+            const kmDiff = (Number(item.kmFim) || 0) - (Number(item.kmIn) || 0);
+            const horasTrab = (() => {
+              if (!item.horaIn || !item.horaFim) return 0;
+              const [h1, m1] = item.horaIn.split(":").map(Number);
+              const [h2, m2] = item.horaFim.split(":").map(Number);
+              if ([h1, m1, h2, m2].some((n) => isNaN(n))) return 0;
+              let diff = (h2 * 60 + m2) - (h1 * 60 + m1);
+              if (diff < 0) diff += 24 * 60;
+              return diff / 60;
+            })();
+            const warnKm = kmDiff > 100;
+            const warnHoras = horasTrab > 10;
+            const hasWarn = warnKm || warnHoras;
             return (
             <TableRow key={item.id} className={`transition-colors hover:bg-primary/10 ${!item.corManual ? (idx % 2 === 1 ? 'bg-yellow-50/60 dark:bg-yellow-900/10' : tipoRowColor(item.tipo)) : ''}`} style={item.corManual ? { backgroundColor: item.corManual } : undefined}>
               <TableCell className={`px-0.5 py-0 font-mono text-[9px] truncate sticky left-0 z-10`} style={item.corManual ? { backgroundColor: item.corManual } : undefined} >{formatDate(item.data)}</TableCell>
               <TableCell className={`px-0.5 py-0 font-mono text-[9px] font-medium truncate sticky left-[58px] z-10`} style={item.corManual ? { backgroundColor: item.corManual } : undefined}>{item.hora}</TableCell>
               <TableCell className="px-0.5 py-0 font-medium text-[9px] truncate">
                 <Tooltip>
-                  <TooltipTrigger asChild><span className="truncate cursor-default">{item.cliente}</span></TooltipTrigger>
-                  <TooltipContent side="top" className="text-xs">{item.cliente}</TooltipContent>
+                  <TooltipTrigger asChild>
+                    <span className="truncate cursor-default inline-flex items-center gap-0.5">
+                      {hasWarn && (
+                        <AlertTriangle className="h-2.5 w-2.5 text-orange-500 shrink-0" />
+                      )}
+                      {item.cliente}
+                    </span>
+                  </TooltipTrigger>
+                  <TooltipContent side="top" className="text-xs">
+                    {item.cliente}
+                    {warnKm && <div className="text-orange-500">⚠ {kmDiff.toFixed(0)} km rodados (acima de 100)</div>}
+                    {warnHoras && <div className="text-orange-500">⚠ {horasTrab.toFixed(1)}h trabalhadas (acima de 10h)</div>}
+                  </TooltipContent>
                 </Tooltip>
               </TableCell>
               <TableCell className="px-0.5 py-0 text-center">
