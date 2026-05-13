@@ -49,18 +49,26 @@ const buildConsolidatedMessage = (items: AgendaItem[]) => {
   items
     .sort((a, b) => a.hora.localeCompare(b.hora))
     .forEach((item, idx) => {
-      const passageiros = item.passageiros.length > 0
-        ? item.passageiros.map(p => p.nome).filter(Boolean).join(", ")
+      const passageirosDetalhados = item.passageiros.length > 0
+        ? item.passageiros
+            .map(p => {
+              const partes = [p.nome].filter(Boolean);
+              if (p.voo) partes.push(`Voo ${p.voo}`);
+              if (p.telefone) partes.push(`Tel ${p.telefone}`);
+              return partes.join(" — ");
+            })
+            .filter(Boolean)
+            .join("\n   • ")
         : "—";
       const voos = item.passageiros.length > 0
-        ? [...new Set(item.passageiros.map(p => p.voo).filter(Boolean))].join(", ")
+        ? [...new Set(item.passageiros.map(p => p.voo).filter(Boolean))].join(", ") || "—"
         : "—";
 
       msg += `\n*Serviço ${idx + 1}*\n`;
       msg += `⏰ Hora: ${item.hora}\n`;
       msg += `🏢 Cliente: ${item.cliente}\n`;
       msg += `👥 SHT: ${item.pax}\n`;
-      msg += `👤 Passageiros: ${passageiros}\n`;
+      msg += `👤 Passageiros:${item.passageiros.length > 1 ? "\n   • " : " "}${passageirosDetalhados}\n`;
       msg += `✈️ Voo: ${voos}\n`;
       msg += `📍 Origem: ${item.origem}\n`;
       msg += `📍 Destino: ${item.destino}\n`;
