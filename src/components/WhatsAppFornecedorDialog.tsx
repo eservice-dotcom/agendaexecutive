@@ -79,7 +79,11 @@ const WhatsAppFornecedorDialog = ({ open, onOpenChange, fornecedorNome, items }:
     const phone = telefone.replace(/\D/g, "");
     const phoneWithCountry = phone.startsWith("55") ? phone : `55${phone}`;
     const encoded = encodeURIComponent(mensagemFinal);
-    window.open(`https://wa.me/${phoneWithCountry}?text=${encoded}`, "_blank");
+    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+    const url = isMobile
+      ? `https://wa.me/${phoneWithCountry}?text=${encoded}`
+      : `https://web.whatsapp.com/send?phone=${phoneWithCountry}&text=${encoded}`;
+    window.open(url, "_blank");
     onOpenChange(false);
   };
 

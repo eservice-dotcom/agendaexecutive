@@ -114,7 +114,13 @@ const WhatsAppDialog = ({ open, onOpenChange, item, allItems = [] }: WhatsAppDia
     const phone = item.telefone.replace(/\D/g, "");
     const phoneWithCountry = phone.startsWith("55") ? phone : `55${phone}`;
     const encoded = encodeURIComponent(mensagemFinal);
-    window.open(`https://wa.me/${phoneWithCountry}?text=${encoded}`, "_blank");
+    // Em desktop, wa.me abre o WhatsApp nativo via protocolo whatsapp:// que corrompe
+    // emojis de plano suplementar (🏢 👥 📍). web.whatsapp.com preserva UTF-8 corretamente.
+    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+    const url = isMobile
+      ? `https://wa.me/${phoneWithCountry}?text=${encoded}`
+      : `https://web.whatsapp.com/send?phone=${phoneWithCountry}&text=${encoded}`;
+    window.open(url, "_blank");
     onOpenChange(false);
     setSelectedId(null);
     setMensagemFinal("");
