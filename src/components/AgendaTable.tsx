@@ -278,7 +278,7 @@ const AgendaTable = ({ items, onEdited, hideFinancials, onClone }: AgendaTablePr
           <col style={{ width: '58px' }} />  {/* Data */}
           <col style={{ width: '34px' }} />  {/* Hora */}
           <col style={{ width: '72px' }} />  {/* Cliente */}
-          <col style={{ width: '24px' }} />  {/* SHT */}
+          <col style={{ width: '36px' }} />  {/* SHT */}
           <col style={{ width: '80px' }} /> {/* Passageiro */}
           <col style={{ width: '38px' }} />  {/* Voo */}
           <col style={{ width: '42px' }} />  {/* O.S. */}
@@ -368,7 +368,7 @@ const AgendaTable = ({ items, onEdited, hideFinancials, onClone }: AgendaTablePr
                 </Tooltip>
               </TableCell>
               <TableCell className="px-0.5 py-0 text-center">
-                <span className="inline-flex h-4 w-4 items-center justify-center rounded-full bg-primary/10 text-[8px] font-bold text-black">
+                <span className="inline-flex min-w-[16px] h-4 px-1 items-center justify-center rounded-full bg-primary/10 text-[8px] font-bold text-black">
                   {item.pax}
                 </span>
               </TableCell>
