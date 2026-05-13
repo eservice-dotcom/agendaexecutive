@@ -368,7 +368,7 @@ const AgendaTable = ({ items, onEdited, hideFinancials, onClone }: AgendaTablePr
                 </Tooltip>
               </TableCell>
               <TableCell className="px-0.5 py-0 text-center">
-                <span className="inline-flex h-4 w-4 items-center justify-center rounded-full bg-primary/10 text-[8px] font-bold text-black">
+                <span className="inline-flex min-w-[16px] h-4 px-1 items-center justify-center rounded-full bg-primary/10 text-[8px] font-bold text-black">
                   {item.pax}
                 </span>
               </TableCell>
