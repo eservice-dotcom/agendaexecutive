@@ -144,7 +144,7 @@ const WhatsAppDialog = ({ open, onOpenChange, item, allItems = [] }: WhatsAppDia
         </DialogHeader>
 
         <div className="space-y-3">
-          {sameDayItems.length > 0 && (
+          {allDriverDayItems.length > 0 && (
             <button
               onClick={handleConsolidado}
               className={`flex items-center gap-2 w-full rounded-md border p-3 text-left text-sm transition-colors ${
@@ -156,10 +156,14 @@ const WhatsAppDialog = ({ open, onOpenChange, item, allItems = [] }: WhatsAppDia
               <CalendarDays className={`h-4 w-4 shrink-0 ${modoConsolidado ? "text-primary" : "text-muted-foreground"}`} />
               <div>
                 <p className="font-medium text-foreground">
-                  Todos os serviços do dia ({allDriverDayItems.length} serviços)
+                  {allDriverDayItems.length === 1
+                    ? "Serviço do dia (formato padrão)"
+                    : `Todos os serviços do dia (${allDriverDayItems.length} serviços)`}
                 </p>
                 <p className="mt-0.5 text-xs text-muted-foreground">
-                  Envia todas as tarefas do motorista neste dia em uma única mensagem
+                  {allDriverDayItems.length === 1
+                    ? "Envia o serviço do motorista no formato padronizado"
+                    : "Envia todas as tarefas do motorista neste dia em uma única mensagem"}
                 </p>
               </div>
             </button>
