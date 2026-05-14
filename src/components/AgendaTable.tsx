@@ -116,13 +116,42 @@ const mapAgendaRow = (row: any): AgendaItem => ({
   formaContratacao: row.forma_contratacao || "",
 });
 
+const MESSAGED_STORAGE_KEY = "whatsapp_messaged_driver_v1";
+
+const loadMessagedMap = (): Record<string, string> => {
+  try {
+    const raw = localStorage.getItem(MESSAGED_STORAGE_KEY);
+    return raw ? JSON.parse(raw) : {};
+  } catch {
+    return {};
+  }
+};
+
 const AgendaTable = ({ items, onEdited, hideFinancials, onClone }: AgendaTableProps) => {
   const [whatsappItem, setWhatsappItem] = useState<AgendaItem | null>(null);
   const [editItem, setEditItem] = useState<AgendaItem | null>(null);
   const [deleteItemId, setDeleteItemId] = useState<string | null>(null);
   const [fornecedorWhatsapp, setFornecedorWhatsapp] = useState<{ nome: string; items: AgendaItem[] } | null>(null);
+  const [messagedMap, setMessagedMap] = useState<Record<string, string>>(() => loadMessagedMap());
   const { canViewFinancials: hasFinancialPermission, session } = useAuth();
   const canViewFinancials = hasFinancialPermission && !hideFinancials;
+
+  const markMessaged = useCallback((item: AgendaItem, consolidated?: AgendaItem[]) => {
+    setMessagedMap((prev) => {
+      const next = { ...prev };
+      const list = consolidated && consolidated.length > 0 ? consolidated : [item];
+      list.forEach((i) => {
+        next[i.id] = i.motorista || "";
+      });
+      try { localStorage.setItem(MESSAGED_STORAGE_KEY, JSON.stringify(next)); } catch {}
+      return next;
+    });
+  }, []);
+
+  const isMessagedToCurrentDriver = useCallback((item: AgendaItem) => {
+    const stored = messagedMap[item.id];
+    return !!stored && stored === (item.motorista || "");
+  }, [messagedMap]);
 
   const tryEditItem = useCallback(async (item: AgendaItem) => {
     if (!session?.user) return;
