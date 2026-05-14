@@ -11,6 +11,7 @@ interface WhatsAppDialogProps {
   onOpenChange: (open: boolean) => void;
   item: AgendaItem | null;
   allItems?: AgendaItem[];
+  onSent?: (item: AgendaItem, consolidatedItems?: AgendaItem[]) => void;
 }
 
 const replacePlaceholders = (texto: string, item: AgendaItem) => {
@@ -81,7 +82,7 @@ const buildConsolidatedMessage = (items: AgendaItem[]) => {
   return msg;
 };
 
-const WhatsAppDialog = ({ open, onOpenChange, item, allItems = [] }: WhatsAppDialogProps) => {
+const WhatsAppDialog = ({ open, onOpenChange, item, allItems = [], onSent }: WhatsAppDialogProps) => {
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [mensagemFinal, setMensagemFinal] = useState("");
   const [modoConsolidado, setModoConsolidado] = useState(false);
@@ -129,6 +130,9 @@ const WhatsAppDialog = ({ open, onOpenChange, item, allItems = [] }: WhatsAppDia
       ? `https://wa.me/${phoneWithCountry}?text=${encoded}`
       : `https://web.whatsapp.com/send?phone=${phoneWithCountry}&text=${encoded}`;
     window.open(url, "_blank");
+    if (item) {
+      onSent?.(item, modoConsolidado ? allDriverDayItems : undefined);
+    }
     onOpenChange(false);
     setSelectedId(null);
     setMensagemFinal("");

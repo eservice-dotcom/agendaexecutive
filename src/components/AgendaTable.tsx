@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
@@ -116,13 +116,42 @@ const mapAgendaRow = (row: any): AgendaItem => ({
   formaContratacao: row.forma_contratacao || "",
 });
 
+const MESSAGED_STORAGE_KEY = "whatsapp_messaged_driver_v1";
+
+const loadMessagedMap = (): Record<string, string> => {
+  try {
+    const raw = localStorage.getItem(MESSAGED_STORAGE_KEY);
+    return raw ? JSON.parse(raw) : {};
+  } catch {
+    return {};
+  }
+};
+
 const AgendaTable = ({ items, onEdited, hideFinancials, onClone }: AgendaTableProps) => {
   const [whatsappItem, setWhatsappItem] = useState<AgendaItem | null>(null);
   const [editItem, setEditItem] = useState<AgendaItem | null>(null);
   const [deleteItemId, setDeleteItemId] = useState<string | null>(null);
   const [fornecedorWhatsapp, setFornecedorWhatsapp] = useState<{ nome: string; items: AgendaItem[] } | null>(null);
+  const [messagedMap, setMessagedMap] = useState<Record<string, string>>(() => loadMessagedMap());
   const { canViewFinancials: hasFinancialPermission, session } = useAuth();
   const canViewFinancials = hasFinancialPermission && !hideFinancials;
+
+  const markMessaged = useCallback((item: AgendaItem, consolidated?: AgendaItem[]) => {
+    setMessagedMap((prev) => {
+      const next = { ...prev };
+      const list = consolidated && consolidated.length > 0 ? consolidated : [item];
+      list.forEach((i) => {
+        next[i.id] = i.motorista || "";
+      });
+      try { localStorage.setItem(MESSAGED_STORAGE_KEY, JSON.stringify(next)); } catch {}
+      return next;
+    });
+  }, []);
+
+  const isMessagedToCurrentDriver = useCallback((item: AgendaItem) => {
+    const stored = messagedMap[item.id];
+    return !!stored && stored === (item.motorista || "");
+  }, [messagedMap]);
 
   const tryEditItem = useCallback(async (item: AgendaItem) => {
     if (!session?.user) return;
@@ -264,7 +293,7 @@ const AgendaTable = ({ items, onEdited, hideFinancials, onClone }: AgendaTablePr
   return (
     <TooltipProvider delayDuration={200}>
     <>
-    <WhatsAppDialog open={!!whatsappItem} onOpenChange={(v) => { if (!v) setWhatsappItem(null); }} item={whatsappItem} allItems={items} />
+    <WhatsAppDialog open={!!whatsappItem} onOpenChange={(v) => { if (!v) setWhatsappItem(null); }} item={whatsappItem} allItems={items} onSent={markMessaged} />
     <WhatsAppFornecedorDialog
       open={!!fornecedorWhatsapp}
       onOpenChange={(v) => { if (!v) setFornecedorWhatsapp(null); }}
@@ -346,10 +375,13 @@ const AgendaTable = ({ items, onEdited, hideFinancials, onClone }: AgendaTablePr
             const warnKm = kmDiff > 100;
             const warnHoras = horasTrab > 10;
             const hasWarn = warnKm || warnHoras;
+            const messaged = isMessagedToCurrentDriver(item);
+            const messagedBg = '#bbf7d0'; // emerald-200
+            const rowInlineBg = item.corManual || (messaged ? messagedBg : undefined);
             return (
-            <TableRow key={item.id} className={`transition-colors hover:bg-primary/10 ${!item.corManual ? (idx % 2 === 1 ? 'bg-yellow-50/60 dark:bg-yellow-900/10' : tipoRowColor(item.tipo)) : ''}`} style={item.corManual ? { backgroundColor: item.corManual } : undefined}>
-              <TableCell className={`px-0.5 py-0 font-mono text-[9px] truncate sticky left-0 z-10`} style={item.corManual ? { backgroundColor: item.corManual } : undefined} >{formatDate(item.data)}</TableCell>
-              <TableCell className={`px-0.5 py-0 font-mono text-[9px] font-medium truncate sticky left-[58px] z-10`} style={item.corManual ? { backgroundColor: item.corManual } : undefined}>{item.hora}</TableCell>
+            <TableRow key={item.id} className={`transition-colors hover:bg-primary/10 ${!rowInlineBg ? (idx % 2 === 1 ? 'bg-yellow-50/60 dark:bg-yellow-900/10' : tipoRowColor(item.tipo)) : ''}`} style={rowInlineBg ? { backgroundColor: rowInlineBg } : undefined} title={messaged ? `Mensagem enviada para ${item.motorista}` : undefined}>
+              <TableCell className={`px-0.5 py-0 font-mono text-[9px] truncate sticky left-0 z-10`} style={rowInlineBg ? { backgroundColor: rowInlineBg } : undefined} >{formatDate(item.data)}</TableCell>
+              <TableCell className={`px-0.5 py-0 font-mono text-[9px] font-medium truncate sticky left-[58px] z-10`} style={rowInlineBg ? { backgroundColor: rowInlineBg } : undefined}>{item.hora}</TableCell>
               <TableCell className="px-0.5 py-0 font-medium text-[9px] truncate">
                 <Tooltip>
                   <TooltipTrigger asChild>
