@@ -11,6 +11,7 @@ interface WhatsAppDialogProps {
   onOpenChange: (open: boolean) => void;
   item: AgendaItem | null;
   allItems?: AgendaItem[];
+  onSent?: (item: AgendaItem, consolidatedItems?: AgendaItem[]) => void;
 }
 
 const replacePlaceholders = (texto: string, item: AgendaItem) => {
