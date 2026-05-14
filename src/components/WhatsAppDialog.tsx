@@ -130,6 +130,9 @@ const WhatsAppDialog = ({ open, onOpenChange, item, allItems = [], onSent }: Wha
       ? `https://wa.me/${phoneWithCountry}?text=${encoded}`
       : `https://web.whatsapp.com/send?phone=${phoneWithCountry}&text=${encoded}`;
     window.open(url, "_blank");
+    if (item) {
+      onSent?.(item, modoConsolidado ? allDriverDayItems : undefined);
+    }
     onOpenChange(false);
     setSelectedId(null);
     setMensagemFinal("");
