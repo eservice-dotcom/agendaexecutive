@@ -375,10 +375,13 @@ const AgendaTable = ({ items, onEdited, hideFinancials, onClone }: AgendaTablePr
             const warnKm = kmDiff > 100;
             const warnHoras = horasTrab > 10;
             const hasWarn = warnKm || warnHoras;
+            const messaged = isMessagedToCurrentDriver(item);
+            const messagedBg = '#bbf7d0'; // emerald-200
+            const rowInlineBg = item.corManual || (messaged ? messagedBg : undefined);
             return (
-            <TableRow key={item.id} className={`transition-colors hover:bg-primary/10 ${!item.corManual ? (idx % 2 === 1 ? 'bg-yellow-50/60 dark:bg-yellow-900/10' : tipoRowColor(item.tipo)) : ''}`} style={item.corManual ? { backgroundColor: item.corManual } : undefined}>
-              <TableCell className={`px-0.5 py-0 font-mono text-[9px] truncate sticky left-0 z-10`} style={item.corManual ? { backgroundColor: item.corManual } : undefined} >{formatDate(item.data)}</TableCell>
-              <TableCell className={`px-0.5 py-0 font-mono text-[9px] font-medium truncate sticky left-[58px] z-10`} style={item.corManual ? { backgroundColor: item.corManual } : undefined}>{item.hora}</TableCell>
+            <TableRow key={item.id} className={`transition-colors hover:bg-primary/10 ${!rowInlineBg ? (idx % 2 === 1 ? 'bg-yellow-50/60 dark:bg-yellow-900/10' : tipoRowColor(item.tipo)) : ''}`} style={rowInlineBg ? { backgroundColor: rowInlineBg } : undefined} title={messaged ? `Mensagem enviada para ${item.motorista}` : undefined}>
+              <TableCell className={`px-0.5 py-0 font-mono text-[9px] truncate sticky left-0 z-10`} style={rowInlineBg ? { backgroundColor: rowInlineBg } : undefined} >{formatDate(item.data)}</TableCell>
+              <TableCell className={`px-0.5 py-0 font-mono text-[9px] font-medium truncate sticky left-[58px] z-10`} style={rowInlineBg ? { backgroundColor: rowInlineBg } : undefined}>{item.hora}</TableCell>
               <TableCell className="px-0.5 py-0 font-medium text-[9px] truncate">
                 <Tooltip>
                   <TooltipTrigger asChild>
