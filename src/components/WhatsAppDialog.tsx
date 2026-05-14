@@ -82,7 +82,7 @@ const buildConsolidatedMessage = (items: AgendaItem[]) => {
   return msg;
 };
 
-const WhatsAppDialog = ({ open, onOpenChange, item, allItems = [] }: WhatsAppDialogProps) => {
+const WhatsAppDialog = ({ open, onOpenChange, item, allItems = [], onSent }: WhatsAppDialogProps) => {
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [mensagemFinal, setMensagemFinal] = useState("");
   const [modoConsolidado, setModoConsolidado] = useState(false);
