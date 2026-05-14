@@ -293,7 +293,7 @@ const AgendaTable = ({ items, onEdited, hideFinancials, onClone }: AgendaTablePr
   return (
     <TooltipProvider delayDuration={200}>
     <>
-    <WhatsAppDialog open={!!whatsappItem} onOpenChange={(v) => { if (!v) setWhatsappItem(null); }} item={whatsappItem} allItems={items} />
+    <WhatsAppDialog open={!!whatsappItem} onOpenChange={(v) => { if (!v) setWhatsappItem(null); }} item={whatsappItem} allItems={items} onSent={markMessaged} />
     <WhatsAppFornecedorDialog
       open={!!fornecedorWhatsapp}
       onOpenChange={(v) => { if (!v) setFornecedorWhatsapp(null); }}
