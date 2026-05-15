@@ -57,6 +57,7 @@ const AgendaFilters = ({ filters, onFilterChange, motoristas, tipos, fornecedore
       sht: "",
       receptivo: "",
       statusFaturamento: "",
+      formaContratacao: "",
     });
   };
 
