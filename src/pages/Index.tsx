@@ -153,6 +153,11 @@ const Index = () => {
           if (filters.statusFaturamento === "sem_status" && sf !== "") return false;
           if (filters.statusFaturamento !== "sem_status" && sf !== filters.statusFaturamento) return false;
         }
+        if (filters.formaContratacao) {
+          const fc = (item as any).formaContratacao || (item as any).forma_contratacao || "";
+          if (filters.formaContratacao === "sem" && fc !== "") return false;
+          if (filters.formaContratacao !== "sem" && fc !== filters.formaContratacao) return false;
+        }
         return true;
       })
       .sort((a, b) => {
