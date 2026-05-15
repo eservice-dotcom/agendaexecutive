@@ -104,15 +104,21 @@ const DashboardFinanceiro = () => {
   const crPeriod = useMemo(() => contasReceber.filter((c) => compDate(c).startsWith(periodPrefix)), [contasReceber, periodPrefix]);
 
   // ========== Receitas vs Despesas (Bar Chart by month) ==========
+  // Receitas vêm da AGENDA (valor dos serviços, por data do serviço).
+  // Despesas continuam vindo de contas_pagar (por competência).
+  const agendaYear = useMemo(
+    () => agendaReceitas.filter((a) => (a.data || "").startsWith(year)),
+    [agendaReceitas, year]
+  );
   const receitasDespesasData = useMemo(() => {
     return MONTHS.map((label, i) => {
       const m = String(i + 1).padStart(2, "0");
       const prefix = `${year}-${m}`;
-      const receitas = crYear.filter((c) => compDate(c).startsWith(prefix)).reduce((s, c) => s + Number(c.valor), 0);
+      const receitas = agendaYear.filter((a) => (a.data || "").startsWith(prefix)).reduce((s, a) => s + a.valor, 0);
       const despesas = cpYear.filter((c) => compDate(c).startsWith(prefix)).reduce((s, c) => s + Number(c.valor), 0);
       return { mes: label, Receitas: receitas, Despesas: despesas };
     });
-  }, [cpYear, crYear, year]);
+  }, [cpYear, agendaYear, year]);
 
   // ========== DRE Simplificado (respeita ano + mês) ==========
   const dre = useMemo(() => {
