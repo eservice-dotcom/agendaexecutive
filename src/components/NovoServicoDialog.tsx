@@ -49,8 +49,10 @@ const NovoServicoDialog = ({ open, onOpenChange, onSaved, initialData }: NovoSer
     estacionamento: "",
     horaExtra: "",
     formaContratacao: "",
+    placaReceptivoUrl: "",
   });
   
+  const [uploadingPlaca, setUploadingPlaca] = useState(false);
   const [passageiros, setPassageiros] = useState<Passageiro[]>([]);
   const [outrosDespesas, setOutrosDespesas] = useState<OutraDespesa[]>([]);
   const [motoristaDiariaMsg, setMotoristaDiariaMsg] = useState("");
@@ -200,6 +202,7 @@ const NovoServicoDialog = ({ open, onOpenChange, onSaved, initialData }: NovoSer
             estacionamento: String(initialData.estacionamento || ""),
             horaExtra: initialData.horaExtra || "",
             formaContratacao: (initialData as any).formaContratacao || "",
+            placaReceptivoUrl: (initialData as any).placaReceptivoUrl || "",
           });
           setPassageiros(initialData.passageiros || []);
           setOutrosDespesas(initialData.outrosDespesas || []);
@@ -209,6 +212,25 @@ const NovoServicoDialog = ({ open, onOpenChange, onSaved, initialData }: NovoSer
   }, [open, initialData]);
 
   const update = (key: string, value: string) => setForm((f) => ({ ...f, [key]: value }));
+
+  const handleUploadPlaca = async (file: File) => {
+    if (!file) return;
+    setUploadingPlaca(true);
+    try {
+      const { supabase } = await import("@/integrations/supabase/client");
+      const ext = file.name.split(".").pop() || "bin";
+      const path = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
+      const { error: upErr } = await supabase.storage.from("placas-receptivo").upload(path, file, { upsert: false });
+      if (upErr) throw upErr;
+      const { data } = supabase.storage.from("placas-receptivo").getPublicUrl(path);
+      update("placaReceptivoUrl", data.publicUrl);
+      toast.success("Arquivo enviado!");
+    } catch (e: any) {
+      toast.error("Erro ao enviar arquivo: " + (e?.message || ""));
+    } finally {
+      setUploadingPlaca(false);
+    }
+  };
 
   const handleSave = async () => {
     if (!form.data || !form.hora || !form.clienteId || !form.tipo || !form.origem || !form.destino) {
@@ -266,6 +288,7 @@ const NovoServicoDialog = ({ open, onOpenChange, onSaved, initialData }: NovoSer
         horaExtra: form.horaExtra || "",
         outrosDespesas: outrosDespesas,
         formaContratacao: form.formaContratacao || "",
+        placaReceptivoUrl: form.placaReceptivoUrl || "",
       });
 
       toast.success("Serviço adicionado com sucesso!");
@@ -274,7 +297,7 @@ const NovoServicoDialog = ({ open, onOpenChange, onSaved, initialData }: NovoSer
         origem: "", destino: "", veiculoId: "", motoristaId: "", valor: "",
         fornecedorId: "", custo: "", observacoes: "", receptivo: "",
         kmIn: "", kmFim: "", kmExtra: "", horaIn: "", horaFim: "",
-        estacionamento: "", horaExtra: "", formaContratacao: "",
+        estacionamento: "", horaExtra: "", formaContratacao: "", placaReceptivoUrl: "",
       });
       setPassageiros([]);
       setOutrosDespesas([]);
@@ -490,6 +513,24 @@ const NovoServicoDialog = ({ open, onOpenChange, onSaved, initialData }: NovoSer
           <div className="space-y-1.5">
             <Label>Receptivo</Label>
             <Input value={form.receptivo} onChange={(e) => update("receptivo", e.target.value)} placeholder="Nome do receptivo" />
+          </div>
+
+          <div className="space-y-1.5">
+            <Label>Arquivo da Placa de Receptivo</Label>
+            <Input
+              type="file"
+              accept="image/*,application/pdf"
+              disabled={uploadingPlaca}
+              onChange={(e) => { const f = e.target.files?.[0]; if (f) handleUploadPlaca(f); }}
+            />
+            {form.placaReceptivoUrl && (
+              <div className="flex items-center gap-2 text-xs">
+                <a href={form.placaReceptivoUrl} target="_blank" rel="noreferrer" className="text-primary underline truncate">
+                  Arquivo enviado
+                </a>
+                <button type="button" className="text-destructive hover:underline" onClick={() => update("placaReceptivoUrl", "")}>Remover</button>
+              </div>
+            )}
           </div>
 
           <div className="space-y-1.5 sm:col-span-2">

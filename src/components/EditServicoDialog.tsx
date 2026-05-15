@@ -52,8 +52,10 @@ const EditServicoDialog = ({ open, onOpenChange, item, onSaved }: EditServicoDia
     estacionamento: "",
     horaExtra: "",
     formaContratacao: "",
+    placaReceptivoUrl: "",
   });
   
+  const [uploadingPlaca, setUploadingPlaca] = useState(false);
   const [passageiros, setPassageiros] = useState<Passageiro[]>([]);
   const [outrosDespesas, setOutrosDespesas] = useState<OutraDespesa[]>([]);
   const [motoristaDiariaMsg, setMotoristaDiariaMsg] = useState("");
@@ -147,6 +149,7 @@ const EditServicoDialog = ({ open, onOpenChange, item, onSaved }: EditServicoDia
         estacionamento: (item.estacionamento || 0).toString(),
         horaExtra: item.horaExtra || "",
         formaContratacao: (item as any).formaContratacao || "",
+        placaReceptivoUrl: (item as any).placaReceptivoUrl || "",
       });
       setPassageiros(item.passageiros || []);
       setOutrosDespesas(item.outrosDespesas || []);
@@ -154,6 +157,25 @@ const EditServicoDialog = ({ open, onOpenChange, item, onSaved }: EditServicoDia
   }, [item, open]);
 
   const update = (key: string, value: string) => setForm((f) => ({ ...f, [key]: value }));
+
+  const handleUploadPlaca = async (file: File) => {
+    if (!file) return;
+    setUploadingPlaca(true);
+    try {
+      const { supabase } = await import("@/integrations/supabase/client");
+      const ext = file.name.split(".").pop() || "bin";
+      const path = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
+      const { error: upErr } = await supabase.storage.from("placas-receptivo").upload(path, file, { upsert: false });
+      if (upErr) throw upErr;
+      const { data } = supabase.storage.from("placas-receptivo").getPublicUrl(path);
+      update("placaReceptivoUrl", data.publicUrl);
+      toast.success("Arquivo enviado!");
+    } catch (e: any) {
+      toast.error("Erro ao enviar arquivo: " + (e?.message || ""));
+    } finally {
+      setUploadingPlaca(false);
+    }
+  };
 
   const handleVeiculoChange = (veiculoId: string) => {
     if (veiculoId === "_manual") {
@@ -261,6 +283,7 @@ const EditServicoDialog = ({ open, onOpenChange, item, onSaved }: EditServicoDia
         horaExtra: form.horaExtra || "",
         outrosDespesas: outrosDespesas,
         formaContratacao: form.formaContratacao || "",
+        placaReceptivoUrl: form.placaReceptivoUrl || "",
       });
 
       toast.success("Serviço atualizado com sucesso!");
@@ -454,6 +477,24 @@ const EditServicoDialog = ({ open, onOpenChange, item, onSaved }: EditServicoDia
           <div className="space-y-1.5">
             <Label>Receptivo</Label>
             <Input value={form.receptivo} onChange={(e) => update("receptivo", e.target.value)} placeholder="Nome do receptivo" />
+          </div>
+
+          <div className="space-y-1.5">
+            <Label>Arquivo da Placa de Receptivo</Label>
+            <Input
+              type="file"
+              accept="image/*,application/pdf"
+              disabled={uploadingPlaca}
+              onChange={(e) => { const f = e.target.files?.[0]; if (f) handleUploadPlaca(f); }}
+            />
+            {form.placaReceptivoUrl && (
+              <div className="flex items-center gap-2 text-xs">
+                <a href={form.placaReceptivoUrl} target="_blank" rel="noreferrer" className="text-primary underline truncate">
+                  Arquivo enviado
+                </a>
+                <button type="button" className="text-destructive hover:underline" onClick={() => update("placaReceptivoUrl", "")}>Remover</button>
+              </div>
+            )}
           </div>
 
           <div className="space-y-1.5 sm:col-span-2">
