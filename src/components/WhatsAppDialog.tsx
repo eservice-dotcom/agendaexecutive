@@ -44,11 +44,13 @@ const buildConsolidatedMessage = (items: AgendaItem[]) => {
   const first = items[0];
   const [y, m, d] = first.data.split("-");
   const dataFormatada = `${d}/${m}/${y}`;
+  const hasMultipleDates = new Set(items.map((i) => i.data)).size > 1;
 
   let msg = `Olá ${first.motorista}! Seguem os serviços do dia ${dataFormatada}:\n`;
 
   items
-    .sort((a, b) => a.hora.localeCompare(b.hora))
+    .slice()
+    .sort((a, b) => (a.data + a.hora).localeCompare(b.data + b.hora))
     .forEach((item, idx) => {
       const passageirosDetalhados = item.passageiros.length > 0
         ? item.passageiros
@@ -64,9 +66,11 @@ const buildConsolidatedMessage = (items: AgendaItem[]) => {
       const voos = item.passageiros.length > 0
         ? [...new Set(item.passageiros.map(p => p.voo).filter(Boolean))].join(", ") || "—"
         : "—";
+      const [iy, im, id] = item.data.split("-");
+      const horaLabel = hasMultipleDates ? `${id}/${im} ${item.hora}` : item.hora;
 
       msg += `\n*Serviço ${idx + 1}*\n`;
-      msg += `⏰ Hora: ${item.hora}\n`;
+      msg += `⏰ Hora: ${horaLabel}\n`;
       msg += `🏢 Cliente: ${item.cliente}\n`;
       msg += `👥 SHT: ${item.pax}\n`;
       msg += `👤 Passageiros:${item.passageiros.length > 1 ? "\n   • " : " "}${passageirosDetalhados}\n`;
