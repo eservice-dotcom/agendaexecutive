@@ -122,7 +122,19 @@ const WhatsAppDialog = ({ open, onOpenChange, item, allItems = [], onSent }: Wha
   const handleSend = () => {
     const phone = item.telefone.replace(/\D/g, "");
     const phoneWithCountry = phone.startsWith("55") ? phone : `55${phone}`;
-    const encoded = encodeURIComponent(mensagemFinal);
+
+    // Anexa link da placa de receptivo (se houver) ao final da mensagem.
+    // No modo consolidado, agrupa todos os links únicos dos serviços do dia.
+    const placas = modoConsolidado
+      ? [...new Set(allDriverDayItems.map((i) => i.placaReceptivoUrl).filter(Boolean))]
+      : [item.placaReceptivoUrl].filter(Boolean) as string[];
+
+    let mensagemFinalComPlaca = mensagemFinal;
+    if (placas.length > 0) {
+      mensagemFinalComPlaca += `\n\n📎 Placa de receptivo:\n${placas.join("\n")}`;
+    }
+
+    const encoded = encodeURIComponent(mensagemFinalComPlaca);
     // Em desktop, wa.me abre o WhatsApp nativo via protocolo whatsapp:// que corrompe
     // emojis de plano suplementar (🏢 👥 📍). web.whatsapp.com preserva UTF-8 corretamente.
     const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
@@ -130,6 +142,11 @@ const WhatsAppDialog = ({ open, onOpenChange, item, allItems = [], onSent }: Wha
       ? `https://wa.me/${phoneWithCountry}?text=${encoded}`
       : `https://web.whatsapp.com/send?phone=${phoneWithCountry}&text=${encoded}`;
     window.open(url, "_blank");
+
+    // Abre cada arquivo de placa em nova aba para que o usuário possa baixar
+    // ou anexar manualmente no WhatsApp (a API web não permite anexar via URL).
+    placas.forEach((u) => window.open(u, "_blank"));
+
     if (item) {
       onSent?.(item, modoConsolidado ? allDriverDayItems : undefined);
     }
