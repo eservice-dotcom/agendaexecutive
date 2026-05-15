@@ -389,13 +389,32 @@ const Index = () => {
     setFechamentoDialogOpen(false);
   };
 
-  // Serviços finalizados pelo receptivo (horaFim preenchida) e ainda sem status de faturamento
+  // Serviços sem status de faturamento, agrupados por receptivo.
+  // Só alerta quando TODOS os serviços da última data (do receptivo) estão finalizados (horaFim preenchida).
   const finalizadosSemFechamento = useMemo(() => {
-    return agendaData.filter((i: any) => {
-      const horaFim = i.horaFim || i.hora_fim || "";
+    const isFinalizado = (i: any) => {
+      const hf = i.horaFim || i.hora_fim || "";
+      return Boolean(hf && String(hf).trim());
+    };
+    const pending = agendaData.filter((i: any) => {
       const sf = i.statusFaturamento || i.status_faturamento || "";
-      return Boolean(horaFim && horaFim.trim()) && !sf;
+      return !sf;
     });
+    const byRecep = new Map<string, any[]>();
+    pending.forEach((i: any) => {
+      const r = (i.receptivo || "").trim() || "—";
+      if (!byRecep.has(r)) byRecep.set(r, []);
+      byRecep.get(r)!.push(i);
+    });
+    const result: any[] = [];
+    byRecep.forEach((items) => {
+      const maxDate = items.reduce((m, i) => (i.data > m ? i.data : m), items[0].data);
+      const lastDateItems = items.filter((i) => i.data === maxDate);
+      if (lastDateItems.every(isFinalizado)) {
+        result.push(...items);
+      }
+    });
+    return result;
   }, [agendaData]);
 
   const finalizadosPorCliente = useMemo(() => {
