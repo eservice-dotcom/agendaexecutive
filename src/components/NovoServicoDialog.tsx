@@ -213,6 +213,25 @@ const NovoServicoDialog = ({ open, onOpenChange, onSaved, initialData }: NovoSer
 
   const update = (key: string, value: string) => setForm((f) => ({ ...f, [key]: value }));
 
+  const handleUploadPlaca = async (file: File) => {
+    if (!file) return;
+    setUploadingPlaca(true);
+    try {
+      const { supabase } = await import("@/integrations/supabase/client");
+      const ext = file.name.split(".").pop() || "bin";
+      const path = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
+      const { error: upErr } = await supabase.storage.from("placas-receptivo").upload(path, file, { upsert: false });
+      if (upErr) throw upErr;
+      const { data } = supabase.storage.from("placas-receptivo").getPublicUrl(path);
+      update("placaReceptivoUrl", data.publicUrl);
+      toast.success("Arquivo enviado!");
+    } catch (e: any) {
+      toast.error("Erro ao enviar arquivo: " + (e?.message || ""));
+    } finally {
+      setUploadingPlaca(false);
+    }
+  };
+
   const handleSave = async () => {
     if (!form.data || !form.hora || !form.clienteId || !form.tipo || !form.origem || !form.destino) {
       toast.error("Preencha os campos obrigatórios: Data, Hora, Cliente, Tipo, Origem e Destino.");
@@ -494,6 +513,24 @@ const NovoServicoDialog = ({ open, onOpenChange, onSaved, initialData }: NovoSer
           <div className="space-y-1.5">
             <Label>Receptivo</Label>
             <Input value={form.receptivo} onChange={(e) => update("receptivo", e.target.value)} placeholder="Nome do receptivo" />
+          </div>
+
+          <div className="space-y-1.5">
+            <Label>Arquivo da Placa de Receptivo</Label>
+            <Input
+              type="file"
+              accept="image/*,application/pdf"
+              disabled={uploadingPlaca}
+              onChange={(e) => { const f = e.target.files?.[0]; if (f) handleUploadPlaca(f); }}
+            />
+            {form.placaReceptivoUrl && (
+              <div className="flex items-center gap-2 text-xs">
+                <a href={form.placaReceptivoUrl} target="_blank" rel="noreferrer" className="text-primary underline truncate">
+                  Arquivo enviado
+                </a>
+                <button type="button" className="text-destructive hover:underline" onClick={() => update("placaReceptivoUrl", "")}>Remover</button>
+              </div>
+            )}
           </div>
 
           <div className="space-y-1.5 sm:col-span-2">
