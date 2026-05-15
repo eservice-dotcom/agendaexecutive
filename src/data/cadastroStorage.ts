@@ -356,6 +356,7 @@ export const getAgendaItems = async (): Promise<AgendaItem[]> => {
     horaExtra: (item as any).hora_extra || "",
     outrosDespesas: ((item as any).outros_despesas || []) as { descricao: string; valor: number }[],
     formaContratacao: (item as any).forma_contratacao || "",
+    placaReceptivoUrl: (item as any).placa_receptivo_url || "",
   }));
 };
 
@@ -393,6 +394,7 @@ export const saveAgendaItem = async (item: Omit<AgendaItem, "id">) => {
     hora_extra: item.horaExtra || "",
     outros_despesas: item.outrosDespesas || [],
     forma_contratacao: item.formaContratacao || "",
+    placa_receptivo_url: item.placaReceptivoUrl || null,
   } as any);
   
   if (error) throw error;
@@ -431,6 +433,7 @@ export const updateAgendaItem = async (updated: AgendaItem) => {
       hora_extra: updated.horaExtra || "",
       outros_despesas: updated.outrosDespesas || [],
       forma_contratacao: updated.formaContratacao || "",
+      placa_receptivo_url: updated.placaReceptivoUrl || null,
     } as any)
     .eq("id", updated.id);
   
