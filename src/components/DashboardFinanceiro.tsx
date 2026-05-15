@@ -44,6 +44,7 @@ const compDate = (c: { data?: string; data_vencimento?: string | null }) =>
 const DashboardFinanceiro = () => {
   const [contasPagar, setContasPagar] = useState<ContaDB[]>([]);
   const [contasReceber, setContasReceber] = useState<ContaDB[]>([]);
+  const [agendaReceitas, setAgendaReceitas] = useState<{ data: string; valor: number }[]>([]);
   const [year, setYear] = useState(new Date().getFullYear().toString());
   const [month, setMonth] = useState<string>("todos"); // "todos" | "01".."12"
   const [detailOpen, setDetailOpen] = useState<null | "receitas" | "despesas">(null);
