@@ -41,6 +41,7 @@ interface FiltersState {
   sht: string;
   receptivo: string;
   statusFaturamento: string;
+  formaContratacao: string;
 }
 
 const initialFilters: FiltersState = {
@@ -58,6 +59,7 @@ const initialFilters: FiltersState = {
   sht: "",
   receptivo: "",
   statusFaturamento: "",
+  formaContratacao: "",
 };
 
 const Index = () => {
@@ -150,6 +152,11 @@ const Index = () => {
           const sf = item.statusFaturamento || item.status_faturamento || "";
           if (filters.statusFaturamento === "sem_status" && sf !== "") return false;
           if (filters.statusFaturamento !== "sem_status" && sf !== filters.statusFaturamento) return false;
+        }
+        if (filters.formaContratacao) {
+          const fc = (item as any).formaContratacao || (item as any).forma_contratacao || "";
+          if (filters.formaContratacao === "sem" && fc !== "") return false;
+          if (filters.formaContratacao !== "sem" && fc !== filters.formaContratacao) return false;
         }
         return true;
       })
