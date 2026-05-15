@@ -44,6 +44,7 @@ const compDate = (c: { data?: string; data_vencimento?: string | null }) =>
 const DashboardFinanceiro = () => {
   const [contasPagar, setContasPagar] = useState<ContaDB[]>([]);
   const [contasReceber, setContasReceber] = useState<ContaDB[]>([]);
+  const [agendaReceitas, setAgendaReceitas] = useState<{ data: string; valor: number }[]>([]);
   const [year, setYear] = useState(new Date().getFullYear().toString());
   const [month, setMonth] = useState<string>("todos"); // "todos" | "01".."12"
   const [detailOpen, setDetailOpen] = useState<null | "receitas" | "despesas">(null);
@@ -62,9 +63,27 @@ const DashboardFinanceiro = () => {
       }
       return all;
     };
-    Promise.all([fetchAll("contas_pagar"), fetchAll("contas_receber")]).then(([cp, cr]) => {
+    const fetchAgenda = async () => {
+      let all: any[] = [];
+      let from = 0;
+      const ps = 1000;
+      while (true) {
+        const { data } = await supabase
+          .from("agenda_items")
+          .select("data,valor,deleted_at")
+          .is("deleted_at", null)
+          .range(from, from + ps - 1);
+        if (!data || data.length === 0) break;
+        all = all.concat(data);
+        if (data.length < ps) break;
+        from += ps;
+      }
+      return all.map((r) => ({ data: r.data, valor: Number(r.valor) || 0 }));
+    };
+    Promise.all([fetchAll("contas_pagar"), fetchAll("contas_receber"), fetchAgenda()]).then(([cp, cr, ag]) => {
       setContasPagar(cp);
       setContasReceber(cr);
+      setAgendaReceitas(ag);
     });
   }, []);
 
@@ -85,15 +104,21 @@ const DashboardFinanceiro = () => {
   const crPeriod = useMemo(() => contasReceber.filter((c) => compDate(c).startsWith(periodPrefix)), [contasReceber, periodPrefix]);
 
   // ========== Receitas vs Despesas (Bar Chart by month) ==========
+  // Receitas vêm da AGENDA (valor dos serviços, por data do serviço).
+  // Despesas continuam vindo de contas_pagar (por competência).
+  const agendaYear = useMemo(
+    () => agendaReceitas.filter((a) => (a.data || "").startsWith(year)),
+    [agendaReceitas, year]
+  );
   const receitasDespesasData = useMemo(() => {
     return MONTHS.map((label, i) => {
       const m = String(i + 1).padStart(2, "0");
       const prefix = `${year}-${m}`;
-      const receitas = crYear.filter((c) => compDate(c).startsWith(prefix)).reduce((s, c) => s + Number(c.valor), 0);
+      const receitas = agendaYear.filter((a) => (a.data || "").startsWith(prefix)).reduce((s, a) => s + a.valor, 0);
       const despesas = cpYear.filter((c) => compDate(c).startsWith(prefix)).reduce((s, c) => s + Number(c.valor), 0);
       return { mes: label, Receitas: receitas, Despesas: despesas };
     });
-  }, [cpYear, crYear, year]);
+  }, [cpYear, agendaYear, year]);
 
   // ========== DRE Simplificado (respeita ano + mês) ==========
   const dre = useMemo(() => {
@@ -243,10 +268,14 @@ const DashboardFinanceiro = () => {
     }
 
     // Recalculate all data with filtered values
+    // Receitas vs Despesas usa AGENDA para receitas (apenas filtro por data se houver)
+    let filteredAgenda = agendaYear;
+    if (printDataInicio) filteredAgenda = filteredAgenda.filter(a => (a.data || "") >= printDataInicio);
+    if (printDataFim) filteredAgenda = filteredAgenda.filter(a => (a.data || "") <= printDataFim);
     const filteredReceitasDespesas = MONTHS.map((label, i) => {
       const m = String(i + 1).padStart(2, "0");
       const prefix = `${year}-${m}`;
-      const receitas = filteredCR.filter(c => compDate(c).startsWith(prefix)).reduce((s, c) => s + Number(c.valor), 0);
+      const receitas = filteredAgenda.filter(a => (a.data || "").startsWith(prefix)).reduce((s, a) => s + a.valor, 0);
       const despesas = filteredCP.filter(c => compDate(c).startsWith(prefix)).reduce((s, c) => s + Number(c.valor), 0);
       return { mes: label, Receitas: receitas, Despesas: despesas };
     });
