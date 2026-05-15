@@ -49,8 +49,10 @@ const NovoServicoDialog = ({ open, onOpenChange, onSaved, initialData }: NovoSer
     estacionamento: "",
     horaExtra: "",
     formaContratacao: "",
+    placaReceptivoUrl: "",
   });
   
+  const [uploadingPlaca, setUploadingPlaca] = useState(false);
   const [passageiros, setPassageiros] = useState<Passageiro[]>([]);
   const [outrosDespesas, setOutrosDespesas] = useState<OutraDespesa[]>([]);
   const [motoristaDiariaMsg, setMotoristaDiariaMsg] = useState("");
@@ -200,6 +202,7 @@ const NovoServicoDialog = ({ open, onOpenChange, onSaved, initialData }: NovoSer
             estacionamento: String(initialData.estacionamento || ""),
             horaExtra: initialData.horaExtra || "",
             formaContratacao: (initialData as any).formaContratacao || "",
+            placaReceptivoUrl: (initialData as any).placaReceptivoUrl || "",
           });
           setPassageiros(initialData.passageiros || []);
           setOutrosDespesas(initialData.outrosDespesas || []);
@@ -266,6 +269,7 @@ const NovoServicoDialog = ({ open, onOpenChange, onSaved, initialData }: NovoSer
         horaExtra: form.horaExtra || "",
         outrosDespesas: outrosDespesas,
         formaContratacao: form.formaContratacao || "",
+        placaReceptivoUrl: form.placaReceptivoUrl || "",
       });
 
       toast.success("Serviço adicionado com sucesso!");
@@ -274,7 +278,7 @@ const NovoServicoDialog = ({ open, onOpenChange, onSaved, initialData }: NovoSer
         origem: "", destino: "", veiculoId: "", motoristaId: "", valor: "",
         fornecedorId: "", custo: "", observacoes: "", receptivo: "",
         kmIn: "", kmFim: "", kmExtra: "", horaIn: "", horaFim: "",
-        estacionamento: "", horaExtra: "", formaContratacao: "",
+        estacionamento: "", horaExtra: "", formaContratacao: "", placaReceptivoUrl: "",
       });
       setPassageiros([]);
       setOutrosDespesas([]);
