@@ -24,6 +24,7 @@ interface FiltersState {
   sht: string;
   receptivo: string;
   statusFaturamento: string;
+  formaContratacao: string;
 }
 
 interface AgendaFiltersProps {
