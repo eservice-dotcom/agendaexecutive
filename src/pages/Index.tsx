@@ -41,6 +41,7 @@ interface FiltersState {
   sht: string;
   receptivo: string;
   statusFaturamento: string;
+  formaContratacao: string;
 }
 
 const initialFilters: FiltersState = {
@@ -58,6 +59,7 @@ const initialFilters: FiltersState = {
   sht: "",
   receptivo: "",
   statusFaturamento: "",
+  formaContratacao: "",
 };
 
 const Index = () => {
