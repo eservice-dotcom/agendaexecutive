@@ -635,6 +635,7 @@ const Index = () => {
                 </div>
               </div>
             )}
+            <div className={`grid gap-3 ${canViewFinancials ? 'grid-cols-2 sm:grid-cols-3 lg:grid-cols-6' : 'grid-cols-1'}`}>
               <StatCard label="Registros" value={filteredData.length.toString()} />
               {canViewFinancials && (
                 <>
