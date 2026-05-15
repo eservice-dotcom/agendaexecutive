@@ -1337,17 +1337,42 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
       toast({ title: "Valor inválido", variant: "destructive" });
       return;
     }
-    const novoValorPago = Number(item.valor_pago || 0) + valorBaixa;
+    const valorPagoAnterior = Number(item.valor_pago || 0);
+    const novoValorPago = valorPagoAnterior + valorBaixa;
     const valorTotal = Number(item.valor);
-    const novoStatus = novoValorPago >= valorTotal ? "pago" : "parcial";
     const today = new Date().toISOString().split("T")[0];
     const table = type === "pagar" ? "contas_pagar" : "contas_receber";
-    await supabase.from(table).update({
-      valor_pago: Math.min(novoValorPago, valorTotal),
-      status: novoStatus,
-      data_pagamento: novoStatus === "pago" ? today : null,
-    }).eq("id", item.id);
-    toast({ title: novoStatus === "pago" ? "Baixa total realizada!" : "Baixa parcial realizada!" });
+    const isPartial = novoValorPago < valorTotal;
+
+    if (isPartial) {
+      // Fecha o registro atual com o valor efetivamente pago e cria um novo pendente com o saldo
+      const valorEfetivoPago = novoValorPago;
+      const saldoRestante = valorTotal - valorEfetivoPago;
+      await supabase.from(table).update({
+        valor: valorEfetivoPago,
+        valor_pago: valorEfetivoPago,
+        status: "pago",
+        data_pagamento: today,
+      }).eq("id", item.id);
+
+      const { id, created_at, updated_at, ...rest } = item as any;
+      const novaConta = {
+        ...rest,
+        valor: saldoRestante,
+        valor_pago: 0,
+        status: "pendente",
+        data_pagamento: null,
+        descritivo: `${item.descritivo || ""}${item.descritivo ? " " : ""}(saldo)`.trim(),
+      };
+      await supabase.from(table).insert(novaConta);
+    } else {
+      await supabase.from(table).update({
+        valor_pago: valorTotal,
+        status: "pago",
+        data_pagamento: today,
+      }).eq("id", item.id);
+    }
+    toast({ title: isPartial ? "Baixa parcial realizada! Saldo lançado em pendentes." : "Baixa total realizada!" });
     setBaixaDialog(null);
     if (type === "pagar") loadContasPagar();
     else loadContasReceber();
