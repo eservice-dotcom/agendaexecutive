@@ -389,6 +389,23 @@ const Index = () => {
     setFechamentoDialogOpen(false);
   };
 
+  // Serviços finalizados pelo receptivo (horaFim preenchida) e ainda sem status de faturamento
+  const finalizadosSemFechamento = useMemo(() => {
+    return agendaData.filter((i: any) => {
+      const horaFim = i.horaFim || i.hora_fim || "";
+      const sf = i.statusFaturamento || i.status_faturamento || "";
+      return Boolean(horaFim && horaFim.trim()) && !sf;
+    });
+  }, [agendaData]);
+
+  const finalizadosPorCliente = useMemo(() => {
+    const map = new Map<string, number>();
+    finalizadosSemFechamento.forEach((i: any) => {
+      map.set(i.cliente, (map.get(i.cliente) || 0) + 1);
+    });
+    return Array.from(map.entries()).sort((a, b) => a[0].localeCompare(b[0]));
+  }, [finalizadosSemFechamento]);
+
   const totalValor = filteredData.reduce((s, i) => s + i.valor, 0);
   const totalCusto = filteredData.reduce((s, i) => s + i.custo, 0);
   const totalExtras = filteredData.reduce((s, i) => {
