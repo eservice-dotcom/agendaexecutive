@@ -97,9 +97,20 @@ const WhatsAppDialog = ({ open, onOpenChange, item, allItems = [], onSent }: Wha
 
   const allDriverDayItems = useMemo(() => {
     if (!item) return [];
+    // Próximo dia (para incluir serviços agendados até 01:00 do dia seguinte)
+    const [y, m, d] = item.data.split("-").map(Number);
+    const next = new Date(Date.UTC(y, m - 1, d));
+    next.setUTCDate(next.getUTCDate() + 1);
+    const nextStr = `${next.getUTCFullYear()}-${String(next.getUTCMonth() + 1).padStart(2, "0")}-${String(next.getUTCDate()).padStart(2, "0")}`;
+
     return allItems
-      .filter((i) => i.motorista === item.motorista && i.data === item.data)
-      .sort((a, b) => a.hora.localeCompare(b.hora));
+      .filter((i) => {
+        if (i.motorista !== item.motorista) return false;
+        if (i.data === item.data) return true;
+        if (i.data === nextStr && i.hora && i.hora <= "01:00") return true;
+        return false;
+      })
+      .sort((a, b) => (a.data + a.hora).localeCompare(b.data + b.hora));
   }, [item, allItems]);
 
   if (!item) return null;
