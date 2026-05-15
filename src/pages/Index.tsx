@@ -1,5 +1,5 @@
 import { useState, useMemo, useCallback, useEffect } from "react";
-import { CalendarDays, ListChecks, Truck, Building2, Plus, BarChart3, Printer, EyeOff, Eye, ShoppingCart, FileText, Search, Trash2, ClipboardList, Archive, FileSpreadsheet, X, DollarSign, ChevronDown } from "lucide-react";
+import { CalendarDays, ListChecks, Truck, Building2, Plus, BarChart3, Printer, EyeOff, Eye, ShoppingCart, FileText, Search, Trash2, ClipboardList, Archive, FileSpreadsheet, X, DollarSign, ChevronDown, MessageCircle } from "lucide-react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import logo from "@/assets/logo-executive-service.png";
 import { Link, useNavigate } from "react-router-dom";
@@ -425,6 +425,33 @@ const Index = () => {
     return Array.from(map.entries()).sort((a, b) => a[0].localeCompare(b[0]));
   }, [finalizadosSemFechamento]);
 
+  // Serviços do dia seguinte cujo motorista ainda não recebeu mensagem (WhatsApp).
+  const motoristasSemMensagemAmanha = useMemo(() => {
+    const now = new Date();
+    const tomorrow = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
+    const yyyy = tomorrow.getFullYear();
+    const mm = String(tomorrow.getMonth() + 1).padStart(2, "0");
+    const dd = String(tomorrow.getDate()).padStart(2, "0");
+    const tomorrowStr = `${yyyy}-${mm}-${dd}`;
+    let messagedMap: Record<string, string> = {};
+    try {
+      const raw = localStorage.getItem("whatsapp_messaged_driver_v1");
+      messagedMap = raw ? JSON.parse(raw) : {};
+    } catch {}
+    const pendentes = agendaData.filter((i: any) => {
+      if (i.data !== tomorrowStr) return false;
+      const motorista = (i.motorista || "").trim();
+      if (!motorista) return false;
+      const stored = messagedMap[i.id];
+      return !(stored && stored === i.motorista);
+    });
+    const map = new Map<string, number>();
+    pendentes.forEach((i: any) => {
+      map.set(i.motorista, (map.get(i.motorista) || 0) + 1);
+    });
+    return Array.from(map.entries()).sort((a, b) => a[0].localeCompare(b[0]));
+  }, [agendaData]);
+
   const totalValor = filteredData.reduce((s, i) => s + i.valor, 0);
   const totalCusto = filteredData.reduce((s, i) => s + i.custo, 0);
   const totalExtras = filteredData.reduce((s, i) => {
@@ -586,6 +613,26 @@ const Index = () => {
                   <FileText className="h-3.5 w-3.5" />
                   Fechamento
                 </Button>
+              </div>
+            )}
+            {motoristasSemMensagemAmanha.length > 0 && (
+              <div className="rounded-lg border border-sky-300 bg-sky-50 dark:bg-sky-950/30 dark:border-sky-700 p-3 flex items-start gap-3">
+                <MessageCircle className="h-5 w-5 text-sky-600 dark:text-sky-400 shrink-0 mt-0.5" />
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-semibold text-sky-900 dark:text-sky-200">
+                    Mensagem de amanhã ainda não enviada para {motoristasSemMensagemAmanha.length} motorista(s)
+                  </p>
+                  <div className="mt-1.5 flex flex-wrap gap-1.5">
+                    {motoristasSemMensagemAmanha.map(([nome, count]) => (
+                      <span
+                        key={nome}
+                        className="text-xs px-2 py-1 rounded-md bg-sky-100 dark:bg-sky-900/40 text-sky-900 dark:text-sky-100 border border-sky-300 dark:border-sky-700"
+                      >
+                        {nome} <span className="font-bold">({count})</span>
+                      </span>
+                    ))}
+                  </div>
+                </div>
               </div>
             )}
             <div className={`grid gap-3 ${canViewFinancials ? 'grid-cols-2 sm:grid-cols-3 lg:grid-cols-6' : 'grid-cols-1'}`}>
