@@ -44,11 +44,13 @@ const buildConsolidatedMessage = (items: AgendaItem[]) => {
   const first = items[0];
   const [y, m, d] = first.data.split("-");
   const dataFormatada = `${d}/${m}/${y}`;
+  const hasMultipleDates = new Set(items.map((i) => i.data)).size > 1;
 
   let msg = `Olá ${first.motorista}! Seguem os serviços do dia ${dataFormatada}:\n`;
 
   items
-    .sort((a, b) => a.hora.localeCompare(b.hora))
+    .slice()
+    .sort((a, b) => (a.data + a.hora).localeCompare(b.data + b.hora))
     .forEach((item, idx) => {
       const passageirosDetalhados = item.passageiros.length > 0
         ? item.passageiros
@@ -64,9 +66,11 @@ const buildConsolidatedMessage = (items: AgendaItem[]) => {
       const voos = item.passageiros.length > 0
         ? [...new Set(item.passageiros.map(p => p.voo).filter(Boolean))].join(", ") || "—"
         : "—";
+      const [iy, im, id] = item.data.split("-");
+      const horaLabel = hasMultipleDates ? `${id}/${im} ${item.hora}` : item.hora;
 
       msg += `\n*Serviço ${idx + 1}*\n`;
-      msg += `⏰ Hora: ${item.hora}\n`;
+      msg += `⏰ Hora: ${horaLabel}\n`;
       msg += `🏢 Cliente: ${item.cliente}\n`;
       msg += `👥 SHT: ${item.pax}\n`;
       msg += `👤 Passageiros:${item.passageiros.length > 1 ? "\n   • " : " "}${passageirosDetalhados}\n`;
@@ -97,9 +101,20 @@ const WhatsAppDialog = ({ open, onOpenChange, item, allItems = [], onSent }: Wha
 
   const allDriverDayItems = useMemo(() => {
     if (!item) return [];
+    // Próximo dia (para incluir serviços agendados até 01:00 do dia seguinte)
+    const [y, m, d] = item.data.split("-").map(Number);
+    const next = new Date(Date.UTC(y, m - 1, d));
+    next.setUTCDate(next.getUTCDate() + 1);
+    const nextStr = `${next.getUTCFullYear()}-${String(next.getUTCMonth() + 1).padStart(2, "0")}-${String(next.getUTCDate()).padStart(2, "0")}`;
+
     return allItems
-      .filter((i) => i.motorista === item.motorista && i.data === item.data)
-      .sort((a, b) => a.hora.localeCompare(b.hora));
+      .filter((i) => {
+        if (i.motorista !== item.motorista) return false;
+        if (i.data === item.data) return true;
+        if (i.data === nextStr && i.hora && i.hora <= "01:00") return true;
+        return false;
+      })
+      .sort((a, b) => (a.data + a.hora).localeCompare(b.data + b.hora));
   }, [item, allItems]);
 
   if (!item) return null;
