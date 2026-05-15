@@ -266,6 +266,20 @@ const AgendaFilters = ({ filters, onFilterChange, motoristas, tipos, fornecedore
             </SelectContent>
           </Select>
         </div>
+        <div className="space-y-1">
+          <label className="text-xs font-medium text-muted-foreground">Forma Contratação</label>
+          <Select value={filters.formaContratacao || "all"} onValueChange={(v) => updateFilter("formaContratacao", v === "all" ? "" : v)}>
+            <SelectTrigger>
+              <SelectValue placeholder="Forma" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">Todas</SelectItem>
+              <SelectItem value="sem">Sem forma</SelectItem>
+              <SelectItem value="transfer">Transfer</SelectItem>
+              <SelectItem value="diaria">Diária</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
       </div>
     </div>
   );
