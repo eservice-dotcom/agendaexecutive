@@ -268,10 +268,14 @@ const DashboardFinanceiro = () => {
     }
 
     // Recalculate all data with filtered values
+    // Receitas vs Despesas usa AGENDA para receitas (apenas filtro por data se houver)
+    let filteredAgenda = agendaYear;
+    if (printDataInicio) filteredAgenda = filteredAgenda.filter(a => (a.data || "") >= printDataInicio);
+    if (printDataFim) filteredAgenda = filteredAgenda.filter(a => (a.data || "") <= printDataFim);
     const filteredReceitasDespesas = MONTHS.map((label, i) => {
       const m = String(i + 1).padStart(2, "0");
       const prefix = `${year}-${m}`;
-      const receitas = filteredCR.filter(c => compDate(c).startsWith(prefix)).reduce((s, c) => s + Number(c.valor), 0);
+      const receitas = filteredAgenda.filter(a => (a.data || "").startsWith(prefix)).reduce((s, a) => s + a.valor, 0);
       const despesas = filteredCP.filter(c => compDate(c).startsWith(prefix)).reduce((s, c) => s + Number(c.valor), 0);
       return { mes: label, Receitas: receitas, Despesas: despesas };
     });
