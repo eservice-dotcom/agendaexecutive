@@ -63,9 +63,27 @@ const DashboardFinanceiro = () => {
       }
       return all;
     };
-    Promise.all([fetchAll("contas_pagar"), fetchAll("contas_receber")]).then(([cp, cr]) => {
+    const fetchAgenda = async () => {
+      let all: any[] = [];
+      let from = 0;
+      const ps = 1000;
+      while (true) {
+        const { data } = await supabase
+          .from("agenda_items")
+          .select("data,valor,deleted_at")
+          .is("deleted_at", null)
+          .range(from, from + ps - 1);
+        if (!data || data.length === 0) break;
+        all = all.concat(data);
+        if (data.length < ps) break;
+        from += ps;
+      }
+      return all.map((r) => ({ data: r.data, valor: Number(r.valor) || 0 }));
+    };
+    Promise.all([fetchAll("contas_pagar"), fetchAll("contas_receber"), fetchAgenda()]).then(([cp, cr, ag]) => {
       setContasPagar(cp);
       setContasReceber(cr);
+      setAgendaReceitas(ag);
     });
   }, []);
 
