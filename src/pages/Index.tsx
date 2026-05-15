@@ -389,6 +389,23 @@ const Index = () => {
     setFechamentoDialogOpen(false);
   };
 
+  // Serviços finalizados pelo receptivo (horaFim preenchida) e ainda sem status de faturamento
+  const finalizadosSemFechamento = useMemo(() => {
+    return agendaData.filter((i: any) => {
+      const horaFim = i.horaFim || i.hora_fim || "";
+      const sf = i.statusFaturamento || i.status_faturamento || "";
+      return Boolean(horaFim && horaFim.trim()) && !sf;
+    });
+  }, [agendaData]);
+
+  const finalizadosPorCliente = useMemo(() => {
+    const map = new Map<string, number>();
+    finalizadosSemFechamento.forEach((i: any) => {
+      map.set(i.cliente, (map.get(i.cliente) || 0) + 1);
+    });
+    return Array.from(map.entries()).sort((a, b) => a[0].localeCompare(b[0]));
+  }, [finalizadosSemFechamento]);
+
   const totalValor = filteredData.reduce((s, i) => s + i.valor, 0);
   const totalCusto = filteredData.reduce((s, i) => s + i.custo, 0);
   const totalExtras = filteredData.reduce((s, i) => {
@@ -526,6 +543,32 @@ const Index = () => {
       <main className="mx-auto max-w-[1600px] space-y-4 px-4 py-6 sm:px-6 lg:px-8">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
           <TabsContent value="agenda" className="space-y-4">
+            {finalizadosSemFechamento.length > 0 && (
+              <div className="rounded-lg border border-amber-300 bg-amber-50 dark:bg-amber-950/30 dark:border-amber-700 p-3 flex items-start gap-3">
+                <ClipboardList className="h-5 w-5 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" />
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-semibold text-amber-900 dark:text-amber-200">
+                    {finalizadosSemFechamento.length} serviço(s) finalizado(s) aguardando envio do fechamento
+                  </p>
+                  <div className="mt-1.5 flex flex-wrap gap-1.5">
+                    {finalizadosPorCliente.map(([cli, count]) => (
+                      <button
+                        key={cli}
+                        onClick={async () => { setFechamentoDialogOpen(true); setActiveTab("fechamentos"); await handleFechamentoClienteChange(cli); }}
+                        className="text-xs px-2 py-1 rounded-md bg-amber-100 dark:bg-amber-900/40 hover:bg-amber-200 dark:hover:bg-amber-900/60 text-amber-900 dark:text-amber-100 border border-amber-300 dark:border-amber-700 transition-colors"
+                        title="Abrir fechamento deste cliente"
+                      >
+                        {cli} <span className="font-bold">({count})</span>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+                <Button size="sm" variant="outline" onClick={handleOpenFechamento} className="shrink-0 gap-1.5 border-amber-400 text-amber-900 dark:text-amber-100 hover:bg-amber-100 dark:hover:bg-amber-900/40">
+                  <FileText className="h-3.5 w-3.5" />
+                  Fechamento
+                </Button>
+              </div>
+            )}
             <div className={`grid gap-3 ${canViewFinancials ? 'grid-cols-2 sm:grid-cols-3 lg:grid-cols-5' : 'grid-cols-1'}`}>
               <StatCard label="Registros" value={filteredData.length.toString()} />
               {canViewFinancials && (
