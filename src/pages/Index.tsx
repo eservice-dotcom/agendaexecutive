@@ -553,26 +553,6 @@ const Index = () => {
                 </DropdownMenuContent>
               </DropdownMenu>
             )}
-            {motoristasSemMensagemAmanha.length > 0 && (
-              <div className="rounded-lg border border-sky-300 bg-sky-50 dark:bg-sky-950/30 dark:border-sky-700 p-3 flex items-start gap-3">
-                <MessageCircle className="h-5 w-5 text-sky-600 dark:text-sky-400 shrink-0 mt-0.5" />
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-semibold text-sky-900 dark:text-sky-200">
-                    Mensagem de amanhã ainda não enviada para {motoristasSemMensagemAmanha.length} motorista(s)
-                  </p>
-                  <div className="mt-1.5 flex flex-wrap gap-1.5">
-                    {motoristasSemMensagemAmanha.map(([nome, count]) => (
-                      <span
-                        key={nome}
-                        className="text-xs px-2 py-1 rounded-md bg-sky-100 dark:bg-sky-900/40 text-sky-900 dark:text-sky-100 border border-sky-300 dark:border-sky-700"
-                      >
-                        {nome} <span className="font-bold">({count})</span>
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            )}
 
             {/* Cadastros */}
             <Link
