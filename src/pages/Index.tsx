@@ -425,6 +425,33 @@ const Index = () => {
     return Array.from(map.entries()).sort((a, b) => a[0].localeCompare(b[0]));
   }, [finalizadosSemFechamento]);
 
+  // Serviços do dia seguinte cujo motorista ainda não recebeu mensagem (WhatsApp).
+  const motoristasSemMensagemAmanha = useMemo(() => {
+    const now = new Date();
+    const tomorrow = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
+    const yyyy = tomorrow.getFullYear();
+    const mm = String(tomorrow.getMonth() + 1).padStart(2, "0");
+    const dd = String(tomorrow.getDate()).padStart(2, "0");
+    const tomorrowStr = `${yyyy}-${mm}-${dd}`;
+    let messagedMap: Record<string, string> = {};
+    try {
+      const raw = localStorage.getItem("whatsapp_messaged_driver_v1");
+      messagedMap = raw ? JSON.parse(raw) : {};
+    } catch {}
+    const pendentes = agendaData.filter((i: any) => {
+      if (i.data !== tomorrowStr) return false;
+      const motorista = (i.motorista || "").trim();
+      if (!motorista) return false;
+      const stored = messagedMap[i.id];
+      return !(stored && stored === i.motorista);
+    });
+    const map = new Map<string, number>();
+    pendentes.forEach((i: any) => {
+      map.set(i.motorista, (map.get(i.motorista) || 0) + 1);
+    });
+    return Array.from(map.entries()).sort((a, b) => a[0].localeCompare(b[0]));
+  }, [agendaData]);
+
   const totalValor = filteredData.reduce((s, i) => s + i.valor, 0);
   const totalCusto = filteredData.reduce((s, i) => s + i.custo, 0);
   const totalExtras = filteredData.reduce((s, i) => {
