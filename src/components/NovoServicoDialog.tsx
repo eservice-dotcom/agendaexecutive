@@ -519,7 +519,7 @@ const NovoServicoDialog = ({ open, onOpenChange, onSaved, initialData }: NovoSer
             <Label>Arquivo da Placa de Receptivo</Label>
             <Input
               type="file"
-              accept="image/*,application/pdf"
+              accept="image/*,image/jpeg,image/jpg,image/png,image/webp,image/heic,image/heif,application/pdf,.jpg,.jpeg,.png,.webp,.heic,.heif,.pdf"
               disabled={uploadingPlaca}
               onChange={(e) => { const f = e.target.files?.[0]; if (f) handleUploadPlaca(f); }}
             />
