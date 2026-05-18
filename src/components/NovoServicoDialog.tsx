@@ -690,7 +690,7 @@ const NovoServicoDialog = ({ open, onOpenChange, onSaved, initialData }: NovoSer
                 </div>
                 <div className="space-y-1.5">
                   <Label>Hora Extra</Label>
-                  <Input type="time" value={form.horaExtra} readOnly className="bg-muted" />
+                  <Input type="time" value={form.horaExtra} onChange={(e) => update("horaExtra", e.target.value)} />
                 </div>
                 <div className="space-y-1.5">
                   <Label>R$ Hora Extra</Label>
@@ -791,7 +791,7 @@ const NovoServicoDialog = ({ open, onOpenChange, onSaved, initialData }: NovoSer
               <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
                 <div className="space-y-1.5">
                   <Label>Hora Extra</Label>
-                  <Input type="time" value={form.horaExtra} readOnly className="bg-muted" />
+                  <Input type="time" value={form.horaExtra} onChange={(e) => update("horaExtra", e.target.value)} />
                 </div>
                 <div className="space-y-1.5">
                   <Label>R$ Hora Extra</Label>
