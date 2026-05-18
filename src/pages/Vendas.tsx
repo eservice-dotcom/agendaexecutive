@@ -221,11 +221,12 @@ const formatOsDescricaoFornecedor = (item: any) => {
   const estacFor = Number(item?.estacionamento_fornecedor ?? item?.estacionamentoFornecedor) || 0;
   const totalOs = Number(item?.custo) || 0;
   const base = Math.max(0, totalOs - kmTot - horaTot - estacFor);
-  const lines = [header, `  • Custo Base: ${formatCurrency(base)}`];
+  const lines = [header];
+  if (base > 0) lines.push(`  • Custo Base: ${formatCurrency(base)}`);
   if (kmTot > 0) lines.push(`  • Km Extra: ${kmExtraQtd} km × ${formatCurrency(valKmExtFor)} = ${formatCurrency(kmTot)}`);
   if (horaTot > 0) lines.push(`  • Hora Extra: ${horaExtraStr} × ${formatCurrency(valHoraExtFor)} = ${formatCurrency(horaTot)}`);
   if (estacFor > 0) lines.push(`  • Estacionamento: ${formatCurrency(estacFor)}`);
-  lines.push(`  • Total O.S.: ${formatCurrency(totalOs)}`);
+  if (totalOs > 0) lines.push(`  • Total O.S.: ${formatCurrency(totalOs)}`);
   return lines.join("\n");
 };
 
