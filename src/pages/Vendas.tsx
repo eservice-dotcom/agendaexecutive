@@ -991,10 +991,8 @@ const Vendas = () => {
           const totalComExtras = info.total;
           const valorRestante = Math.round((totalComExtras - jaPago) * 100) / 100;
           if (valorRestante <= 0) return null; // já totalmente pago
-          const descLines = info.items.map((item: any) => formatOsDescricao(item));
-          const allLines = info.extrasLines.length > 0
-            ? [...descLines, "--- Extras ---", ...info.extrasLines]
-            : descLines;
+          const descLines = info.items.map((item: any) => formatOsDescricaoFornecedor(item));
+          const allLines = descLines;
           // Vencimento = data do serviço mais recente + 30 dias
           const datasServico = info.items.map((i: any) => i.data).filter(Boolean).sort();
           const dataBase = datasServico[datasServico.length - 1] || venda.data_venda;
