@@ -53,6 +53,9 @@ const EditServicoDialog = ({ open, onOpenChange, item, onSaved }: EditServicoDia
     estacionamento: "",
     horaExtra: "",
     valorHoraExtra: "",
+    valorKmExtraFornecedor: "",
+    valorHoraExtraFornecedor: "",
+    estacionamentoFornecedor: "",
     formaContratacao: "",
     placaReceptivoUrl: "",
   });
