@@ -725,7 +725,7 @@ const Vendas = () => {
           user_id: session!.user.id,
           fornecedor,
           descritivo: allLines.join("\n"),
-          valor: info.total + info.extrasTotal,
+          valor: info.total,
           data: dataVenda,
           data_vencimento: vencFornecedorStr,
           status: "pendente",
