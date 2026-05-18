@@ -52,6 +52,7 @@ const EditServicoDialog = ({ open, onOpenChange, item, onSaved }: EditServicoDia
     horaFim: "",
     estacionamento: "",
     horaExtra: "",
+    valorHoraExtra: "",
     formaContratacao: "",
     placaReceptivoUrl: "",
   });
@@ -150,6 +151,7 @@ const EditServicoDialog = ({ open, onOpenChange, item, onSaved }: EditServicoDia
         horaFim: item.horaFim || "",
         estacionamento: (item.estacionamento || 0).toString(),
         horaExtra: item.horaExtra || "",
+        valorHoraExtra: ((item as any).valorHoraExtra || 0).toString(),
         formaContratacao: (item as any).formaContratacao || "",
         placaReceptivoUrl: (item as any).placaReceptivoUrl || "",
       });
@@ -284,6 +286,7 @@ const EditServicoDialog = ({ open, onOpenChange, item, onSaved }: EditServicoDia
         horaFim: form.horaFim || "",
         estacionamento: parseFloat(form.estacionamento) || 0,
         horaExtra: form.horaExtra || "",
+        valorHoraExtra: parseFloat(form.valorHoraExtra) || 0,
         outrosDespesas: outrosDespesas,
         formaContratacao: form.formaContratacao || "",
         placaReceptivoUrl: form.placaReceptivoUrl || "",
