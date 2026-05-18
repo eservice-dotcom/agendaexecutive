@@ -140,6 +140,14 @@ const parseMoneyValue = (value: string | number | null | undefined): number => {
   return Number.isFinite(parsed) ? parsed : 0;
 };
 
+const horaExtraToHours = (he?: string | null) => {
+  if (!he || typeof he !== "string") return 0;
+  const parts = he.split(":").map(Number);
+  const h = isNaN(parts[0]) ? 0 : parts[0];
+  const m = isNaN(parts[1]) ? 0 : parts[1];
+  return h + m / 60;
+};
+
 const buildAgendaExtrasFromItems = (items: any[]) => {
   return items.flatMap((item: any) => {
     const osLabel = item?.cot ? `O.S. ${item.cot}` : "Serviço";
@@ -171,7 +179,23 @@ const buildAgendaExtrasFromItems = (items: any[]) => {
     const estacValor = parseMoneyValue(item?.estacionamento);
     const estacExtra = estacValor > 0 ? [{ descricao: `Estacionamento ${osLabel}`, valor: estacValor }] : [];
 
-    return [...estacExtra, ...despesasExtras, ...outrosExtra];
+    // Km Extra (cliente) - discriminado
+    const kmExtraQtd = Number(item?.km_extra) || 0;
+    const valorKmExtra = Number(item?.valor_km_extra) || 0;
+    const kmExtraTotal = kmExtraQtd * valorKmExtra;
+    const kmExtraExtra = kmExtraTotal > 0
+      ? [{ descricao: `Km Extra ${osLabel} (${kmExtraQtd} km x R$ ${valorKmExtra.toFixed(2)})`, valor: kmExtraTotal }]
+      : [];
+
+    // Hora Extra (cliente) - discriminado
+    const horasExtra = horaExtraToHours(item?.hora_extra);
+    const valorHoraExtra = Number(item?.valor_hora_extra) || 0;
+    const horaExtraTotal = horasExtra * valorHoraExtra;
+    const horaExtraExtra = horaExtraTotal > 0
+      ? [{ descricao: `Hora Extra ${osLabel} (${item?.hora_extra} x R$ ${valorHoraExtra.toFixed(2)})`, valor: horaExtraTotal }]
+      : [];
+
+    return [...estacExtra, ...kmExtraExtra, ...horaExtraExtra, ...despesasExtras, ...outrosExtra];
   });
 };
 
