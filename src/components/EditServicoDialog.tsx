@@ -571,7 +571,10 @@ const EditServicoDialog = ({ open, onOpenChange, item, onSaved }: EditServicoDia
               <div className="space-y-1.5">
                 <Label>R$ Km Extra</Label>
                 <Input type="number" min={0} step="0.01" value={form.valorKmExtra} onChange={(e) => update("valorKmExtra", e.target.value)} placeholder="0,00" />
-                <p className="text-[10px] text-muted-foreground">Total: R$ {(((parseFloat(form.kmExtra) || 0) * (parseFloat(form.valorKmExtra) || 0))).toFixed(2)}</p>
+              </div>
+              <div className="space-y-1.5">
+                <Label>R$ Total do Km Extra</Label>
+                <Input type="text" readOnly className="bg-muted" value={`R$ ${((parseFloat(form.kmExtra) || 0) * (parseFloat(form.valorKmExtra) || 0)).toFixed(2)}`} />
               </div>
               <div className="space-y-1.5">
                 <Label>Hora Início</Label>
