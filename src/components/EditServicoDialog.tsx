@@ -18,6 +18,16 @@ interface EditServicoDialogProps {
   onSaved: () => void;
 }
 
+const computeHoraExtra = (horaIn?: string, horaFim?: string): string => {
+  if (!horaIn || !horaFim) return "";
+  const toMin = (t: string) => { const [h, m] = (t || "").split(":").map(Number); return (isNaN(h) ? 0 : h) * 60 + (isNaN(m) ? 0 : m); };
+  let total = toMin(horaFim) - toMin(horaIn);
+  if (total < 0) total += 24 * 60;
+  const extra = total > 600 ? total - 600 : 0;
+  if (extra <= 0) return "";
+  return `${String(Math.floor(extra / 60)).padStart(2, "0")}:${String(extra % 60).padStart(2, "0")}`;
+};
+
 const EditServicoDialog = ({ open, onOpenChange, item, onSaved }: EditServicoDialogProps) => {
   const [tiposServico, setTiposServico] = useState<string[]>([]);
   const [veiculos, setVeiculos] = useState<Veiculo[]>([]);
