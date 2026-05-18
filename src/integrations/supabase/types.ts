@@ -52,6 +52,7 @@ export type Database = {
           updated_at: string
           user_id: string
           valor: number
+          valor_hora_extra: number
           valor_km_extra: number
           veiculo: string
         }
@@ -92,6 +93,7 @@ export type Database = {
           updated_at?: string
           user_id: string
           valor: number
+          valor_hora_extra?: number
           valor_km_extra?: number
           veiculo: string
         }
@@ -132,6 +134,7 @@ export type Database = {
           updated_at?: string
           user_id?: string
           valor?: number
+          valor_hora_extra?: number
           valor_km_extra?: number
           veiculo?: string
         }
