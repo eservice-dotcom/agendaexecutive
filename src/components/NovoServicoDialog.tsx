@@ -298,6 +298,9 @@ const NovoServicoDialog = ({ open, onOpenChange, onSaved, initialData }: NovoSer
         estacionamento: parseFloat(form.estacionamento) || 0,
         horaExtra: form.horaExtra || "",
         valorHoraExtra: parseFloat(form.valorHoraExtra) || 0,
+        valorKmExtraFornecedor: parseFloat(form.valorKmExtraFornecedor) || 0,
+        valorHoraExtraFornecedor: parseFloat(form.valorHoraExtraFornecedor) || 0,
+        estacionamentoFornecedor: parseFloat(form.estacionamentoFornecedor) || 0,
         outrosDespesas: outrosDespesas,
         formaContratacao: form.formaContratacao || "",
         placaReceptivoUrl: form.placaReceptivoUrl || "",
@@ -309,7 +312,9 @@ const NovoServicoDialog = ({ open, onOpenChange, onSaved, initialData }: NovoSer
         origem: "", destino: "", veiculoId: "", motoristaId: "", valor: "",
         fornecedorId: "", custo: "", observacoes: "", receptivo: "",
         kmIn: "", kmFim: "", kmExtra: "", valorKmExtra: "", horaIn: "", horaFim: "",
-        estacionamento: "", horaExtra: "", valorHoraExtra: "", formaContratacao: "", placaReceptivoUrl: "",
+        estacionamento: "", horaExtra: "", valorHoraExtra: "",
+        valorKmExtraFornecedor: "", valorHoraExtraFornecedor: "", estacionamentoFornecedor: "",
+        formaContratacao: "", placaReceptivoUrl: "",
       });
       setPassageiros([]);
       setOutrosDespesas([]);
