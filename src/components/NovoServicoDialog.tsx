@@ -50,6 +50,9 @@ const NovoServicoDialog = ({ open, onOpenChange, onSaved, initialData }: NovoSer
     estacionamento: "",
     horaExtra: "",
     valorHoraExtra: "",
+    valorKmExtraFornecedor: "",
+    valorHoraExtraFornecedor: "",
+    estacionamentoFornecedor: "",
     formaContratacao: "",
     placaReceptivoUrl: "",
   });
