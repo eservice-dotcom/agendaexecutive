@@ -142,7 +142,16 @@ const EditServicoDialog = ({ open, onOpenChange, item, onSaved }: EditServicoDia
         telefone: item.telefone,
         valor: item.valor.toString(),
         fornecedor: item.fornecedor,
-        custo: item.custo.toString(),
+        custo: (() => {
+          const total = Number(item.custo) || 0;
+          const kmTot = (Number(item.kmExtra) || 0) * (Number((item as any).valorKmExtraFornecedor) || 0);
+          const [hh, mm] = (item.horaExtra || "").split(":").map((v: string) => parseInt(v) || 0);
+          const horas = (hh || 0) + ((mm || 0) / 60);
+          const horaTot = horas * (Number((item as any).valorHoraExtraFornecedor) || 0);
+          const estac = Number((item as any).estacionamentoFornecedor) || 0;
+          const base = total - kmTot - horaTot - estac;
+          return base > 0 ? String(base) : String(total || "");
+        })(),
         observacoes: item.observacoes || "",
         receptivo: item.receptivo || "",
         statusFaturamento: item.statusFaturamento || (item as any).status_faturamento || "",
