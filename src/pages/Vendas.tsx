@@ -209,6 +209,26 @@ const formatDate = (d: string) => {
 const formatOsDescricao = (item: Pick<AgendaItem, "cot" | "tipo" | "origem" | "destino" | "motorista" | "data"> & { custo?: number | string }) =>
   `O.S.${item.cot} - ${item.tipo || ""} - ${item.origem || ""} → ${item.destino || ""} - ${item.motorista || ""} (${formatDate(item.data)}) - ${formatCurrency(Number(item.custo) || 0)}`;
 
+const formatOsDescricaoFornecedor = (item: any) => {
+  const header = `O.S.${item.cot} - ${item.tipo || ""} - ${item.origem || ""} → ${item.destino || ""} - ${item.motorista || ""} (${formatDate(item.data)})`;
+  const kmExtraQtd = Number(item?.km_extra ?? item?.kmExtra) || 0;
+  const valKmExtFor = Number(item?.valor_km_extra_fornecedor ?? item?.valorKmExtraFornecedor) || 0;
+  const kmTot = kmExtraQtd * valKmExtFor;
+  const horaExtraStr = item?.hora_extra ?? item?.horaExtra ?? "";
+  const horas = horaExtraToHours(horaExtraStr);
+  const valHoraExtFor = Number(item?.valor_hora_extra_fornecedor ?? item?.valorHoraExtraFornecedor) || 0;
+  const horaTot = horas * valHoraExtFor;
+  const estacFor = Number(item?.estacionamento_fornecedor ?? item?.estacionamentoFornecedor) || 0;
+  const totalOs = Number(item?.custo) || 0;
+  const base = Math.max(0, totalOs - kmTot - horaTot - estacFor);
+  const lines = [header, `  • Custo Base: ${formatCurrency(base)}`];
+  if (kmTot > 0) lines.push(`  • Km Extra: ${kmExtraQtd} km × ${formatCurrency(valKmExtFor)} = ${formatCurrency(kmTot)}`);
+  if (horaTot > 0) lines.push(`  • Hora Extra: ${horaExtraStr} × ${formatCurrency(valHoraExtFor)} = ${formatCurrency(horaTot)}`);
+  if (estacFor > 0) lines.push(`  • Estacionamento: ${formatCurrency(estacFor)}`);
+  lines.push(`  • Total O.S.: ${formatCurrency(totalOs)}`);
+  return lines.join("\n");
+};
+
 const normalizeDescricaoForDisplay = (value?: string | null) => {
   if (!value) return "—";
   return value.replace(/\s*\|\s*/g, "\n");
