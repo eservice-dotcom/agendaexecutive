@@ -140,6 +140,14 @@ const parseMoneyValue = (value: string | number | null | undefined): number => {
   return Number.isFinite(parsed) ? parsed : 0;
 };
 
+const horaExtraToHours = (he?: string | null) => {
+  if (!he || typeof he !== "string") return 0;
+  const parts = he.split(":").map(Number);
+  const h = isNaN(parts[0]) ? 0 : parts[0];
+  const m = isNaN(parts[1]) ? 0 : parts[1];
+  return h + m / 60;
+};
+
 const buildAgendaExtrasFromItems = (items: any[]) => {
   return items.flatMap((item: any) => {
     const osLabel = item?.cot ? `O.S. ${item.cot}` : "Serviço";
@@ -171,7 +179,23 @@ const buildAgendaExtrasFromItems = (items: any[]) => {
     const estacValor = parseMoneyValue(item?.estacionamento);
     const estacExtra = estacValor > 0 ? [{ descricao: `Estacionamento ${osLabel}`, valor: estacValor }] : [];
 
-    return [...estacExtra, ...despesasExtras, ...outrosExtra];
+    // Km Extra (cliente) - discriminado
+    const kmExtraQtd = Number(item?.km_extra) || 0;
+    const valorKmExtra = Number(item?.valor_km_extra) || 0;
+    const kmExtraTotal = kmExtraQtd * valorKmExtra;
+    const kmExtraExtra = kmExtraTotal > 0
+      ? [{ descricao: `Km Extra ${osLabel} (${kmExtraQtd} km x R$ ${valorKmExtra.toFixed(2)})`, valor: kmExtraTotal }]
+      : [];
+
+    // Hora Extra (cliente) - discriminado
+    const horasExtra = horaExtraToHours(item?.hora_extra);
+    const valorHoraExtra = Number(item?.valor_hora_extra) || 0;
+    const horaExtraTotal = horasExtra * valorHoraExtra;
+    const horaExtraExtra = horaExtraTotal > 0
+      ? [{ descricao: `Hora Extra ${osLabel} (${item?.hora_extra} x R$ ${valorHoraExtra.toFixed(2)})`, valor: horaExtraTotal }]
+      : [];
+
+    return [...estacExtra, ...kmExtraExtra, ...horaExtraExtra, ...despesasExtras, ...outrosExtra];
   });
 };
 
@@ -525,7 +549,7 @@ const Vendas = () => {
     const load = async () => {
       const { data } = await supabase
         .from("agenda_items")
-        .select("id, cliente, data, hora, tipo, origem, destino, valor, custo, motorista, veiculo, placa, pax, cot, fornecedor, status_faturamento, estacionamento, outros, outros_despesas")
+        .select("id, cliente, data, hora, tipo, origem, destino, valor, custo, motorista, veiculo, placa, pax, cot, fornecedor, status_faturamento, estacionamento, outros, outros_despesas, km_extra, valor_km_extra, hora_extra, valor_hora_extra, valor_km_extra_fornecedor, valor_hora_extra_fornecedor, estacionamento_fornecedor")
         .eq("cliente", cliente)
         .eq("status_faturamento", "enviado")
         .is("deleted_at", null)
@@ -652,18 +676,43 @@ const Vendas = () => {
 
       // Auto-generate contas a pagar grouped by fornecedor with detailed descritivo
       const selectedAgendaItems = agendaItems.filter((i) => selectedItems.has(i.id));
-      const fornecedorMap = new Map<string, { total: number; items: typeof selectedAgendaItems }>();
-      selectedAgendaItems.forEach((item) => {
-        if (item.fornecedor && item.custo > 0) {
-          const existing = fornecedorMap.get(item.fornecedor) || { total: 0, items: [] };
-          existing.total += item.custo;
+      const fornecedorMap = new Map<string, { total: number; items: typeof selectedAgendaItems; extrasLines: string[]; extrasTotal: number }>();
+      selectedAgendaItems.forEach((item: any) => {
+        if (item.fornecedor && Number(item.custo) > 0) {
+          const existing = fornecedorMap.get(item.fornecedor) || { total: 0, items: [], extrasLines: [], extrasTotal: 0 };
+          existing.total += Number(item.custo);
           existing.items.push(item);
+
+          const osLabel = item?.cot ? `O.S. ${item.cot}` : "Serviço";
+          const kmExtraQtd = Number(item?.km_extra) || 0;
+          const valKmExtFor = Number(item?.valor_km_extra_fornecedor) || 0;
+          const kmExtraTotalFor = kmExtraQtd * valKmExtFor;
+          if (kmExtraTotalFor > 0) {
+            existing.extrasLines.push(`Km Extra ${osLabel} (${kmExtraQtd} km x R$ ${valKmExtFor.toFixed(2)}) = R$ ${kmExtraTotalFor.toFixed(2)}`);
+            existing.extrasTotal += kmExtraTotalFor;
+          }
+          const horas = horaExtraToHours(item?.hora_extra);
+          const valHoraExtFor = Number(item?.valor_hora_extra_fornecedor) || 0;
+          const horaExtraTotalFor = horas * valHoraExtFor;
+          if (horaExtraTotalFor > 0) {
+            existing.extrasLines.push(`Hora Extra ${osLabel} (${item?.hora_extra} x R$ ${valHoraExtFor.toFixed(2)}) = R$ ${horaExtraTotalFor.toFixed(2)}`);
+            existing.extrasTotal += horaExtraTotalFor;
+          }
+          const estacFor = Number(item?.estacionamento_fornecedor) || 0;
+          if (estacFor > 0) {
+            existing.extrasLines.push(`Estacionamento ${osLabel} = R$ ${estacFor.toFixed(2)}`);
+            existing.extrasTotal += estacFor;
+          }
+
           fornecedorMap.set(item.fornecedor, existing);
         }
       });
 
       const autoContasPagar = Array.from(fornecedorMap.entries()).map(([fornecedor, info]) => {
         const descLines = info.items.map((item) => formatOsDescricao(item));
+        const allLines = info.extrasLines.length > 0
+          ? [...descLines, "--- Extras ---", ...info.extrasLines]
+          : descLines;
         // Vencimento = data do serviço mais recente + 30 dias
         const datasServico = info.items.map((i) => i.data).filter(Boolean).sort();
         const dataBase = datasServico[datasServico.length - 1] || dataVenda;
@@ -675,8 +724,8 @@ const Vendas = () => {
           venda_id: venda.id,
           user_id: session!.user.id,
           fornecedor,
-          descritivo: descLines.join("\n"),
-          valor: info.total,
+          descritivo: allLines.join("\n"),
+          valor: info.total + info.extrasTotal,
           data: dataVenda,
           data_vencimento: vencFornecedorStr,
           status: "pendente",
@@ -878,12 +927,34 @@ const Vendas = () => {
       });
 
       // Group by fornecedor (same logic as original creation)
-      const fornecedorMap = new Map<string, { total: number; items: any[] }>();
-      agendaItems.forEach((item) => {
+      const fornecedorMap = new Map<string, { total: number; items: any[]; extrasLines: string[]; extrasTotal: number }>();
+      agendaItems.forEach((item: any) => {
         if (item.fornecedor && Number(item.custo) > 0) {
-          const existing = fornecedorMap.get(item.fornecedor) || { total: 0, items: [] };
+          const existing = fornecedorMap.get(item.fornecedor) || { total: 0, items: [], extrasLines: [], extrasTotal: 0 };
           existing.total += Number(item.custo);
           existing.items.push(item);
+
+          const osLabel = item?.cot ? `O.S. ${item.cot}` : "Serviço";
+          const kmExtraQtd = Number(item?.km_extra) || 0;
+          const valKmExtFor = Number(item?.valor_km_extra_fornecedor) || 0;
+          const kmExtraTotalFor = kmExtraQtd * valKmExtFor;
+          if (kmExtraTotalFor > 0) {
+            existing.extrasLines.push(`Km Extra ${osLabel} (${kmExtraQtd} km x R$ ${valKmExtFor.toFixed(2)}) = R$ ${kmExtraTotalFor.toFixed(2)}`);
+            existing.extrasTotal += kmExtraTotalFor;
+          }
+          const horas = horaExtraToHours(item?.hora_extra);
+          const valHoraExtFor = Number(item?.valor_hora_extra_fornecedor) || 0;
+          const horaExtraTotalFor = horas * valHoraExtFor;
+          if (horaExtraTotalFor > 0) {
+            existing.extrasLines.push(`Hora Extra ${osLabel} (${item?.hora_extra} x R$ ${valHoraExtFor.toFixed(2)}) = R$ ${horaExtraTotalFor.toFixed(2)}`);
+            existing.extrasTotal += horaExtraTotalFor;
+          }
+          const estacFor = Number(item?.estacionamento_fornecedor) || 0;
+          if (estacFor > 0) {
+            existing.extrasLines.push(`Estacionamento ${osLabel} = R$ ${estacFor.toFixed(2)}`);
+            existing.extrasTotal += estacFor;
+          }
+
           fornecedorMap.set(item.fornecedor, existing);
         }
       });
@@ -899,9 +970,13 @@ const Vendas = () => {
       const novasContas = Array.from(fornecedorMap.entries())
         .map(([fornecedor, info]) => {
           const jaPago = pagosPorFornecedor.get(fornecedor) || 0;
-          const valorRestante = Math.round((info.total - jaPago) * 100) / 100;
+          const totalComExtras = info.total + info.extrasTotal;
+          const valorRestante = Math.round((totalComExtras - jaPago) * 100) / 100;
           if (valorRestante <= 0) return null; // já totalmente pago
           const descLines = info.items.map((item: any) => formatOsDescricao(item));
+          const allLines = info.extrasLines.length > 0
+            ? [...descLines, "--- Extras ---", ...info.extrasLines]
+            : descLines;
           // Vencimento = data do serviço mais recente + 30 dias
           const datasServico = info.items.map((i: any) => i.data).filter(Boolean).sort();
           const dataBase = datasServico[datasServico.length - 1] || venda.data_venda;
@@ -913,7 +988,7 @@ const Vendas = () => {
             venda_id: venda.id,
             user_id: user.id,
             fornecedor,
-            descritivo: descLines.join("\n"),
+            descritivo: allLines.join("\n"),
             valor: valorRestante,
             data: venda.data_venda,
             data_vencimento: vencFornecedorStr,
