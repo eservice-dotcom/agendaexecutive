@@ -196,7 +196,16 @@ const NovoServicoDialog = ({ open, onOpenChange, onSaved, initialData }: NovoSer
             motoristaId: motoristaMatch?.id || "",
             valor: String(initialData.valor || ""),
             fornecedorId: fornecedorMatch?.id || "",
-            custo: String(initialData.custo || ""),
+            custo: (() => {
+              const total = Number(initialData.custo) || 0;
+              const kmTot = (Number(initialData.kmExtra) || 0) * (Number((initialData as any).valorKmExtraFornecedor) || 0);
+              const [hh, mm] = (initialData.horaExtra || "").split(":").map((v: string) => parseInt(v) || 0);
+              const horas = (hh || 0) + ((mm || 0) / 60);
+              const horaTot = horas * (Number((initialData as any).valorHoraExtraFornecedor) || 0);
+              const estac = Number((initialData as any).estacionamentoFornecedor) || 0;
+              const base = total - kmTot - horaTot - estac;
+              return base > 0 ? String(base) : String(total || "");
+            })(),
             observacoes: initialData.observacoes || "",
             receptivo: initialData.receptivo || "",
             kmIn: String(initialData.kmIn || ""),
