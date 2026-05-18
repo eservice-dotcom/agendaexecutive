@@ -142,7 +142,16 @@ const EditServicoDialog = ({ open, onOpenChange, item, onSaved }: EditServicoDia
         telefone: item.telefone,
         valor: item.valor.toString(),
         fornecedor: item.fornecedor,
-        custo: item.custo.toString(),
+        custo: (() => {
+          const total = Number(item.custo) || 0;
+          const kmTot = (Number(item.kmExtra) || 0) * (Number((item as any).valorKmExtraFornecedor) || 0);
+          const [hh, mm] = (item.horaExtra || "").split(":").map((v: string) => parseInt(v) || 0);
+          const horas = (hh || 0) + ((mm || 0) / 60);
+          const horaTot = horas * (Number((item as any).valorHoraExtraFornecedor) || 0);
+          const estac = Number((item as any).estacionamentoFornecedor) || 0;
+          const base = total - kmTot - horaTot - estac;
+          return base > 0 ? String(base) : String(total || "");
+        })(),
         observacoes: item.observacoes || "",
         receptivo: item.receptivo || "",
         statusFaturamento: item.statusFaturamento || (item as any).status_faturamento || "",
@@ -280,7 +289,16 @@ const EditServicoDialog = ({ open, onOpenChange, item, onSaved }: EditServicoDia
         telefone: form.telefone,
         valor: parseFloat(form.valor) || 0,
         fornecedor: form.fornecedor,
-        custo: form.fornecedor.toLowerCase().includes("executive") ? 0 : (parseFloat(form.custo) || 0),
+        custo: (() => {
+          if (form.fornecedor.toLowerCase().includes("executive")) return 0;
+          const base = parseFloat(form.custo) || 0;
+          const kmTot = (parseFloat(form.kmExtra) || 0) * (parseFloat(form.valorKmExtraFornecedor) || 0);
+          const [hh, mm] = (form.horaExtra || "").split(":").map((v: string) => parseInt(v) || 0);
+          const horas = (hh || 0) + ((mm || 0) / 60);
+          const horaTot = horas * (parseFloat(form.valorHoraExtraFornecedor) || 0);
+          const estac = parseFloat(form.estacionamentoFornecedor) || 0;
+          return base + kmTot + horaTot + estac;
+        })(),
         observacoes: form.observacoes,
         receptivo: form.receptivo,
         statusFaturamento: form.statusFaturamento,
@@ -486,7 +504,17 @@ const EditServicoDialog = ({ open, onOpenChange, item, onSaved }: EditServicoDia
 
           <div className="space-y-1.5">
             <Label>Custo (R$)</Label>
-            <Input type="number" min={0} step="0.01" value={form.fornecedor.toLowerCase().includes("executive") ? "0" : form.custo} onChange={(e) => update("custo", e.target.value)} placeholder="0,00" disabled={form.fornecedor.toLowerCase().includes("executive")} />
+            <Input type="text" readOnly className="bg-muted" value={(() => {
+              if (form.fornecedor.toLowerCase().includes("executive")) return "R$ 0,00";
+              const base = parseFloat(form.custo) || 0;
+              const kmTot = (parseFloat(form.kmExtra) || 0) * (parseFloat(form.valorKmExtraFornecedor) || 0);
+              const [hh, mm] = (form.horaExtra || "").split(":").map((v: string) => parseInt(v) || 0);
+              const horas = (hh || 0) + ((mm || 0) / 60);
+              const horaTot = horas * (parseFloat(form.valorHoraExtraFornecedor) || 0);
+              const estac = parseFloat(form.estacionamentoFornecedor) || 0;
+              const total = base + kmTot + horaTot + estac;
+              return `R$ ${total.toFixed(2).replace(".", ",")}`;
+            })()} />
           </div>
 
           <div className="space-y-1.5">

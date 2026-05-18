@@ -725,7 +725,7 @@ const Vendas = () => {
           user_id: session!.user.id,
           fornecedor,
           descritivo: allLines.join("\n"),
-          valor: info.total + info.extrasTotal,
+          valor: info.total,
           data: dataVenda,
           data_vencimento: vencFornecedorStr,
           status: "pendente",
@@ -970,7 +970,7 @@ const Vendas = () => {
       const novasContas = Array.from(fornecedorMap.entries())
         .map(([fornecedor, info]) => {
           const jaPago = pagosPorFornecedor.get(fornecedor) || 0;
-          const totalComExtras = info.total + info.extrasTotal;
+          const totalComExtras = info.total;
           const valorRestante = Math.round((totalComExtras - jaPago) * 100) / 100;
           if (valorRestante <= 0) return null; // já totalmente pago
           const descLines = info.items.map((item: any) => formatOsDescricao(item));
