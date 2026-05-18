@@ -1,0 +1,1 @@
+ALTER TABLE public.agenda_items ADD COLUMN IF NOT EXISTS valor_km_extra numeric NOT NULL DEFAULT 0;

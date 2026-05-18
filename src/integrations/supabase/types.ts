@@ -52,6 +52,7 @@ export type Database = {
           updated_at: string
           user_id: string
           valor: number
+          valor_km_extra: number
           veiculo: string
         }
         Insert: {
@@ -91,6 +92,7 @@ export type Database = {
           updated_at?: string
           user_id: string
           valor: number
+          valor_km_extra?: number
           veiculo: string
         }
         Update: {
@@ -130,6 +132,7 @@ export type Database = {
           updated_at?: string
           user_id?: string
           valor?: number
+          valor_km_extra?: number
           veiculo?: string
         }
         Relationships: []
