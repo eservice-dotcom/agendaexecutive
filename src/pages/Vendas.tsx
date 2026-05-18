@@ -729,10 +729,8 @@ const Vendas = () => {
       });
 
       const autoContasPagar = Array.from(fornecedorMap.entries()).map(([fornecedor, info]) => {
-        const descLines = info.items.map((item) => formatOsDescricao(item));
-        const allLines = info.extrasLines.length > 0
-          ? [...descLines, "--- Extras ---", ...info.extrasLines]
-          : descLines;
+        const descLines = info.items.map((item) => formatOsDescricaoFornecedor(item));
+        const allLines = descLines;
         // Vencimento = data do serviço mais recente + 30 dias
         const datasServico = info.items.map((i) => i.data).filter(Boolean).sort();
         const dataBase = datasServico[datasServico.length - 1] || dataVenda;
