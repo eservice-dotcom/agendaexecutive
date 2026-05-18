@@ -49,6 +49,7 @@ const NovoServicoDialog = ({ open, onOpenChange, onSaved, initialData }: NovoSer
     horaFim: "",
     estacionamento: "",
     horaExtra: "",
+    valorHoraExtra: "",
     formaContratacao: "",
     placaReceptivoUrl: "",
   });
@@ -203,6 +204,7 @@ const NovoServicoDialog = ({ open, onOpenChange, onSaved, initialData }: NovoSer
             horaFim: initialData.horaFim || "",
             estacionamento: String(initialData.estacionamento || ""),
             horaExtra: initialData.horaExtra || "",
+            valorHoraExtra: String((initialData as any).valorHoraExtra || ""),
             formaContratacao: (initialData as any).formaContratacao || "",
             placaReceptivoUrl: (initialData as any).placaReceptivoUrl || "",
           });
@@ -289,6 +291,7 @@ const NovoServicoDialog = ({ open, onOpenChange, onSaved, initialData }: NovoSer
         horaFim: form.horaFim || "",
         estacionamento: parseFloat(form.estacionamento) || 0,
         horaExtra: form.horaExtra || "",
+        valorHoraExtra: parseFloat(form.valorHoraExtra) || 0,
         outrosDespesas: outrosDespesas,
         formaContratacao: form.formaContratacao || "",
         placaReceptivoUrl: form.placaReceptivoUrl || "",
@@ -300,7 +303,7 @@ const NovoServicoDialog = ({ open, onOpenChange, onSaved, initialData }: NovoSer
         origem: "", destino: "", veiculoId: "", motoristaId: "", valor: "",
         fornecedorId: "", custo: "", observacoes: "", receptivo: "",
         kmIn: "", kmFim: "", kmExtra: "", valorKmExtra: "", horaIn: "", horaFim: "",
-        estacionamento: "", horaExtra: "", formaContratacao: "", placaReceptivoUrl: "",
+        estacionamento: "", horaExtra: "", valorHoraExtra: "", formaContratacao: "", placaReceptivoUrl: "",
       });
       setPassageiros([]);
       setOutrosDespesas([]);
@@ -602,11 +605,27 @@ const NovoServicoDialog = ({ open, onOpenChange, onSaved, initialData }: NovoSer
               </div>
               <div className="space-y-1.5">
                 <Label>Hora Início</Label>
-                <Input type="time" value={form.horaIn} onChange={(e) => update("horaIn", e.target.value)} />
+                <Input type="time" value={form.horaIn} onChange={(e) => {
+                  const horaIn = e.target.value;
+                  const toMin = (t: string) => { const [h,m] = (t||"").split(":").map(Number); return (isNaN(h)?0:h)*60+(isNaN(m)?0:m); };
+                  const fmt = (mins: number) => `${String(Math.floor(mins/60)).padStart(2,"0")}:${String(mins%60).padStart(2,"0")}`;
+                  let total = horaIn && form.horaFim ? toMin(form.horaFim) - toMin(horaIn) : 0;
+                  if (total < 0) total += 24*60;
+                  const extra = total > 600 ? total - 600 : 0;
+                  setForm({ ...form, horaIn, horaExtra: extra > 0 ? fmt(extra) : "" });
+                }} />
               </div>
               <div className="space-y-1.5">
                 <Label>Hora Fim</Label>
-                <Input type="time" value={form.horaFim} onChange={(e) => update("horaFim", e.target.value)} />
+                <Input type="time" value={form.horaFim} onChange={(e) => {
+                  const horaFim = e.target.value;
+                  const toMin = (t: string) => { const [h,m] = (t||"").split(":").map(Number); return (isNaN(h)?0:h)*60+(isNaN(m)?0:m); };
+                  const fmt = (mins: number) => `${String(Math.floor(mins/60)).padStart(2,"0")}:${String(mins%60).padStart(2,"0")}`;
+                  let total = form.horaIn && horaFim ? toMin(horaFim) - toMin(form.horaIn) : 0;
+                  if (total < 0) total += 24*60;
+                  const extra = total > 600 ? total - 600 : 0;
+                  setForm({ ...form, horaFim, horaExtra: extra > 0 ? fmt(extra) : "" });
+                }} />
               </div>
               <div className="space-y-1.5">
                 <Label>Estacionamento (R$)</Label>
@@ -614,7 +633,19 @@ const NovoServicoDialog = ({ open, onOpenChange, onSaved, initialData }: NovoSer
               </div>
               <div className="space-y-1.5">
                 <Label>Hora Extra</Label>
-                <Input type="time" value={form.horaExtra} onChange={(e) => update("horaExtra", e.target.value)} />
+                <Input type="time" value={form.horaExtra} readOnly className="bg-muted" />
+              </div>
+              <div className="space-y-1.5">
+                <Label>R$ Hora Extra</Label>
+                <Input type="number" min={0} step="0.01" value={form.valorHoraExtra} onChange={(e) => update("valorHoraExtra", e.target.value)} placeholder="0,00" />
+              </div>
+              <div className="space-y-1.5">
+                <Label>R$ Total Hora Extra</Label>
+                <Input type="text" readOnly className="bg-muted" value={(() => {
+                  const [h,m] = (form.horaExtra||"").split(":").map(Number);
+                  const horas = ((isNaN(h)?0:h) + (isNaN(m)?0:m)/60);
+                  return `R$ ${(horas * (parseFloat(form.valorHoraExtra) || 0)).toFixed(2)}`;
+                })()} />
               </div>
               {/* Outras Despesas */}
               <div className="sm:col-span-4 space-y-2">
