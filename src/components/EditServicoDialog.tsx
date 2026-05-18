@@ -155,6 +155,9 @@ const EditServicoDialog = ({ open, onOpenChange, item, onSaved }: EditServicoDia
         estacionamento: (item.estacionamento || 0).toString(),
         horaExtra: item.horaExtra || "",
         valorHoraExtra: ((item as any).valorHoraExtra || 0).toString(),
+        valorKmExtraFornecedor: ((item as any).valorKmExtraFornecedor || 0).toString(),
+        valorHoraExtraFornecedor: ((item as any).valorHoraExtraFornecedor || 0).toString(),
+        estacionamentoFornecedor: ((item as any).estacionamentoFornecedor || 0).toString(),
         formaContratacao: (item as any).formaContratacao || "",
         placaReceptivoUrl: (item as any).placaReceptivoUrl || "",
       });
