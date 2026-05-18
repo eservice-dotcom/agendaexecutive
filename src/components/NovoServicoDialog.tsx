@@ -50,6 +50,9 @@ const NovoServicoDialog = ({ open, onOpenChange, onSaved, initialData }: NovoSer
     estacionamento: "",
     horaExtra: "",
     valorHoraExtra: "",
+    valorKmExtraFornecedor: "",
+    valorHoraExtraFornecedor: "",
+    estacionamentoFornecedor: "",
     formaContratacao: "",
     placaReceptivoUrl: "",
   });
@@ -205,6 +208,9 @@ const NovoServicoDialog = ({ open, onOpenChange, onSaved, initialData }: NovoSer
             estacionamento: String(initialData.estacionamento || ""),
             horaExtra: initialData.horaExtra || "",
             valorHoraExtra: String((initialData as any).valorHoraExtra || ""),
+            valorKmExtraFornecedor: String((initialData as any).valorKmExtraFornecedor || ""),
+            valorHoraExtraFornecedor: String((initialData as any).valorHoraExtraFornecedor || ""),
+            estacionamentoFornecedor: String((initialData as any).estacionamentoFornecedor || ""),
             formaContratacao: (initialData as any).formaContratacao || "",
             placaReceptivoUrl: (initialData as any).placaReceptivoUrl || "",
           });
@@ -292,6 +298,9 @@ const NovoServicoDialog = ({ open, onOpenChange, onSaved, initialData }: NovoSer
         estacionamento: parseFloat(form.estacionamento) || 0,
         horaExtra: form.horaExtra || "",
         valorHoraExtra: parseFloat(form.valorHoraExtra) || 0,
+        valorKmExtraFornecedor: parseFloat(form.valorKmExtraFornecedor) || 0,
+        valorHoraExtraFornecedor: parseFloat(form.valorHoraExtraFornecedor) || 0,
+        estacionamentoFornecedor: parseFloat(form.estacionamentoFornecedor) || 0,
         outrosDespesas: outrosDespesas,
         formaContratacao: form.formaContratacao || "",
         placaReceptivoUrl: form.placaReceptivoUrl || "",
@@ -303,7 +312,9 @@ const NovoServicoDialog = ({ open, onOpenChange, onSaved, initialData }: NovoSer
         origem: "", destino: "", veiculoId: "", motoristaId: "", valor: "",
         fornecedorId: "", custo: "", observacoes: "", receptivo: "",
         kmIn: "", kmFim: "", kmExtra: "", valorKmExtra: "", horaIn: "", horaFim: "",
-        estacionamento: "", horaExtra: "", valorHoraExtra: "", formaContratacao: "", placaReceptivoUrl: "",
+        estacionamento: "", horaExtra: "", valorHoraExtra: "",
+        valorKmExtraFornecedor: "", valorHoraExtraFornecedor: "", estacionamentoFornecedor: "",
+        formaContratacao: "", placaReceptivoUrl: "",
       });
       setPassageiros([]);
       setOutrosDespesas([]);
@@ -697,6 +708,75 @@ const NovoServicoDialog = ({ open, onOpenChange, onSaved, initialData }: NovoSer
                     </Button>
                   </div>
                 ))}
+              </div>
+            </div>
+          </div>
+
+          {/* Fechamento Fornecedor */}
+          <div className="sm:col-span-2 border-t pt-3 mt-2 space-y-4">
+            <p className="text-sm font-semibold text-muted-foreground">Fechamento Fornecedor</p>
+
+            {/* Custo Base */}
+            <div className="space-y-2">
+              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Custo Base</p>
+              <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
+                <div className="space-y-1.5">
+                  <Label>Custo (R$)</Label>
+                  <Input type="number" min={0} step="0.01" value={form.custo} onChange={(e) => update("custo", e.target.value)} placeholder="0,00" />
+                </div>
+              </div>
+            </div>
+
+            {/* Quilometragem Fornecedor */}
+            <div className="space-y-2">
+              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Quilometragem</p>
+              <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
+                <div className="space-y-1.5">
+                  <Label>KM Extra</Label>
+                  <Input type="number" min={0} value={form.kmExtra} readOnly className="bg-muted" placeholder="0" />
+                </div>
+                <div className="space-y-1.5">
+                  <Label>R$ Km Extra</Label>
+                  <Input type="number" min={0} step="0.01" value={form.valorKmExtraFornecedor} onChange={(e) => update("valorKmExtraFornecedor", e.target.value)} placeholder="0,00" />
+                </div>
+                <div className="space-y-1.5">
+                  <Label>R$ Total Km Extra</Label>
+                  <Input type="text" readOnly className="bg-muted" value={`R$ ${((parseFloat(form.kmExtra) || 0) * (parseFloat(form.valorKmExtraFornecedor) || 0)).toFixed(2)}`} />
+                </div>
+              </div>
+            </div>
+
+            {/* Horas Fornecedor */}
+            <div className="space-y-2">
+              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Horas</p>
+              <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
+                <div className="space-y-1.5">
+                  <Label>Hora Extra</Label>
+                  <Input type="time" value={form.horaExtra} readOnly className="bg-muted" />
+                </div>
+                <div className="space-y-1.5">
+                  <Label>R$ Hora Extra</Label>
+                  <Input type="number" min={0} step="0.01" value={form.valorHoraExtraFornecedor} onChange={(e) => update("valorHoraExtraFornecedor", e.target.value)} placeholder="0,00" />
+                </div>
+                <div className="space-y-1.5">
+                  <Label>R$ Total Hora Extra</Label>
+                  <Input type="text" readOnly className="bg-muted" value={(() => {
+                    const [h,m] = (form.horaExtra||"").split(":").map(Number);
+                    const horas = ((isNaN(h)?0:h) + (isNaN(m)?0:m)/60);
+                    return `R$ ${(horas * (parseFloat(form.valorHoraExtraFornecedor) || 0)).toFixed(2)}`;
+                  })()} />
+                </div>
+              </div>
+            </div>
+
+            {/* Outros Fornecedor */}
+            <div className="space-y-2">
+              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Outros</p>
+              <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
+                <div className="space-y-1.5">
+                  <Label>Estacionamento (R$)</Label>
+                  <Input type="number" min={0} step="0.01" value={form.estacionamentoFornecedor} onChange={(e) => update("estacionamentoFornecedor", e.target.value)} placeholder="0,00" />
+                </div>
               </div>
             </div>
           </div>

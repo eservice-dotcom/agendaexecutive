@@ -25,6 +25,7 @@ export type Database = {
           deleted_at: string | null
           destino: string
           estacionamento: number | null
+          estacionamento_fornecedor: number
           forma_contratacao: string
           fornecedor: string
           hora: string
@@ -53,7 +54,9 @@ export type Database = {
           user_id: string
           valor: number
           valor_hora_extra: number
+          valor_hora_extra_fornecedor: number
           valor_km_extra: number
+          valor_km_extra_fornecedor: number
           veiculo: string
         }
         Insert: {
@@ -66,6 +69,7 @@ export type Database = {
           deleted_at?: string | null
           destino: string
           estacionamento?: number | null
+          estacionamento_fornecedor?: number
           forma_contratacao?: string
           fornecedor: string
           hora: string
@@ -94,7 +98,9 @@ export type Database = {
           user_id: string
           valor: number
           valor_hora_extra?: number
+          valor_hora_extra_fornecedor?: number
           valor_km_extra?: number
+          valor_km_extra_fornecedor?: number
           veiculo: string
         }
         Update: {
@@ -107,6 +113,7 @@ export type Database = {
           deleted_at?: string | null
           destino?: string
           estacionamento?: number | null
+          estacionamento_fornecedor?: number
           forma_contratacao?: string
           fornecedor?: string
           hora?: string
@@ -135,7 +142,9 @@ export type Database = {
           user_id?: string
           valor?: number
           valor_hora_extra?: number
+          valor_hora_extra_fornecedor?: number
           valor_km_extra?: number
+          valor_km_extra_fornecedor?: number
           veiculo?: string
         }
         Relationships: []
