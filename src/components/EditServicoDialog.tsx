@@ -545,15 +545,25 @@ const EditServicoDialog = ({ open, onOpenChange, item, onSaved }: EditServicoDia
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
               <div className="space-y-1.5">
                 <Label>KM Início</Label>
-                <Input type="number" min={0} value={form.kmIn} onChange={(e) => update("kmIn", e.target.value)} placeholder="0" />
+                <Input type="number" min={0} value={form.kmIn} onChange={(e) => {
+                  const kmIn = e.target.value;
+                  const diff = (parseFloat(form.kmFim) || 0) - (parseFloat(kmIn) || 0);
+                  const extra = diff > 100 ? diff - 100 : 0;
+                  setForm({ ...form, kmIn, kmExtra: String(extra) });
+                }} placeholder="0" />
               </div>
               <div className="space-y-1.5">
                 <Label>KM Fim</Label>
-                <Input type="number" min={0} value={form.kmFim} onChange={(e) => update("kmFim", e.target.value)} placeholder="0" />
+                <Input type="number" min={0} value={form.kmFim} onChange={(e) => {
+                  const kmFim = e.target.value;
+                  const diff = (parseFloat(kmFim) || 0) - (parseFloat(form.kmIn) || 0);
+                  const extra = diff > 100 ? diff - 100 : 0;
+                  setForm({ ...form, kmFim, kmExtra: String(extra) });
+                }} placeholder="0" />
               </div>
               <div className="space-y-1.5">
                 <Label>KM Extra</Label>
-                <Input type="number" min={0} value={form.kmExtra} onChange={(e) => update("kmExtra", e.target.value)} placeholder="0" />
+                <Input type="number" min={0} value={form.kmExtra} readOnly className="bg-muted" placeholder="0" />
               </div>
               <div className="space-y-1.5">
                 <Label>Hora Início</Label>
