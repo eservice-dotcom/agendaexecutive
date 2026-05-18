@@ -185,6 +185,13 @@ const EditServicoDialog = ({ open, onOpenChange, item, onSaved }: EditServicoDia
     }
   }, [item, open]);
 
+  // Auto-recalcula Hora Extra quando Hora Início/Fim mudam (mantém editável manualmente)
+  useEffect(() => {
+    const computed = computeHoraExtra(form.horaIn, form.horaFim);
+    setForm((f) => (f.horaExtra === computed ? f : { ...f, horaExtra: computed }));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [form.horaIn, form.horaFim]);
+
   const update = (key: string, value: string) => setForm((f) => ({ ...f, [key]: value }));
 
   const handleUploadPlaca = async (file: File) => {
