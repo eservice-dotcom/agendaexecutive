@@ -781,7 +781,6 @@ const NovoServicoDialog = ({ open, onOpenChange, onSaved, initialData }: NovoSer
             </div>
           </div>
         </div>
-        </div>
 
         <DialogFooter className="mt-4">
           <Button variant="outline" onClick={() => onOpenChange(false)}>Cancelar</Button>
