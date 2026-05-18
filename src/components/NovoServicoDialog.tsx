@@ -285,7 +285,16 @@ const NovoServicoDialog = ({ open, onOpenChange, onSaved, initialData }: NovoSer
         telefone: motorista?.telefone || "",
         valor: parseFloat(form.valor) || 0,
         fornecedor: fornecedor?.razaoSocial || "",
-        custo: fornecedor?.razaoSocial.toLowerCase().includes("executive") ? 0 : (parseFloat(form.custo) || 0),
+        custo: (() => {
+          if (fornecedor?.razaoSocial.toLowerCase().includes("executive")) return 0;
+          const base = parseFloat(form.custo) || 0;
+          const kmTot = (parseFloat(form.kmExtra) || 0) * (parseFloat(form.valorKmExtraFornecedor) || 0);
+          const [hh, mm] = (form.horaExtra || "").split(":").map((v: string) => parseInt(v) || 0);
+          const horas = (hh || 0) + ((mm || 0) / 60);
+          const horaTot = horas * (parseFloat(form.valorHoraExtraFornecedor) || 0);
+          const estac = parseFloat(form.estacionamentoFornecedor) || 0;
+          return base + kmTot + horaTot + estac;
+        })(),
         observacoes: form.observacoes,
         receptivo: form.receptivo,
         statusFaturamento: "",
