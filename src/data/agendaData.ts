@@ -36,6 +36,7 @@ export interface AgendaItem {
   kmIn?: number;
   kmFim?: number;
   kmExtra?: number;
+  valorKmExtra?: number;
   horaIn?: string;
   horaFim?: string;
   estacionamento?: number;

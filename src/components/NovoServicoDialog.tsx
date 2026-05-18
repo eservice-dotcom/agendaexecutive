@@ -44,6 +44,7 @@ const NovoServicoDialog = ({ open, onOpenChange, onSaved, initialData }: NovoSer
     kmIn: "",
     kmFim: "",
     kmExtra: "",
+    valorKmExtra: "",
     horaIn: "",
     horaFim: "",
     estacionamento: "",
@@ -197,6 +198,7 @@ const NovoServicoDialog = ({ open, onOpenChange, onSaved, initialData }: NovoSer
             kmIn: String(initialData.kmIn || ""),
             kmFim: String(initialData.kmFim || ""),
             kmExtra: String(initialData.kmExtra || ""),
+            valorKmExtra: String((initialData as any).valorKmExtra || ""),
             horaIn: initialData.horaIn || "",
             horaFim: initialData.horaFim || "",
             estacionamento: String(initialData.estacionamento || ""),
@@ -282,6 +284,7 @@ const NovoServicoDialog = ({ open, onOpenChange, onSaved, initialData }: NovoSer
         kmIn: parseFloat(form.kmIn) || 0,
         kmFim: parseFloat(form.kmFim) || 0,
         kmExtra: parseFloat(form.kmExtra) || 0,
+        valorKmExtra: parseFloat(form.valorKmExtra) || 0,
         horaIn: form.horaIn || "",
         horaFim: form.horaFim || "",
         estacionamento: parseFloat(form.estacionamento) || 0,
@@ -296,7 +299,7 @@ const NovoServicoDialog = ({ open, onOpenChange, onSaved, initialData }: NovoSer
         data: "", hora: "", clienteId: "", pax: "", cot: "", tipo: "",
         origem: "", destino: "", veiculoId: "", motoristaId: "", valor: "",
         fornecedorId: "", custo: "", observacoes: "", receptivo: "",
-        kmIn: "", kmFim: "", kmExtra: "", horaIn: "", horaFim: "",
+        kmIn: "", kmFim: "", kmExtra: "", valorKmExtra: "", horaIn: "", horaFim: "",
         estacionamento: "", horaExtra: "", formaContratacao: "", placaReceptivoUrl: "",
       });
       setPassageiros([]);
@@ -588,6 +591,11 @@ const NovoServicoDialog = ({ open, onOpenChange, onSaved, initialData }: NovoSer
               <div className="space-y-1.5">
                 <Label>KM Extra</Label>
                 <Input type="number" min={0} value={form.kmExtra} readOnly className="bg-muted" placeholder="0" />
+              </div>
+              <div className="space-y-1.5">
+                <Label>R$ Km Extra</Label>
+                <Input type="number" min={0} step="0.01" value={form.valorKmExtra} onChange={(e) => update("valorKmExtra", e.target.value)} placeholder="0,00" />
+                <p className="text-[10px] text-muted-foreground">Total: R$ {(((parseFloat(form.kmExtra) || 0) * (parseFloat(form.valorKmExtra) || 0))).toFixed(2)}</p>
               </div>
               <div className="space-y-1.5">
                 <Label>Hora Início</Label>

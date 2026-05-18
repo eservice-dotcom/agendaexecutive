@@ -47,6 +47,7 @@ const EditServicoDialog = ({ open, onOpenChange, item, onSaved }: EditServicoDia
     kmIn: "",
     kmFim: "",
     kmExtra: "",
+    valorKmExtra: "",
     horaIn: "",
     horaFim: "",
     estacionamento: "",
@@ -144,6 +145,7 @@ const EditServicoDialog = ({ open, onOpenChange, item, onSaved }: EditServicoDia
         kmIn: (item.kmIn || 0).toString(),
         kmFim: (item.kmFim || 0).toString(),
         kmExtra: (item.kmExtra || 0).toString(),
+        valorKmExtra: ((item as any).valorKmExtra || 0).toString(),
         horaIn: item.horaIn || "",
         horaFim: item.horaFim || "",
         estacionamento: (item.estacionamento || 0).toString(),
@@ -277,6 +279,7 @@ const EditServicoDialog = ({ open, onOpenChange, item, onSaved }: EditServicoDia
         kmIn: parseFloat(form.kmIn) || 0,
         kmFim: parseFloat(form.kmFim) || 0,
         kmExtra: parseFloat(form.kmExtra) || 0,
+        valorKmExtra: parseFloat(form.valorKmExtra) || 0,
         horaIn: form.horaIn || "",
         horaFim: form.horaFim || "",
         estacionamento: parseFloat(form.estacionamento) || 0,
@@ -564,6 +567,11 @@ const EditServicoDialog = ({ open, onOpenChange, item, onSaved }: EditServicoDia
               <div className="space-y-1.5">
                 <Label>KM Extra</Label>
                 <Input type="number" min={0} value={form.kmExtra} readOnly className="bg-muted" placeholder="0" />
+              </div>
+              <div className="space-y-1.5">
+                <Label>R$ Km Extra</Label>
+                <Input type="number" min={0} step="0.01" value={form.valorKmExtra} onChange={(e) => update("valorKmExtra", e.target.value)} placeholder="0,00" />
+                <p className="text-[10px] text-muted-foreground">Total: R$ {(((parseFloat(form.kmExtra) || 0) * (parseFloat(form.valorKmExtra) || 0))).toFixed(2)}</p>
               </div>
               <div className="space-y-1.5">
                 <Label>Hora Início</Label>
