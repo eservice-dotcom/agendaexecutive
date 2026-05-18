@@ -38,6 +38,9 @@ export interface AgendaItem {
   kmExtra?: number;
   valorKmExtra?: number;
   valorHoraExtra?: number;
+  valorKmExtraFornecedor?: number;
+  valorHoraExtraFornecedor?: number;
+  estacionamentoFornecedor?: number;
   horaIn?: string;
   horaFim?: string;
   estacionamento?: number;
