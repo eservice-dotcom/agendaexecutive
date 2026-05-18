@@ -208,6 +208,9 @@ const NovoServicoDialog = ({ open, onOpenChange, onSaved, initialData }: NovoSer
             estacionamento: String(initialData.estacionamento || ""),
             horaExtra: initialData.horaExtra || "",
             valorHoraExtra: String((initialData as any).valorHoraExtra || ""),
+            valorKmExtraFornecedor: String((initialData as any).valorKmExtraFornecedor || ""),
+            valorHoraExtraFornecedor: String((initialData as any).valorHoraExtraFornecedor || ""),
+            estacionamentoFornecedor: String((initialData as any).estacionamentoFornecedor || ""),
             formaContratacao: (initialData as any).formaContratacao || "",
             placaReceptivoUrl: (initialData as any).placaReceptivoUrl || "",
           });
