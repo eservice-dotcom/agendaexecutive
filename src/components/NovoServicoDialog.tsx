@@ -308,7 +308,7 @@ const NovoServicoDialog = ({ open, onOpenChange, onSaved, initialData }: NovoSer
           if (fornecedor?.razaoSocial.toLowerCase().includes("executive")) return 0;
           const base = parseFloat(form.custo) || 0;
           const kmTot = (parseFloat(form.kmExtra) || 0) * (parseFloat(form.valorKmExtraFornecedor) || 0);
-          const [hh, mm] = (computeHoraExtra(form.horaIn, form.horaFim) || "").split(":").map((v: string) => parseInt(v) || 0);
+          const [hh, mm] = (form.horaExtra || "").split(":").map((v: string) => parseInt(v) || 0);
           const horas = (hh || 0) + ((mm || 0) / 60);
           const horaTot = horas * (parseFloat(form.valorHoraExtraFornecedor) || 0);
           const estac = parseFloat(form.estacionamentoFornecedor) || 0;
@@ -324,7 +324,7 @@ const NovoServicoDialog = ({ open, onOpenChange, onSaved, initialData }: NovoSer
         horaIn: form.horaIn || "",
         horaFim: form.horaFim || "",
         estacionamento: parseFloat(form.estacionamento) || 0,
-        horaExtra: computeHoraExtra(form.horaIn, form.horaFim) || "",
+        horaExtra: form.horaExtra || "",
         valorHoraExtra: parseFloat(form.valorHoraExtra) || 0,
         valorKmExtraFornecedor: parseFloat(form.valorKmExtraFornecedor) || 0,
         valorHoraExtraFornecedor: parseFloat(form.valorHoraExtraFornecedor) || 0,
@@ -557,7 +557,7 @@ const NovoServicoDialog = ({ open, onOpenChange, onSaved, initialData }: NovoSer
               if (f && f.razaoSocial.toLowerCase().includes("executive")) return "R$ 0,00";
               const base = parseFloat(form.custo) || 0;
               const kmTot = (parseFloat(form.kmExtra) || 0) * (parseFloat(form.valorKmExtraFornecedor) || 0);
-              const [hh, mm] = (computeHoraExtra(form.horaIn, form.horaFim) || "").split(":").map((v: string) => parseInt(v) || 0);
+              const [hh, mm] = (form.horaExtra || "").split(":").map((v: string) => parseInt(v) || 0);
               const horas = (hh || 0) + ((mm || 0) / 60);
               const horaTot = horas * (parseFloat(form.valorHoraExtraFornecedor) || 0);
               const estac = parseFloat(form.estacionamentoFornecedor) || 0;
@@ -690,7 +690,7 @@ const NovoServicoDialog = ({ open, onOpenChange, onSaved, initialData }: NovoSer
                 </div>
                 <div className="space-y-1.5">
                   <Label>Hora Extra</Label>
-                  <Input type="time" value={computeHoraExtra(form.horaIn, form.horaFim)} readOnly className="bg-muted" />
+                  <Input type="time" value={form.horaExtra} readOnly className="bg-muted" />
                 </div>
                 <div className="space-y-1.5">
                   <Label>R$ Hora Extra</Label>
@@ -699,7 +699,7 @@ const NovoServicoDialog = ({ open, onOpenChange, onSaved, initialData }: NovoSer
                 <div className="space-y-1.5">
                   <Label>R$ Total Hora Extra</Label>
                   <Input type="text" readOnly className="bg-muted" value={(() => {
-                    const [h,m] = (computeHoraExtra(form.horaIn, form.horaFim)||"").split(":").map(Number);
+                    const [h,m] = (form.horaExtra||"").split(":").map(Number);
                     const horas = ((isNaN(h)?0:h) + (isNaN(m)?0:m)/60);
                     return `R$ ${(horas * (parseFloat(form.valorHoraExtra) || 0)).toFixed(2)}`;
                   })()} />
@@ -791,7 +791,7 @@ const NovoServicoDialog = ({ open, onOpenChange, onSaved, initialData }: NovoSer
               <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
                 <div className="space-y-1.5">
                   <Label>Hora Extra</Label>
-                  <Input type="time" value={computeHoraExtra(form.horaIn, form.horaFim)} readOnly className="bg-muted" />
+                  <Input type="time" value={form.horaExtra} readOnly className="bg-muted" />
                 </div>
                 <div className="space-y-1.5">
                   <Label>R$ Hora Extra</Label>
@@ -800,7 +800,7 @@ const NovoServicoDialog = ({ open, onOpenChange, onSaved, initialData }: NovoSer
                 <div className="space-y-1.5">
                   <Label>R$ Total Hora Extra</Label>
                   <Input type="text" readOnly className="bg-muted" value={(() => {
-                    const [h,m] = (computeHoraExtra(form.horaIn, form.horaFim)||"").split(":").map(Number);
+                    const [h,m] = (form.horaExtra||"").split(":").map(Number);
                     const horas = ((isNaN(h)?0:h) + (isNaN(m)?0:m)/60);
                     return `R$ ${(horas * (parseFloat(form.valorHoraExtraFornecedor) || 0)).toFixed(2)}`;
                   })()} />
