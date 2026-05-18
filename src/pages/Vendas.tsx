@@ -676,18 +676,43 @@ const Vendas = () => {
 
       // Auto-generate contas a pagar grouped by fornecedor with detailed descritivo
       const selectedAgendaItems = agendaItems.filter((i) => selectedItems.has(i.id));
-      const fornecedorMap = new Map<string, { total: number; items: typeof selectedAgendaItems }>();
-      selectedAgendaItems.forEach((item) => {
-        if (item.fornecedor && item.custo > 0) {
-          const existing = fornecedorMap.get(item.fornecedor) || { total: 0, items: [] };
-          existing.total += item.custo;
+      const fornecedorMap = new Map<string, { total: number; items: typeof selectedAgendaItems; extrasLines: string[]; extrasTotal: number }>();
+      selectedAgendaItems.forEach((item: any) => {
+        if (item.fornecedor && Number(item.custo) > 0) {
+          const existing = fornecedorMap.get(item.fornecedor) || { total: 0, items: [], extrasLines: [], extrasTotal: 0 };
+          existing.total += Number(item.custo);
           existing.items.push(item);
+
+          const osLabel = item?.cot ? `O.S. ${item.cot}` : "Serviço";
+          const kmExtraQtd = Number(item?.km_extra) || 0;
+          const valKmExtFor = Number(item?.valor_km_extra_fornecedor) || 0;
+          const kmExtraTotalFor = kmExtraQtd * valKmExtFor;
+          if (kmExtraTotalFor > 0) {
+            existing.extrasLines.push(`Km Extra ${osLabel} (${kmExtraQtd} km x R$ ${valKmExtFor.toFixed(2)}) = R$ ${kmExtraTotalFor.toFixed(2)}`);
+            existing.extrasTotal += kmExtraTotalFor;
+          }
+          const horas = horaExtraToHours(item?.hora_extra);
+          const valHoraExtFor = Number(item?.valor_hora_extra_fornecedor) || 0;
+          const horaExtraTotalFor = horas * valHoraExtFor;
+          if (horaExtraTotalFor > 0) {
+            existing.extrasLines.push(`Hora Extra ${osLabel} (${item?.hora_extra} x R$ ${valHoraExtFor.toFixed(2)}) = R$ ${horaExtraTotalFor.toFixed(2)}`);
+            existing.extrasTotal += horaExtraTotalFor;
+          }
+          const estacFor = Number(item?.estacionamento_fornecedor) || 0;
+          if (estacFor > 0) {
+            existing.extrasLines.push(`Estacionamento ${osLabel} = R$ ${estacFor.toFixed(2)}`);
+            existing.extrasTotal += estacFor;
+          }
+
           fornecedorMap.set(item.fornecedor, existing);
         }
       });
 
       const autoContasPagar = Array.from(fornecedorMap.entries()).map(([fornecedor, info]) => {
         const descLines = info.items.map((item) => formatOsDescricao(item));
+        const allLines = info.extrasLines.length > 0
+          ? [...descLines, "--- Extras ---", ...info.extrasLines]
+          : descLines;
         // Vencimento = data do serviço mais recente + 30 dias
         const datasServico = info.items.map((i) => i.data).filter(Boolean).sort();
         const dataBase = datasServico[datasServico.length - 1] || dataVenda;
@@ -699,8 +724,8 @@ const Vendas = () => {
           venda_id: venda.id,
           user_id: session!.user.id,
           fornecedor,
-          descritivo: descLines.join("\n"),
-          valor: info.total,
+          descritivo: allLines.join("\n"),
+          valor: info.total + info.extrasTotal,
           data: dataVenda,
           data_vencimento: vencFornecedorStr,
           status: "pendente",
