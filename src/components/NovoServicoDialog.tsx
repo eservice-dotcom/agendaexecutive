@@ -565,7 +565,7 @@ const NovoServicoDialog = ({ open, onOpenChange, onSaved, initialData }: NovoSer
 
           {/* Fechamento */}
           <div className="sm:col-span-2 border-t pt-3 mt-2">
-            <p className="text-sm font-semibold text-muted-foreground mb-3">Fechamento</p>
+            <p className="text-sm font-semibold text-muted-foreground mb-3">Fechamento Cliente</p>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
               <div className="space-y-1.5">
                 <Label>KM Início</Label>
