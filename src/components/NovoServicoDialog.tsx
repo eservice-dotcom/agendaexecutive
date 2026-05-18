@@ -593,6 +593,11 @@ const NovoServicoDialog = ({ open, onOpenChange, onSaved, initialData }: NovoSer
                 <Input type="number" min={0} value={form.kmExtra} readOnly className="bg-muted" placeholder="0" />
               </div>
               <div className="space-y-1.5">
+                <Label>R$ Km Extra</Label>
+                <Input type="number" min={0} step="0.01" value={form.valorKmExtra} onChange={(e) => update("valorKmExtra", e.target.value)} placeholder="0,00" />
+                <p className="text-[10px] text-muted-foreground">Total: R$ {(((parseFloat(form.kmExtra) || 0) * (parseFloat(form.valorKmExtra) || 0))).toFixed(2)}</p>
+              </div>
+              <div className="space-y-1.5">
                 <Label>Hora Início</Label>
                 <Input type="time" value={form.horaIn} onChange={(e) => update("horaIn", e.target.value)} />
               </div>
