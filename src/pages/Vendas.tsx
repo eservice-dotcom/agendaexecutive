@@ -927,12 +927,34 @@ const Vendas = () => {
       });
 
       // Group by fornecedor (same logic as original creation)
-      const fornecedorMap = new Map<string, { total: number; items: any[] }>();
-      agendaItems.forEach((item) => {
+      const fornecedorMap = new Map<string, { total: number; items: any[]; extrasLines: string[]; extrasTotal: number }>();
+      agendaItems.forEach((item: any) => {
         if (item.fornecedor && Number(item.custo) > 0) {
-          const existing = fornecedorMap.get(item.fornecedor) || { total: 0, items: [] };
+          const existing = fornecedorMap.get(item.fornecedor) || { total: 0, items: [], extrasLines: [], extrasTotal: 0 };
           existing.total += Number(item.custo);
           existing.items.push(item);
+
+          const osLabel = item?.cot ? `O.S. ${item.cot}` : "Serviço";
+          const kmExtraQtd = Number(item?.km_extra) || 0;
+          const valKmExtFor = Number(item?.valor_km_extra_fornecedor) || 0;
+          const kmExtraTotalFor = kmExtraQtd * valKmExtFor;
+          if (kmExtraTotalFor > 0) {
+            existing.extrasLines.push(`Km Extra ${osLabel} (${kmExtraQtd} km x R$ ${valKmExtFor.toFixed(2)}) = R$ ${kmExtraTotalFor.toFixed(2)}`);
+            existing.extrasTotal += kmExtraTotalFor;
+          }
+          const horas = horaExtraToHours(item?.hora_extra);
+          const valHoraExtFor = Number(item?.valor_hora_extra_fornecedor) || 0;
+          const horaExtraTotalFor = horas * valHoraExtFor;
+          if (horaExtraTotalFor > 0) {
+            existing.extrasLines.push(`Hora Extra ${osLabel} (${item?.hora_extra} x R$ ${valHoraExtFor.toFixed(2)}) = R$ ${horaExtraTotalFor.toFixed(2)}`);
+            existing.extrasTotal += horaExtraTotalFor;
+          }
+          const estacFor = Number(item?.estacionamento_fornecedor) || 0;
+          if (estacFor > 0) {
+            existing.extrasLines.push(`Estacionamento ${osLabel} = R$ ${estacFor.toFixed(2)}`);
+            existing.extrasTotal += estacFor;
+          }
+
           fornecedorMap.set(item.fornecedor, existing);
         }
       });
@@ -948,9 +970,13 @@ const Vendas = () => {
       const novasContas = Array.from(fornecedorMap.entries())
         .map(([fornecedor, info]) => {
           const jaPago = pagosPorFornecedor.get(fornecedor) || 0;
-          const valorRestante = Math.round((info.total - jaPago) * 100) / 100;
+          const totalComExtras = info.total + info.extrasTotal;
+          const valorRestante = Math.round((totalComExtras - jaPago) * 100) / 100;
           if (valorRestante <= 0) return null; // já totalmente pago
           const descLines = info.items.map((item: any) => formatOsDescricao(item));
+          const allLines = info.extrasLines.length > 0
+            ? [...descLines, "--- Extras ---", ...info.extrasLines]
+            : descLines;
           // Vencimento = data do serviço mais recente + 30 dias
           const datasServico = info.items.map((i: any) => i.data).filter(Boolean).sort();
           const dataBase = datasServico[datasServico.length - 1] || venda.data_venda;
@@ -962,7 +988,7 @@ const Vendas = () => {
             venda_id: venda.id,
             user_id: user.id,
             fornecedor,
-            descritivo: descLines.join("\n"),
+            descritivo: allLines.join("\n"),
             valor: valorRestante,
             data: venda.data_venda,
             data_vencimento: vencFornecedorStr,
