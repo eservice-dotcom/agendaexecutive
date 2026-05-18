@@ -685,6 +685,71 @@ const EditServicoDialog = ({ open, onOpenChange, item, onSaved }: EditServicoDia
               </div>
             </div>
           </div>
+
+          {/* Fechamento Fornecedor */}
+          <div className="sm:col-span-2 border-t pt-3 mt-2 space-y-4">
+            <p className="text-sm font-semibold text-muted-foreground">Fechamento Fornecedor</p>
+
+            <div className="space-y-2">
+              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Custo Base</p>
+              <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
+                <div className="space-y-1.5">
+                  <Label>Custo (R$)</Label>
+                  <Input type="number" min={0} step="0.01" value={form.custo} onChange={(e) => update("custo", e.target.value)} placeholder="0,00" />
+                </div>
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Quilometragem</p>
+              <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
+                <div className="space-y-1.5">
+                  <Label>KM Extra</Label>
+                  <Input type="number" min={0} value={form.kmExtra} readOnly className="bg-muted" placeholder="0" />
+                </div>
+                <div className="space-y-1.5">
+                  <Label>R$ Km Extra</Label>
+                  <Input type="number" min={0} step="0.01" value={form.valorKmExtraFornecedor} onChange={(e) => update("valorKmExtraFornecedor", e.target.value)} placeholder="0,00" />
+                </div>
+                <div className="space-y-1.5">
+                  <Label>R$ Total Km Extra</Label>
+                  <Input type="text" readOnly className="bg-muted" value={`R$ ${((parseFloat(form.kmExtra) || 0) * (parseFloat(form.valorKmExtraFornecedor) || 0)).toFixed(2)}`} />
+                </div>
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Horas</p>
+              <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
+                <div className="space-y-1.5">
+                  <Label>Hora Extra</Label>
+                  <Input type="time" value={form.horaExtra} readOnly className="bg-muted" />
+                </div>
+                <div className="space-y-1.5">
+                  <Label>R$ Hora Extra</Label>
+                  <Input type="number" min={0} step="0.01" value={form.valorHoraExtraFornecedor} onChange={(e) => update("valorHoraExtraFornecedor", e.target.value)} placeholder="0,00" />
+                </div>
+                <div className="space-y-1.5">
+                  <Label>R$ Total Hora Extra</Label>
+                  <Input type="text" readOnly className="bg-muted" value={(() => {
+                    const [h,m] = (form.horaExtra||"").split(":").map(Number);
+                    const horas = ((isNaN(h)?0:h) + (isNaN(m)?0:m)/60);
+                    return `R$ ${(horas * (parseFloat(form.valorHoraExtraFornecedor) || 0)).toFixed(2)}`;
+                  })()} />
+                </div>
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Outros</p>
+              <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
+                <div className="space-y-1.5">
+                  <Label>Estacionamento (R$)</Label>
+                  <Input type="number" min={0} step="0.01" value={form.estacionamentoFornecedor} onChange={(e) => update("estacionamentoFornecedor", e.target.value)} placeholder="0,00" />
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
 
         <DialogFooter className="mt-4">
