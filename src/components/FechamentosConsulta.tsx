@@ -205,6 +205,13 @@ const FechamentosConsulta = () => {
     const extrasArray = editExtras
       .filter((e) => e.descricao.trim())
       .map((e) => ({ descricao: e.descricao.trim(), valor: parseFloat(e.valor) || 0 }));
+    const descontoVal = Math.abs(parseFloat(editDescontoValor) || 0);
+    if (descontoVal > 0) {
+      const desc = editDescontoDescricao.trim()
+        ? `Desconto: ${editDescontoDescricao.trim()}`
+        : "Desconto";
+      extrasArray.push({ descricao: desc, valor: -descontoVal });
+    }
     const extrasTotal = extrasArray.reduce((s, e) => s + e.valor, 0);
     const { error } = await supabase
       .from("fechamentos")
