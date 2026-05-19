@@ -59,6 +59,8 @@ const FechamentosConsulta = () => {
   const [editDataEmissao, setEditDataEmissao] = useState("");
   const [editValorTotal, setEditValorTotal] = useState("");
   const [editExtras, setEditExtras] = useState<{ descricao: string; valor: string }[]>([]);
+  const [editDescontoDescricao, setEditDescontoDescricao] = useState("");
+  const [editDescontoValor, setEditDescontoValor] = useState("");
   const [editObservacoes, setEditObservacoes] = useState("");
   const [saving, setSaving] = useState(false);
 
