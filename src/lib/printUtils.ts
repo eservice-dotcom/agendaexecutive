@@ -510,6 +510,78 @@ export const printFatFornecedor = (items: any[], includeFinancials = true) => {
 ${totals}`);
 };
 
+export const printFatFornecedorDetalhado = (items: any[]) => {
+  // Group items by fornecedor
+  const map = new Map<string, any[]>();
+  items.forEach(i => {
+    const key = i.fornecedor || "Sem fornecedor";
+    const arr = map.get(key) || [];
+    arr.push(i);
+    map.set(key, arr);
+  });
+
+  // Sort fornecedores by total custo desc
+  const grupos = Array.from(map.entries())
+    .map(([fornecedor, arr]) => ({
+      fornecedor,
+      arr: arr.slice().sort((a, b) => {
+        const da = (a.data || "").localeCompare(b.data || "");
+        if (da !== 0) return da;
+        return (a.hora || "").localeCompare(b.hora || "");
+      }),
+      totalCusto: arr.reduce((s, x) => s + (Number(x.custo) || 0), 0),
+      totalPax: arr.reduce((s, x) => s + (Number(x.pax) || 0), 0),
+    }))
+    .sort((a, b) => b.totalCusto - a.totalCusto);
+
+  const grupoHtml = grupos.map(g => {
+    const linhas = g.arr.map(i => `
+      <tr>
+        <td>${i.data ? formatDate(i.data) : "—"}</td>
+        <td class="c">${i.hora || "—"}</td>
+        <td>${i.cliente || "—"}</td>
+        <td class="c">${i.pax || 0}</td>
+        <td class="c">${i.tipo || "—"}</td>
+        <td>${i.origem || "—"}</td>
+        <td>${i.destino || "—"}</td>
+        <td class="c">${i.placa || "—"}</td>
+        <td>${i.motorista || "—"}</td>
+        <td class="r b">${formatCurrency(Number(i.custo) || 0)}</td>
+      </tr>`).join("");
+
+    return `
+      <div class="grupo">
+        <div class="grupo-title">${g.fornecedor} <span class="grupo-meta">— ${g.arr.length} viagem(ns) · ${g.totalPax} PAX</span></div>
+        <table>
+          <thead><tr>
+            <th>Data</th><th class="c">Hora</th><th>Cliente</th><th class="c">PAX</th>
+            <th class="c">Tipo</th><th>Origem</th><th>Destino</th>
+            <th class="c">Placa</th><th>Motorista</th><th class="r">Custo</th>
+          </tr></thead>
+          <tbody>${linhas}</tbody>
+          <tfoot><tr>
+            <td colspan="9" class="r b">Subtotal ${g.fornecedor}</td>
+            <td class="r b">${formatCurrency(g.totalCusto)}</td>
+          </tr></tfoot>
+        </table>
+      </div>`;
+  }).join("");
+
+  const totalGeral = grupos.reduce((s, g) => s + g.totalCusto, 0);
+  const totalViagens = grupos.reduce((s, g) => s + g.arr.length, 0);
+  const totalPax = grupos.reduce((s, g) => s + g.totalPax, 0);
+
+  const extraStyles = `
+    .grupo{margin-bottom:18px;page-break-inside:avoid}
+    .grupo-title{font-size:12px;font-weight:700;color:#1a3a5c;background:#f0f4f8;padding:6px 10px;border-left:4px solid #c8a456;margin-bottom:4px}
+    .grupo-meta{font-weight:400;color:#666;font-size:10px}
+    tfoot td{background:#f8f9fa}
+  `;
+  openPrint("Atendimentos por Fornecedor", `<style>${extraStyles}</style>
+${grupoHtml}
+<div class="totals"><b>Fornecedores:</b> ${grupos.length} | <b>Viagens:</b> ${totalViagens} | <b>PAX:</b> ${totalPax} | <b>Custo Total:</b> ${formatCurrency(totalGeral)}</div>`);
+};
+
 export const printDashboardFinanceiro = (
   data: {
     year: string;

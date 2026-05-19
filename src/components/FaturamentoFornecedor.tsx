@@ -3,7 +3,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Button } from "@/components/ui/button";
 import { Building2, Printer } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-import { printFatFornecedor } from "@/lib/printUtils";
+import { printFatFornecedor, printFatFornecedorDetalhado } from "@/lib/printUtils";
 
 const formatCurrency = (value: number) =>
   new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(value);
@@ -94,6 +94,10 @@ const FaturamentoFornecedor = () => {
         <Button variant="outline" size="sm" onClick={() => printFatFornecedor(items, printWithFinancials)} className="gap-2">
           <Printer className="h-4 w-4" />
           Imprimir
+        </Button>
+        <Button variant="outline" size="sm" onClick={() => printFatFornecedorDetalhado(items)} className="gap-2">
+          <Printer className="h-4 w-4" />
+          Imprimir Detalhado
         </Button>
       </div>
 
