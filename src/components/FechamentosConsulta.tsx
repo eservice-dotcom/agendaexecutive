@@ -588,6 +588,29 @@ const FechamentosConsulta = () => {
               </div>
             </div>
             <div>
+              <Label className="mb-2 block">Desconto</Label>
+              <div className="flex gap-2 items-center">
+                <Input
+                  placeholder="Descrição do desconto"
+                  value={editDescontoDescricao}
+                  onChange={(e) => setEditDescontoDescricao(e.target.value)}
+                  className="flex-1"
+                />
+                <Input
+                  type="number"
+                  step="0.01"
+                  min="0"
+                  placeholder="Valor"
+                  value={editDescontoValor}
+                  onChange={(e) => setEditDescontoValor(e.target.value)}
+                  className="w-28"
+                />
+              </div>
+              <p className="text-xs text-muted-foreground mt-1">
+                Informe valor positivo. Será subtraído do total do fechamento.
+              </p>
+            </div>
+            <div>
               <Label>Observações</Label>
               <Textarea
                 value={editObservacoes}
