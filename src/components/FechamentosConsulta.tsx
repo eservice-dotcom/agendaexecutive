@@ -178,12 +178,23 @@ const FechamentosConsulta = () => {
     setEditCliente(f.cliente);
     setEditDataEmissao(f.data_emissao);
     setEditValorTotal(String(f.valor_total));
-    const extras = Array.isArray(f.extras) && f.extras.length > 0
+    const rawExtras = Array.isArray(f.extras) && f.extras.length > 0
       ? f.extras.map((e: any) => ({ descricao: e.descricao || "", valor: String(e.valor || 0) }))
       : f.extras_total > 0
         ? [{ descricao: "Extras", valor: String(f.extras_total) }]
         : [];
-    setEditExtras(extras);
+    // Separate discount entries (descricao prefix "Desconto") from regular extras
+    const descontoEntry = rawExtras.find((e) => /^desconto/i.test(e.descricao.trim()));
+    const otherExtras = rawExtras.filter((e) => !/^desconto/i.test(e.descricao.trim()));
+    setEditExtras(otherExtras);
+    if (descontoEntry) {
+      const desc = descontoEntry.descricao.replace(/^desconto\s*:?\s*/i, "").trim();
+      setEditDescontoDescricao(desc);
+      setEditDescontoValor(String(Math.abs(parseFloat(descontoEntry.valor) || 0)));
+    } else {
+      setEditDescontoDescricao("");
+      setEditDescontoValor("");
+    }
     setEditObservacoes(f.observacoes || "");
     setEditOpen(true);
   };
