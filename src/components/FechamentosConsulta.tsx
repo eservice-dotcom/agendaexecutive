@@ -59,6 +59,8 @@ const FechamentosConsulta = () => {
   const [editDataEmissao, setEditDataEmissao] = useState("");
   const [editValorTotal, setEditValorTotal] = useState("");
   const [editExtras, setEditExtras] = useState<{ descricao: string; valor: string }[]>([]);
+  const [editDescontoDescricao, setEditDescontoDescricao] = useState("");
+  const [editDescontoValor, setEditDescontoValor] = useState("");
   const [editObservacoes, setEditObservacoes] = useState("");
   const [saving, setSaving] = useState(false);
 
@@ -176,12 +178,23 @@ const FechamentosConsulta = () => {
     setEditCliente(f.cliente);
     setEditDataEmissao(f.data_emissao);
     setEditValorTotal(String(f.valor_total));
-    const extras = Array.isArray(f.extras) && f.extras.length > 0
+    const rawExtras = Array.isArray(f.extras) && f.extras.length > 0
       ? f.extras.map((e: any) => ({ descricao: e.descricao || "", valor: String(e.valor || 0) }))
       : f.extras_total > 0
         ? [{ descricao: "Extras", valor: String(f.extras_total) }]
         : [];
-    setEditExtras(extras);
+    // Separate discount entries (descricao prefix "Desconto") from regular extras
+    const descontoEntry = rawExtras.find((e) => /^desconto/i.test(e.descricao.trim()));
+    const otherExtras = rawExtras.filter((e) => !/^desconto/i.test(e.descricao.trim()));
+    setEditExtras(otherExtras);
+    if (descontoEntry) {
+      const desc = descontoEntry.descricao.replace(/^desconto\s*:?\s*/i, "").trim();
+      setEditDescontoDescricao(desc);
+      setEditDescontoValor(String(Math.abs(parseFloat(descontoEntry.valor) || 0)));
+    } else {
+      setEditDescontoDescricao("");
+      setEditDescontoValor("");
+    }
     setEditObservacoes(f.observacoes || "");
     setEditOpen(true);
   };
@@ -192,6 +205,13 @@ const FechamentosConsulta = () => {
     const extrasArray = editExtras
       .filter((e) => e.descricao.trim())
       .map((e) => ({ descricao: e.descricao.trim(), valor: parseFloat(e.valor) || 0 }));
+    const descontoVal = Math.abs(parseFloat(editDescontoValor) || 0);
+    if (descontoVal > 0) {
+      const desc = editDescontoDescricao.trim()
+        ? `Desconto: ${editDescontoDescricao.trim()}`
+        : "Desconto";
+      extrasArray.push({ descricao: desc, valor: -descontoVal });
+    }
     const extrasTotal = extrasArray.reduce((s, e) => s + e.valor, 0);
     const { error } = await supabase
       .from("fechamentos")
@@ -566,6 +586,29 @@ const FechamentosConsulta = () => {
                   </p>
                 )}
               </div>
+            </div>
+            <div>
+              <Label className="mb-2 block">Desconto</Label>
+              <div className="flex gap-2 items-center">
+                <Input
+                  placeholder="Descrição do desconto"
+                  value={editDescontoDescricao}
+                  onChange={(e) => setEditDescontoDescricao(e.target.value)}
+                  className="flex-1"
+                />
+                <Input
+                  type="number"
+                  step="0.01"
+                  min="0"
+                  placeholder="Valor"
+                  value={editDescontoValor}
+                  onChange={(e) => setEditDescontoValor(e.target.value)}
+                  className="w-28"
+                />
+              </div>
+              <p className="text-xs text-muted-foreground mt-1">
+                Informe valor positivo. Será subtraído do total do fechamento.
+              </p>
             </div>
             <div>
               <Label>Observações</Label>
