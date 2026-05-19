@@ -1,7 +1,10 @@
 import { useMemo, useEffect, useState } from "react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { Building2, Printer } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Building2, Printer, X } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { printFatFornecedor, printFatFornecedorDetalhado } from "@/lib/printUtils";
 
@@ -18,6 +21,9 @@ const formatCompactList = (values: string[], max = 2) => {
 const FaturamentoFornecedor = () => {
   const [items, setItems] = useState<any[]>([]);
   const [printWithFinancials, setPrintWithFinancials] = useState(true);
+  const [fornecedorFiltro, setFornecedorFiltro] = useState<string>("__all__");
+  const [dataInicio, setDataInicio] = useState<string>("");
+  const [dataFim, setDataFim] = useState<string>("");
 
   useEffect(() => {
     const fetchAll = async () => {
@@ -27,7 +33,8 @@ const FaturamentoFornecedor = () => {
       while (true) {
         const { data } = await supabase
           .from("agenda_items")
-          .select("fornecedor, valor, custo, pax, cliente, cot")
+          .select("fornecedor, valor, custo, pax, cliente, cot, data, hora, tipo, origem, destino, placa, motorista")
+          .is("deleted_at", null)
           .range(from, from + pageSize - 1);
         if (!data || data.length === 0) break;
         all = all.concat(data);
@@ -38,6 +45,21 @@ const FaturamentoFornecedor = () => {
     };
     fetchAll();
   }, []);
+
+  const fornecedoresList = useMemo(() => {
+    const s = new Set<string>();
+    items.forEach(i => { if (i.fornecedor) s.add(i.fornecedor); });
+    return Array.from(s).sort((a, b) => a.localeCompare(b));
+  }, [items]);
+
+  const itemsFiltrados = useMemo(() => {
+    return items.filter(i => {
+      if (fornecedorFiltro !== "__all__" && (i.fornecedor || "") !== fornecedorFiltro) return false;
+      if (dataInicio && (i.data || "") < dataInicio) return false;
+      if (dataFim && (i.data || "") > dataFim) return false;
+      return true;
+    });
+  }, [items, fornecedorFiltro, dataInicio, dataFim]);
 
   const dados = useMemo(() => {
     const map = new Map<string, {
@@ -51,7 +73,7 @@ const FaturamentoFornecedor = () => {
       cots: string[];
     }>();
 
-    items.forEach((item) => {
+    itemsFiltrados.forEach((item) => {
       const key = item.fornecedor || "Sem fornecedor";
       const existing = map.get(key) || {
         key,
@@ -73,10 +95,17 @@ const FaturamentoFornecedor = () => {
     });
 
     return Array.from(map.values()).sort((a, b) => b.custo - a.custo);
-  }, [items]);
+  }, [itemsFiltrados]);
 
   const totalReceita = dados.reduce((s, d) => s + d.receita, 0);
   const totalCusto = dados.reduce((s, d) => s + d.custo, 0);
+
+  const limparFiltros = () => {
+    setFornecedorFiltro("__all__");
+    setDataInicio("");
+    setDataFim("");
+  };
+  const temFiltro = fornecedorFiltro !== "__all__" || dataInicio || dataFim;
 
   return (
     <div className="space-y-4">
@@ -86,16 +115,47 @@ const FaturamentoFornecedor = () => {
         <StatCard label="Custo Total" value={formatCurrency(totalCusto)} />
         <StatCard label="Margem Total" value={formatCurrency(totalReceita - totalCusto)} accent />
       </div>
+
+      <div className="rounded-lg border border-border bg-card p-3 shadow-sm">
+        <div className="flex flex-wrap items-end gap-3">
+          <div className="min-w-[200px] flex-1">
+            <Label className="text-xs text-muted-foreground">Fornecedor</Label>
+            <Select value={fornecedorFiltro} onValueChange={setFornecedorFiltro}>
+              <SelectTrigger className="h-9"><SelectValue /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="__all__">Todos os fornecedores</SelectItem>
+                {fornecedoresList.map(f => (
+                  <SelectItem key={f} value={f}>{f}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          <div>
+            <Label className="text-xs text-muted-foreground">Data início</Label>
+            <Input type="date" value={dataInicio} onChange={e => setDataInicio(e.target.value)} className="h-9 w-[160px]" />
+          </div>
+          <div>
+            <Label className="text-xs text-muted-foreground">Data fim</Label>
+            <Input type="date" value={dataFim} onChange={e => setDataFim(e.target.value)} className="h-9 w-[160px]" />
+          </div>
+          {temFiltro && (
+            <Button variant="ghost" size="sm" onClick={limparFiltros} className="h-9 gap-1">
+              <X className="h-4 w-4" /> Limpar
+            </Button>
+          )}
+        </div>
+      </div>
+
       <div className="flex items-center justify-end gap-3">
         <label className="flex items-center gap-1.5 text-xs text-muted-foreground cursor-pointer select-none">
           <input type="checkbox" checked={printWithFinancials} onChange={e => setPrintWithFinancials(e.target.checked)} className="rounded" />
           Incluir financeiro
         </label>
-        <Button variant="outline" size="sm" onClick={() => printFatFornecedor(items, printWithFinancials)} className="gap-2">
+        <Button variant="outline" size="sm" onClick={() => printFatFornecedor(itemsFiltrados, printWithFinancials)} className="gap-2">
           <Printer className="h-4 w-4" />
           Imprimir
         </Button>
-        <Button variant="outline" size="sm" onClick={() => printFatFornecedorDetalhado(items)} className="gap-2">
+        <Button variant="outline" size="sm" onClick={() => printFatFornecedorDetalhado(itemsFiltrados)} className="gap-2">
           <Printer className="h-4 w-4" />
           Imprimir Detalhado
         </Button>
