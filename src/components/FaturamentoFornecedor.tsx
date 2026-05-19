@@ -95,6 +95,10 @@ const FaturamentoFornecedor = () => {
           <Printer className="h-4 w-4" />
           Imprimir
         </Button>
+        <Button variant="outline" size="sm" onClick={() => printFatFornecedorDetalhado(items)} className="gap-2">
+          <Printer className="h-4 w-4" />
+          Imprimir Detalhado
+        </Button>
       </div>
 
       <div className="overflow-auto rounded-lg border border-border bg-card shadow-sm">
