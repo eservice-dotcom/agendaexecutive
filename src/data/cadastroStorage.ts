@@ -411,6 +411,12 @@ export const saveAgendaItem = async (item: Omit<AgendaItem, "id">) => {
     outros_despesas: item.outrosDespesas || [],
     forma_contratacao: item.formaContratacao || "",
     placa_receptivo_url: item.placaReceptivoUrl || null,
+    km_in_fornecedor: item.kmInFornecedor || 0,
+    km_fim_fornecedor: item.kmFimFornecedor || 0,
+    km_extra_fornecedor: item.kmExtraFornecedor || 0,
+    hora_in_fornecedor: item.horaInFornecedor || null,
+    hora_fim_fornecedor: item.horaFimFornecedor || null,
+    hora_extra_fornecedor: item.horaExtraFornecedor || "",
   } as any);
   
   if (error) throw error;
