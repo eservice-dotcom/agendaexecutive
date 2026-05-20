@@ -328,8 +328,8 @@ const NovoServicoDialog = ({ open, onOpenChange, onSaved, initialData }: NovoSer
         custo: (() => {
           if (fornecedor?.razaoSocial.toLowerCase().includes("executive")) return 0;
           const base = parseFloat(form.custo) || 0;
-          const kmTot = (parseFloat(form.kmExtra) || 0) * (parseFloat(form.valorKmExtraFornecedor) || 0);
-          const [hh, mm] = (form.horaExtra || "").split(":").map((v: string) => parseInt(v) || 0);
+          const kmTot = (parseFloat(form.kmExtraFornecedor) || 0) * (parseFloat(form.valorKmExtraFornecedor) || 0);
+          const [hh, mm] = (form.horaExtraFornecedor || "").split(":").map((v: string) => parseInt(v) || 0);
           const horas = (hh || 0) + ((mm || 0) / 60);
           const horaTot = horas * (parseFloat(form.valorHoraExtraFornecedor) || 0);
           const estac = parseFloat(form.estacionamentoFornecedor) || 0;
@@ -350,6 +350,12 @@ const NovoServicoDialog = ({ open, onOpenChange, onSaved, initialData }: NovoSer
         valorKmExtraFornecedor: parseFloat(form.valorKmExtraFornecedor) || 0,
         valorHoraExtraFornecedor: parseFloat(form.valorHoraExtraFornecedor) || 0,
         estacionamentoFornecedor: parseFloat(form.estacionamentoFornecedor) || 0,
+        kmInFornecedor: parseFloat(form.kmInFornecedor) || 0,
+        kmFimFornecedor: parseFloat(form.kmFimFornecedor) || 0,
+        kmExtraFornecedor: parseFloat(form.kmExtraFornecedor) || 0,
+        horaInFornecedor: form.horaInFornecedor || "",
+        horaFimFornecedor: form.horaFimFornecedor || "",
+        horaExtraFornecedor: form.horaExtraFornecedor || "",
         outrosDespesas: outrosDespesas,
         formaContratacao: form.formaContratacao || "",
         placaReceptivoUrl: form.placaReceptivoUrl || "",
@@ -363,6 +369,8 @@ const NovoServicoDialog = ({ open, onOpenChange, onSaved, initialData }: NovoSer
         kmIn: "", kmFim: "", kmExtra: "", valorKmExtra: "", horaIn: "", horaFim: "",
         estacionamento: "", horaExtra: "", valorHoraExtra: "",
         valorKmExtraFornecedor: "", valorHoraExtraFornecedor: "", estacionamentoFornecedor: "",
+        kmInFornecedor: "", kmFimFornecedor: "", kmExtraFornecedor: "",
+        horaInFornecedor: "", horaFimFornecedor: "", horaExtraFornecedor: "",
         formaContratacao: "", placaReceptivoUrl: "",
       });
       setPassageiros([]);
