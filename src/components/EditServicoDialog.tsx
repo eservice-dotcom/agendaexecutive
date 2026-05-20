@@ -544,8 +544,8 @@ const EditServicoDialog = ({ open, onOpenChange, item, onSaved }: EditServicoDia
             <Input type="text" readOnly className="bg-muted" value={(() => {
               if (form.fornecedor.toLowerCase().includes("executive")) return "R$ 0,00";
               const base = parseFloat(form.custo) || 0;
-              const kmTot = (parseFloat(form.kmExtra) || 0) * (parseFloat(form.valorKmExtraFornecedor) || 0);
-              const [hh, mm] = (form.horaExtra || "").split(":").map((v: string) => parseInt(v) || 0);
+              const kmTot = (parseFloat(form.kmExtraFornecedor) || 0) * (parseFloat(form.valorKmExtraFornecedor) || 0);
+              const [hh, mm] = (form.horaExtraFornecedor || "").split(":").map((v: string) => parseInt(v) || 0);
               const horas = (hh || 0) + ((mm || 0) / 60);
               const horaTot = horas * (parseFloat(form.valorHoraExtraFornecedor) || 0);
               const estac = parseFloat(form.estacionamentoFornecedor) || 0;
