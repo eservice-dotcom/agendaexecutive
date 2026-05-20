@@ -535,7 +535,10 @@ export const printFatFornecedorDetalhado = (items: any[]) => {
     .sort((a, b) => b.totalCusto - a.totalCusto);
 
   const grupoHtml = grupos.map(g => {
-    const linhas = g.arr.map(i => `
+    const linhas = g.arr.map(i => {
+      const st = (i.status_faturamento || "").toString().trim();
+      const stLabel = st ? st.charAt(0).toUpperCase() + st.slice(1) : "Pendente";
+      return `
       <tr>
         <td>${i.data ? formatDate(i.data) : "—"}</td>
         <td class="c">${i.hora || "—"}</td>
@@ -546,8 +549,10 @@ export const printFatFornecedorDetalhado = (items: any[]) => {
         <td>${i.destino || "—"}</td>
         <td class="c">${i.placa || "—"}</td>
         <td>${i.motorista || "—"}</td>
+        <td class="c">${stLabel}</td>
         <td class="r b">${formatCurrency(Number(i.custo) || 0)}</td>
-      </tr>`).join("");
+      </tr>`;
+    }).join("");
 
     return `
       <div class="grupo">
@@ -556,11 +561,11 @@ export const printFatFornecedorDetalhado = (items: any[]) => {
           <thead><tr>
             <th>Data</th><th class="c">Hora</th><th>Cliente</th><th class="c">PAX</th>
             <th class="c">Tipo</th><th>Origem</th><th>Destino</th>
-            <th class="c">Placa</th><th>Motorista</th><th class="r">Custo</th>
+            <th class="c">Placa</th><th>Motorista</th><th class="c">Status</th><th class="r">Custo</th>
           </tr></thead>
           <tbody>${linhas}</tbody>
           <tfoot><tr>
-            <td colspan="9" class="r b">Subtotal ${g.fornecedor}</td>
+            <td colspan="10" class="r b">Subtotal ${g.fornecedor}</td>
             <td class="r b">${formatCurrency(g.totalCusto)}</td>
           </tr></tfoot>
         </table>

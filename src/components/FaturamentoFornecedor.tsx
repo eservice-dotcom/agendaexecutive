@@ -33,7 +33,7 @@ const FaturamentoFornecedor = () => {
       while (true) {
         const { data } = await supabase
           .from("agenda_items")
-          .select("fornecedor, valor, custo, pax, cliente, cot, data, hora, tipo, origem, destino, placa, motorista")
+          .select("fornecedor, valor, custo, pax, cliente, cot, data, hora, tipo, origem, destino, placa, motorista, status_faturamento")
           .is("deleted_at", null)
           .range(from, from + pageSize - 1);
         if (!data || data.length === 0) break;
