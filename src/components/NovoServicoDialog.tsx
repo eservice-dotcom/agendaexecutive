@@ -214,8 +214,10 @@ const NovoServicoDialog = ({ open, onOpenChange, onSaved, initialData }: NovoSer
             fornecedorId: fornecedorMatch?.id || "",
             custo: (() => {
               const total = Number(initialData.custo) || 0;
-              const kmTot = (Number(initialData.kmExtra) || 0) * (Number((initialData as any).valorKmExtraFornecedor) || 0);
-              const [hh, mm] = (initialData.horaExtra || "").split(":").map((v: string) => parseInt(v) || 0);
+              const kmEf = Number((initialData as any).kmExtraFornecedor) || Number(initialData.kmExtra) || 0;
+              const kmTot = kmEf * (Number((initialData as any).valorKmExtraFornecedor) || 0);
+              const heStr = (initialData as any).horaExtraFornecedor || initialData.horaExtra || "";
+              const [hh, mm] = heStr.split(":").map((v: string) => parseInt(v) || 0);
               const horas = (hh || 0) + ((mm || 0) / 60);
               const horaTot = horas * (Number((initialData as any).valorHoraExtraFornecedor) || 0);
               const estac = Number((initialData as any).estacionamentoFornecedor) || 0;
@@ -236,6 +238,12 @@ const NovoServicoDialog = ({ open, onOpenChange, onSaved, initialData }: NovoSer
             valorKmExtraFornecedor: String((initialData as any).valorKmExtraFornecedor || ""),
             valorHoraExtraFornecedor: String((initialData as any).valorHoraExtraFornecedor || ""),
             estacionamentoFornecedor: String((initialData as any).estacionamentoFornecedor || ""),
+            kmInFornecedor: String((initialData as any).kmInFornecedor || ""),
+            kmFimFornecedor: String((initialData as any).kmFimFornecedor || ""),
+            kmExtraFornecedor: String((initialData as any).kmExtraFornecedor || ""),
+            horaInFornecedor: (initialData as any).horaInFornecedor || "",
+            horaFimFornecedor: (initialData as any).horaFimFornecedor || "",
+            horaExtraFornecedor: (initialData as any).horaExtraFornecedor || "",
             formaContratacao: (initialData as any).formaContratacao || "",
             placaReceptivoUrl: (initialData as any).placaReceptivoUrl || "",
           });
