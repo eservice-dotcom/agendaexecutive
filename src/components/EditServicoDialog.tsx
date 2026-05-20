@@ -183,6 +183,12 @@ const EditServicoDialog = ({ open, onOpenChange, item, onSaved }: EditServicoDia
         valorKmExtraFornecedor: ((item as any).valorKmExtraFornecedor || 0).toString(),
         valorHoraExtraFornecedor: ((item as any).valorHoraExtraFornecedor || 0).toString(),
         estacionamentoFornecedor: ((item as any).estacionamentoFornecedor || 0).toString(),
+        kmInFornecedor: ((item as any).kmInFornecedor || 0).toString(),
+        kmFimFornecedor: ((item as any).kmFimFornecedor || 0).toString(),
+        kmExtraFornecedor: ((item as any).kmExtraFornecedor || 0).toString(),
+        horaInFornecedor: (item as any).horaInFornecedor || "",
+        horaFimFornecedor: (item as any).horaFimFornecedor || "",
+        horaExtraFornecedor: (item as any).horaExtraFornecedor || "",
         formaContratacao: (item as any).formaContratacao || "",
         placaReceptivoUrl: (item as any).placaReceptivoUrl || "",
       });
