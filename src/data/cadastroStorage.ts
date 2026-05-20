@@ -359,6 +359,12 @@ export const getAgendaItems = async (): Promise<AgendaItem[]> => {
     horaFim: (item as any).hora_fim || "",
     estacionamento: Number((item as any).estacionamento) || 0,
     horaExtra: (item as any).hora_extra || "",
+    kmInFornecedor: Number((item as any).km_in_fornecedor) || 0,
+    kmFimFornecedor: Number((item as any).km_fim_fornecedor) || 0,
+    kmExtraFornecedor: Number((item as any).km_extra_fornecedor) || 0,
+    horaInFornecedor: (item as any).hora_in_fornecedor || "",
+    horaFimFornecedor: (item as any).hora_fim_fornecedor || "",
+    horaExtraFornecedor: (item as any).hora_extra_fornecedor || "",
     outrosDespesas: ((item as any).outros_despesas || []) as { descricao: string; valor: number }[],
     formaContratacao: (item as any).forma_contratacao || "",
     placaReceptivoUrl: (item as any).placa_receptivo_url || "",
@@ -405,6 +411,12 @@ export const saveAgendaItem = async (item: Omit<AgendaItem, "id">) => {
     outros_despesas: item.outrosDespesas || [],
     forma_contratacao: item.formaContratacao || "",
     placa_receptivo_url: item.placaReceptivoUrl || null,
+    km_in_fornecedor: item.kmInFornecedor || 0,
+    km_fim_fornecedor: item.kmFimFornecedor || 0,
+    km_extra_fornecedor: item.kmExtraFornecedor || 0,
+    hora_in_fornecedor: item.horaInFornecedor || null,
+    hora_fim_fornecedor: item.horaFimFornecedor || null,
+    hora_extra_fornecedor: item.horaExtraFornecedor || "",
   } as any);
   
   if (error) throw error;
@@ -449,6 +461,12 @@ export const updateAgendaItem = async (updated: AgendaItem) => {
       outros_despesas: updated.outrosDespesas || [],
       forma_contratacao: updated.formaContratacao || "",
       placa_receptivo_url: updated.placaReceptivoUrl || null,
+      km_in_fornecedor: updated.kmInFornecedor || 0,
+      km_fim_fornecedor: updated.kmFimFornecedor || 0,
+      km_extra_fornecedor: updated.kmExtraFornecedor || 0,
+      hora_in_fornecedor: updated.horaInFornecedor || null,
+      hora_fim_fornecedor: updated.horaFimFornecedor || null,
+      hora_extra_fornecedor: updated.horaExtraFornecedor || "",
     } as any)
     .eq("id", updated.id);
   

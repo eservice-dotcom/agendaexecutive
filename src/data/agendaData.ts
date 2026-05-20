@@ -40,6 +40,12 @@ export interface AgendaItem {
   valorHoraExtra?: number;
   valorKmExtraFornecedor?: number;
   valorHoraExtraFornecedor?: number;
+  kmInFornecedor?: number;
+  kmFimFornecedor?: number;
+  kmExtraFornecedor?: number;
+  horaInFornecedor?: string;
+  horaFimFornecedor?: string;
+  horaExtraFornecedor?: string;
   estacionamentoFornecedor?: number;
   horaIn?: string;
   horaFim?: string;
