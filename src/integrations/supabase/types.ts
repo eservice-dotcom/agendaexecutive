@@ -30,12 +30,18 @@ export type Database = {
           fornecedor: string
           hora: string
           hora_extra: string | null
+          hora_extra_fornecedor: string | null
           hora_fim: string | null
+          hora_fim_fornecedor: string | null
           hora_in: string | null
+          hora_in_fornecedor: string | null
           id: string
           km_extra: number | null
+          km_extra_fornecedor: number | null
           km_fim: number | null
+          km_fim_fornecedor: number | null
           km_in: number | null
+          km_in_fornecedor: number | null
           motorista: string
           observacoes: string | null
           origem: string
@@ -74,12 +80,18 @@ export type Database = {
           fornecedor: string
           hora: string
           hora_extra?: string | null
+          hora_extra_fornecedor?: string | null
           hora_fim?: string | null
+          hora_fim_fornecedor?: string | null
           hora_in?: string | null
+          hora_in_fornecedor?: string | null
           id?: string
           km_extra?: number | null
+          km_extra_fornecedor?: number | null
           km_fim?: number | null
+          km_fim_fornecedor?: number | null
           km_in?: number | null
+          km_in_fornecedor?: number | null
           motorista: string
           observacoes?: string | null
           origem: string
@@ -118,12 +130,18 @@ export type Database = {
           fornecedor?: string
           hora?: string
           hora_extra?: string | null
+          hora_extra_fornecedor?: string | null
           hora_fim?: string | null
+          hora_fim_fornecedor?: string | null
           hora_in?: string | null
+          hora_in_fornecedor?: string | null
           id?: string
           km_extra?: number | null
+          km_extra_fornecedor?: number | null
           km_fim?: number | null
+          km_fim_fornecedor?: number | null
           km_in?: number | null
+          km_in_fornecedor?: number | null
           motorista?: string
           observacoes?: string | null
           origem?: string
