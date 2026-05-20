@@ -160,8 +160,10 @@ const EditServicoDialog = ({ open, onOpenChange, item, onSaved }: EditServicoDia
         fornecedor: item.fornecedor,
         custo: (() => {
           const total = Number(item.custo) || 0;
-          const kmTot = (Number(item.kmExtra) || 0) * (Number((item as any).valorKmExtraFornecedor) || 0);
-          const [hh, mm] = (item.horaExtra || "").split(":").map((v: string) => parseInt(v) || 0);
+          const kmEf = Number((item as any).kmExtraFornecedor) || Number(item.kmExtra) || 0;
+          const kmTot = kmEf * (Number((item as any).valorKmExtraFornecedor) || 0);
+          const heStr = (item as any).horaExtraFornecedor || item.horaExtra || "";
+          const [hh, mm] = heStr.split(":").map((v: string) => parseInt(v) || 0);
           const horas = (hh || 0) + ((mm || 0) / 60);
           const horaTot = horas * (Number((item as any).valorHoraExtraFornecedor) || 0);
           const estac = Number((item as any).estacionamentoFornecedor) || 0;
