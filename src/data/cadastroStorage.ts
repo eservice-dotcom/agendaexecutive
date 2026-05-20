@@ -461,6 +461,12 @@ export const updateAgendaItem = async (updated: AgendaItem) => {
       outros_despesas: updated.outrosDespesas || [],
       forma_contratacao: updated.formaContratacao || "",
       placa_receptivo_url: updated.placaReceptivoUrl || null,
+      km_in_fornecedor: updated.kmInFornecedor || 0,
+      km_fim_fornecedor: updated.kmFimFornecedor || 0,
+      km_extra_fornecedor: updated.kmExtraFornecedor || 0,
+      hora_in_fornecedor: updated.horaInFornecedor || null,
+      hora_fim_fornecedor: updated.horaFimFornecedor || null,
+      hora_extra_fornecedor: updated.horaExtraFornecedor || "",
     } as any)
     .eq("id", updated.id);
   
