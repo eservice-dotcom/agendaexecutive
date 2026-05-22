@@ -2056,7 +2056,7 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
                               <Pencil className="h-4 w-4 text-primary" />
                             </Button>
                             <Button variant="ghost" size="icon" onClick={() => handleGerarFatura(v)} title="Imprimir Fatura">
-                              <FileText className="h-4 w-4 text-primary" />
+                              <Printer className="h-4 w-4 text-primary" />
                             </Button>
                             <Button variant="ghost" size="icon" onClick={() => handleSalvarFatura(v)} title="Salvar Fatura">
                               <Download className="h-4 w-4 text-primary" />
