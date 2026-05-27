@@ -196,6 +196,7 @@ const EditServicoDialog = ({ open, onOpenChange, item, onSaved }: EditServicoDia
         formaContratacao: (item as any).formaContratacao || "",
         placaReceptivoUrl: (item as any).placaReceptivoUrl || "",
         placaReceptivoUrls: ((item as any).placaReceptivoUrls || []) as string[],
+        comprovanteEstacionamentoUrls: ((item as any).comprovanteEstacionamentoUrls || []) as string[],
       });
       setPassageiros(item.passageiros || []);
       setOutrosDespesas(item.outrosDespesas || []);
