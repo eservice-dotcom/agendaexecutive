@@ -373,7 +373,7 @@ const NovoServicoDialog = ({ open, onOpenChange, onSaved, initialData }: NovoSer
         valorKmExtraFornecedor: "", valorHoraExtraFornecedor: "", estacionamentoFornecedor: "",
         kmInFornecedor: "", kmFimFornecedor: "", kmExtraFornecedor: "",
         horaInFornecedor: "", horaFimFornecedor: "", horaExtraFornecedor: "",
-        formaContratacao: "", placaReceptivoUrl: "",
+        formaContratacao: "", placaReceptivoUrl: "", placaReceptivoUrls: [],
       });
       setPassageiros([]);
       setOutrosDespesas([]);
