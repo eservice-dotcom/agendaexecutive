@@ -17,6 +17,7 @@ export type Database = {
       agenda_items: {
         Row: {
           cliente: string
+          comprovante_estacionamento_urls: string[]
           cor_manual: string | null
           cot: string
           created_at: string
@@ -68,6 +69,7 @@ export type Database = {
         }
         Insert: {
           cliente: string
+          comprovante_estacionamento_urls?: string[]
           cor_manual?: string | null
           cot: string
           created_at?: string
@@ -119,6 +121,7 @@ export type Database = {
         }
         Update: {
           cliente?: string
+          comprovante_estacionamento_urls?: string[]
           cor_manual?: string | null
           cot?: string
           created_at?: string

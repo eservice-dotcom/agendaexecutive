@@ -55,6 +55,7 @@ export interface AgendaItem {
   formaContratacao?: string;
   placaReceptivoUrl?: string;
   placaReceptivoUrls?: string[];
+  comprovanteEstacionamentoUrls?: string[];
 }
 
 export const tiposServicoDefault = ["Transfer In", "Transfer Out", "City Tour", "Translado", "Fretamento", "Coordenação", "Diária de 5h", "Diária de 10h", "Viagem", "Comissaria"];

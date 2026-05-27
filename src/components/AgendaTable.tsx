@@ -693,6 +693,7 @@ const AgendaTable = ({ items, onEdited, hideFinancials, onClone }: AgendaTablePr
                         `Fechamento - ${item.cot}`,
                         `O.S. ${item.cot} — ${item.cliente}`
                       );
+                      ((item.comprovanteEstacionamentoUrls || []) as string[]).forEach((u) => window.open(u, "_blank"));
                       onEdited();
                     }}
                     title="Relatório de Fechamento"

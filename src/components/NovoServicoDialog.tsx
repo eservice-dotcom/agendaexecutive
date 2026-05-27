@@ -72,6 +72,7 @@ const NovoServicoDialog = ({ open, onOpenChange, onSaved, initialData }: NovoSer
     formaContratacao: "",
     placaReceptivoUrl: "",
     placaReceptivoUrls: [] as string[],
+    comprovanteEstacionamentoUrls: [] as string[],
   });
   
   const [uploadingPlaca, setUploadingPlaca] = useState(false);
@@ -248,6 +249,7 @@ const NovoServicoDialog = ({ open, onOpenChange, onSaved, initialData }: NovoSer
             formaContratacao: (initialData as any).formaContratacao || "",
             placaReceptivoUrl: (initialData as any).placaReceptivoUrl || "",
             placaReceptivoUrls: ((initialData as any).placaReceptivoUrls || []) as string[],
+            comprovanteEstacionamentoUrls: ((initialData as any).comprovanteEstacionamentoUrls || []) as string[],
           });
           setPassageiros(initialData.passageiros || []);
           setOutrosDespesas(initialData.outrosDespesas || []);
@@ -281,6 +283,29 @@ const NovoServicoDialog = ({ open, onOpenChange, onSaved, initialData }: NovoSer
       }
       setForm((f) => ({ ...f, placaReceptivoUrls: [...(f.placaReceptivoUrls || []), ...novos] }));
       toast.success(novos.length > 1 ? `${novos.length} arquivos enviados!` : "Arquivo enviado!");
+    } catch (e: any) {
+      toast.error("Erro ao enviar arquivo: " + (e?.message || ""));
+    } finally {
+      setUploadingPlaca(false);
+    }
+  };
+
+  const handleUploadEstacionamento = async (files: FileList | null) => {
+    if (!files || files.length === 0) return;
+    setUploadingPlaca(true);
+    try {
+      const { supabase } = await import("@/integrations/supabase/client");
+      const novos: string[] = [];
+      for (const file of Array.from(files)) {
+        const ext = file.name.split(".").pop() || "bin";
+        const path = `estac-${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
+        const { error: upErr } = await supabase.storage.from("placas-receptivo").upload(path, file, { upsert: false });
+        if (upErr) throw upErr;
+        const { data } = supabase.storage.from("placas-receptivo").getPublicUrl(path);
+        novos.push(data.publicUrl);
+      }
+      setForm((f) => ({ ...f, comprovanteEstacionamentoUrls: [...(f.comprovanteEstacionamentoUrls || []), ...novos] }));
+      toast.success(novos.length > 1 ? `${novos.length} arquivos enviados!` : "Comprovante enviado!");
     } catch (e: any) {
       toast.error("Erro ao enviar arquivo: " + (e?.message || ""));
     } finally {
@@ -367,6 +392,7 @@ const NovoServicoDialog = ({ open, onOpenChange, onSaved, initialData }: NovoSer
         formaContratacao: form.formaContratacao || "",
         placaReceptivoUrl: form.placaReceptivoUrl || "",
         placaReceptivoUrls: form.placaReceptivoUrls || [],
+        comprovanteEstacionamentoUrls: form.comprovanteEstacionamentoUrls || [],
       });
 
       toast.success("Serviço adicionado com sucesso!");
@@ -379,7 +405,7 @@ const NovoServicoDialog = ({ open, onOpenChange, onSaved, initialData }: NovoSer
         valorKmExtraFornecedor: "", valorHoraExtraFornecedor: "", estacionamentoFornecedor: "",
         kmInFornecedor: "", kmFimFornecedor: "", kmExtraFornecedor: "",
         horaInFornecedor: "", horaFimFornecedor: "", horaExtraFornecedor: "",
-        formaContratacao: "", placaReceptivoUrl: "", placaReceptivoUrls: [],
+        formaContratacao: "", placaReceptivoUrl: "", placaReceptivoUrls: [], comprovanteEstacionamentoUrls: [],
       });
       setPassageiros([]);
       setOutrosDespesas([]);
@@ -769,10 +795,34 @@ const NovoServicoDialog = ({ open, onOpenChange, onSaved, initialData }: NovoSer
             {/* Outros */}
             <div className="space-y-2">
               <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Outros</p>
-              <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div className="space-y-1.5">
                   <Label>Estacionamento (R$)</Label>
                   <Input type="number" min={0} step="0.01" value={form.estacionamento} onChange={(e) => update("estacionamento", e.target.value)} placeholder="0,00" />
+                </div>
+                <div className="space-y-1.5">
+                  <Label>Comprovantes de Estacionamento</Label>
+                  <Input
+                    type="file"
+                    multiple
+                    accept="image/*,application/pdf,.jpg,.jpeg,.png,.webp,.heic,.heif,.pdf,.pptx"
+                    disabled={uploadingPlaca}
+                    onChange={(e) => { handleUploadEstacionamento(e.target.files); e.currentTarget.value = ""; }}
+                  />
+                  {(form.comprovanteEstacionamentoUrls || []).length > 0 && (
+                    <div className="space-y-1">
+                      {(form.comprovanteEstacionamentoUrls || []).map((url, i) => (
+                        <div key={url + i} className="flex items-center gap-2 text-xs">
+                          <a href={url} target="_blank" rel="noreferrer" className="text-primary underline truncate">Comprovante {i + 1}</a>
+                          <button
+                            type="button"
+                            className="text-destructive hover:underline"
+                            onClick={() => setForm((f) => ({ ...f, comprovanteEstacionamentoUrls: (f.comprovanteEstacionamentoUrls || []).filter((u) => u !== url) }))}
+                          >Remover</button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
               </div>
             </div>

@@ -155,6 +155,12 @@ const FechamentosConsulta = () => {
       },
       f.numero_fechamento
     );
+    (items as any[]).forEach((it: any) => {
+      const urls: string[] = Array.isArray(it?.comprovante_estacionamento_urls)
+        ? it.comprovante_estacionamento_urls
+        : (Array.isArray(it?.comprovanteEstacionamentoUrls) ? it.comprovanteEstacionamentoUrls : []);
+      urls.forEach((u) => u && window.open(u, "_blank"));
+    });
   };
 
   const handleExportExcel = (f: Fechamento) => {

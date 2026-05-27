@@ -374,6 +374,9 @@ export const getAgendaItems = async (): Promise<AgendaItem[]> => {
       if (legacy && !arr.includes(legacy)) arr.unshift(legacy);
       return arr;
     })(),
+    comprovanteEstacionamentoUrls: Array.isArray((item as any).comprovante_estacionamento_urls)
+      ? (item as any).comprovante_estacionamento_urls.filter(Boolean)
+      : [],
   }));
 };
 
@@ -418,6 +421,7 @@ export const saveAgendaItem = async (item: Omit<AgendaItem, "id">) => {
     forma_contratacao: item.formaContratacao || "",
     placa_receptivo_url: item.placaReceptivoUrl || null,
     placa_receptivo_urls: item.placaReceptivoUrls || [],
+    comprovante_estacionamento_urls: item.comprovanteEstacionamentoUrls || [],
     km_in_fornecedor: item.kmInFornecedor || 0,
     km_fim_fornecedor: item.kmFimFornecedor || 0,
     km_extra_fornecedor: item.kmExtraFornecedor || 0,
@@ -469,6 +473,7 @@ export const updateAgendaItem = async (updated: AgendaItem) => {
       forma_contratacao: updated.formaContratacao || "",
       placa_receptivo_url: updated.placaReceptivoUrl || null,
       placa_receptivo_urls: updated.placaReceptivoUrls || [],
+      comprovante_estacionamento_urls: updated.comprovanteEstacionamentoUrls || [],
       km_in_fornecedor: updated.kmInFornecedor || 0,
       km_fim_fornecedor: updated.kmFimFornecedor || 0,
       km_extra_fornecedor: updated.kmExtraFornecedor || 0,
