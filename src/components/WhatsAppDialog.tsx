@@ -140,9 +140,13 @@ const WhatsAppDialog = ({ open, onOpenChange, item, allItems = [], onSent }: Wha
 
     // Anexa link da placa de receptivo (se houver) ao final da mensagem.
     // No modo consolidado, agrupa todos os links únicos dos serviços do dia.
+    const collectUrls = (i: any): string[] => [
+      ...(i.placaReceptivoUrl ? [i.placaReceptivoUrl] : []),
+      ...((i.placaReceptivoUrls || []) as string[]),
+    ];
     const placas = modoConsolidado
-      ? [...new Set(allDriverDayItems.map((i) => i.placaReceptivoUrl).filter(Boolean))]
-      : [item.placaReceptivoUrl].filter(Boolean) as string[];
+      ? [...new Set(allDriverDayItems.flatMap(collectUrls).filter(Boolean))]
+      : ([...new Set(collectUrls(item))] as string[]);
 
     let mensagemFinalComPlaca = mensagemFinal;
     if (placas.length > 0) {
