@@ -368,6 +368,12 @@ export const getAgendaItems = async (): Promise<AgendaItem[]> => {
     outrosDespesas: ((item as any).outros_despesas || []) as { descricao: string; valor: number }[],
     formaContratacao: (item as any).forma_contratacao || "",
     placaReceptivoUrl: (item as any).placa_receptivo_url || "",
+    placaReceptivoUrls: (() => {
+      const arr: string[] = Array.isArray((item as any).placa_receptivo_urls) ? (item as any).placa_receptivo_urls.filter(Boolean) : [];
+      const legacy = (item as any).placa_receptivo_url;
+      if (legacy && !arr.includes(legacy)) arr.unshift(legacy);
+      return arr;
+    })(),
   }));
 };
 
