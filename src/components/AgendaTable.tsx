@@ -561,11 +561,44 @@ const AgendaTable = ({ items, onEdited, hideFinancials, onClone }: AgendaTablePr
                 </TableCell>
               )}
               <TableCell className="px-0.5 py-0 text-[9px] truncate">
-                <Tooltip>
-                  <TooltipTrigger asChild><span className="truncate cursor-default">{item.receptivo || "—"}</span></TooltipTrigger>
-                  {item.receptivo && <TooltipContent side="top" className="text-xs">{item.receptivo}</TooltipContent>}
-                </Tooltip>
+                {(() => {
+                  const anexos = [
+                    ...(item.placaReceptivoUrl ? [item.placaReceptivoUrl] : []),
+                    ...((item.placaReceptivoUrls || []) as string[]),
+                  ];
+                  const unicos = [...new Set(anexos)];
+                  return (
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <span className="truncate cursor-default inline-flex items-center gap-0.5">
+                          {unicos.length > 0 && (
+                            <a href={unicos[0]} target="_blank" rel="noreferrer" className="inline-flex items-center text-primary shrink-0" title={`${unicos.length} anexo(s)`}>
+                              <Paperclip className="h-2.5 w-2.5" />
+                              {unicos.length > 1 && <span className="text-[7px] font-bold ml-0.5">{unicos.length}</span>}
+                            </a>
+                          )}
+                          <span className="truncate">{item.receptivo || (unicos.length > 0 ? "" : "—")}</span>
+                        </span>
+                      </TooltipTrigger>
+                      {(item.receptivo || unicos.length > 0) && (
+                        <TooltipContent side="top" className="text-xs">
+                          {item.receptivo}
+                          {unicos.length > 0 && (
+                            <div className="mt-1 space-y-0.5">
+                              {unicos.map((u, i) => (
+                                <div key={u + i}>
+                                  <a href={u} target="_blank" rel="noreferrer" className="underline">Anexo {i + 1}</a>
+                                </div>
+                              ))}
+                            </div>
+                          )}
+                        </TooltipContent>
+                      )}
+                    </Tooltip>
+                  );
+                })()}
               </TableCell>
+
               <TableCell className="px-0.5 py-0 truncate text-[9px] text-muted-foreground">
                 <Tooltip>
                   <TooltipTrigger asChild><span className="truncate cursor-default">{item.observacoes || "—"}</span></TooltipTrigger>
