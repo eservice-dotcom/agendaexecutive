@@ -473,6 +473,7 @@ export const updateAgendaItem = async (updated: AgendaItem) => {
       forma_contratacao: updated.formaContratacao || "",
       placa_receptivo_url: updated.placaReceptivoUrl || null,
       placa_receptivo_urls: updated.placaReceptivoUrls || [],
+      comprovante_estacionamento_urls: updated.comprovanteEstacionamentoUrls || [],
       km_in_fornecedor: updated.kmInFornecedor || 0,
       km_fim_fornecedor: updated.kmFimFornecedor || 0,
       km_extra_fornecedor: updated.kmExtraFornecedor || 0,
