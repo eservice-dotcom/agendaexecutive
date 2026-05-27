@@ -388,6 +388,7 @@ const EditServicoDialog = ({ open, onOpenChange, item, onSaved }: EditServicoDia
         formaContratacao: form.formaContratacao || "",
         placaReceptivoUrl: form.placaReceptivoUrl || "",
         placaReceptivoUrls: form.placaReceptivoUrls || [],
+        comprovanteEstacionamentoUrls: form.comprovanteEstacionamentoUrls || [],
       });
 
       toast.success("Serviço atualizado com sucesso!");
