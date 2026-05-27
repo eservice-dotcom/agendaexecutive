@@ -366,6 +366,7 @@ const NovoServicoDialog = ({ open, onOpenChange, onSaved, initialData }: NovoSer
         outrosDespesas: outrosDespesas,
         formaContratacao: form.formaContratacao || "",
         placaReceptivoUrl: form.placaReceptivoUrl || "",
+        placaReceptivoUrls: form.placaReceptivoUrls || [],
       });
 
       toast.success("Serviço adicionado com sucesso!");
