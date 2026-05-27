@@ -52,6 +52,7 @@ export type Database = {
           pax: number
           placa: string
           placa_receptivo_url: string | null
+          placa_receptivo_urls: string[]
           receptivo: string
           status_faturamento: string | null
           telefone: string
@@ -102,6 +103,7 @@ export type Database = {
           pax: number
           placa: string
           placa_receptivo_url?: string | null
+          placa_receptivo_urls?: string[]
           receptivo?: string
           status_faturamento?: string | null
           telefone: string
@@ -152,6 +154,7 @@ export type Database = {
           pax?: number
           placa?: string
           placa_receptivo_url?: string | null
+          placa_receptivo_urls?: string[]
           receptivo?: string
           status_faturamento?: string | null
           telefone?: string
