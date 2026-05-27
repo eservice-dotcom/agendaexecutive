@@ -268,7 +268,7 @@ const Index = () => {
 
     const { data } = await supabase
       .from("agenda_items")
-      .select("id, cot, data, hora, tipo, origem, destino, pax, motorista, veiculo, placa, fornecedor, valor, custo, km_in, km_fim, km_extra, hora_in, hora_fim, hora_extra, estacionamento, outros, outros_despesas, cliente, receptivo, status_faturamento")
+      .select("id, cot, data, hora, tipo, origem, destino, pax, motorista, veiculo, placa, fornecedor, valor, custo, km_in, km_fim, km_extra, hora_in, hora_fim, hora_extra, estacionamento, outros, outros_despesas, cliente, receptivo, status_faturamento, comprovante_estacionamento_urls")
       .eq("cliente", cli)
       .is("deleted_at", null)
       .order("data", { ascending: true });
