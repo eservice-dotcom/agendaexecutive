@@ -74,6 +74,7 @@ const EditServicoDialog = ({ open, onOpenChange, item, onSaved }: EditServicoDia
     horaExtraFornecedor: "",
     formaContratacao: "",
     placaReceptivoUrl: "",
+    placaReceptivoUrls: [] as string[],
   });
   
   const [uploadingPlaca, setUploadingPlaca] = useState(false);
