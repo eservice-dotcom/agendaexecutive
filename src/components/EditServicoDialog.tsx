@@ -563,7 +563,7 @@ const EditServicoDialog = ({ open, onOpenChange, item, onSaved }: EditServicoDia
             <Label>Arquivo da Placa de Receptivo</Label>
             <Input
               type="file"
-              accept="image/*,image/jpeg,image/jpg,image/png,image/webp,image/heic,image/heif,application/pdf,.jpg,.jpeg,.png,.webp,.heic,.heif,.pdf"
+              accept="image/*,image/jpeg,image/jpg,image/png,image/webp,image/heic,image/heif,application/pdf,application/vnd.openxmlformats-officedocument.presentationml.presentation,.jpg,.jpeg,.png,.webp,.heic,.heif,.pdf,.pptx"
               disabled={uploadingPlaca}
               onChange={(e) => { const f = e.target.files?.[0]; if (f) handleUploadPlaca(f); }}
             />
