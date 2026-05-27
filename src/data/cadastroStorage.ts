@@ -421,6 +421,7 @@ export const saveAgendaItem = async (item: Omit<AgendaItem, "id">) => {
     forma_contratacao: item.formaContratacao || "",
     placa_receptivo_url: item.placaReceptivoUrl || null,
     placa_receptivo_urls: item.placaReceptivoUrls || [],
+    comprovante_estacionamento_urls: item.comprovanteEstacionamentoUrls || [],
     km_in_fornecedor: item.kmInFornecedor || 0,
     km_fim_fornecedor: item.kmFimFornecedor || 0,
     km_extra_fornecedor: item.kmExtraFornecedor || 0,
