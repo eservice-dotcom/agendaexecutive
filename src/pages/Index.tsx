@@ -392,6 +392,11 @@ const Index = () => {
     } else {
       generateClosingReport(...reportArgs);
     }
+    // Abre comprovantes de estacionamento de cada serviço selecionado em novas abas
+    (selectedItems as any[]).forEach((it: any) => {
+      const urls: string[] = Array.isArray(it?.comprovante_estacionamento_urls) ? it.comprovante_estacionamento_urls : [];
+      urls.forEach((u) => u && window.open(u, "_blank"));
+    });
     toast.success(`Fechamento Nº ${numero} salvo com sucesso!`);
     setFechamentoDialogOpen(false);
   };
