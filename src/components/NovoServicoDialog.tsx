@@ -247,6 +247,7 @@ const NovoServicoDialog = ({ open, onOpenChange, onSaved, initialData }: NovoSer
             horaExtraFornecedor: (initialData as any).horaExtraFornecedor || "",
             formaContratacao: (initialData as any).formaContratacao || "",
             placaReceptivoUrl: (initialData as any).placaReceptivoUrl || "",
+            placaReceptivoUrls: ((initialData as any).placaReceptivoUrls || []) as string[],
           });
           setPassageiros(initialData.passageiros || []);
           setOutrosDespesas(initialData.outrosDespesas || []);
