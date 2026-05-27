@@ -368,6 +368,12 @@ export const getAgendaItems = async (): Promise<AgendaItem[]> => {
     outrosDespesas: ((item as any).outros_despesas || []) as { descricao: string; valor: number }[],
     formaContratacao: (item as any).forma_contratacao || "",
     placaReceptivoUrl: (item as any).placa_receptivo_url || "",
+    placaReceptivoUrls: (() => {
+      const arr: string[] = Array.isArray((item as any).placa_receptivo_urls) ? (item as any).placa_receptivo_urls.filter(Boolean) : [];
+      const legacy = (item as any).placa_receptivo_url;
+      if (legacy && !arr.includes(legacy)) arr.unshift(legacy);
+      return arr;
+    })(),
   }));
 };
 
@@ -411,6 +417,7 @@ export const saveAgendaItem = async (item: Omit<AgendaItem, "id">) => {
     outros_despesas: item.outrosDespesas || [],
     forma_contratacao: item.formaContratacao || "",
     placa_receptivo_url: item.placaReceptivoUrl || null,
+    placa_receptivo_urls: item.placaReceptivoUrls || [],
     km_in_fornecedor: item.kmInFornecedor || 0,
     km_fim_fornecedor: item.kmFimFornecedor || 0,
     km_extra_fornecedor: item.kmExtraFornecedor || 0,
@@ -461,6 +468,7 @@ export const updateAgendaItem = async (updated: AgendaItem) => {
       outros_despesas: updated.outrosDespesas || [],
       forma_contratacao: updated.formaContratacao || "",
       placa_receptivo_url: updated.placaReceptivoUrl || null,
+      placa_receptivo_urls: updated.placaReceptivoUrls || [],
       km_in_fornecedor: updated.kmInFornecedor || 0,
       km_fim_fornecedor: updated.kmFimFornecedor || 0,
       km_extra_fornecedor: updated.kmExtraFornecedor || 0,

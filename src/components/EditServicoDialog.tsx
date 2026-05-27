@@ -74,6 +74,7 @@ const EditServicoDialog = ({ open, onOpenChange, item, onSaved }: EditServicoDia
     horaExtraFornecedor: "",
     formaContratacao: "",
     placaReceptivoUrl: "",
+    placaReceptivoUrls: [] as string[],
   });
   
   const [uploadingPlaca, setUploadingPlaca] = useState(false);
@@ -193,6 +194,7 @@ const EditServicoDialog = ({ open, onOpenChange, item, onSaved }: EditServicoDia
         horaExtraFornecedor: (item as any).horaExtraFornecedor || "",
         formaContratacao: (item as any).formaContratacao || "",
         placaReceptivoUrl: (item as any).placaReceptivoUrl || "",
+        placaReceptivoUrls: ((item as any).placaReceptivoUrls || []) as string[],
       });
       setPassageiros(item.passageiros || []);
       setOutrosDespesas(item.outrosDespesas || []);
@@ -208,24 +210,29 @@ const EditServicoDialog = ({ open, onOpenChange, item, onSaved }: EditServicoDia
 
   const update = (key: string, value: string) => setForm((f) => ({ ...f, [key]: value }));
 
-  const handleUploadPlaca = async (file: File) => {
-    if (!file) return;
+  const handleUploadPlaca = async (files: FileList | null) => {
+    if (!files || files.length === 0) return;
     setUploadingPlaca(true);
     try {
       const { supabase } = await import("@/integrations/supabase/client");
-      const ext = file.name.split(".").pop() || "bin";
-      const path = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
-      const { error: upErr } = await supabase.storage.from("placas-receptivo").upload(path, file, { upsert: false });
-      if (upErr) throw upErr;
-      const { data } = supabase.storage.from("placas-receptivo").getPublicUrl(path);
-      update("placaReceptivoUrl", data.publicUrl);
-      toast.success("Arquivo enviado!");
+      const novos: string[] = [];
+      for (const file of Array.from(files)) {
+        const ext = file.name.split(".").pop() || "bin";
+        const path = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
+        const { error: upErr } = await supabase.storage.from("placas-receptivo").upload(path, file, { upsert: false });
+        if (upErr) throw upErr;
+        const { data } = supabase.storage.from("placas-receptivo").getPublicUrl(path);
+        novos.push(data.publicUrl);
+      }
+      setForm((f) => ({ ...f, placaReceptivoUrls: [...(f.placaReceptivoUrls || []), ...novos] }));
+      toast.success(novos.length > 1 ? `${novos.length} arquivos enviados!` : "Arquivo enviado!");
     } catch (e: any) {
       toast.error("Erro ao enviar arquivo: " + (e?.message || ""));
     } finally {
       setUploadingPlaca(false);
     }
   };
+
 
   const handleVeiculoChange = (veiculoId: string) => {
     if (veiculoId === "_manual") {
@@ -354,6 +361,7 @@ const EditServicoDialog = ({ open, onOpenChange, item, onSaved }: EditServicoDia
         outrosDespesas: outrosDespesas,
         formaContratacao: form.formaContratacao || "",
         placaReceptivoUrl: form.placaReceptivoUrl || "",
+        placaReceptivoUrls: form.placaReceptivoUrls || [],
       });
 
       toast.success("Serviço atualizado com sucesso!");
@@ -560,22 +568,44 @@ const EditServicoDialog = ({ open, onOpenChange, item, onSaved }: EditServicoDia
           </div>
 
           <div className="space-y-1.5">
-            <Label>Arquivo da Placa de Receptivo</Label>
+            <Label>Arquivos da Placa de Receptivo</Label>
             <Input
               type="file"
+              multiple
               accept="image/*,image/jpeg,image/jpg,image/png,image/webp,image/heic,image/heif,application/pdf,application/vnd.openxmlformats-officedocument.presentationml.presentation,.jpg,.jpeg,.png,.webp,.heic,.heif,.pdf,.pptx"
               disabled={uploadingPlaca}
-              onChange={(e) => { const f = e.target.files?.[0]; if (f) handleUploadPlaca(f); }}
+              onChange={(e) => { handleUploadPlaca(e.target.files); e.currentTarget.value = ""; }}
             />
-            {form.placaReceptivoUrl && (
-              <div className="flex items-center gap-2 text-xs">
-                <a href={form.placaReceptivoUrl} target="_blank" rel="noreferrer" className="text-primary underline truncate">
-                  Arquivo enviado
-                </a>
-                <button type="button" className="text-destructive hover:underline" onClick={() => update("placaReceptivoUrl", "")}>Remover</button>
-              </div>
-            )}
+            {(() => {
+              const lista = [
+                ...(form.placaReceptivoUrl ? [form.placaReceptivoUrl] : []),
+                ...(form.placaReceptivoUrls || []),
+              ];
+              if (lista.length === 0) return null;
+              return (
+                <div className="space-y-1">
+                  {lista.map((url, i) => (
+                    <div key={url + i} className="flex items-center gap-2 text-xs">
+                      <a href={url} target="_blank" rel="noreferrer" className="text-primary underline truncate">
+                        Arquivo {i + 1}
+                      </a>
+                      <button
+                        type="button"
+                        className="text-destructive hover:underline"
+                        onClick={() => {
+                          if (form.placaReceptivoUrl === url) update("placaReceptivoUrl", "");
+                          setForm((f) => ({ ...f, placaReceptivoUrls: (f.placaReceptivoUrls || []).filter((u) => u !== url) }));
+                        }}
+                      >
+                        Remover
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              );
+            })()}
           </div>
+
 
           <div className="space-y-1.5 sm:col-span-2">
             <Label>Observações</Label>

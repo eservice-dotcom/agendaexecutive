@@ -1,0 +1,1 @@
+ALTER TABLE public.agenda_items ADD COLUMN IF NOT EXISTS placa_receptivo_urls text[] NOT NULL DEFAULT '{}';
