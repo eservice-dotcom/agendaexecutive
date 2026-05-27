@@ -235,6 +235,30 @@ const EditServicoDialog = ({ open, onOpenChange, item, onSaved }: EditServicoDia
     }
   };
 
+  const handleUploadEstacionamento = async (files: FileList | null) => {
+    if (!files || files.length === 0) return;
+    setUploadingPlaca(true);
+    try {
+      const { supabase } = await import("@/integrations/supabase/client");
+      const novos: string[] = [];
+      for (const file of Array.from(files)) {
+        const ext = file.name.split(".").pop() || "bin";
+        const path = `estac-${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
+        const { error: upErr } = await supabase.storage.from("placas-receptivo").upload(path, file, { upsert: false });
+        if (upErr) throw upErr;
+        const { data } = supabase.storage.from("placas-receptivo").getPublicUrl(path);
+        novos.push(data.publicUrl);
+      }
+      setForm((f) => ({ ...f, comprovanteEstacionamentoUrls: [...(f.comprovanteEstacionamentoUrls || []), ...novos] }));
+      toast.success(novos.length > 1 ? `${novos.length} arquivos enviados!` : "Comprovante enviado!");
+    } catch (e: any) {
+      toast.error("Erro ao enviar arquivo: " + (e?.message || ""));
+    } finally {
+      setUploadingPlaca(false);
+    }
+  };
+
+
 
   const handleVeiculoChange = (veiculoId: string) => {
     if (veiculoId === "_manual") {
