@@ -194,6 +194,7 @@ const EditServicoDialog = ({ open, onOpenChange, item, onSaved }: EditServicoDia
         horaExtraFornecedor: (item as any).horaExtraFornecedor || "",
         formaContratacao: (item as any).formaContratacao || "",
         placaReceptivoUrl: (item as any).placaReceptivoUrl || "",
+        placaReceptivoUrls: ((item as any).placaReceptivoUrls || []) as string[],
       });
       setPassageiros(item.passageiros || []);
       setOutrosDespesas(item.outrosDespesas || []);
