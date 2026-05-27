@@ -71,6 +71,7 @@ const NovoServicoDialog = ({ open, onOpenChange, onSaved, initialData }: NovoSer
     horaExtraFornecedor: "",
     formaContratacao: "",
     placaReceptivoUrl: "",
+    placaReceptivoUrls: [] as string[],
   });
   
   const [uploadingPlaca, setUploadingPlaca] = useState(false);
