@@ -568,22 +568,44 @@ const EditServicoDialog = ({ open, onOpenChange, item, onSaved }: EditServicoDia
           </div>
 
           <div className="space-y-1.5">
-            <Label>Arquivo da Placa de Receptivo</Label>
+            <Label>Arquivos da Placa de Receptivo</Label>
             <Input
               type="file"
+              multiple
               accept="image/*,image/jpeg,image/jpg,image/png,image/webp,image/heic,image/heif,application/pdf,application/vnd.openxmlformats-officedocument.presentationml.presentation,.jpg,.jpeg,.png,.webp,.heic,.heif,.pdf,.pptx"
               disabled={uploadingPlaca}
-              onChange={(e) => { const f = e.target.files?.[0]; if (f) handleUploadPlaca(f); }}
+              onChange={(e) => { handleUploadPlaca(e.target.files); e.currentTarget.value = ""; }}
             />
-            {form.placaReceptivoUrl && (
-              <div className="flex items-center gap-2 text-xs">
-                <a href={form.placaReceptivoUrl} target="_blank" rel="noreferrer" className="text-primary underline truncate">
-                  Arquivo enviado
-                </a>
-                <button type="button" className="text-destructive hover:underline" onClick={() => update("placaReceptivoUrl", "")}>Remover</button>
-              </div>
-            )}
+            {(() => {
+              const lista = [
+                ...(form.placaReceptivoUrl ? [form.placaReceptivoUrl] : []),
+                ...(form.placaReceptivoUrls || []),
+              ];
+              if (lista.length === 0) return null;
+              return (
+                <div className="space-y-1">
+                  {lista.map((url, i) => (
+                    <div key={url + i} className="flex items-center gap-2 text-xs">
+                      <a href={url} target="_blank" rel="noreferrer" className="text-primary underline truncate">
+                        Arquivo {i + 1}
+                      </a>
+                      <button
+                        type="button"
+                        className="text-destructive hover:underline"
+                        onClick={() => {
+                          if (form.placaReceptivoUrl === url) update("placaReceptivoUrl", "");
+                          setForm((f) => ({ ...f, placaReceptivoUrls: (f.placaReceptivoUrls || []).filter((u) => u !== url) }));
+                        }}
+                      >
+                        Remover
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              );
+            })()}
           </div>
+
 
           <div className="space-y-1.5 sm:col-span-2">
             <Label>Observações</Label>
