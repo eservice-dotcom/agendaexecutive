@@ -374,6 +374,9 @@ export const getAgendaItems = async (): Promise<AgendaItem[]> => {
       if (legacy && !arr.includes(legacy)) arr.unshift(legacy);
       return arr;
     })(),
+    comprovanteEstacionamentoUrls: Array.isArray((item as any).comprovante_estacionamento_urls)
+      ? (item as any).comprovante_estacionamento_urls.filter(Boolean)
+      : [],
   }));
 };
 
