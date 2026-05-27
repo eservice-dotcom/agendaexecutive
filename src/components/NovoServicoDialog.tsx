@@ -369,6 +369,7 @@ const NovoServicoDialog = ({ open, onOpenChange, onSaved, initialData }: NovoSer
         formaContratacao: form.formaContratacao || "",
         placaReceptivoUrl: form.placaReceptivoUrl || "",
         placaReceptivoUrls: form.placaReceptivoUrls || [],
+        comprovanteEstacionamentoUrls: form.comprovanteEstacionamentoUrls || [],
       });
 
       toast.success("Serviço adicionado com sucesso!");
@@ -381,7 +382,7 @@ const NovoServicoDialog = ({ open, onOpenChange, onSaved, initialData }: NovoSer
         valorKmExtraFornecedor: "", valorHoraExtraFornecedor: "", estacionamentoFornecedor: "",
         kmInFornecedor: "", kmFimFornecedor: "", kmExtraFornecedor: "",
         horaInFornecedor: "", horaFimFornecedor: "", horaExtraFornecedor: "",
-        formaContratacao: "", placaReceptivoUrl: "", placaReceptivoUrls: [],
+        formaContratacao: "", placaReceptivoUrl: "", placaReceptivoUrls: [], comprovanteEstacionamentoUrls: [],
       });
       setPassageiros([]);
       setOutrosDespesas([]);
