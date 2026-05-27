@@ -795,10 +795,34 @@ const NovoServicoDialog = ({ open, onOpenChange, onSaved, initialData }: NovoSer
             {/* Outros */}
             <div className="space-y-2">
               <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Outros</p>
-              <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div className="space-y-1.5">
                   <Label>Estacionamento (R$)</Label>
                   <Input type="number" min={0} step="0.01" value={form.estacionamento} onChange={(e) => update("estacionamento", e.target.value)} placeholder="0,00" />
+                </div>
+                <div className="space-y-1.5">
+                  <Label>Comprovantes de Estacionamento</Label>
+                  <Input
+                    type="file"
+                    multiple
+                    accept="image/*,application/pdf,.jpg,.jpeg,.png,.webp,.heic,.heif,.pdf,.pptx"
+                    disabled={uploadingPlaca}
+                    onChange={(e) => { handleUploadEstacionamento(e.target.files); e.currentTarget.value = ""; }}
+                  />
+                  {(form.comprovanteEstacionamentoUrls || []).length > 0 && (
+                    <div className="space-y-1">
+                      {(form.comprovanteEstacionamentoUrls || []).map((url, i) => (
+                        <div key={url + i} className="flex items-center gap-2 text-xs">
+                          <a href={url} target="_blank" rel="noreferrer" className="text-primary underline truncate">Comprovante {i + 1}</a>
+                          <button
+                            type="button"
+                            className="text-destructive hover:underline"
+                            onClick={() => setForm((f) => ({ ...f, comprovanteEstacionamentoUrls: (f.comprovanteEstacionamentoUrls || []).filter((u) => u !== url) }))}
+                          >Remover</button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
