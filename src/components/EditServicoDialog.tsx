@@ -226,7 +226,17 @@ const EditServicoDialog = ({ open, onOpenChange, item, onSaved }: EditServicoDia
         const { data } = supabase.storage.from("placas-receptivo").getPublicUrl(path);
         novos.push(data.publicUrl);
       }
-      setForm((f) => ({ ...f, placaReceptivoUrls: [...(f.placaReceptivoUrls || []), ...novos] }));
+      const novaLista = [...(form.placaReceptivoUrls || []), ...novos];
+      setForm((f) => ({ ...f, placaReceptivoUrls: novaLista }));
+      // Persiste imediatamente no banco para não perder o anexo se o usuário fechar sem salvar
+      if (item?.id) {
+        const { error: dbErr } = await supabase
+          .from("agenda_items")
+          .update({ placa_receptivo_urls: novaLista } as any)
+          .eq("id", item.id);
+        if (dbErr) throw dbErr;
+        onSaved();
+      }
       toast.success(novos.length > 1 ? `${novos.length} arquivos enviados!` : "Arquivo enviado!");
     } catch (e: any) {
       toast.error("Erro ao enviar arquivo: " + (e?.message || ""));
@@ -249,7 +259,16 @@ const EditServicoDialog = ({ open, onOpenChange, item, onSaved }: EditServicoDia
         const { data } = supabase.storage.from("placas-receptivo").getPublicUrl(path);
         novos.push(data.publicUrl);
       }
-      setForm((f) => ({ ...f, comprovanteEstacionamentoUrls: [...(f.comprovanteEstacionamentoUrls || []), ...novos] }));
+      const novaLista = [...(form.comprovanteEstacionamentoUrls || []), ...novos];
+      setForm((f) => ({ ...f, comprovanteEstacionamentoUrls: novaLista }));
+      if (item?.id) {
+        const { error: dbErr } = await supabase
+          .from("agenda_items")
+          .update({ comprovante_estacionamento_urls: novaLista } as any)
+          .eq("id", item.id);
+        if (dbErr) throw dbErr;
+        onSaved();
+      }
       toast.success(novos.length > 1 ? `${novos.length} arquivos enviados!` : "Comprovante enviado!");
     } catch (e: any) {
       toast.error("Erro ao enviar arquivo: " + (e?.message || ""));
@@ -257,6 +276,7 @@ const EditServicoDialog = ({ open, onOpenChange, item, onSaved }: EditServicoDia
       setUploadingPlaca(false);
     }
   };
+
 
 
 
@@ -619,13 +639,23 @@ const EditServicoDialog = ({ open, onOpenChange, item, onSaved }: EditServicoDia
                       <button
                         type="button"
                         className="text-destructive hover:underline"
-                        onClick={() => {
-                          if (form.placaReceptivoUrl === url) update("placaReceptivoUrl", "");
-                          setForm((f) => ({ ...f, placaReceptivoUrls: (f.placaReceptivoUrls || []).filter((u) => u !== url) }));
+                        onClick={async () => {
+                          const novaLista = (form.placaReceptivoUrls || []).filter((u) => u !== url);
+                          const novoLegacy = form.placaReceptivoUrl === url ? "" : form.placaReceptivoUrl;
+                          setForm((f) => ({ ...f, placaReceptivoUrl: novoLegacy, placaReceptivoUrls: novaLista }));
+                          if (item?.id) {
+                            const { supabase } = await import("@/integrations/supabase/client");
+                            await supabase.from("agenda_items").update({
+                              placa_receptivo_urls: novaLista,
+                              placa_receptivo_url: novoLegacy || null,
+                            } as any).eq("id", item.id);
+                            onSaved();
+                          }
                         }}
                       >
                         Remover
                       </button>
+
                     </div>
                   ))}
                 </div>
@@ -789,8 +819,17 @@ const EditServicoDialog = ({ open, onOpenChange, item, onSaved }: EditServicoDia
                           <button
                             type="button"
                             className="text-destructive hover:underline"
-                            onClick={() => setForm((f) => ({ ...f, comprovanteEstacionamentoUrls: (f.comprovanteEstacionamentoUrls || []).filter((u) => u !== url) }))}
+                            onClick={async () => {
+                              const novaLista = (form.comprovanteEstacionamentoUrls || []).filter((u) => u !== url);
+                              setForm((f) => ({ ...f, comprovanteEstacionamentoUrls: novaLista }));
+                              if (item?.id) {
+                                const { supabase } = await import("@/integrations/supabase/client");
+                                await supabase.from("agenda_items").update({ comprovante_estacionamento_urls: novaLista } as any).eq("id", item.id);
+                                onSaved();
+                              }
+                            }}
                           >Remover</button>
+
                         </div>
                       ))}
                     </div>
