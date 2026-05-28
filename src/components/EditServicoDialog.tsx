@@ -639,13 +639,23 @@ const EditServicoDialog = ({ open, onOpenChange, item, onSaved }: EditServicoDia
                       <button
                         type="button"
                         className="text-destructive hover:underline"
-                        onClick={() => {
-                          if (form.placaReceptivoUrl === url) update("placaReceptivoUrl", "");
-                          setForm((f) => ({ ...f, placaReceptivoUrls: (f.placaReceptivoUrls || []).filter((u) => u !== url) }));
+                        onClick={async () => {
+                          const novaLista = (form.placaReceptivoUrls || []).filter((u) => u !== url);
+                          const novoLegacy = form.placaReceptivoUrl === url ? "" : form.placaReceptivoUrl;
+                          setForm((f) => ({ ...f, placaReceptivoUrl: novoLegacy, placaReceptivoUrls: novaLista }));
+                          if (item?.id) {
+                            const { supabase } = await import("@/integrations/supabase/client");
+                            await supabase.from("agenda_items").update({
+                              placa_receptivo_urls: novaLista,
+                              placa_receptivo_url: novoLegacy || null,
+                            } as any).eq("id", item.id);
+                            onSaved();
+                          }
                         }}
                       >
                         Remover
                       </button>
+
                     </div>
                   ))}
                 </div>
