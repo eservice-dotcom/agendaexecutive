@@ -819,8 +819,17 @@ const EditServicoDialog = ({ open, onOpenChange, item, onSaved }: EditServicoDia
                           <button
                             type="button"
                             className="text-destructive hover:underline"
-                            onClick={() => setForm((f) => ({ ...f, comprovanteEstacionamentoUrls: (f.comprovanteEstacionamentoUrls || []).filter((u) => u !== url) }))}
+                            onClick={async () => {
+                              const novaLista = (form.comprovanteEstacionamentoUrls || []).filter((u) => u !== url);
+                              setForm((f) => ({ ...f, comprovanteEstacionamentoUrls: novaLista }));
+                              if (item?.id) {
+                                const { supabase } = await import("@/integrations/supabase/client");
+                                await supabase.from("agenda_items").update({ comprovante_estacionamento_urls: novaLista } as any).eq("id", item.id);
+                                onSaved();
+                              }
+                            }}
                           >Remover</button>
+
                         </div>
                       ))}
                     </div>
