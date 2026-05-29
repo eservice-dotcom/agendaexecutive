@@ -679,6 +679,18 @@ const AgendaTable = ({ items, onEdited, hideFinancials, onClone }: AgendaTablePr
                     className="h-4 w-4 p-0 text-muted-foreground hover:text-primary"
                     onClick={async () => {
                       await supabase.from("agenda_items").update({ status_faturamento: "enviado" }).eq("id", item.id);
+                      const osLabel = item.cot ? `O.S. ${item.cot}` : "Serviço";
+                      const despesasExtras = ((item.outrosDespesas || []) as any[])
+                        .map((d) => ({
+                          descricao: (d?.descricao || "").trim() || `Outros ${osLabel}`,
+                          valor: Number(d?.valor) || 0,
+                        }))
+                        .filter((d) => d.valor > 0);
+                      const estacValor = Number(item.estacionamento) || 0;
+                      const reportExtras = [
+                        ...(estacValor > 0 ? [{ descricao: `Estacionamento ${osLabel}`, valor: estacValor }] : []),
+                        ...despesasExtras,
+                      ];
                       generateClosingReport(
                         [{
                           cot: item.cot, data: item.data, hora: item.hora, tipo: item.tipo,
@@ -691,7 +703,8 @@ const AgendaTable = ({ items, onEdited, hideFinancials, onClone }: AgendaTablePr
                           outros_despesas: item.outrosDespesas, cliente: item.cliente,
                         }],
                         `Fechamento - ${item.cot}`,
-                        `O.S. ${item.cot} — ${item.cliente}`
+                        `O.S. ${item.cot} — ${item.cliente}`,
+                        { cliente: item.cliente, extras: reportExtras }
                       );
                       ((item.comprovanteEstacionamentoUrls || []) as string[]).forEach((u) => window.open(u, "_blank"));
                       onEdited();
