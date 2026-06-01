@@ -1197,6 +1197,94 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
     toast({ title: "Fatura salva", description: "Arquivo HTML baixado com sucesso" });
   };
 
+  const handleExportarVendaExcel = async (venda: Venda) => {
+    const XLSX = await import("xlsx");
+
+    const { data: vendaItems } = await supabase
+      .from("venda_items")
+      .select("*, agenda_items:agenda_item_id(cot, data, hora, tipo, origem, destino, pax, motorista, veiculo, placa, fornecedor)")
+      .eq("venda_id", venda.id);
+
+    const { data: extrasData } = await supabase
+      .from("venda_extras")
+      .select("descricao, valor")
+      .eq("venda_id", venda.id);
+
+    const items = vendaItems || [];
+    const extras = extrasData || [];
+
+    const rows: any[] = items.map((it: any, idx: number) => {
+      const ai = it.agenda_items || {};
+      return {
+        "#": idx + 1,
+        "O.S.": ai.cot || "",
+        "Data": ai.data ? formatDate(ai.data) : "",
+        "Hora": ai.hora || "",
+        "Tipo": ai.tipo || "",
+        "Origem": ai.origem || "",
+        "Destino": ai.destino || "",
+        "SHT": ai.pax || "",
+        "Motorista": ai.motorista || "",
+        "Veículo": ai.veiculo || "",
+        "Placa": ai.placa || "",
+        "Valor": Number(it.valor) || 0,
+      };
+    });
+
+    extras.forEach((ex: any, idx: number) => {
+      rows.push({
+        "#": items.length + idx + 1,
+        "O.S.": "EXTRA",
+        "Data": "",
+        "Hora": "",
+        "Tipo": ex.descricao || "Extra",
+        "Origem": "",
+        "Destino": "",
+        "SHT": "",
+        "Motorista": "",
+        "Veículo": "",
+        "Placa": "",
+        "Valor": Number(ex.valor) || 0,
+      });
+    });
+
+    const total =
+      items.reduce((s: number, it: any) => s + (Number(it.valor) || 0), 0) +
+      extras.reduce((s: number, ex: any) => s + (Number(ex.valor) || 0), 0);
+
+    rows.push({
+      "#": "", "O.S.": "TOTAL", "Data": "", "Hora": "", "Tipo": "", "Origem": "",
+      "Destino": "", "SHT": "", "Motorista": "", "Veículo": "", "Placa": "", "Valor": total,
+    });
+
+    const wb = XLSX.utils.book_new();
+    const ws = XLSX.utils.json_to_sheet(rows);
+    ws["!cols"] = [
+      { wch: 4 }, { wch: 10 }, { wch: 12 }, { wch: 8 }, { wch: 18 }, { wch: 20 },
+      { wch: 20 }, { wch: 6 }, { wch: 16 }, { wch: 14 }, { wch: 10 }, { wch: 14 },
+    ];
+    XLSX.utils.book_append_sheet(wb, ws, "Venda");
+
+    const resumo = [
+      { Campo: "Venda Nº", Valor: venda.numero_venda },
+      { Campo: "Cliente", Valor: venda.cliente },
+      { Campo: "Data Venda", Valor: formatDate(venda.data_venda) },
+      { Campo: "Vencimento", Valor: venda.data_vencimento ? formatDate(venda.data_vencimento) : "" },
+      { Campo: "Forma de Pagamento", Valor: venda.forma_pagamento || "" },
+      { Campo: "Status", Valor: venda.status },
+      { Campo: "Qtd Serviços", Valor: items.length },
+      { Campo: "Qtd Extras", Valor: extras.length },
+      { Campo: "Valor Total", Valor: total },
+      { Campo: "Observações", Valor: venda.observacoes || "" },
+    ];
+    const wsResumo = XLSX.utils.json_to_sheet(resumo);
+    wsResumo["!cols"] = [{ wch: 24 }, { wch: 40 }];
+    XLSX.utils.book_append_sheet(wb, wsResumo, "Resumo");
+
+    XLSX.writeFile(wb, `Venda_${venda.numero_venda}_${venda.cliente.replace(/\s+/g, "_")}.xlsx`);
+    toast({ title: "Excel exportado", description: "Arquivo .xlsx baixado com sucesso" });
+  };
+
   const loadFechamentoClientes = useCallback(async () => {
     const { data } = await supabase
       .from("agenda_items")
