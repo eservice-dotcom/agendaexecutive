@@ -2149,6 +2149,9 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
                             <Button variant="ghost" size="icon" onClick={() => handleSalvarFatura(v)} title="Salvar Fatura">
                               <Download className="h-4 w-4 text-primary" />
                             </Button>
+                            <Button variant="ghost" size="icon" onClick={() => handleExportarVendaExcel(v)} title="Exportar Venda em Excel">
+                              <FileSpreadsheet className="h-4 w-4 text-emerald-600" />
+                            </Button>
                             <Button variant="ghost" size="icon" onClick={() => handleRelatorioFechamento(v)} title="Relatório de Fechamento">
                               <ClipboardList className="h-4 w-4 text-primary" />
                             </Button>
