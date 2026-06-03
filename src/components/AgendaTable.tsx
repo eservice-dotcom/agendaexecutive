@@ -114,6 +114,16 @@ const mapAgendaRow = (row: any): AgendaItem => ({
   horaExtra: row.hora_extra || "",
   outrosDespesas: row.outros_despesas || [],
   formaContratacao: row.forma_contratacao || "",
+  placaReceptivoUrl: row.placa_receptivo_url || "",
+  placaReceptivoUrls: (() => {
+    const arr: string[] = Array.isArray(row.placa_receptivo_urls) ? row.placa_receptivo_urls.filter(Boolean) : [];
+    const legacy = row.placa_receptivo_url;
+    if (legacy && !arr.includes(legacy)) arr.unshift(legacy);
+    return arr;
+  })(),
+  comprovanteEstacionamentoUrls: Array.isArray(row.comprovante_estacionamento_urls)
+    ? row.comprovante_estacionamento_urls.filter(Boolean)
+    : [],
 });
 
 const MESSAGED_STORAGE_KEY = "whatsapp_messaged_driver_v1";
