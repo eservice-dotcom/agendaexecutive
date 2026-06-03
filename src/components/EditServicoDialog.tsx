@@ -217,12 +217,18 @@ const EditServicoDialog = ({ open, onOpenChange, item, onSaved }: EditServicoDia
     setUploadingPlaca(true);
     try {
       const { supabase } = await import("@/integrations/supabase/client");
+      const { data: sessionData } = await supabase.auth.getSession();
+      if (!sessionData?.session) {
+        throw new Error("Sessão expirada. Faça login novamente para anexar arquivos.");
+      }
       const novos: string[] = [];
       for (const file of Array.from(files)) {
-        const ext = file.name.split(".").pop() || "bin";
+        const ext = (file.name.split(".").pop() || "bin").toLowerCase();
         const path = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
-        const { error: upErr } = await supabase.storage.from("placas-receptivo").upload(path, file, { upsert: false });
-        if (upErr) throw upErr;
+        const { error: upErr } = await supabase.storage
+          .from("placas-receptivo")
+          .upload(path, file, { upsert: false, contentType: file.type || undefined });
+        if (upErr) { console.error("[UploadPlaca] storage error:", upErr); throw upErr; }
         const { data } = supabase.storage.from("placas-receptivo").getPublicUrl(path);
         novos.push(data.publicUrl);
       }
@@ -234,12 +240,15 @@ const EditServicoDialog = ({ open, onOpenChange, item, onSaved }: EditServicoDia
           .from("agenda_items")
           .update({ placa_receptivo_urls: novaLista } as any)
           .eq("id", item.id);
-        if (dbErr) throw dbErr;
+        if (dbErr) { console.error("[UploadPlaca] db error:", dbErr); throw dbErr; }
         onSaved();
+        toast.success(novos.length > 1 ? `${novos.length} arquivos anexados e salvos!` : "Arquivo anexado e salvo!");
+      } else {
+        toast.success(novos.length > 1 ? `${novos.length} arquivos prontos — clique em Salvar` : "Arquivo pronto — clique em Salvar");
       }
-      toast.success(novos.length > 1 ? `${novos.length} arquivos enviados!` : "Arquivo enviado!");
     } catch (e: any) {
-      toast.error("Erro ao enviar arquivo: " + (e?.message || ""));
+      console.error("[UploadPlaca] falha:", e);
+      toast.error("Erro ao enviar arquivo: " + (e?.message || JSON.stringify(e)), { duration: 8000 });
     } finally {
       setUploadingPlaca(false);
     }
