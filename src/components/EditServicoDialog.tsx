@@ -232,13 +232,14 @@ const EditServicoDialog = ({ open, onOpenChange, item, onSaved }: EditServicoDia
         const { data } = supabase.storage.from("placas-receptivo").getPublicUrl(path);
         novos.push(data.publicUrl);
       }
-      const novaLista = [...(form.placaReceptivoUrls || []), ...novos];
-      setForm((f) => ({ ...f, placaReceptivoUrls: novaLista }));
+      const novaLista = [...new Set([...(form.placaReceptivoUrls || []), ...novos])];
+      const novoLegacy = form.placaReceptivoUrl || novaLista[0] || "";
+      setForm((f) => ({ ...f, placaReceptivoUrl: f.placaReceptivoUrl || novaLista[0] || "", placaReceptivoUrls: novaLista }));
       // Persiste imediatamente no banco para não perder o anexo se o usuário fechar sem salvar
       if (item?.id) {
         const { error: dbErr } = await supabase
           .from("agenda_items")
-          .update({ placa_receptivo_urls: novaLista } as any)
+          .update({ placa_receptivo_url: novoLegacy || null, placa_receptivo_urls: novaLista } as any)
           .eq("id", item.id);
         if (dbErr) { console.error("[UploadPlaca] db error:", dbErr); throw dbErr; }
         onSaved();
