@@ -326,6 +326,10 @@ const NovoServicoDialog = ({ open, onOpenChange, onSaved, initialData }: NovoSer
 
 
   const handleSave = async () => {
+    if (uploadingPlaca) {
+      toast.warning("Aguarde o arquivo terminar de anexar antes de salvar.");
+      return;
+    }
     if (!form.data || !form.hora || !form.clienteId || !form.tipo || !form.origem || !form.destino) {
       toast.error("Preencha os campos obrigatórios: Data, Hora, Cliente, Tipo, Origem e Destino.");
       return;
@@ -985,7 +989,9 @@ const NovoServicoDialog = ({ open, onOpenChange, onSaved, initialData }: NovoSer
 
         <DialogFooter className="mt-4">
           <Button variant="outline" onClick={() => onOpenChange(false)}>Cancelar</Button>
-          <Button onClick={handleSave}>Salvar Serviço</Button>
+          <Button onClick={handleSave} disabled={uploadingPlaca}>
+            {uploadingPlaca ? "Anexando..." : "Salvar Serviço"}
+          </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

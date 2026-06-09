@@ -365,6 +365,10 @@ const EditServicoDialog = ({ open, onOpenChange, item, onSaved }: EditServicoDia
 
   const handleSave = async () => {
     if (!item) return;
+    if (uploadingPlaca) {
+      toast.warning("Aguarde o arquivo terminar de anexar antes de salvar.");
+      return;
+    }
     if (!form.data || !form.hora || !form.cliente || !form.tipo || !form.origem || !form.destino) {
       toast.error("Preencha os campos obrigatórios: Data, Hora, Cliente, Tipo, Origem e Destino.");
       return;
@@ -1011,7 +1015,9 @@ const EditServicoDialog = ({ open, onOpenChange, item, onSaved }: EditServicoDia
 
         <DialogFooter className="mt-4">
           <Button variant="outline" onClick={() => onOpenChange(false)}>Cancelar</Button>
-          <Button onClick={handleSave}>Salvar Alterações</Button>
+          <Button onClick={handleSave} disabled={uploadingPlaca}>
+            {uploadingPlaca ? "Anexando..." : "Salvar Alterações"}
+          </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
