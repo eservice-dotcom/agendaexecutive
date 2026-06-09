@@ -272,19 +272,30 @@ const NovoServicoDialog = ({ open, onOpenChange, onSaved, initialData }: NovoSer
     setUploadingPlaca(true);
     try {
       const { supabase } = await import("@/integrations/supabase/client");
+      const { data: userData, error: userError } = await supabase.auth.getUser();
+      if (userError || !userData?.user) {
+        console.error("[NovoUploadPlaca] auth error:", userError);
+        throw new Error("Sessão expirada. Faça login novamente para anexar arquivos.");
+      }
       const novos: string[] = [];
       for (const file of Array.from(files)) {
-        const ext = file.name.split(".").pop() || "bin";
+        const ext = (file.name.split(".").pop() || "bin").toLowerCase();
         const path = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
-        const { error: upErr } = await supabase.storage.from("placas-receptivo").upload(path, file, { upsert: false });
-        if (upErr) throw upErr;
+        const { error: upErr } = await supabase.storage
+          .from("placas-receptivo")
+          .upload(path, file, { upsert: false, contentType: file.type || undefined });
+        if (upErr) { console.error("[NovoUploadPlaca] storage error:", upErr); throw upErr; }
         const { data } = supabase.storage.from("placas-receptivo").getPublicUrl(path);
         novos.push(data.publicUrl);
       }
-      setForm((f) => ({ ...f, placaReceptivoUrls: [...(f.placaReceptivoUrls || []), ...novos] }));
-      toast.success(novos.length > 1 ? `${novos.length} arquivos enviados!` : "Arquivo enviado!");
+      setForm((f) => {
+        const lista = [...new Set([...(f.placaReceptivoUrl ? [f.placaReceptivoUrl] : []), ...(f.placaReceptivoUrls || []), ...novos].filter(Boolean))];
+        return { ...f, placaReceptivoUrl: lista[0] || "", placaReceptivoUrls: lista };
+      });
+      toast.success(novos.length > 1 ? `${novos.length} arquivos prontos — clique em Salvar` : "Arquivo pronto — clique em Salvar");
     } catch (e: any) {
-      toast.error("Erro ao enviar arquivo: " + (e?.message || ""));
+      console.error("[NovoUploadPlaca] falha:", e);
+      toast.error("Erro ao enviar arquivo: " + (e?.message || JSON.stringify(e)), { duration: 8000 });
     } finally {
       setUploadingPlaca(false);
     }

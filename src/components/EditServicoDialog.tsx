@@ -217,8 +217,9 @@ const EditServicoDialog = ({ open, onOpenChange, item, onSaved }: EditServicoDia
     setUploadingPlaca(true);
     try {
       const { supabase } = await import("@/integrations/supabase/client");
-      const { data: sessionData } = await supabase.auth.getSession();
-      if (!sessionData?.session) {
+      const { data: userData, error: userError } = await supabase.auth.getUser();
+      if (userError || !userData?.user) {
+        console.error("[UploadPlaca] auth error:", userError);
         throw new Error("Sessão expirada. Faça login novamente para anexar arquivos.");
       }
       const novos: string[] = [];
@@ -232,9 +233,28 @@ const EditServicoDialog = ({ open, onOpenChange, item, onSaved }: EditServicoDia
         const { data } = supabase.storage.from("placas-receptivo").getPublicUrl(path);
         novos.push(data.publicUrl);
       }
-      const novaLista = [...new Set([...(form.placaReceptivoUrls || []), ...novos])];
-      const novoLegacy = form.placaReceptivoUrl || novaLista[0] || "";
-      setForm((f) => ({ ...f, placaReceptivoUrl: f.placaReceptivoUrl || novaLista[0] || "", placaReceptivoUrls: novaLista }));
+
+      let anexosAtuais = [
+        ...(form.placaReceptivoUrl ? [form.placaReceptivoUrl] : []),
+        ...(form.placaReceptivoUrls || []),
+      ];
+      if (item?.id) {
+        const { data: atual, error: fetchErr } = await supabase
+          .from("agenda_items")
+          .select("placa_receptivo_url, placa_receptivo_urls")
+          .eq("id", item.id)
+          .maybeSingle();
+        if (fetchErr) { console.error("[UploadPlaca] fetch current error:", fetchErr); throw fetchErr; }
+        anexosAtuais = [
+          ...(((atual as any)?.placa_receptivo_url) ? [(atual as any).placa_receptivo_url] : []),
+          ...(Array.isArray((atual as any)?.placa_receptivo_urls) ? (atual as any).placa_receptivo_urls : []),
+          ...anexosAtuais,
+        ];
+      }
+
+      const novaLista = [...new Set([...anexosAtuais, ...novos].filter(Boolean))];
+      const novoLegacy = novaLista[0] || "";
+      setForm((f) => ({ ...f, placaReceptivoUrl: novoLegacy, placaReceptivoUrls: novaLista }));
       // Persiste imediatamente no banco para não perder o anexo se o usuário fechar sem salvar
       if (item?.id) {
         const { error: dbErr } = await supabase
