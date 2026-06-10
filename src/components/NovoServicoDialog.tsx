@@ -656,7 +656,11 @@ const NovoServicoDialog = ({ open, onOpenChange, onSaved, initialData }: NovoSer
               multiple
               accept="image/*,image/jpeg,image/jpg,image/png,image/webp,image/heic,image/heif,application/pdf,application/vnd.openxmlformats-officedocument.presentationml.presentation,.jpg,.jpeg,.png,.webp,.heic,.heif,.pdf,.pptx"
               disabled={uploadingPlaca}
-              onChange={(e) => { handleUploadPlaca(e.target.files); e.currentTarget.value = ""; }}
+              onChange={(e) => {
+                const files = Array.from(e.currentTarget.files || []);
+                e.currentTarget.value = "";
+                handleUploadPlaca(files);
+              }}
             />
             {(() => {
               const lista = [
@@ -822,7 +826,11 @@ const NovoServicoDialog = ({ open, onOpenChange, onSaved, initialData }: NovoSer
                     multiple
                     accept="image/*,application/pdf,.jpg,.jpeg,.png,.webp,.heic,.heif,.pdf,.pptx"
                     disabled={uploadingPlaca}
-                    onChange={(e) => { handleUploadEstacionamento(e.target.files); e.currentTarget.value = ""; }}
+                    onChange={(e) => {
+                      const files = Array.from(e.currentTarget.files || []);
+                      e.currentTarget.value = "";
+                      handleUploadEstacionamento(files);
+                    }}
                   />
                   {(form.comprovanteEstacionamentoUrls || []).length > 0 && (
                     <div className="space-y-1">
