@@ -212,8 +212,8 @@ const EditServicoDialog = ({ open, onOpenChange, item, onSaved }: EditServicoDia
 
   const update = (key: string, value: string) => setForm((f) => ({ ...f, [key]: value }));
 
-  const handleUploadPlaca = async (files: FileList | null) => {
-    if (!files || files.length === 0) return;
+  const handleUploadPlaca = async (files: File[]) => {
+    if (files.length === 0) return;
     setUploadingPlaca(true);
     try {
       const { supabase } = await import("@/integrations/supabase/client");
@@ -223,7 +223,7 @@ const EditServicoDialog = ({ open, onOpenChange, item, onSaved }: EditServicoDia
         throw new Error("Sessão expirada. Faça login novamente para anexar arquivos.");
       }
       const novos: string[] = [];
-      for (const file of Array.from(files)) {
+      for (const file of files) {
         const ext = (file.name.split(".").pop() || "bin").toLowerCase();
         const path = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
         const { error: upErr } = await supabase.storage
@@ -275,13 +275,13 @@ const EditServicoDialog = ({ open, onOpenChange, item, onSaved }: EditServicoDia
     }
   };
 
-  const handleUploadEstacionamento = async (files: FileList | null) => {
-    if (!files || files.length === 0) return;
+  const handleUploadEstacionamento = async (files: File[]) => {
+    if (files.length === 0) return;
     setUploadingPlaca(true);
     try {
       const { supabase } = await import("@/integrations/supabase/client");
       const novos: string[] = [];
-      for (const file of Array.from(files)) {
+      for (const file of files) {
         const ext = file.name.split(".").pop() || "bin";
         const path = `estac-${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
         const { error: upErr } = await supabase.storage.from("placas-receptivo").upload(path, file, { upsert: false });
@@ -655,7 +655,11 @@ const EditServicoDialog = ({ open, onOpenChange, item, onSaved }: EditServicoDia
               multiple
               accept="image/*,image/jpeg,image/jpg,image/png,image/webp,image/heic,image/heif,application/pdf,application/vnd.openxmlformats-officedocument.presentationml.presentation,.jpg,.jpeg,.png,.webp,.heic,.heif,.pdf,.pptx"
               disabled={uploadingPlaca}
-              onChange={(e) => { handleUploadPlaca(e.target.files); e.currentTarget.value = ""; }}
+              onChange={(e) => {
+                const files = Array.from(e.currentTarget.files || []);
+                e.currentTarget.value = "";
+                handleUploadPlaca(files);
+              }}
             />
             {(() => {
               const lista = [
@@ -843,7 +847,11 @@ const EditServicoDialog = ({ open, onOpenChange, item, onSaved }: EditServicoDia
                     multiple
                     accept="image/*,application/pdf,.jpg,.jpeg,.png,.webp,.heic,.heif,.pdf,.pptx"
                     disabled={uploadingPlaca}
-                    onChange={(e) => { handleUploadEstacionamento(e.target.files); e.currentTarget.value = ""; }}
+                    onChange={(e) => {
+                      const files = Array.from(e.currentTarget.files || []);
+                      e.currentTarget.value = "";
+                      handleUploadEstacionamento(files);
+                    }}
                   />
                   {(form.comprovanteEstacionamentoUrls || []).length > 0 && (
                     <div className="space-y-1">
