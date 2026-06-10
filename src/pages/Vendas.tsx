@@ -1929,10 +1929,10 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
       filtered = filtered.filter((cp) => !cp.data_vencimento || cp.data_vencimento <= filtroVencimentoFimPagar);
     }
     if (filtroPagamentoInicioPagar) {
-      filtered = filtered.filter((cp) => !cp.data_pagamento || cp.data_pagamento >= filtroPagamentoInicioPagar);
+      filtered = filtered.filter((cp) => !!cp.data_pagamento && cp.data_pagamento >= filtroPagamentoInicioPagar);
     }
     if (filtroPagamentoFimPagar) {
-      filtered = filtered.filter((cp) => !cp.data_pagamento || cp.data_pagamento <= filtroPagamentoFimPagar);
+      filtered = filtered.filter((cp) => !!cp.data_pagamento && cp.data_pagamento <= filtroPagamentoFimPagar);
     }
     return filtered;
   }, [contasPagarList, filtroOsPagar, filtroFornecedorPagar, filtroStatusPagar, filtroCentroCustoPagar, filtroVencimentoInicioPagar, filtroVencimentoFimPagar, filtroPagamentoInicioPagar, filtroPagamentoFimPagar, vendaOsMap]);
