@@ -352,6 +352,8 @@ const Vendas = () => {
   const [filtroCentroCustoPagar, setFiltroCentroCustoPagar] = useState("");
   const [filtroVencimentoInicioPagar, setFiltroVencimentoInicioPagar] = useState("");
   const [filtroVencimentoFimPagar, setFiltroVencimentoFimPagar] = useState("");
+  const [filtroPagamentoInicioPagar, setFiltroPagamentoInicioPagar] = useState("");
+  const [filtroPagamentoFimPagar, setFiltroPagamentoFimPagar] = useState("");
 
   // Filtro contas a receber por OS e cliente
   const [filtroOsReceber, setFiltroOsReceber] = useState("");
@@ -1926,8 +1928,14 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
     if (filtroVencimentoFimPagar) {
       filtered = filtered.filter((cp) => !cp.data_vencimento || cp.data_vencimento <= filtroVencimentoFimPagar);
     }
+    if (filtroPagamentoInicioPagar) {
+      filtered = filtered.filter((cp) => !cp.data_pagamento || cp.data_pagamento >= filtroPagamentoInicioPagar);
+    }
+    if (filtroPagamentoFimPagar) {
+      filtered = filtered.filter((cp) => !cp.data_pagamento || cp.data_pagamento <= filtroPagamentoFimPagar);
+    }
     return filtered;
-  }, [contasPagarList, filtroOsPagar, filtroFornecedorPagar, filtroStatusPagar, filtroCentroCustoPagar, filtroVencimentoInicioPagar, filtroVencimentoFimPagar, vendaOsMap]);
+  }, [contasPagarList, filtroOsPagar, filtroFornecedorPagar, filtroStatusPagar, filtroCentroCustoPagar, filtroVencimentoInicioPagar, filtroVencimentoFimPagar, filtroPagamentoInicioPagar, filtroPagamentoFimPagar, vendaOsMap]);
 
   const filteredContasReceberList = useMemo(() => {
     let filtered = contasReceberList;
@@ -2392,6 +2400,24 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
                     type="date"
                     value={filtroVencimentoFimPagar}
                     onChange={(e) => setFiltroVencimentoFimPagar(e.target.value)}
+                    className="w-36 h-8 text-sm"
+                  />
+                </div>
+                <div className="flex flex-col gap-0.5">
+                  <span className="text-xs font-medium text-muted-foreground">Pagamento De</span>
+                  <Input
+                    type="date"
+                    value={filtroPagamentoInicioPagar}
+                    onChange={(e) => setFiltroPagamentoInicioPagar(e.target.value)}
+                    className="w-36 h-8 text-sm"
+                  />
+                </div>
+                <div className="flex flex-col gap-0.5">
+                  <span className="text-xs font-medium text-muted-foreground">Pagamento Até</span>
+                  <Input
+                    type="date"
+                    value={filtroPagamentoFimPagar}
+                    onChange={(e) => setFiltroPagamentoFimPagar(e.target.value)}
                     className="w-36 h-8 text-sm"
                   />
                 </div>
