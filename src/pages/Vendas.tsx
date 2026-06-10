@@ -352,6 +352,8 @@ const Vendas = () => {
   const [filtroCentroCustoPagar, setFiltroCentroCustoPagar] = useState("");
   const [filtroVencimentoInicioPagar, setFiltroVencimentoInicioPagar] = useState("");
   const [filtroVencimentoFimPagar, setFiltroVencimentoFimPagar] = useState("");
+  const [filtroPagamentoInicioPagar, setFiltroPagamentoInicioPagar] = useState("");
+  const [filtroPagamentoFimPagar, setFiltroPagamentoFimPagar] = useState("");
 
   // Filtro contas a receber por OS e cliente
   const [filtroOsReceber, setFiltroOsReceber] = useState("");
