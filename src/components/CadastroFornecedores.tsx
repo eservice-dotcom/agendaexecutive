@@ -6,26 +6,87 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
-import { Plus, Trash2, Building2, Pencil } from "lucide-react";
-import { Fornecedor, TIPOS_FORNECEDOR, getFornecedores, saveFornecedor, updateFornecedor, deleteFornecedor } from "@/data/cadastroStorage";
+import { Plus, Trash2, Building2, Pencil, Settings2, X, Check } from "lucide-react";
+import { Fornecedor, getFornecedores, saveFornecedor, updateFornecedor, deleteFornecedor } from "@/data/cadastroStorage";
+import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
 const emptyForm = { razaoSocial: "", cnpj: "", contato: "", telefone: "", email: "", pix: "", tipos: [] as string[] };
 
+interface TipoFornecedor { id: string; nome: string; }
+
 const CadastroFornecedores = () => {
   const [items, setItems] = useState<Fornecedor[]>([]);
+  const [tipos, setTipos] = useState<TipoFornecedor[]>([]);
   const [open, setOpen] = useState(false);
+  const [tiposOpen, setTiposOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [form, setForm] = useState(emptyForm);
+  const [novoTipo, setNovoTipo] = useState("");
+  const [editingTipoId, setEditingTipoId] = useState<string | null>(null);
+  const [editingTipoNome, setEditingTipoNome] = useState("");
 
   const refresh = async () => {
     const data = await getFornecedores();
     setItems(data);
   };
 
+  const refreshTipos = async () => {
+    const { data } = await supabase.from("tipos_fornecedor").select("id, nome").order("nome");
+    if (data) setTipos(data);
+  };
+
   useEffect(() => {
     refresh();
+    refreshTipos();
   }, []);
+
+  const handleAddTipo = async () => {
+    const nome = novoTipo.trim();
+    if (!nome) { toast.error("Digite o nome do tipo"); return; }
+    if (tipos.some((t) => t.nome.toLowerCase() === nome.toLowerCase())) {
+      toast.error("Esse tipo já existe"); return;
+    }
+    const { error } = await supabase.from("tipos_fornecedor").insert({ nome });
+    if (error) { toast.error("Erro ao adicionar"); return; }
+    setNovoTipo("");
+    await refreshTipos();
+    toast.success("Tipo adicionado!");
+  };
+
+  const handleUpdateTipo = async (id: string) => {
+    const nome = editingTipoNome.trim();
+    if (!nome) { toast.error("Nome obrigatório"); return; }
+    const old = tipos.find((t) => t.id === id);
+    const { error } = await supabase.from("tipos_fornecedor").update({ nome }).eq("id", id);
+    if (error) { toast.error("Erro ao atualizar"); return; }
+    if (old && old.nome !== nome) {
+      const afetados = items.filter((f) => (f.tipos || []).includes(old.nome));
+      await Promise.all(afetados.map((f) => {
+        const novos = (f.tipos || []).map((t) => t === old.nome ? nome : t);
+        return supabase.from("fornecedores").update({ tipos: novos }).eq("id", f.id);
+      }));
+    }
+    setEditingTipoId(null);
+    setEditingTipoNome("");
+    await refreshTipos();
+    await refresh();
+    toast.success("Tipo atualizado!");
+  };
+
+  const handleDeleteTipo = async (id: string, nome: string) => {
+    if (!confirm(`Remover o tipo "${nome}"? Ele será também removido dos fornecedores que o possuem.`)) return;
+    const { error } = await supabase.from("tipos_fornecedor").delete().eq("id", id);
+    if (error) { toast.error("Erro ao remover"); return; }
+    const afetados = items.filter((f) => (f.tipos || []).includes(nome));
+    await Promise.all(afetados.map((f) => {
+      const novos = (f.tipos || []).filter((t) => t !== nome);
+      return supabase.from("fornecedores").update({ tipos: novos }).eq("id", f.id);
+    }));
+    await refreshTipos();
+    await refresh();
+    toast.success("Tipo removido!");
+  };
 
   const toggleTipo = (tipo: string) => {
     setForm((f) => ({
