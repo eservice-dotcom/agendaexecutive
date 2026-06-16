@@ -6,7 +6,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
-import { Plus, Trash2, Building2, Pencil, Settings2, X, Check } from "lucide-react";
+import { Plus, Trash2, Building2, Pencil, Settings2, X, Check, Filter } from "lucide-react";
 import { Fornecedor, getFornecedores, saveFornecedor, updateFornecedor, deleteFornecedor } from "@/data/cadastroStorage";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
