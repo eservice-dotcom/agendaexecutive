@@ -921,6 +921,27 @@ export type Database = {
           },
         ]
       }
+      tipos_fornecedor: {
+        Row: {
+          created_at: string
+          id: string
+          nome: string
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          nome: string
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          nome?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       tipos_servico: {
         Row: {
           created_at: string

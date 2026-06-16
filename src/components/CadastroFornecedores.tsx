@@ -6,26 +6,87 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
-import { Plus, Trash2, Building2, Pencil } from "lucide-react";
-import { Fornecedor, TIPOS_FORNECEDOR, getFornecedores, saveFornecedor, updateFornecedor, deleteFornecedor } from "@/data/cadastroStorage";
+import { Plus, Trash2, Building2, Pencil, Settings2, X, Check } from "lucide-react";
+import { Fornecedor, getFornecedores, saveFornecedor, updateFornecedor, deleteFornecedor } from "@/data/cadastroStorage";
+import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
 const emptyForm = { razaoSocial: "", cnpj: "", contato: "", telefone: "", email: "", pix: "", tipos: [] as string[] };
 
+interface TipoFornecedor { id: string; nome: string; }
+
 const CadastroFornecedores = () => {
   const [items, setItems] = useState<Fornecedor[]>([]);
+  const [tipos, setTipos] = useState<TipoFornecedor[]>([]);
   const [open, setOpen] = useState(false);
+  const [tiposOpen, setTiposOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [form, setForm] = useState(emptyForm);
+  const [novoTipo, setNovoTipo] = useState("");
+  const [editingTipoId, setEditingTipoId] = useState<string | null>(null);
+  const [editingTipoNome, setEditingTipoNome] = useState("");
 
   const refresh = async () => {
     const data = await getFornecedores();
     setItems(data);
   };
 
+  const refreshTipos = async () => {
+    const { data } = await supabase.from("tipos_fornecedor").select("id, nome").order("nome");
+    if (data) setTipos(data);
+  };
+
   useEffect(() => {
     refresh();
+    refreshTipos();
   }, []);
+
+  const handleAddTipo = async () => {
+    const nome = novoTipo.trim();
+    if (!nome) { toast.error("Digite o nome do tipo"); return; }
+    if (tipos.some((t) => t.nome.toLowerCase() === nome.toLowerCase())) {
+      toast.error("Esse tipo já existe"); return;
+    }
+    const { error } = await supabase.from("tipos_fornecedor").insert({ nome });
+    if (error) { toast.error("Erro ao adicionar"); return; }
+    setNovoTipo("");
+    await refreshTipos();
+    toast.success("Tipo adicionado!");
+  };
+
+  const handleUpdateTipo = async (id: string) => {
+    const nome = editingTipoNome.trim();
+    if (!nome) { toast.error("Nome obrigatório"); return; }
+    const old = tipos.find((t) => t.id === id);
+    const { error } = await supabase.from("tipos_fornecedor").update({ nome }).eq("id", id);
+    if (error) { toast.error("Erro ao atualizar"); return; }
+    if (old && old.nome !== nome) {
+      const afetados = items.filter((f) => (f.tipos || []).includes(old.nome));
+      await Promise.all(afetados.map((f) => {
+        const novos = (f.tipos || []).map((t) => t === old.nome ? nome : t);
+        return supabase.from("fornecedores").update({ tipos: novos }).eq("id", f.id);
+      }));
+    }
+    setEditingTipoId(null);
+    setEditingTipoNome("");
+    await refreshTipos();
+    await refresh();
+    toast.success("Tipo atualizado!");
+  };
+
+  const handleDeleteTipo = async (id: string, nome: string) => {
+    if (!confirm(`Remover o tipo "${nome}"? Ele será também removido dos fornecedores que o possuem.`)) return;
+    const { error } = await supabase.from("tipos_fornecedor").delete().eq("id", id);
+    if (error) { toast.error("Erro ao remover"); return; }
+    const afetados = items.filter((f) => (f.tipos || []).includes(nome));
+    await Promise.all(afetados.map((f) => {
+      const novos = (f.tipos || []).filter((t) => t !== nome);
+      return supabase.from("fornecedores").update({ tipos: novos }).eq("id", f.id);
+    }));
+    await refreshTipos();
+    await refresh();
+    toast.success("Tipo removido!");
+  };
 
   const toggleTipo = (tipo: string) => {
     setForm((f) => ({
@@ -83,9 +144,75 @@ const CadastroFornecedores = () => {
           <Building2 className="h-4 w-4" />
           {items.length} fornecedor(es) cadastrado(s)
         </div>
-        <Button onClick={handleOpenNew} className="gap-2">
-          <Plus className="h-4 w-4" /> Novo Fornecedor
-        </Button>
+        <div className="flex gap-2">
+          <Button variant="outline" onClick={() => setTiposOpen(true)} className="gap-2">
+            <Settings2 className="h-4 w-4" /> Gerenciar Tipos
+          </Button>
+          <Button onClick={handleOpenNew} className="gap-2">
+            <Plus className="h-4 w-4" /> Novo Fornecedor
+          </Button>
+        </div>
+
+        <Dialog open={tiposOpen} onOpenChange={setTiposOpen}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Gerenciar Tipos de Fornecedor</DialogTitle>
+              <DialogDescription>Adicione, edite ou remova os tipos disponíveis.</DialogDescription>
+            </DialogHeader>
+            <div className="space-y-3">
+              <div className="flex gap-2">
+                <Input
+                  placeholder="Novo tipo..."
+                  value={novoTipo}
+                  onChange={(e) => setNovoTipo(e.target.value)}
+                  onKeyDown={(e) => e.key === "Enter" && handleAddTipo()}
+                />
+                <Button onClick={handleAddTipo} size="sm" className="gap-1">
+                  <Plus className="h-4 w-4" /> Adicionar
+                </Button>
+              </div>
+              <div className="rounded-md border border-border divide-y">
+                {tipos.length === 0 ? (
+                  <div className="p-3 text-sm text-muted-foreground text-center">Nenhum tipo cadastrado.</div>
+                ) : tipos.map((t) => (
+                  <div key={t.id} className="flex items-center justify-between gap-2 p-2">
+                    {editingTipoId === t.id ? (
+                      <>
+                        <Input
+                          value={editingTipoNome}
+                          onChange={(e) => setEditingTipoNome(e.target.value)}
+                          onKeyDown={(e) => e.key === "Enter" && handleUpdateTipo(t.id)}
+                          className="h-8"
+                          autoFocus
+                        />
+                        <div className="flex gap-1">
+                          <Button size="sm" variant="ghost" className="h-7 w-7 p-0" onClick={() => handleUpdateTipo(t.id)}>
+                            <Check className="h-4 w-4 text-green-600" />
+                          </Button>
+                          <Button size="sm" variant="ghost" className="h-7 w-7 p-0" onClick={() => { setEditingTipoId(null); setEditingTipoNome(""); }}>
+                            <X className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </>
+                    ) : (
+                      <>
+                        <span className="text-sm">{t.nome}</span>
+                        <div className="flex gap-1">
+                          <Button size="sm" variant="ghost" className="h-7 w-7 p-0" onClick={() => { setEditingTipoId(t.id); setEditingTipoNome(t.nome); }}>
+                            <Pencil className="h-4 w-4" />
+                          </Button>
+                          <Button size="sm" variant="ghost" className="h-7 w-7 p-0 text-destructive" onClick={() => handleDeleteTipo(t.id, t.nome)}>
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
       </div>
 
       <Dialog open={open} onOpenChange={setOpen}>
@@ -108,10 +235,12 @@ const CadastroFornecedores = () => {
             <div>
               <Label>Tipo de Fornecedor (selecione um ou mais)</Label>
               <div className="mt-2 flex flex-wrap gap-3 rounded-md border border-border p-3">
-                {TIPOS_FORNECEDOR.map((tipo) => (
-                  <label key={tipo} className="flex cursor-pointer items-center gap-2 text-sm">
-                    <Checkbox checked={form.tipos.includes(tipo)} onCheckedChange={() => toggleTipo(tipo)} />
-                    <span>{tipo}</span>
+                {tipos.length === 0 ? (
+                  <span className="text-xs text-muted-foreground">Nenhum tipo cadastrado. Clique em "Gerenciar Tipos".</span>
+                ) : tipos.map((tipo) => (
+                  <label key={tipo.id} className="flex cursor-pointer items-center gap-2 text-sm">
+                    <Checkbox checked={form.tipos.includes(tipo.nome)} onCheckedChange={() => toggleTipo(tipo.nome)} />
+                    <span>{tipo.nome}</span>
                   </label>
                 ))}
               </div>
