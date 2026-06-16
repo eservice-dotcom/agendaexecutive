@@ -23,6 +23,7 @@ const CadastroFornecedores = () => {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [form, setForm] = useState(emptyForm);
   const [novoTipo, setNovoTipo] = useState("");
+  const [editingTipoId, setEditingTipoId] = useState<string | null>(null);
   const [editingTipoNome, setEditingTipoNome] = useState("");
   const [filtroTipos, setFiltroTipos] = useState<string[]>([]);
 
