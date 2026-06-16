@@ -189,6 +189,7 @@ export const updateMotorista = async (id: string, item: Omit<Motorista, "id">) =
     telefone: item.telefone,
     email: item.email,
     categoria: item.categoria,
+    tipos: item.tipos || [],
   }).eq("id", id);
   if (error) throw error;
 };
