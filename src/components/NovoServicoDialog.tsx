@@ -112,7 +112,7 @@ const NovoServicoDialog = ({ open, onOpenChange, onSaved, initialData }: NovoSer
 
   // Quick-add motorista
   const [showNewMotorista, setShowNewMotorista] = useState(false);
-  const [newMotorista, setNewMotorista] = useState({ nome: "", cnh: "", telefone: "", email: "", categoria: "" });
+  const [newMotorista, setNewMotorista] = useState({ nome: "", cnh: "", telefone: "", email: "", categoria: "", tipos: [] as string[] });
 
   // Quick-add fornecedor
   const [showNewFornecedor, setShowNewFornecedor] = useState(false);
@@ -144,7 +144,7 @@ const NovoServicoDialog = ({ open, onOpenChange, onSaved, initialData }: NovoSer
       setMotoristas(updated);
       const created = updated.find((m) => m.nome === newMotorista.nome);
       if (created) update("motoristaId", created.id);
-      setNewMotorista({ nome: "", cnh: "", telefone: "", email: "", categoria: "" });
+      setNewMotorista({ nome: "", cnh: "", telefone: "", email: "", categoria: "", tipos: [] as string[] });
       setShowNewMotorista(false);
       toast.success("Motorista cadastrado!");
     } catch { toast.error("Erro ao cadastrar motorista"); }

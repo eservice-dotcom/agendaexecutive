@@ -83,7 +83,7 @@ const EditServicoDialog = ({ open, onOpenChange, item, onSaved }: EditServicoDia
   const [outrosDespesas, setOutrosDespesas] = useState<OutraDespesa[]>([]);
   const [motoristaDiariaMsg, setMotoristaDiariaMsg] = useState("");
   const [showNewMotorista, setShowNewMotorista] = useState(false);
-  const [newMotorista, setNewMotorista] = useState({ nome: "", cnh: "", telefone: "", email: "", categoria: "" });
+  const [newMotorista, setNewMotorista] = useState({ nome: "", cnh: "", telefone: "", email: "", categoria: "", tipos: [] as string[] });
 
   const handleSaveNewMotorista = async () => {
     if (!newMotorista.nome) { toast.error("Nome do motorista é obrigatório"); return; }
@@ -93,7 +93,7 @@ const EditServicoDialog = ({ open, onOpenChange, item, onSaved }: EditServicoDia
       setMotoristas(updated);
       update("motorista", newMotorista.nome);
       update("telefone", newMotorista.telefone);
-      setNewMotorista({ nome: "", cnh: "", telefone: "", email: "", categoria: "" });
+      setNewMotorista({ nome: "", cnh: "", telefone: "", email: "", categoria: "", tipos: [] as string[] });
       setShowNewMotorista(false);
       toast.success("Motorista cadastrado!");
     } catch { toast.error("Erro ao cadastrar motorista"); }

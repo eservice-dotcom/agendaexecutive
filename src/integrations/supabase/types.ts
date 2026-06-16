@@ -830,6 +830,7 @@ export type Database = {
           id: string
           nome: string
           telefone: string
+          tipos: string[]
           updated_at: string
           user_id: string
         }
@@ -841,6 +842,7 @@ export type Database = {
           id?: string
           nome: string
           telefone: string
+          tipos?: string[]
           updated_at?: string
           user_id: string
         }
@@ -852,6 +854,7 @@ export type Database = {
           id?: string
           nome?: string
           telefone?: string
+          tipos?: string[]
           updated_at?: string
           user_id?: string
         }
@@ -939,6 +942,27 @@ export type Database = {
           id?: string
           nome?: string
           user_id?: string | null
+        }
+        Relationships: []
+      }
+      tipos_motorista: {
+        Row: {
+          created_at: string
+          id: string
+          nome: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          nome: string
+          user_id?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          nome?: string
+          user_id?: string
         }
         Relationships: []
       }
