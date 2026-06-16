@@ -147,7 +147,9 @@ const CadastroFornecedores = () => {
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2 text-sm text-muted-foreground">
           <Building2 className="h-4 w-4" />
-          {items.length} fornecedor(es) cadastrado(s)
+          {filtroTipos.length > 0
+            ? `${filteredItems.length} de ${items.length} fornecedor(es)`
+            : `${items.length} fornecedor(es) cadastrado(s)`}
         </div>
         <div className="flex gap-2">
           <Button variant="outline" onClick={() => setTiposOpen(true)} className="gap-2">
@@ -157,6 +159,41 @@ const CadastroFornecedores = () => {
             <Plus className="h-4 w-4" /> Novo Fornecedor
           </Button>
         </div>
+      </div>
+
+      {tipos.length > 0 && (
+        <div className="flex flex-wrap items-center gap-2">
+          <Filter className="h-4 w-4 text-muted-foreground" />
+          {tipos.map((t) => {
+            const ativo = filtroTipos.includes(t.nome);
+            return (
+              <button
+                key={t.id}
+                onClick={() =>
+                  setFiltroTipos((prev) =>
+                    ativo ? prev.filter((x) => x !== t.nome) : [...prev, t.nome]
+                  )
+                }
+                className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-medium transition-colors border ${
+                  ativo
+                    ? "bg-primary text-primary-foreground border-primary"
+                    : "bg-background text-muted-foreground border-border hover:border-muted-foreground"
+                }`}
+              >
+                {t.nome}
+              </button>
+            );
+          })}
+          {filtroTipos.length > 0 && (
+            <button
+              onClick={() => setFiltroTipos([])}
+              className="text-xs text-muted-foreground underline hover:text-foreground"
+            >
+              Limpar filtros
+            </button>
+          )}
+        </div>
+      )}
 
         <Dialog open={tiposOpen} onOpenChange={setTiposOpen}>
           <DialogContent>
