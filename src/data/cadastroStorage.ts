@@ -29,6 +29,7 @@ export interface Motorista {
   telefone: string;
   email: string;
   categoria: string;
+  tipos: string[];
 }
 
 export interface Fornecedor {
