@@ -39,7 +39,10 @@ export interface Fornecedor {
   telefone: string;
   email: string;
   pix: string;
+  tipos: string[];
 }
+
+export const TIPOS_FORNECEDOR = ["Executivo", "Motorista", "Veículo", "RH", "Serviços", "Outros"] as const;
 
 // Clientes
 export const getClientes = async (): Promise<Cliente[]> => {
@@ -214,6 +217,7 @@ export const getFornecedores = async (): Promise<Fornecedor[]> => {
     telefone: item.telefone,
     email: item.email,
     pix: (item as any).pix || "",
+    tipos: Array.isArray((item as any).tipos) ? (item as any).tipos : [],
   }));
 };
 
@@ -229,6 +233,7 @@ export const saveFornecedor = async (item: Omit<Fornecedor, "id">) => {
     telefone: item.telefone,
     email: item.email,
     pix: item.pix,
+    tipos: item.tipos || [],
   } as any);
   
   if (error) throw error;
@@ -242,6 +247,7 @@ export const updateFornecedor = async (id: string, item: Omit<Fornecedor, "id">,
     telefone: item.telefone,
     email: item.email,
     pix: item.pix,
+    tipos: item.tipos || [],
   } as any).eq("id", id);
   if (error) throw error;
 

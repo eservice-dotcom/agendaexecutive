@@ -4,15 +4,19 @@ import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Badge } from "@/components/ui/badge";
 import { Plus, Trash2, Building2, Pencil } from "lucide-react";
-import { Fornecedor, getFornecedores, saveFornecedor, updateFornecedor, deleteFornecedor } from "@/data/cadastroStorage";
+import { Fornecedor, TIPOS_FORNECEDOR, getFornecedores, saveFornecedor, updateFornecedor, deleteFornecedor } from "@/data/cadastroStorage";
 import { toast } from "sonner";
+
+const emptyForm = { razaoSocial: "", cnpj: "", contato: "", telefone: "", email: "", pix: "", tipos: [] as string[] };
 
 const CadastroFornecedores = () => {
   const [items, setItems] = useState<Fornecedor[]>([]);
   const [open, setOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
-  const [form, setForm] = useState({ razaoSocial: "", cnpj: "", contato: "", telefone: "", email: "", pix: "" });
+  const [form, setForm] = useState(emptyForm);
 
   const refresh = async () => {
     const data = await getFornecedores();
@@ -22,6 +26,13 @@ const CadastroFornecedores = () => {
   useEffect(() => {
     refresh();
   }, []);
+
+  const toggleTipo = (tipo: string) => {
+    setForm((f) => ({
+      ...f,
+      tipos: f.tipos.includes(tipo) ? f.tipos.filter((t) => t !== tipo) : [...f.tipos, tipo],
+    }));
+  };
 
   const handleSave = async () => {
     if (!form.razaoSocial.trim()) { toast.error("Razão Social é obrigatória"); return; }
@@ -34,7 +45,7 @@ const CadastroFornecedores = () => {
         await saveFornecedor(form);
         toast.success("Fornecedor cadastrado!");
       }
-      setForm({ razaoSocial: "", cnpj: "", contato: "", telefone: "", email: "", pix: "" });
+      setForm(emptyForm);
       setEditingId(null);
       setOpen(false);
       await refresh();
@@ -45,7 +56,7 @@ const CadastroFornecedores = () => {
 
   const handleEdit = (item: Fornecedor) => {
     setEditingId(item.id);
-    setForm({ razaoSocial: item.razaoSocial, cnpj: item.cnpj, contato: item.contato, telefone: item.telefone, email: item.email, pix: item.pix });
+    setForm({ razaoSocial: item.razaoSocial, cnpj: item.cnpj, contato: item.contato, telefone: item.telefone, email: item.email, pix: item.pix, tipos: item.tipos || [] });
     setOpen(true);
   };
 
@@ -61,7 +72,7 @@ const CadastroFornecedores = () => {
 
   const handleOpenNew = () => {
     setEditingId(null);
-    setForm({ razaoSocial: "", cnpj: "", contato: "", telefone: "", email: "", pix: "" });
+    setForm(emptyForm);
     setOpen(true);
   };
 
@@ -94,6 +105,17 @@ const CadastroFornecedores = () => {
               <div><Label>Email</Label><Input type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} /></div>
             </div>
             <div><Label>PIX</Label><Input value={form.pix} onChange={(e) => setForm({ ...form, pix: e.target.value })} placeholder="Chave PIX (CPF, CNPJ, e-mail, telefone ou aleatória)" /></div>
+            <div>
+              <Label>Tipo de Fornecedor (selecione um ou mais)</Label>
+              <div className="mt-2 flex flex-wrap gap-3 rounded-md border border-border p-3">
+                {TIPOS_FORNECEDOR.map((tipo) => (
+                  <label key={tipo} className="flex cursor-pointer items-center gap-2 text-sm">
+                    <Checkbox checked={form.tipos.includes(tipo)} onCheckedChange={() => toggleTipo(tipo)} />
+                    <span>{tipo}</span>
+                  </label>
+                ))}
+              </div>
+            </div>
             <Button onClick={handleSave}>{editingId ? "Atualizar" : "Salvar"}</Button>
           </div>
         </DialogContent>
@@ -107,6 +129,7 @@ const CadastroFornecedores = () => {
             <TableHeader>
               <TableRow className="bg-muted/50 hover:bg-muted/50">
                 <TableHead className="font-semibold">Razão Social</TableHead>
+                <TableHead className="font-semibold">Tipos</TableHead>
                 <TableHead className="font-semibold">CNPJ</TableHead>
                 <TableHead className="font-semibold">Contato</TableHead>
                 <TableHead className="font-semibold">Telefone</TableHead>
@@ -119,6 +142,13 @@ const CadastroFornecedores = () => {
               {items.map((item) => (
                 <TableRow key={item.id}>
                   <TableCell className="font-medium">{item.razaoSocial}</TableCell>
+                  <TableCell>
+                    <div className="flex flex-wrap gap-1">
+                      {(item.tipos || []).map((t) => (
+                        <Badge key={t} variant="secondary" className="text-xs">{t}</Badge>
+                      ))}
+                    </div>
+                  </TableCell>
                   <TableCell className="font-mono text-sm">{item.cnpj}</TableCell>
                   <TableCell className="text-sm">{item.contato}</TableCell>
                   <TableCell className="text-sm">{item.telefone}</TableCell>
