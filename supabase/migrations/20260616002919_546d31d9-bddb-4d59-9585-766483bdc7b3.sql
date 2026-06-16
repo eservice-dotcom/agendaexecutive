@@ -1,0 +1,1 @@
+ALTER TABLE public.fornecedores ADD COLUMN IF NOT EXISTS tipos text[] NOT NULL DEFAULT '{}'::text[];
