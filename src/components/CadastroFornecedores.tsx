@@ -135,6 +135,9 @@ const CadastroFornecedores = () => {
   const handleOpenNew = () => {
     setEditingId(null);
     setForm(emptyForm);
+    setOpen(true);
+  };
+
   const filteredItems = filtroTipos.length > 0
     ? items.filter((f) => (f.tipos || []).some((t) => filtroTipos.includes(t)))
     : items;
