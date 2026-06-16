@@ -116,7 +116,7 @@ const NovoServicoDialog = ({ open, onOpenChange, onSaved, initialData }: NovoSer
 
   // Quick-add fornecedor
   const [showNewFornecedor, setShowNewFornecedor] = useState(false);
-  const [newFornecedor, setNewFornecedor] = useState({ razaoSocial: "", cnpj: "", contato: "", telefone: "", email: "", pix: "" });
+  const [newFornecedor, setNewFornecedor] = useState({ razaoSocial: "", cnpj: "", contato: "", telefone: "", email: "", pix: "", tipos: [] as string[] });
 
   // Quick-add cliente
   const [showNewCliente, setShowNewCliente] = useState(false);
@@ -158,7 +158,7 @@ const NovoServicoDialog = ({ open, onOpenChange, onSaved, initialData }: NovoSer
       setFornecedores(updated);
       const created = updated.find((f) => f.razaoSocial === newFornecedor.razaoSocial);
       if (created) update("fornecedorId", created.id);
-      setNewFornecedor({ razaoSocial: "", cnpj: "", contato: "", telefone: "", email: "", pix: "" });
+      setNewFornecedor({ razaoSocial: "", cnpj: "", contato: "", telefone: "", email: "", pix: "", tipos: [] as string[] });
       setShowNewFornecedor(false);
       toast.success("Fornecedor cadastrado!");
     } catch { toast.error("Erro ao cadastrar fornecedor"); }
