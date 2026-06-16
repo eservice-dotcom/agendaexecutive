@@ -144,9 +144,75 @@ const CadastroFornecedores = () => {
           <Building2 className="h-4 w-4" />
           {items.length} fornecedor(es) cadastrado(s)
         </div>
-        <Button onClick={handleOpenNew} className="gap-2">
-          <Plus className="h-4 w-4" /> Novo Fornecedor
-        </Button>
+        <div className="flex gap-2">
+          <Button variant="outline" onClick={() => setTiposOpen(true)} className="gap-2">
+            <Settings2 className="h-4 w-4" /> Gerenciar Tipos
+          </Button>
+          <Button onClick={handleOpenNew} className="gap-2">
+            <Plus className="h-4 w-4" /> Novo Fornecedor
+          </Button>
+        </div>
+
+        <Dialog open={tiposOpen} onOpenChange={setTiposOpen}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Gerenciar Tipos de Fornecedor</DialogTitle>
+              <DialogDescription>Adicione, edite ou remova os tipos disponíveis.</DialogDescription>
+            </DialogHeader>
+            <div className="space-y-3">
+              <div className="flex gap-2">
+                <Input
+                  placeholder="Novo tipo..."
+                  value={novoTipo}
+                  onChange={(e) => setNovoTipo(e.target.value)}
+                  onKeyDown={(e) => e.key === "Enter" && handleAddTipo()}
+                />
+                <Button onClick={handleAddTipo} size="sm" className="gap-1">
+                  <Plus className="h-4 w-4" /> Adicionar
+                </Button>
+              </div>
+              <div className="rounded-md border border-border divide-y">
+                {tipos.length === 0 ? (
+                  <div className="p-3 text-sm text-muted-foreground text-center">Nenhum tipo cadastrado.</div>
+                ) : tipos.map((t) => (
+                  <div key={t.id} className="flex items-center justify-between gap-2 p-2">
+                    {editingTipoId === t.id ? (
+                      <>
+                        <Input
+                          value={editingTipoNome}
+                          onChange={(e) => setEditingTipoNome(e.target.value)}
+                          onKeyDown={(e) => e.key === "Enter" && handleUpdateTipo(t.id)}
+                          className="h-8"
+                          autoFocus
+                        />
+                        <div className="flex gap-1">
+                          <Button size="sm" variant="ghost" className="h-7 w-7 p-0" onClick={() => handleUpdateTipo(t.id)}>
+                            <Check className="h-4 w-4 text-green-600" />
+                          </Button>
+                          <Button size="sm" variant="ghost" className="h-7 w-7 p-0" onClick={() => { setEditingTipoId(null); setEditingTipoNome(""); }}>
+                            <X className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </>
+                    ) : (
+                      <>
+                        <span className="text-sm">{t.nome}</span>
+                        <div className="flex gap-1">
+                          <Button size="sm" variant="ghost" className="h-7 w-7 p-0" onClick={() => { setEditingTipoId(t.id); setEditingTipoNome(t.nome); }}>
+                            <Pencil className="h-4 w-4" />
+                          </Button>
+                          <Button size="sm" variant="ghost" className="h-7 w-7 p-0 text-destructive" onClick={() => handleDeleteTipo(t.id, t.nome)}>
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
       </div>
 
       <Dialog open={open} onOpenChange={setOpen}>
@@ -169,10 +235,12 @@ const CadastroFornecedores = () => {
             <div>
               <Label>Tipo de Fornecedor (selecione um ou mais)</Label>
               <div className="mt-2 flex flex-wrap gap-3 rounded-md border border-border p-3">
-                {TIPOS_FORNECEDOR.map((tipo) => (
-                  <label key={tipo} className="flex cursor-pointer items-center gap-2 text-sm">
-                    <Checkbox checked={form.tipos.includes(tipo)} onCheckedChange={() => toggleTipo(tipo)} />
-                    <span>{tipo}</span>
+                {tipos.length === 0 ? (
+                  <span className="text-xs text-muted-foreground">Nenhum tipo cadastrado. Clique em "Gerenciar Tipos".</span>
+                ) : tipos.map((tipo) => (
+                  <label key={tipo.id} className="flex cursor-pointer items-center gap-2 text-sm">
+                    <Checkbox checked={form.tipos.includes(tipo.nome)} onCheckedChange={() => toggleTipo(tipo.nome)} />
+                    <span>{tipo.nome}</span>
                   </label>
                 ))}
               </div>
