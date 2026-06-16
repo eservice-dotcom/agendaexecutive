@@ -6,7 +6,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
-import { Plus, Trash2, Building2, Pencil, Settings2, X, Check } from "lucide-react";
+import { Plus, Trash2, Building2, Pencil, Settings2, X, Check, Filter } from "lucide-react";
 import { Fornecedor, getFornecedores, saveFornecedor, updateFornecedor, deleteFornecedor } from "@/data/cadastroStorage";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -25,6 +25,7 @@ const CadastroFornecedores = () => {
   const [novoTipo, setNovoTipo] = useState("");
   const [editingTipoId, setEditingTipoId] = useState<string | null>(null);
   const [editingTipoNome, setEditingTipoNome] = useState("");
+  const [filtroTipos, setFiltroTipos] = useState<string[]>([]);
 
   const refresh = async () => {
     const data = await getFornecedores();
@@ -137,12 +138,18 @@ const CadastroFornecedores = () => {
     setOpen(true);
   };
 
+  const filteredItems = filtroTipos.length > 0
+    ? items.filter((f) => (f.tipos || []).some((t) => filtroTipos.includes(t)))
+    : items;
+
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2 text-sm text-muted-foreground">
           <Building2 className="h-4 w-4" />
-          {items.length} fornecedor(es) cadastrado(s)
+          {filtroTipos.length > 0
+            ? `${filteredItems.length} de ${items.length} fornecedor(es)`
+            : `${items.length} fornecedor(es) cadastrado(s)`}
         </div>
         <div className="flex gap-2">
           <Button variant="outline" onClick={() => setTiposOpen(true)} className="gap-2">
@@ -152,6 +159,41 @@ const CadastroFornecedores = () => {
             <Plus className="h-4 w-4" /> Novo Fornecedor
           </Button>
         </div>
+      </div>
+
+      {tipos.length > 0 && (
+        <div className="flex flex-wrap items-center gap-2">
+          <Filter className="h-4 w-4 text-muted-foreground" />
+          {tipos.map((t) => {
+            const ativo = filtroTipos.includes(t.nome);
+            return (
+              <button
+                key={t.id}
+                onClick={() =>
+                  setFiltroTipos((prev) =>
+                    ativo ? prev.filter((x) => x !== t.nome) : [...prev, t.nome]
+                  )
+                }
+                className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-medium transition-colors border ${
+                  ativo
+                    ? "bg-primary text-primary-foreground border-primary"
+                    : "bg-background text-muted-foreground border-border hover:border-muted-foreground"
+                }`}
+              >
+                {t.nome}
+              </button>
+            );
+          })}
+          {filtroTipos.length > 0 && (
+            <button
+              onClick={() => setFiltroTipos([])}
+              className="text-xs text-muted-foreground underline hover:text-foreground"
+            >
+              Limpar filtros
+            </button>
+          )}
+        </div>
+      )}
 
         <Dialog open={tiposOpen} onOpenChange={setTiposOpen}>
           <DialogContent>
@@ -213,7 +255,6 @@ const CadastroFornecedores = () => {
             </div>
           </DialogContent>
         </Dialog>
-      </div>
 
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent>
@@ -250,8 +291,10 @@ const CadastroFornecedores = () => {
         </DialogContent>
       </Dialog>
 
-      {items.length === 0 ? (
-        <div className="flex h-32 items-center justify-center rounded-lg border border-border bg-card text-muted-foreground">Nenhum fornecedor cadastrado.</div>
+      {filteredItems.length === 0 ? (
+        <div className="flex h-32 items-center justify-center rounded-lg border border-border bg-card text-muted-foreground">
+          {items.length === 0 ? "Nenhum fornecedor cadastrado." : "Nenhum fornecedor corresponde aos filtros selecionados."}
+        </div>
       ) : (
         <div className="overflow-auto rounded-lg border border-border bg-card shadow-sm">
           <Table>
@@ -268,7 +311,7 @@ const CadastroFornecedores = () => {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {items.map((item) => (
+              {filteredItems.map((item) => (
                 <TableRow key={item.id}>
                   <TableCell className="font-medium">{item.razaoSocial}</TableCell>
                   <TableCell>
