@@ -291,8 +291,10 @@ const CadastroFornecedores = () => {
         </DialogContent>
       </Dialog>
 
-      {items.length === 0 ? (
-        <div className="flex h-32 items-center justify-center rounded-lg border border-border bg-card text-muted-foreground">Nenhum fornecedor cadastrado.</div>
+      {filteredItems.length === 0 ? (
+        <div className="flex h-32 items-center justify-center rounded-lg border border-border bg-card text-muted-foreground">
+          {items.length === 0 ? "Nenhum fornecedor cadastrado." : "Nenhum fornecedor corresponde aos filtros selecionados."}
+        </div>
       ) : (
         <div className="overflow-auto rounded-lg border border-border bg-card shadow-sm">
           <Table>
@@ -309,7 +311,7 @@ const CadastroFornecedores = () => {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {items.map((item) => (
+              {filteredItems.map((item) => (
                 <TableRow key={item.id}>
                   <TableCell className="font-medium">{item.razaoSocial}</TableCell>
                   <TableCell>
