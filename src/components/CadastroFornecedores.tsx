@@ -255,7 +255,6 @@ const CadastroFornecedores = () => {
             </div>
           </DialogContent>
         </Dialog>
-      </div>
 
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent>
