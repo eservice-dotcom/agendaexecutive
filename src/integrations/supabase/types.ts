@@ -759,6 +759,7 @@ export type Database = {
           pix: string
           razao_social: string
           telefone: string
+          tipos: string[]
           updated_at: string
           user_id: string
         }
@@ -771,6 +772,7 @@ export type Database = {
           pix?: string
           razao_social: string
           telefone: string
+          tipos?: string[]
           updated_at?: string
           user_id: string
         }
@@ -783,6 +785,7 @@ export type Database = {
           pix?: string
           razao_social?: string
           telefone?: string
+          tipos?: string[]
           updated_at?: string
           user_id?: string
         }
