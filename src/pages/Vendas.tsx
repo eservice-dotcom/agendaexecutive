@@ -445,19 +445,55 @@ const Vendas = () => {
   }, []);
 
   const loadContasPagar = useCallback(async () => {
-    const { data } = await supabase
-      .from("contas_pagar")
-      .select("*")
-      .order("data_vencimento", { ascending: true });
-    if (data) setContasPagarList(data as ContaPagarDB[]);
+    const pageSize = 1000;
+    const allContas: ContaPagarDB[] = [];
+    let from = 0;
+
+    while (true) {
+      const { data, error } = await supabase
+        .from("contas_pagar")
+        .select("*")
+        .order("data_vencimento", { ascending: true })
+        .range(from, from + pageSize - 1);
+
+      if (error) {
+        console.error("Erro ao carregar contas a pagar:", error);
+        break;
+      }
+
+      if (!data || data.length === 0) break;
+      allContas.push(...(data as ContaPagarDB[]));
+      if (data.length < pageSize) break;
+      from += pageSize;
+    }
+
+    setContasPagarList(allContas);
   }, []);
 
   const loadContasReceber = useCallback(async () => {
-    const { data } = await supabase
-      .from("contas_receber")
-      .select("*")
-      .order("data_vencimento", { ascending: true });
-    if (data) setContasReceberList(data as ContaReceberDB[]);
+    const pageSize = 1000;
+    const allContas: ContaReceberDB[] = [];
+    let from = 0;
+
+    while (true) {
+      const { data, error } = await supabase
+        .from("contas_receber")
+        .select("*")
+        .order("data_vencimento", { ascending: true })
+        .range(from, from + pageSize - 1);
+
+      if (error) {
+        console.error("Erro ao carregar contas a receber:", error);
+        break;
+      }
+
+      if (!data || data.length === 0) break;
+      allContas.push(...(data as ContaReceberDB[]));
+      if (data.length < pageSize) break;
+      from += pageSize;
+    }
+
+    setContasReceberList(allContas);
   }, []);
 
   const loadVendaOsMap = useCallback(async () => {
