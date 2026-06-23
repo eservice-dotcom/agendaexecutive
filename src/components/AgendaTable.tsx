@@ -534,11 +534,25 @@ const AgendaTable = ({ items, onEdited, hideFinancials, onClone }: AgendaTablePr
               </TableCell>
               {canViewFinancials && (
                 <TableCell className={`px-0.5 py-0 text-right font-mono text-[9px] font-semibold text-foreground truncate ${!item.valor ? 'bg-orange-200 dark:bg-orange-900/40' : ''}`}>
-                  {formatCurrency(
-                    item.valor +
-                    (item.estacionamento || 0) +
-                    (item.outrosDespesas || []).reduce((sum, d) => sum + (d.valor || 0), 0)
-                  )}
+                  {(() => {
+                    const kmExtraTotal = (Number(item.kmExtra) || 0) * (Number(item.valorKmExtra) || 0);
+                    const heStr = (item.horaExtra || "").toString();
+                    let horas = 0;
+                    if (heStr.includes(":")) {
+                      const [h, m] = heStr.split(":").map((n) => Number(n) || 0);
+                      horas = h + m / 60;
+                    } else {
+                      horas = Number(heStr) || 0;
+                    }
+                    const horaExtraTotal = horas * (Number(item.valorHoraExtra) || 0);
+                    return formatCurrency(
+                      (item.valor || 0) +
+                      (item.estacionamento || 0) +
+                      (item.outrosDespesas || []).reduce((sum, d) => sum + (d.valor || 0), 0) +
+                      kmExtraTotal +
+                      horaExtraTotal
+                    );
+                  })()}
                 </TableCell>
               )}
               <TableCell className="px-0.5 py-0 text-[9px] truncate">
