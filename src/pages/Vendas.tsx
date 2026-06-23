@@ -992,7 +992,7 @@ const Vendas = () => {
           existing.total += Number(item.custo);
           existing.items.push(item);
 
-          const osLabel = item?.cot ? `O.S. ${item.cot}` : "Serviço";
+          const osLabel = `${item?.cot ? `O.S. ${item.cot}` : "Serviço"}${item?.pax ? ` / SHT ${item.pax}` : ""}`;
           const kmExtraQtd = Number(item?.km_extra) || 0;
           const valKmExtFor = Number(item?.valor_km_extra_fornecedor) || 0;
           const kmExtraTotalFor = kmExtraQtd * valKmExtFor;
