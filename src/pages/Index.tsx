@@ -207,7 +207,8 @@ const Index = () => {
 
   const buildAgendaExtrasFromItems = (items: any[]): { descricao: string; valor: number; auto?: boolean; sourceId?: string }[] => {
     return items.flatMap((item: any) => {
-      const osLabel = item?.cot ? `O.S. ${item.cot}` : "Serviço";
+      const shtLabel = item?.pax ? ` / SHT ${item.pax}` : "";
+      const osLabel = item?.cot ? `O.S. ${item.cot}${shtLabel}` : `Serviço${shtLabel}`;
       const sourceId = item?.id || item?.cot || osLabel;
       const rawDespesas = item?.outros_despesas;
       let despesas: any[] = [];

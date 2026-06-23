@@ -150,7 +150,8 @@ const horaExtraToHours = (he?: string | null) => {
 
 const buildAgendaExtrasFromItems = (items: any[]) => {
   return items.flatMap((item: any) => {
-    const osLabel = item?.cot ? `O.S. ${item.cot}` : "Serviço";
+    const shtLabel = item?.pax ? ` / SHT ${item.pax}` : "";
+    const osLabel = item?.cot ? `O.S. ${item.cot}${shtLabel}` : `Serviço${shtLabel}`;
     const rawDespesas = item?.outros_despesas;
     let despesas: any[] = [];
 
@@ -742,7 +743,7 @@ const Vendas = () => {
           existing.total += Number(item.custo);
           existing.items.push(item);
 
-          const osLabel = item?.cot ? `O.S. ${item.cot}` : "Serviço";
+          const osLabel = `${item?.cot ? `O.S. ${item.cot}` : "Serviço"}${item?.pax ? ` / SHT ${item.pax}` : ""}`;
           const kmExtraQtd = Number(item?.km_extra) || 0;
           const valKmExtFor = Number(item?.valor_km_extra_fornecedor) || 0;
           const kmExtraTotalFor = kmExtraQtd * valKmExtFor;
@@ -991,7 +992,7 @@ const Vendas = () => {
           existing.total += Number(item.custo);
           existing.items.push(item);
 
-          const osLabel = item?.cot ? `O.S. ${item.cot}` : "Serviço";
+          const osLabel = `${item?.cot ? `O.S. ${item.cot}` : "Serviço"}${item?.pax ? ` / SHT ${item.pax}` : ""}`;
           const kmExtraQtd = Number(item?.km_extra) || 0;
           const valKmExtFor = Number(item?.valor_km_extra_fornecedor) || 0;
           const kmExtraTotalFor = kmExtraQtd * valKmExtFor;
