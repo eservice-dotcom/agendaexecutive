@@ -721,6 +721,7 @@ const Index = () => {
             </div>
             <AgendaTable items={filteredData} onEdited={reloadData} hideFinancials={!showFinancials} onClone={(item) => { setCloneData(item); setNovoDialogOpen(true); }} />
             <NovoServicoDialog open={novoDialogOpen} onOpenChange={(v) => { setNovoDialogOpen(v); if (!v) setCloneData(null); }} onSaved={reloadData} initialData={cloneData} />
+            <ContatosMotoristasDialog open={contatosDialogOpen} onOpenChange={setContatosDialogOpen} items={filteredData} />
           </TabsContent>
 
           <TabsContent value="lixeira" className="space-y-4">
