@@ -78,6 +78,7 @@ const Index = () => {
   const [agendaData, setAgendaData] = useState<any[]>([]);
   const [printWithFinancials, setPrintWithFinancials] = useState(true);
   const [activeTab, setActiveTab] = useState("agenda");
+  const [contatosDialogOpen, setContatosDialogOpen] = useState(false);
 
   // Fechamento dialog state
   const [fechamentoDialogOpen, setFechamentoDialogOpen] = useState(false);
