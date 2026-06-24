@@ -51,20 +51,31 @@ const ContatosMotoristasDialog = ({ open, onOpenChange, items }: ContatosMotoris
 
   const mensagem = useMemo(() => {
     const selecionados = items.filter((i) => selected.has(i.id));
-    const linhas: string[] = [];
+    if (selecionados.length === 0) return "";
+
+    // Agrupa por data
+    const porData = new Map<string, typeof selecionados>();
     selecionados.forEach((i) => {
       if (!i.motorista || !i.telefone) return;
-      const partes = [
-        i.hora || "",
-        `O.S. ${i.cot || "—"}`,
-        `SHT ${i.pax ?? "—"}`,
-        i.motorista,
-        i.telefone,
-      ].filter(Boolean);
-      linhas.push(partes.join(" — "));
+      const arr = porData.get(i.data) || [];
+      arr.push(i);
+      porData.set(i.data, arr);
     });
-    if (linhas.length === 0) return "";
-    return `Contatos dos motoristas:\n${linhas.join("\n")}`;
+    if (porData.size === 0) return "";
+
+    const datasOrdenadas = [...porData.keys()].sort();
+    const blocos: string[] = [];
+    datasOrdenadas.forEach((data) => {
+      const linhasDia = porData.get(data)!
+        .slice()
+        .sort((a, b) => (a.hora || "").localeCompare(b.hora || ""))
+        .map((i) => {
+          return `🕐 ${i.hora}  |  📋 O.S. ${i.cot || "—"}  |  👥 SHT ${i.pax ?? "—"}\n   👤 ${i.motorista}   📞 ${i.telefone}`;
+        });
+      blocos.push(`📅 *${formatDate(data)}*\n${linhasDia.join("\n\n")}`);
+    });
+
+    return `🚗 *CONTATOS DOS MOTORISTAS*\n\n${blocos.join("\n\n────────────\n\n")}`;
   }, [items, selected]);
 
   const handleCopy = async () => {
