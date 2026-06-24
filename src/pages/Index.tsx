@@ -705,6 +705,10 @@ const Index = () => {
                   <Printer className="h-4 w-4" />
                   Imprimir
                 </Button>
+                <Button variant="outline" size="sm" onClick={() => setContatosDialogOpen(true)} className="gap-2">
+                  <Users className="h-4 w-4" />
+                  Contatos motoristas
+                </Button>
                 <Button variant="outline" size="sm" onClick={() => setActiveTab("fechamentos")} className="gap-2">
                   <FileText className="h-4 w-4" />
                   Fechamentos
