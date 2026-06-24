@@ -51,16 +51,17 @@ const ContatosMotoristasDialog = ({ open, onOpenChange, items }: ContatosMotoris
 
   const mensagem = useMemo(() => {
     const selecionados = items.filter((i) => selected.has(i.id));
-    // Deduplica por motorista+telefone, mantendo ordem
-    const seen = new Set<string>();
     const linhas: string[] = [];
     selecionados.forEach((i) => {
-      const key = `${i.motorista}||${i.telefone}`;
-      if (seen.has(key)) return;
-      seen.add(key);
-      if (i.motorista && i.telefone) {
-        linhas.push(`${i.motorista} — ${i.telefone}`);
-      }
+      if (!i.motorista || !i.telefone) return;
+      const partes = [
+        i.hora || "",
+        `O.S. ${i.cot || "—"}`,
+        `SHT ${i.pax ?? "—"}`,
+        i.motorista,
+        i.telefone,
+      ].filter(Boolean);
+      linhas.push(partes.join(" — "));
     });
     if (linhas.length === 0) return "";
     return `Contatos dos motoristas:\n${linhas.join("\n")}`;
@@ -132,6 +133,8 @@ const ContatosMotoristasDialog = ({ open, onOpenChange, items }: ContatosMotoris
                   <th className="px-2 py-1.5 text-left w-8"></th>
                   <th className="px-2 py-1.5 text-left">Data</th>
                   <th className="px-2 py-1.5 text-left">Hora</th>
+                  <th className="px-2 py-1.5 text-left">O.S.</th>
+                  <th className="px-2 py-1.5 text-center">SHT</th>
                   <th className="px-2 py-1.5 text-left">Cliente</th>
                   <th className="px-2 py-1.5 text-left">Motorista</th>
                   <th className="px-2 py-1.5 text-left">Telefone</th>
@@ -151,6 +154,8 @@ const ContatosMotoristasDialog = ({ open, onOpenChange, items }: ContatosMotoris
                       </td>
                       <td className="px-2 py-1 font-mono">{formatDate(i.data)}</td>
                       <td className="px-2 py-1 font-mono">{i.hora}</td>
+                      <td className="px-2 py-1 font-mono">{i.cot || "—"}</td>
+                      <td className="px-2 py-1 font-mono text-center">{i.pax ?? "—"}</td>
                       <td className="px-2 py-1 truncate max-w-[140px]">{i.cliente}</td>
                       <td className="px-2 py-1">{i.motorista || "—"}</td>
                       <td className="px-2 py-1 font-mono">{i.telefone || "—"}</td>
