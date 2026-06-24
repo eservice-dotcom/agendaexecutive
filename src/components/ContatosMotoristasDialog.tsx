@@ -133,6 +133,8 @@ const ContatosMotoristasDialog = ({ open, onOpenChange, items }: ContatosMotoris
                   <th className="px-2 py-1.5 text-left w-8"></th>
                   <th className="px-2 py-1.5 text-left">Data</th>
                   <th className="px-2 py-1.5 text-left">Hora</th>
+                  <th className="px-2 py-1.5 text-left">O.S.</th>
+                  <th className="px-2 py-1.5 text-center">SHT</th>
                   <th className="px-2 py-1.5 text-left">Cliente</th>
                   <th className="px-2 py-1.5 text-left">Motorista</th>
                   <th className="px-2 py-1.5 text-left">Telefone</th>
@@ -152,6 +154,8 @@ const ContatosMotoristasDialog = ({ open, onOpenChange, items }: ContatosMotoris
                       </td>
                       <td className="px-2 py-1 font-mono">{formatDate(i.data)}</td>
                       <td className="px-2 py-1 font-mono">{i.hora}</td>
+                      <td className="px-2 py-1 font-mono">{i.cot || "—"}</td>
+                      <td className="px-2 py-1 font-mono text-center">{i.pax ?? "—"}</td>
                       <td className="px-2 py-1 truncate max-w-[140px]">{i.cliente}</td>
                       <td className="px-2 py-1">{i.motorista || "—"}</td>
                       <td className="px-2 py-1 font-mono">{i.telefone || "—"}</td>
