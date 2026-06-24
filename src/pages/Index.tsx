@@ -1,5 +1,5 @@
 import { useState, useMemo, useCallback, useEffect } from "react";
-import { CalendarDays, ListChecks, Truck, Building2, Plus, BarChart3, Printer, EyeOff, Eye, ShoppingCart, FileText, Search, Trash2, ClipboardList, Archive, FileSpreadsheet, X, DollarSign, ChevronDown, MessageCircle } from "lucide-react";
+import { CalendarDays, ListChecks, Truck, Building2, Plus, BarChart3, Printer, EyeOff, Eye, ShoppingCart, FileText, Search, Trash2, ClipboardList, Archive, FileSpreadsheet, X, DollarSign, ChevronDown, MessageCircle, Users } from "lucide-react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import logo from "@/assets/logo-executive-service.png";
 import { Link, useNavigate } from "react-router-dom";
@@ -20,6 +20,7 @@ import NovoServicoDialog from "@/components/NovoServicoDialog";
 import FechamentosConsulta from "@/components/FechamentosConsulta";
 import { getAgendaItems } from "@/data/cadastroStorage";
 import AgendaLixeira from "@/components/AgendaLixeira";
+import ContatosMotoristasDialog from "@/components/ContatosMotoristasDialog";
 import { printAgenda } from "@/lib/printUtils";
 import { generateClosingReport } from "@/lib/closingReport";
 import { generateClosingReportExcel } from "@/lib/closingReportExcel";
@@ -77,6 +78,7 @@ const Index = () => {
   const [agendaData, setAgendaData] = useState<any[]>([]);
   const [printWithFinancials, setPrintWithFinancials] = useState(true);
   const [activeTab, setActiveTab] = useState("agenda");
+  const [contatosDialogOpen, setContatosDialogOpen] = useState(false);
 
   // Fechamento dialog state
   const [fechamentoDialogOpen, setFechamentoDialogOpen] = useState(false);
@@ -703,6 +705,10 @@ const Index = () => {
                   <Printer className="h-4 w-4" />
                   Imprimir
                 </Button>
+                <Button variant="outline" size="sm" onClick={() => setContatosDialogOpen(true)} className="gap-2">
+                  <Users className="h-4 w-4" />
+                  Contatos motoristas
+                </Button>
                 <Button variant="outline" size="sm" onClick={() => setActiveTab("fechamentos")} className="gap-2">
                   <FileText className="h-4 w-4" />
                   Fechamentos
@@ -715,6 +721,7 @@ const Index = () => {
             </div>
             <AgendaTable items={filteredData} onEdited={reloadData} hideFinancials={!showFinancials} onClone={(item) => { setCloneData(item); setNovoDialogOpen(true); }} />
             <NovoServicoDialog open={novoDialogOpen} onOpenChange={(v) => { setNovoDialogOpen(v); if (!v) setCloneData(null); }} onSaved={reloadData} initialData={cloneData} />
+            <ContatosMotoristasDialog open={contatosDialogOpen} onOpenChange={setContatosDialogOpen} items={filteredData} />
           </TabsContent>
 
           <TabsContent value="lixeira" className="space-y-4">
