@@ -51,16 +51,17 @@ const ContatosMotoristasDialog = ({ open, onOpenChange, items }: ContatosMotoris
 
   const mensagem = useMemo(() => {
     const selecionados = items.filter((i) => selected.has(i.id));
-    // Deduplica por motorista+telefone, mantendo ordem
-    const seen = new Set<string>();
     const linhas: string[] = [];
     selecionados.forEach((i) => {
-      const key = `${i.motorista}||${i.telefone}`;
-      if (seen.has(key)) return;
-      seen.add(key);
-      if (i.motorista && i.telefone) {
-        linhas.push(`${i.motorista} — ${i.telefone}`);
-      }
+      if (!i.motorista || !i.telefone) return;
+      const partes = [
+        i.hora || "",
+        `O.S. ${i.cot || "—"}`,
+        `SHT ${i.pax ?? "—"}`,
+        i.motorista,
+        i.telefone,
+      ].filter(Boolean);
+      linhas.push(partes.join(" — "));
     });
     if (linhas.length === 0) return "";
     return `Contatos dos motoristas:\n${linhas.join("\n")}`;
