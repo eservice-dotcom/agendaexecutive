@@ -45,13 +45,12 @@ const ddmmyyyyToISO = (s: string): string => {
   return `${m[3]}-${m[2]}-${m[1]}`;
 };
 
-// Build line-grouped text from a PDF page
+// Build line-grouped text from a PDF page. Large horizontal gaps within a line are marked with TAB so callers can split columns.
 const extractPageLines = async (page: any): Promise<string[]> => {
   const content = await page.getTextContent();
-  const items: { str: string; x: number; y: number }[] = content.items
+  const items: { str: string; x: number; y: number; w: number }[] = content.items
     .filter((i: any) => i.str && i.str.trim().length > 0)
-    .map((i: any) => ({ str: i.str, x: i.transform[4], y: i.transform[5] }));
-  // Group by y (within 2pt tolerance)
+    .map((i: any) => ({ str: i.str, x: i.transform[4], y: i.transform[5], w: i.width || 0 }));
   items.sort((a, b) => (b.y - a.y) || (a.x - b.x));
   const lines: { y: number; items: typeof items }[] = [];
   for (const it of items) {
@@ -62,14 +61,18 @@ const extractPageLines = async (page: any): Promise<string[]> => {
       lines.push({ y: it.y, items: [it] });
     }
   }
-  return lines.map((l) =>
-    l.items
-      .sort((a, b) => a.x - b.x)
-      .map((i) => i.str)
-      .join(" ")
-      .replace(/\s+/g, " ")
-      .trim()
-  );
+  return lines.map((l) => {
+    const sorted = l.items.sort((a, b) => a.x - b.x);
+    let out = "";
+    let prevEnd = -1;
+    for (const it of sorted) {
+      if (prevEnd >= 0 && it.x - prevEnd > 60) out += "\t";
+      else if (out) out += " ";
+      out += it.str;
+      prevEnd = it.x + (it.w || 0);
+    }
+    return out.replace(/[ ]+/g, " ").trim();
+  });
 };
 
 const parsePDF = async (file: File): Promise<ParsedService[]> => {
