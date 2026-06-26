@@ -120,10 +120,7 @@ const parsePDF = async (file: File): Promise<ParsedService[]> => {
       if (t && !/SHT-/i.test(ln) && !tipo) tipo = t[1].trim();
     }
 
-    // Local apresentação & destino — labels appear; collect text between labels and the "Observação"/"Motorista"
-    let origem = "";
-    let destino = "";
-    const lapIdx = b.lines.findIndex((l) => /Local de Apresenta[çc][ãa]o/i.test(l));
+    // (origem/destino computed below using two-column layout)
     // Local de Apresentação & Local de Destino — labels appear BELOW the address text in two columns separated by a TAB.
     let origem = "";
     let destino = "";
