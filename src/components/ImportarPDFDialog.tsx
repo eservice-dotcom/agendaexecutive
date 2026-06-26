@@ -7,7 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Checkbox } from "@/components/ui/checkbox";
 import { toast } from "sonner";
 import { Upload, FileText, Loader2, Trash2 } from "lucide-react";
-import { getClientes, getFornecedores, getMotoristas, getTiposServico, saveAgendaItem, saveCliente } from "@/data/cadastroStorage";
+import { getClientes, getFornecedores, getMotoristas, getTiposServico, saveAgendaItem, saveCliente, getAgendaItems, updateAgendaItem } from "@/data/cadastroStorage";
 import type { Passageiro } from "@/data/agendaData";
 
 // pdfjs-dist (v6, ESM)
