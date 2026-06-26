@@ -124,27 +124,48 @@ const parsePDF = async (file: File): Promise<ParsedService[]> => {
     let origem = "";
     let destino = "";
     const lapIdx = b.lines.findIndex((l) => /Local de Apresenta[çc][ãa]o/i.test(l));
-    const ldsIdx = b.lines.findIndex((l) => /Local de Destino/i.test(l));
-    const obsIdx = b.lines.findIndex((l) => /^Observa[çc][ãa]o/i.test(l));
-    const grab = (startIdx: number, endIdx: number, label: RegExp) => {
-      if (startIdx < 0) return "";
-      const parts: string[] = [];
-      const first = b.lines[startIdx].replace(label, "").trim();
-      if (first) parts.push(first);
-      const end = endIdx > startIdx ? endIdx : b.lines.length;
-      for (let i = startIdx + 1; i < end; i++) {
+    // Local de Apresentação & Local de Destino — labels appear BELOW the address text in two columns separated by a TAB.
+    let origem = "";
+    let destino = "";
+    const labelIdx = b.lines.findIndex(
+      (l) => /Local de Apresenta[çc][ãa]o/i.test(l) && /Local de Destino/i.test(l)
+    );
+    const STOP_RE = /Valor\s*R\$|Data de (Apresenta|Sa[íi]da)|Telefone|Motorista|Placa|Ve[íi]culo|Servi[çc]o\s*-?\s*SHT|Fornecedor:|Cliente Final:|À Faturar:|^---PAGE---$/i;
+    if (labelIdx >= 0) {
+      // collect address rows immediately above the label until we hit a stop marker
+      const rows: string[] = [];
+      for (let i = labelIdx - 1; i >= 0; i--) {
         const ln = b.lines[i];
-        if (/Local de (Apresenta|Destino)/i.test(ln)) break;
-        if (/^Observa[çc][ãa]o|Motorista faz|Passageiro|Telefone\s+Documento/i.test(ln)) break;
-        parts.push(ln);
+        if (!ln.trim()) continue;
+        if (STOP_RE.test(ln)) break;
+        rows.unshift(ln);
       }
-      return parts.join(" ").replace(/\s+/g, " ").trim();
-    };
-    origem = grab(lapIdx, ldsIdx, /Local de Apresenta[çc][ãa]o/i);
-    destino = grab(ldsIdx, obsIdx >= 0 ? obsIdx : b.lines.length, /Local de Destino/i);
+      // also pick up any trailing text on the label line itself (after the labels)
+      const labelLine = b.lines[labelIdx];
+      const labelParts = labelLine.split("\t").map((s) => s.trim());
+      const tailOri = labelParts[0]?.replace(/Local de Apresenta[çc][ãa]o/i, "").trim() || "";
+      const tailDes = labelParts[1]?.replace(/Local de Destino/i, "").trim() || "";
+      const oriParts: string[] = [];
+      const desParts: string[] = [];
+      for (const r of rows) {
+        const cols = r.split("\t");
+        if (cols.length >= 2) {
+          if (cols[0].trim()) oriParts.push(cols[0].trim());
+          if (cols[1].trim()) desParts.push(cols[1].trim());
+        } else {
+          // single column — assume it belongs to origem
+          if (cols[0].trim()) oriParts.push(cols[0].trim());
+        }
+      }
+      if (tailOri) oriParts.push(tailOri);
+      if (tailDes) desParts.push(tailDes);
+      origem = oriParts.join(" ").replace(/\s+/g, " ").trim();
+      destino = desParts.join(" ").replace(/\s+/g, " ").trim();
+    }
 
     // Observação
     let observacoes = "";
+    const obsIdx = b.lines.findIndex((l) => /^Observa[çc][ãa]o/i.test(l));
     if (obsIdx >= 0) {
       const parts: string[] = [];
       const first = b.lines[obsIdx].replace(/Observa[çc][ãa]o/i, "").trim();
