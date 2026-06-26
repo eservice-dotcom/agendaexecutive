@@ -495,9 +495,25 @@ const ImportarPDFDialog = ({ open, onOpenChange, onImported }: Props) => {
                   </thead>
                   <tbody>
                     {services.map((s, idx) => (
-                      <tr key={idx} className="border-t">
+                      <tr key={idx} className={`border-t ${s.status === "inalterado" ? "opacity-60" : ""}`}>
                         <td className="p-1 text-center">
                           <Checkbox checked={s.selected} onCheckedChange={(v) => updateService(idx, { selected: !!v })} />
+                        </td>
+                        <td className="p-1">
+                          {s.status === "novo" && (
+                            <span className="inline-block px-2 py-0.5 rounded text-[10px] font-semibold bg-emerald-100 text-emerald-800">NOVO</span>
+                          )}
+                          {s.status === "alterado" && (
+                            <span
+                              className="inline-block px-2 py-0.5 rounded text-[10px] font-semibold bg-amber-100 text-amber-800"
+                              title={`Campos alterados: ${(s.changedFields || []).join(", ")}`}
+                            >
+                              ALTERADO
+                            </span>
+                          )}
+                          {s.status === "inalterado" && (
+                            <span className="inline-block px-2 py-0.5 rounded text-[10px] font-semibold bg-muted text-muted-foreground">SEM MUDANÇAS</span>
+                          )}
                         </td>
                         <td className="p-1">
                           <Input value={s.sht} onChange={(e) => updateService(idx, { sht: e.target.value })} className="h-8 w-28" />
