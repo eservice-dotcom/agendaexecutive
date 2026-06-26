@@ -7,7 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Checkbox } from "@/components/ui/checkbox";
 import { toast } from "sonner";
 import { Upload, FileText, Loader2, Trash2 } from "lucide-react";
-import { getClientes, getFornecedores, getMotoristas, getTiposServico, saveAgendaItem, saveCliente } from "@/data/cadastroStorage";
+import { getClientes, getFornecedores, getMotoristas, getTiposServico, saveAgendaItem, saveCliente, getAgendaItems, updateAgendaItem } from "@/data/cadastroStorage";
 import type { Passageiro } from "@/data/agendaData";
 
 // pdfjs-dist (v6, ESM)
@@ -31,6 +31,10 @@ interface ParsedService {
   fornecedorId: string;
   motoristaId: string;
   custo: string;
+  // duplicate-detection metadata (filled after comparing with existing agenda items)
+  status?: "novo" | "alterado" | "inalterado";
+  existingId?: string;
+  changedFields?: string[];
 }
 
 interface Props {
@@ -261,8 +265,51 @@ const ImportarPDFDialog = ({ open, onOpenChange, onImported }: Props) => {
       if (parsed.length === 0) {
         toast.error("Nenhum serviço identificado no PDF.");
       } else {
-        setServices(parsed);
-        toast.success(`${parsed.length} serviço(s) extraído(s) do PDF.`);
+        // Compare with existing agenda items to detect duplicates / changes
+        let existing: any[] = [];
+        try { existing = await getAgendaItems(); } catch {}
+        const shtSet = new Set(parsed.map((p) => p.sht));
+        const byCot = new Map<string, any>();
+        for (const it of existing) {
+          if (it.cot && shtSet.has(String(it.cot))) byCot.set(String(it.cot), it);
+        }
+        const norm = (s: any) => String(s ?? "").replace(/\s+/g, " ").trim().toLowerCase();
+        const tagged: ParsedService[] = parsed.map((p) => {
+          const ex = byCot.get(p.sht);
+          if (!ex) return { ...p, status: "novo" as const };
+          const changed: string[] = [];
+          if (norm(ex.data) !== norm(p.data)) changed.push("data");
+          if (norm(ex.hora) !== norm(p.hora)) changed.push("hora");
+          if (norm(ex.tipo) !== norm(p.tipo)) changed.push("tipo");
+          if (norm(ex.veiculo) !== norm(p.veiculoTipo)) changed.push("veículo");
+          if (norm(ex.origem) !== norm(p.origem)) changed.push("origem");
+          if (norm(ex.destino) !== norm(p.destino)) changed.push("destino");
+          if (Number(ex.valor || 0) !== Number(p.valor || 0)) changed.push("valor");
+          if (norm(ex.observacoes) !== norm(p.observacoes)) changed.push("obs");
+          const exPax = JSON.stringify((ex.passageiros || []).map((x: any) => ({ n: norm(x.nome), v: norm(x.voo), t: norm(x.telefone) })));
+          const pPax = JSON.stringify((p.passageiros || []).map((x: any) => ({ n: norm(x.nome), v: norm(x.voo), t: norm(x.telefone) })));
+          if (exPax !== pPax) changed.push("passageiros");
+          if (changed.length === 0) {
+            return { ...p, status: "inalterado" as const, existingId: ex.id, selected: false };
+          }
+          // pre-fill fornecedor/motorista IDs from existing record so the user doesn't re-pick them
+          const fornecedorMatch = fornecedores.find((f) => norm(f.razaoSocial) === norm(ex.fornecedor));
+          const motoristaMatch = motoristas.find((m) => norm(m.nome) === norm(ex.motorista));
+          return {
+            ...p,
+            status: "alterado" as const,
+            existingId: ex.id,
+            changedFields: changed,
+            fornecedorId: fornecedorMatch?.id || p.fornecedorId,
+            motoristaId: motoristaMatch?.id || p.motoristaId,
+            custo: ex.custo ? String(ex.custo) : p.custo,
+          };
+        });
+        const novos = tagged.filter((t) => t.status === "novo").length;
+        const alterados = tagged.filter((t) => t.status === "alterado").length;
+        const iguais = tagged.filter((t) => t.status === "inalterado").length;
+        setServices(tagged);
+        toast.success(`${tagged.length} serviço(s) lido(s). ${novos} novo(s), ${alterados} alterado(s), ${iguais} sem mudanças.`);
       }
     } catch (e: any) {
       console.error(e);
@@ -299,42 +346,75 @@ const ImportarPDFDialog = ({ open, onOpenChange, onImported }: Props) => {
     }
 
     setSaving(true);
-    let ok = 0, fail = 0;
+    // Load existing items once so we can preserve manual fields on update
+    let existingItems: any[] = [];
+    try { existingItems = await getAgendaItems(); } catch {}
+    const existingById = new Map(existingItems.map((i) => [i.id, i]));
+    let inseridos = 0, atualizados = 0, fail = 0;
     for (const s of toImport) {
       try {
         const forn = fornecedores.find((f) => f.id === s.fornecedorId);
         const mot = motoristas.find((m) => m.id === s.motoristaId);
-        await saveAgendaItem({
-          data: s.data,
-          hora: s.hora,
-          cliente: clienteNome,
-          pax: s.passageiros.length,
-          passageiros: s.passageiros,
-          cot: s.sht, // O.S. = SHT
-          tipo: s.tipo,
-          origem: s.origem,
-          destino: s.destino,
-          placa: "",
-          veiculo: s.veiculoTipo,
-          motorista: mot?.nome || "",
-          telefone: mot?.telefone || "",
-          valor: s.valor,
-          fornecedor: forn?.razaoSocial || "",
-          custo: forn?.razaoSocial?.toLowerCase().includes("executive") ? 0 : (parseFloat(s.custo) || 0),
-          observacoes: s.observacoes,
-          receptivo: "",
-          statusFaturamento: "",
-          outrosDespesas: [],
-        } as any);
-        ok++;
+        if (s.status === "alterado" && s.existingId && existingById.has(s.existingId)) {
+          // Preserve manual fields (placa, km, hora_in/fim, extras, anexos, etc.) and only overwrite PDF-derived fields + the chosen fornecedor/motorista/custo.
+          const prev = existingById.get(s.existingId);
+          await updateAgendaItem({
+            ...prev,
+            data: s.data,
+            hora: s.hora,
+            cliente: clienteNome,
+            pax: s.passageiros.length,
+            passageiros: s.passageiros,
+            cot: s.sht,
+            tipo: s.tipo,
+            origem: s.origem,
+            destino: s.destino,
+            veiculo: s.veiculoTipo,
+            valor: s.valor,
+            observacoes: s.observacoes,
+            motorista: mot?.nome || prev.motorista || "",
+            telefone: mot?.telefone || prev.telefone || "",
+            fornecedor: forn?.razaoSocial || prev.fornecedor || "",
+            custo: forn?.razaoSocial?.toLowerCase().includes("executive")
+              ? 0
+              : (parseFloat(s.custo) || Number(prev.custo) || 0),
+          });
+          atualizados++;
+        } else {
+          await saveAgendaItem({
+            data: s.data,
+            hora: s.hora,
+            cliente: clienteNome,
+            pax: s.passageiros.length,
+            passageiros: s.passageiros,
+            cot: s.sht,
+            tipo: s.tipo,
+            origem: s.origem,
+            destino: s.destino,
+            placa: "",
+            veiculo: s.veiculoTipo,
+            motorista: mot?.nome || "",
+            telefone: mot?.telefone || "",
+            valor: s.valor,
+            fornecedor: forn?.razaoSocial || "",
+            custo: forn?.razaoSocial?.toLowerCase().includes("executive") ? 0 : (parseFloat(s.custo) || 0),
+            observacoes: s.observacoes,
+            receptivo: "",
+            statusFaturamento: "",
+            outrosDespesas: [],
+          } as any);
+          inseridos++;
+        }
       } catch (e) {
         console.error("Erro ao importar SHT", s.sht, e);
         fail++;
       }
     }
     setSaving(false);
-    toast.success(`${ok} serviço(s) importado(s).${fail ? ` ${fail} falharam.` : ""}`);
-    if (ok > 0) {
+    toast.success(
+      `${inseridos} novo(s), ${atualizados} atualizado(s).` + (fail ? ` ${fail} falharam.` : "")
+    );
+    if (inseridos + atualizados > 0) {
       onImported();
       onOpenChange(false);
     }
@@ -397,6 +477,7 @@ const ImportarPDFDialog = ({ open, onOpenChange, onImported }: Props) => {
                   <thead className="bg-muted">
                     <tr>
                       <th className="p-2"><Checkbox checked={services.every(s => s.selected)} onCheckedChange={(v) => setServices(prev => prev.map(s => ({ ...s, selected: !!v })))} /></th>
+                      <th className="p-2 text-left">Status</th>
                       <th className="p-2 text-left">SHT</th>
                       <th className="p-2 text-left">Data</th>
                       <th className="p-2 text-left">Hora</th>
@@ -414,9 +495,25 @@ const ImportarPDFDialog = ({ open, onOpenChange, onImported }: Props) => {
                   </thead>
                   <tbody>
                     {services.map((s, idx) => (
-                      <tr key={idx} className="border-t">
+                      <tr key={idx} className={`border-t ${s.status === "inalterado" ? "opacity-60" : ""}`}>
                         <td className="p-1 text-center">
                           <Checkbox checked={s.selected} onCheckedChange={(v) => updateService(idx, { selected: !!v })} />
+                        </td>
+                        <td className="p-1">
+                          {s.status === "novo" && (
+                            <span className="inline-block px-2 py-0.5 rounded text-[10px] font-semibold bg-emerald-100 text-emerald-800">NOVO</span>
+                          )}
+                          {s.status === "alterado" && (
+                            <span
+                              className="inline-block px-2 py-0.5 rounded text-[10px] font-semibold bg-amber-100 text-amber-800"
+                              title={`Campos alterados: ${(s.changedFields || []).join(", ")}`}
+                            >
+                              ALTERADO
+                            </span>
+                          )}
+                          {s.status === "inalterado" && (
+                            <span className="inline-block px-2 py-0.5 rounded text-[10px] font-semibold bg-muted text-muted-foreground">SEM MUDANÇAS</span>
+                          )}
                         </td>
                         <td className="p-1">
                           <Input value={s.sht} onChange={(e) => updateService(idx, { sht: e.target.value })} className="h-8 w-28" />
