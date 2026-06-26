@@ -175,8 +175,9 @@ const parsePDF = async (file: File): Promise<ParsedService[]> => {
     }
 
     const valor = valorM ? parseFloat(valorM[1].replace(/\./g, "").replace(",", ".")) : 0;
-    const data = dataAp ? ddmmyyyyToISO(dataAp[1]) : "";
-    const hora = dataAp ? dataAp[2] : "";
+    const baseDate = dataSa || dataAp;
+    const data = baseDate ? ddmmyyyyToISO(baseDate[1]) : "";
+    const hora = baseDate ? baseDate[2] : "";
 
     return {
       selected: true,
