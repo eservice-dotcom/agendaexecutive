@@ -265,8 +265,51 @@ const ImportarPDFDialog = ({ open, onOpenChange, onImported }: Props) => {
       if (parsed.length === 0) {
         toast.error("Nenhum serviço identificado no PDF.");
       } else {
-        setServices(parsed);
-        toast.success(`${parsed.length} serviço(s) extraído(s) do PDF.`);
+        // Compare with existing agenda items to detect duplicates / changes
+        let existing: any[] = [];
+        try { existing = await getAgendaItems(); } catch {}
+        const shtSet = new Set(parsed.map((p) => p.sht));
+        const byCot = new Map<string, any>();
+        for (const it of existing) {
+          if (it.cot && shtSet.has(String(it.cot))) byCot.set(String(it.cot), it);
+        }
+        const norm = (s: any) => String(s ?? "").replace(/\s+/g, " ").trim().toLowerCase();
+        const tagged: ParsedService[] = parsed.map((p) => {
+          const ex = byCot.get(p.sht);
+          if (!ex) return { ...p, status: "novo" as const };
+          const changed: string[] = [];
+          if (norm(ex.data) !== norm(p.data)) changed.push("data");
+          if (norm(ex.hora) !== norm(p.hora)) changed.push("hora");
+          if (norm(ex.tipo) !== norm(p.tipo)) changed.push("tipo");
+          if (norm(ex.veiculo) !== norm(p.veiculoTipo)) changed.push("veículo");
+          if (norm(ex.origem) !== norm(p.origem)) changed.push("origem");
+          if (norm(ex.destino) !== norm(p.destino)) changed.push("destino");
+          if (Number(ex.valor || 0) !== Number(p.valor || 0)) changed.push("valor");
+          if (norm(ex.observacoes) !== norm(p.observacoes)) changed.push("obs");
+          const exPax = JSON.stringify((ex.passageiros || []).map((x: any) => ({ n: norm(x.nome), v: norm(x.voo), t: norm(x.telefone) })));
+          const pPax = JSON.stringify((p.passageiros || []).map((x: any) => ({ n: norm(x.nome), v: norm(x.voo), t: norm(x.telefone) })));
+          if (exPax !== pPax) changed.push("passageiros");
+          if (changed.length === 0) {
+            return { ...p, status: "inalterado" as const, existingId: ex.id, selected: false };
+          }
+          // pre-fill fornecedor/motorista IDs from existing record so the user doesn't re-pick them
+          const fornecedorMatch = fornecedores.find((f) => norm(f.razaoSocial) === norm(ex.fornecedor));
+          const motoristaMatch = motoristas.find((m) => norm(m.nome) === norm(ex.motorista));
+          return {
+            ...p,
+            status: "alterado" as const,
+            existingId: ex.id,
+            changedFields: changed,
+            fornecedorId: fornecedorMatch?.id || p.fornecedorId,
+            motoristaId: motoristaMatch?.id || p.motoristaId,
+            custo: ex.custo ? String(ex.custo) : p.custo,
+          };
+        });
+        const novos = tagged.filter((t) => t.status === "novo").length;
+        const alterados = tagged.filter((t) => t.status === "alterado").length;
+        const iguais = tagged.filter((t) => t.status === "inalterado").length;
+        setServices(tagged);
+        toast.success(`${tagged.length} serviço(s) lido(s). ${novos} novo(s), ${alterados} alterado(s), ${iguais} sem mudanças.`);
       }
     } catch (e: any) {
       console.error(e);
