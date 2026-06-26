@@ -31,6 +31,10 @@ interface ParsedService {
   fornecedorId: string;
   motoristaId: string;
   custo: string;
+  // duplicate-detection metadata (filled after comparing with existing agenda items)
+  status?: "novo" | "alterado" | "inalterado";
+  existingId?: string;
+  changedFields?: string[];
 }
 
 interface Props {
