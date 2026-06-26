@@ -1,5 +1,5 @@
 import { useState, useMemo, useCallback, useEffect } from "react";
-import { CalendarDays, ListChecks, Truck, Building2, Plus, BarChart3, Printer, EyeOff, Eye, ShoppingCart, FileText, Search, Trash2, ClipboardList, Archive, FileSpreadsheet, X, DollarSign, ChevronDown, MessageCircle, Users } from "lucide-react";
+import { CalendarDays, ListChecks, Truck, Building2, Plus, BarChart3, Printer, EyeOff, Eye, ShoppingCart, FileText, Search, Trash2, ClipboardList, Archive, FileSpreadsheet, X, DollarSign, ChevronDown, MessageCircle, Users, Upload } from "lucide-react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import logo from "@/assets/logo-executive-service.png";
 import { Link, useNavigate } from "react-router-dom";
@@ -80,6 +80,7 @@ const Index = () => {
   const [printWithFinancials, setPrintWithFinancials] = useState(true);
   const [activeTab, setActiveTab] = useState("agenda");
   const [contatosDialogOpen, setContatosDialogOpen] = useState(false);
+  const [importPdfDialogOpen, setImportPdfDialogOpen] = useState(false);
 
   // Fechamento dialog state
   const [fechamentoDialogOpen, setFechamentoDialogOpen] = useState(false);
@@ -714,6 +715,10 @@ const Index = () => {
                   <FileText className="h-4 w-4" />
                   Fechamentos
                 </Button>
+                <Button variant="outline" size="sm" onClick={() => setImportPdfDialogOpen(true)} className="gap-2">
+                  <Upload className="h-4 w-4" />
+                  Importar PDF
+                </Button>
                 <Button onClick={() => setNovoDialogOpen(true)} className="gap-2">
                   <Plus className="h-4 w-4" />
                   Novo Serviço
@@ -723,6 +728,7 @@ const Index = () => {
             <AgendaTable items={filteredData} onEdited={reloadData} hideFinancials={!showFinancials} onClone={(item) => { setCloneData(item); setNovoDialogOpen(true); }} />
             <NovoServicoDialog open={novoDialogOpen} onOpenChange={(v) => { setNovoDialogOpen(v); if (!v) setCloneData(null); }} onSaved={reloadData} initialData={cloneData} />
             <ContatosMotoristasDialog open={contatosDialogOpen} onOpenChange={setContatosDialogOpen} items={filteredData} />
+            <ImportarPDFDialog open={importPdfDialogOpen} onOpenChange={setImportPdfDialogOpen} onImported={reloadData} />
           </TabsContent>
 
           <TabsContent value="lixeira" className="space-y-4">
