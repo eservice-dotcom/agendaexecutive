@@ -21,6 +21,7 @@ import FechamentosConsulta from "@/components/FechamentosConsulta";
 import { getAgendaItems } from "@/data/cadastroStorage";
 import AgendaLixeira from "@/components/AgendaLixeira";
 import ContatosMotoristasDialog from "@/components/ContatosMotoristasDialog";
+import ImportarPDFDialog from "@/components/ImportarPDFDialog";
 import { printAgenda } from "@/lib/printUtils";
 import { generateClosingReport } from "@/lib/closingReport";
 import { generateClosingReportExcel } from "@/lib/closingReportExcel";
