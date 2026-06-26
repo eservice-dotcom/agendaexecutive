@@ -717,7 +717,7 @@ const Index = () => {
                 </Button>
                 <Button variant="outline" size="sm" onClick={() => setImportPdfDialogOpen(true)} className="gap-2">
                   <Upload className="h-4 w-4" />
-                  Importar PDF
+                  PDF Shift
                 </Button>
                 <Button onClick={() => setNovoDialogOpen(true)} className="gap-2">
                   <Plus className="h-4 w-4" />
