@@ -477,6 +477,7 @@ const ImportarPDFDialog = ({ open, onOpenChange, onImported }: Props) => {
                   <thead className="bg-muted">
                     <tr>
                       <th className="p-2"><Checkbox checked={services.every(s => s.selected)} onCheckedChange={(v) => setServices(prev => prev.map(s => ({ ...s, selected: !!v })))} /></th>
+                      <th className="p-2 text-left">Status</th>
                       <th className="p-2 text-left">SHT</th>
                       <th className="p-2 text-left">Data</th>
                       <th className="p-2 text-left">Hora</th>
