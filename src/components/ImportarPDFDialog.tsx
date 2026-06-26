@@ -89,15 +89,35 @@ const parsePDF = async (file: File): Promise<ParsedService[]> => {
     allLines.push(...lines, "---PAGE---");
   }
 
-  // Split into service blocks by SHT marker
+  // Split into service blocks by SHT marker. The "Veículo X" line precedes the SHT line in this layout,
+  // so we look back one line when starting a new block.
   const fullText = allLines.join("\n");
-  const blocks: { sht: string; lines: string[] }[] = [];
-  let current: { sht: string; lines: string[] } | null = null;
-  for (const line of allLines) {
+  const blocks: { sht: string; lines: string[]; veiculo?: string; tipo?: string }[] = [];
+  let current: { sht: string; lines: string[]; veiculo?: string; tipo?: string } | null = null;
+  for (let i = 0; i < allLines.length; i++) {
+    const line = allLines[i];
     const shtMatch = line.match(/SHT-(\d+)/);
     if (shtMatch && /Servi[çc]o\s*-\s*SHT/i.test(line)) {
       if (current) blocks.push(current);
-      current = { sht: shtMatch[1], lines: [line] };
+      // Look back for "Veículo <tipo>" line (skip blanks/page markers)
+      let veiculo = "";
+      for (let j = i - 1; j >= 0 && j >= i - 4; j--) {
+        const prev = allLines[j];
+        if (!prev || prev === "---PAGE---") continue;
+        const vm = prev.match(/^\s*Ve[íi]culo\s+(.+?)\s*$/i);
+        if (vm) { veiculo = vm[1].trim(); break; }
+        // stop if we hit another structural line
+        if (/Fornecedor:|Cliente Final:|À Faturar:|SHT-/i.test(prev)) break;
+      }
+      // Tipo de serviço appears on the same SHT line after the second column (TAB-separated)
+      // e.g. "1\tServiço - SHT-1769088\tServiço Traslado (Ida ou Volta)"
+      let tipo = "";
+      const cols = line.split("\t");
+      for (const c of cols) {
+        const tm = c.match(/^\s*Servi[çc]o\s+(.+)$/i);
+        if (tm && !/SHT-/i.test(c)) { tipo = tm[1].trim(); break; }
+      }
+      current = { sht: shtMatch[1], lines: [line], veiculo, tipo };
     } else if (current) {
       current.lines.push(line);
     }
@@ -111,18 +131,23 @@ const parsePDF = async (file: File): Promise<ParsedService[]> => {
     const dataSa = text.match(/Data de Sa[íi]da[^\d]*(\d{2}-\d{2}-\d{4})\s+(\d{2}:\d{2})/i);
     const valorM = text.match(/Valor\s*R\$\s*([\d.]+,\d{2})/i);
 
-    // Veículo & tipo serviço — appear near the SHT line. Look at lines containing the labels.
-    let veiculo = "";
-    let tipo = "";
-    for (const ln of b.lines) {
-      const v = ln.match(/Ve[íi]culo\s+(.+?)(?:\s+Servi[çc]o\s+(.+?))?$/i);
-      if (v) {
-        if (!veiculo && v[1] && !/SHT-/i.test(v[1])) veiculo = v[1].trim();
-        if (v[2]) { tipo = v[2].trim(); break; }
+    // Veículo & tipo serviço — preferentially from the block header captured above; fallback to scanning lines.
+    let veiculo = b.veiculo || "";
+    let tipo = b.tipo || "";
+    if (!veiculo || !tipo) {
+      for (const ln of b.lines) {
+        if (!veiculo) {
+          const v = ln.match(/^\s*Ve[íi]culo\s+(.+?)\s*$/i);
+          if (v && !/SHT-/i.test(v[1])) veiculo = v[1].trim();
+        }
+        if (!tipo) {
+          const t = ln.match(/^\s*Servi[çc]o\s+([A-Za-zÀ-ÿ].+)$/);
+          if (t && !/SHT-/i.test(ln)) tipo = t[1].trim();
+        }
+        if (veiculo && tipo) break;
       }
-      const t = ln.match(/^\s*Servi[çc]o\s+([A-Za-zÀ-ÿ].+)$/);
-      if (t && !/SHT-/i.test(ln) && !tipo) tipo = t[1].trim();
     }
+
 
     // (origem/destino computed below using two-column layout)
     // Local de Apresentação & Local de Destino — labels appear BELOW the address text in two columns separated by a TAB.
