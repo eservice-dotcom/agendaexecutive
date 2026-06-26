@@ -379,8 +379,10 @@ const ImportarPDFDialog = ({ open, onOpenChange, onImported }: Props) => {
                       <th className="p-2 text-left">SHT</th>
                       <th className="p-2 text-left">Data</th>
                       <th className="p-2 text-left">Hora</th>
-                      <th className="p-2 text-left">Tipo</th>
-                      <th className="p-2 text-left">Veículo</th>
+                      <th className="p-2 text-left">Tipo Serviço</th>
+                      <th className="p-2 text-left">Tipo Veículo</th>
+                      <th className="p-2 text-left">Origem</th>
+                      <th className="p-2 text-left">Destino</th>
                       <th className="p-2 text-left">Valor</th>
                       <th className="p-2 text-left">PAX</th>
                       <th className="p-2 text-left">Fornecedor</th>
@@ -414,7 +416,13 @@ const ImportarPDFDialog = ({ open, onOpenChange, onImported }: Props) => {
                           </Select>
                         </td>
                         <td className="p-1">
-                          <Input value={s.veiculoTipo} onChange={(e) => updateService(idx, { veiculoTipo: e.target.value })} className="h-8 w-32" />
+                          <Input value={s.veiculoTipo} onChange={(e) => updateService(idx, { veiculoTipo: e.target.value })} className="h-8 w-36" />
+                        </td>
+                        <td className="p-1">
+                          <Input value={s.origem} onChange={(e) => updateService(idx, { origem: e.target.value })} className="h-8 w-56" title={s.origem} />
+                        </td>
+                        <td className="p-1">
+                          <Input value={s.destino} onChange={(e) => updateService(idx, { destino: e.target.value })} className="h-8 w-56" title={s.destino} />
                         </td>
                         <td className="p-1">
                           <Input type="number" step="0.01" value={s.valor} onChange={(e) => updateService(idx, { valor: parseFloat(e.target.value) || 0 })} className="h-8 w-24" />
