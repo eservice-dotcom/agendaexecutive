@@ -346,42 +346,75 @@ const ImportarPDFDialog = ({ open, onOpenChange, onImported }: Props) => {
     }
 
     setSaving(true);
-    let ok = 0, fail = 0;
+    // Load existing items once so we can preserve manual fields on update
+    let existingItems: any[] = [];
+    try { existingItems = await getAgendaItems(); } catch {}
+    const existingById = new Map(existingItems.map((i) => [i.id, i]));
+    let inseridos = 0, atualizados = 0, fail = 0;
     for (const s of toImport) {
       try {
         const forn = fornecedores.find((f) => f.id === s.fornecedorId);
         const mot = motoristas.find((m) => m.id === s.motoristaId);
-        await saveAgendaItem({
-          data: s.data,
-          hora: s.hora,
-          cliente: clienteNome,
-          pax: s.passageiros.length,
-          passageiros: s.passageiros,
-          cot: s.sht, // O.S. = SHT
-          tipo: s.tipo,
-          origem: s.origem,
-          destino: s.destino,
-          placa: "",
-          veiculo: s.veiculoTipo,
-          motorista: mot?.nome || "",
-          telefone: mot?.telefone || "",
-          valor: s.valor,
-          fornecedor: forn?.razaoSocial || "",
-          custo: forn?.razaoSocial?.toLowerCase().includes("executive") ? 0 : (parseFloat(s.custo) || 0),
-          observacoes: s.observacoes,
-          receptivo: "",
-          statusFaturamento: "",
-          outrosDespesas: [],
-        } as any);
-        ok++;
+        if (s.status === "alterado" && s.existingId && existingById.has(s.existingId)) {
+          // Preserve manual fields (placa, km, hora_in/fim, extras, anexos, etc.) and only overwrite PDF-derived fields + the chosen fornecedor/motorista/custo.
+          const prev = existingById.get(s.existingId);
+          await updateAgendaItem({
+            ...prev,
+            data: s.data,
+            hora: s.hora,
+            cliente: clienteNome,
+            pax: s.passageiros.length,
+            passageiros: s.passageiros,
+            cot: s.sht,
+            tipo: s.tipo,
+            origem: s.origem,
+            destino: s.destino,
+            veiculo: s.veiculoTipo,
+            valor: s.valor,
+            observacoes: s.observacoes,
+            motorista: mot?.nome || prev.motorista || "",
+            telefone: mot?.telefone || prev.telefone || "",
+            fornecedor: forn?.razaoSocial || prev.fornecedor || "",
+            custo: forn?.razaoSocial?.toLowerCase().includes("executive")
+              ? 0
+              : (parseFloat(s.custo) || Number(prev.custo) || 0),
+          });
+          atualizados++;
+        } else {
+          await saveAgendaItem({
+            data: s.data,
+            hora: s.hora,
+            cliente: clienteNome,
+            pax: s.passageiros.length,
+            passageiros: s.passageiros,
+            cot: s.sht,
+            tipo: s.tipo,
+            origem: s.origem,
+            destino: s.destino,
+            placa: "",
+            veiculo: s.veiculoTipo,
+            motorista: mot?.nome || "",
+            telefone: mot?.telefone || "",
+            valor: s.valor,
+            fornecedor: forn?.razaoSocial || "",
+            custo: forn?.razaoSocial?.toLowerCase().includes("executive") ? 0 : (parseFloat(s.custo) || 0),
+            observacoes: s.observacoes,
+            receptivo: "",
+            statusFaturamento: "",
+            outrosDespesas: [],
+          } as any);
+          inseridos++;
+        }
       } catch (e) {
         console.error("Erro ao importar SHT", s.sht, e);
         fail++;
       }
     }
     setSaving(false);
-    toast.success(`${ok} serviço(s) importado(s).${fail ? ` ${fail} falharam.` : ""}`);
-    if (ok > 0) {
+    toast.success(
+      `${inseridos} novo(s), ${atualizados} atualizado(s).` + (fail ? ` ${fail} falharam.` : "")
+    );
+    if (inseridos + atualizados > 0) {
       onImported();
       onOpenChange(false);
     }
