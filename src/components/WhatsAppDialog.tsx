@@ -4,7 +4,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { getMensagens } from "@/data/mensagensData";
 import { AgendaItem } from "@/data/agendaData";
 import { useState, useMemo } from "react";
-import { MessageCircle, Send, FileText, CalendarDays } from "lucide-react";
+import { MessageCircle, Send, FileText, CalendarDays, Paperclip, ExternalLink } from "lucide-react";
+import { toast } from "sonner";
 
 interface WhatsAppDialogProps {
   open: boolean;
