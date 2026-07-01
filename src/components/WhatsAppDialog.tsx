@@ -164,8 +164,12 @@ const WhatsAppDialog = ({ open, onOpenChange, item, allItems = [], onSent }: Wha
   };
 
   const handleSend = () => {
-    const phone = item.telefone.replace(/\D/g, "");
-    const phoneWithCountry = phone.startsWith("55") ? phone : `55${phone}`;
+    const rawPhone = (item.telefone || "").replace(/\D/g, "");
+    if (!rawPhone) {
+      toast.error("Motorista sem telefone cadastrado.");
+      return;
+    }
+    const phoneWithCountry = rawPhone.startsWith("55") ? rawPhone : `55${rawPhone}`;
 
     let mensagemFinalComPlaca = mensagemFinal;
     if (placasAnexos.length > 0) {
