@@ -16,25 +16,27 @@ interface WhatsAppDialogProps {
 }
 
 const replacePlaceholders = (texto: string, item: AgendaItem) => {
-  const [y, m, d] = item.data.split("-");
-  const voos = item.passageiros.length > 0
-    ? [...new Set(item.passageiros.map(p => p.voo).filter(Boolean))].join(", ")
+  const dataStr = item.data || "";
+  const [y, m, d] = dataStr.includes("-") ? dataStr.split("-") : ["", "", ""];
+  const passageirosArr = item.passageiros || [];
+  const voos = passageirosArr.length > 0
+    ? [...new Set(passageirosArr.map(p => p.voo).filter(Boolean))].join(", ")
     : "—";
-  const passageiros = item.passageiros.length > 0
-    ? item.passageiros.map(p => p.nome).filter(Boolean).join(", ")
+  const passageiros = passageirosArr.length > 0
+    ? passageirosArr.map(p => p.nome).filter(Boolean).join(", ")
     : "—";
   return texto
-    .replace(/{data}/g, `${d}/${m}/${y}`)
-    .replace(/{hora}/g, item.hora)
-    .replace(/{cliente}/g, item.cliente)
-    .replace(/{origem}/g, item.origem)
-    .replace(/{destino}/g, item.destino)
-    .replace(/{veiculo}/g, item.veiculo)
-    .replace(/{placa}/g, item.placa)
-    .replace(/{motorista}/g, item.motorista)
-    .replace(/{pax}/g, String(item.pax))
-    .replace(/{cot}/g, item.cot)
-    .replace(/{tipo}/g, item.tipo)
+    .replace(/{data}/g, y ? `${d}/${m}/${y}` : "—")
+    .replace(/{hora}/g, item.hora || "—")
+    .replace(/{cliente}/g, item.cliente || "—")
+    .replace(/{origem}/g, item.origem || "—")
+    .replace(/{destino}/g, item.destino || "—")
+    .replace(/{veiculo}/g, item.veiculo || "—")
+    .replace(/{placa}/g, item.placa || "—")
+    .replace(/{motorista}/g, item.motorista || "—")
+    .replace(/{pax}/g, String(item.pax ?? ""))
+    .replace(/{cot}/g, item.cot || "—")
+    .replace(/{tipo}/g, item.tipo || "—")
     .replace(/{voos}/g, voos)
     .replace(/{passageiros}/g, passageiros)
     .replace(/{observacoes}/g, item.observacoes || "—");
