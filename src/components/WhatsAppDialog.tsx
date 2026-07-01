@@ -16,25 +16,27 @@ interface WhatsAppDialogProps {
 }
 
 const replacePlaceholders = (texto: string, item: AgendaItem) => {
-  const [y, m, d] = item.data.split("-");
-  const voos = item.passageiros.length > 0
-    ? [...new Set(item.passageiros.map(p => p.voo).filter(Boolean))].join(", ")
+  const dataStr = item.data || "";
+  const [y, m, d] = dataStr.includes("-") ? dataStr.split("-") : ["", "", ""];
+  const passageirosArr = item.passageiros || [];
+  const voos = passageirosArr.length > 0
+    ? [...new Set(passageirosArr.map(p => p.voo).filter(Boolean))].join(", ")
     : "—";
-  const passageiros = item.passageiros.length > 0
-    ? item.passageiros.map(p => p.nome).filter(Boolean).join(", ")
+  const passageiros = passageirosArr.length > 0
+    ? passageirosArr.map(p => p.nome).filter(Boolean).join(", ")
     : "—";
   return texto
-    .replace(/{data}/g, `${d}/${m}/${y}`)
-    .replace(/{hora}/g, item.hora)
-    .replace(/{cliente}/g, item.cliente)
-    .replace(/{origem}/g, item.origem)
-    .replace(/{destino}/g, item.destino)
-    .replace(/{veiculo}/g, item.veiculo)
-    .replace(/{placa}/g, item.placa)
-    .replace(/{motorista}/g, item.motorista)
-    .replace(/{pax}/g, String(item.pax))
-    .replace(/{cot}/g, item.cot)
-    .replace(/{tipo}/g, item.tipo)
+    .replace(/{data}/g, y ? `${d}/${m}/${y}` : "—")
+    .replace(/{hora}/g, item.hora || "—")
+    .replace(/{cliente}/g, item.cliente || "—")
+    .replace(/{origem}/g, item.origem || "—")
+    .replace(/{destino}/g, item.destino || "—")
+    .replace(/{veiculo}/g, item.veiculo || "—")
+    .replace(/{placa}/g, item.placa || "—")
+    .replace(/{motorista}/g, item.motorista || "—")
+    .replace(/{pax}/g, String(item.pax ?? ""))
+    .replace(/{cot}/g, item.cot || "—")
+    .replace(/{tipo}/g, item.tipo || "—")
     .replace(/{voos}/g, voos)
     .replace(/{passageiros}/g, passageiros)
     .replace(/{observacoes}/g, item.observacoes || "—");
@@ -43,18 +45,20 @@ const replacePlaceholders = (texto: string, item: AgendaItem) => {
 const buildConsolidatedMessage = (items: AgendaItem[]) => {
   if (items.length === 0) return "";
   const first = items[0];
-  const [y, m, d] = first.data.split("-");
-  const dataFormatada = `${d}/${m}/${y}`;
+  const dataStr = first.data || "";
+  const [y, m, d] = dataStr.includes("-") ? dataStr.split("-") : ["", "", ""];
+  const dataFormatada = y ? `${d}/${m}/${y}` : "—";
   const hasMultipleDates = new Set(items.map((i) => i.data)).size > 1;
 
-  let msg = `Olá ${first.motorista}! Seguem os serviços do dia ${dataFormatada}:\n`;
+  let msg = `Olá ${first.motorista || ""}! Seguem os serviços do dia ${dataFormatada}:\n`;
 
   items
     .slice()
-    .sort((a, b) => (a.data + a.hora).localeCompare(b.data + b.hora))
+    .sort((a, b) => ((a.data || "") + (a.hora || "")).localeCompare((b.data || "") + (b.hora || "")))
     .forEach((item, idx) => {
-      const passageirosDetalhados = item.passageiros.length > 0
-        ? item.passageiros
+      const passageirosArr = item.passageiros || [];
+      const passageirosDetalhados = passageirosArr.length > 0
+        ? passageirosArr
             .map(p => {
               const partes = [p.nome].filter(Boolean);
               if (p.voo) partes.push(`Voo ${p.voo}`);
@@ -64,20 +68,21 @@ const buildConsolidatedMessage = (items: AgendaItem[]) => {
             .filter(Boolean)
             .join("\n   • ")
         : "—";
-      const voos = item.passageiros.length > 0
-        ? [...new Set(item.passageiros.map(p => p.voo).filter(Boolean))].join(", ") || "—"
+      const voos = passageirosArr.length > 0
+        ? [...new Set(passageirosArr.map(p => p.voo).filter(Boolean))].join(", ") || "—"
         : "—";
-      const [iy, im, id] = item.data.split("-");
-      const horaLabel = hasMultipleDates ? `${id}/${im} ${item.hora}` : item.hora;
+      const itemData = item.data || "";
+      const [, im, id] = itemData.includes("-") ? itemData.split("-") : ["", "", ""];
+      const horaLabel = hasMultipleDates && im ? `${id}/${im} ${item.hora || ""}` : (item.hora || "");
 
       msg += `\n*Serviço ${idx + 1}*\n`;
       msg += `⏰ Hora: ${horaLabel}\n`;
-      msg += `🏢 Cliente: ${item.cliente}\n`;
-      msg += `👥 SHT: ${item.pax}\n`;
-      msg += `👤 Passageiros:${item.passageiros.length > 1 ? "\n   • " : " "}${passageirosDetalhados}\n`;
+      msg += `🏢 Cliente: ${item.cliente || "—"}\n`;
+      msg += `👥 SHT: ${item.pax ?? ""}\n`;
+      msg += `👤 Passageiros:${passageirosArr.length > 1 ? "\n   • " : " "}${passageirosDetalhados}\n`;
       msg += `✈️ Voo: ${voos}\n`;
-      msg += `📍 Origem: ${item.origem}\n`;
-      msg += `📍 Destino: ${item.destino}\n`;
+      msg += `📍 Origem: ${item.origem || "—"}\n`;
+      msg += `📍 Destino: ${item.destino || "—"}\n`;
       if (item.observacoes) {
         msg += `📝 Obs: ${item.observacoes}\n`;
       }
@@ -101,9 +106,10 @@ const WhatsAppDialog = ({ open, onOpenChange, item, allItems = [], onSent }: Wha
   }, [item, allItems]);
 
   const allDriverDayItems = useMemo(() => {
-    if (!item) return [];
+    if (!item || !item.data || !item.data.includes("-")) return [];
     // Próximo dia (para incluir serviços agendados até 01:00 do dia seguinte)
     const [y, m, d] = item.data.split("-").map(Number);
+    if (!y || !m || !d) return [];
     const next = new Date(Date.UTC(y, m - 1, d));
     next.setUTCDate(next.getUTCDate() + 1);
     const nextStr = `${next.getUTCFullYear()}-${String(next.getUTCMonth() + 1).padStart(2, "0")}-${String(next.getUTCDate()).padStart(2, "0")}`;
@@ -115,7 +121,7 @@ const WhatsAppDialog = ({ open, onOpenChange, item, allItems = [], onSent }: Wha
         if (i.data === nextStr && i.hora && i.hora <= "01:00") return true;
         return false;
       })
-      .sort((a, b) => (a.data + a.hora).localeCompare(b.data + b.hora));
+      .sort((a, b) => ((a.data || "") + (a.hora || "")).localeCompare((b.data || "") + (b.hora || "")));
   }, [item, allItems]);
 
   if (!item) return null;
@@ -158,8 +164,12 @@ const WhatsAppDialog = ({ open, onOpenChange, item, allItems = [], onSent }: Wha
   };
 
   const handleSend = () => {
-    const phone = item.telefone.replace(/\D/g, "");
-    const phoneWithCountry = phone.startsWith("55") ? phone : `55${phone}`;
+    const rawPhone = (item.telefone || "").replace(/\D/g, "");
+    if (!rawPhone) {
+      toast.error("Motorista sem telefone cadastrado.");
+      return;
+    }
+    const phoneWithCountry = rawPhone.startsWith("55") ? rawPhone : `55${rawPhone}`;
 
     let mensagemFinalComPlaca = mensagemFinal;
     if (placasAnexos.length > 0) {
@@ -207,7 +217,7 @@ const WhatsAppDialog = ({ open, onOpenChange, item, allItems = [], onSent }: Wha
             Enviar WhatsApp
           </DialogTitle>
           <DialogDescription>
-            Para: <strong>{item.motorista}</strong> — {item.telefone}
+            Para: <strong>{item.motorista || "—"}</strong> — {item.telefone || "sem telefone"}
           </DialogDescription>
         </DialogHeader>
 
