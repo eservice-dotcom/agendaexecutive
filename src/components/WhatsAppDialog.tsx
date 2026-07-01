@@ -7,6 +7,14 @@ import { useState, useMemo } from "react";
 import { MessageCircle, Send, FileText, CalendarDays, Paperclip, ExternalLink } from "lucide-react";
 import { toast } from "sonner";
 
+const collectAttachmentUrls = (i: Partial<AgendaItem> | null | undefined): string[] => {
+  if (!i) return [];
+  return [
+    ...(i.placaReceptivoUrl ? [i.placaReceptivoUrl] : []),
+    ...((i.placaReceptivoUrls || []) as string[]),
+  ].filter(Boolean);
+};
+
 interface WhatsAppDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -124,6 +132,12 @@ const WhatsAppDialog = ({ open, onOpenChange, item, allItems = [], onSent }: Wha
       .sort((a, b) => ((a.data || "") + (a.hora || "")).localeCompare((b.data || "") + (b.hora || "")));
   }, [item, allItems]);
 
+  const placasAnexos = useMemo(() => {
+    if (!item) return [] as string[];
+    const source = modoConsolidado ? allDriverDayItems : [item];
+    return [...new Set(source.flatMap(collectAttachmentUrls))] as string[];
+  }, [item, modoConsolidado, allDriverDayItems]);
+
   if (!item) return null;
 
   const handleSelectTemplate = (id: string) => {
@@ -140,17 +154,6 @@ const WhatsAppDialog = ({ open, onOpenChange, item, allItems = [], onSent }: Wha
     setModoConsolidado(true);
     setMensagemFinal(buildConsolidatedMessage(allDriverDayItems));
   };
-
-  const collectUrls = (i: any): string[] => [
-    ...(i.placaReceptivoUrl ? [i.placaReceptivoUrl] : []),
-    ...((i.placaReceptivoUrls || []) as string[]),
-  ];
-
-  const placasAnexos = useMemo(() => {
-    if (!item) return [] as string[];
-    const source = modoConsolidado ? allDriverDayItems : [item];
-    return [...new Set(source.flatMap(collectUrls).filter(Boolean))] as string[];
-  }, [item, modoConsolidado, allDriverDayItems]);
 
   const openAttachment = (url: string) => {
     // Usa <a> click em vez de window.open — não é bloqueado por popup blockers
