@@ -217,7 +217,7 @@ const WhatsAppDialog = ({ open, onOpenChange, item, allItems = [], onSent }: Wha
             Enviar WhatsApp
           </DialogTitle>
           <DialogDescription>
-            Para: <strong>{item.motorista}</strong> — {item.telefone}
+            Para: <strong>{item.motorista || "—"}</strong> — {item.telefone || "sem telefone"}
           </DialogDescription>
         </DialogHeader>
 
