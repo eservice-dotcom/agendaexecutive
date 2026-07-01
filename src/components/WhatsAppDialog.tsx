@@ -267,6 +267,30 @@ const WhatsAppDialog = ({ open, onOpenChange, item, allItems = [], onSent }: Wha
                 rows={6}
                 className="text-sm"
               />
+
+              {placasAnexos.length > 0 && (
+                <div className="rounded-md border border-amber-300 bg-amber-50 p-2 space-y-1.5">
+                  <p className="flex items-center gap-1.5 text-xs font-semibold text-amber-900">
+                    <Paperclip className="h-3.5 w-3.5" />
+                    {placasAnexos.length} anexo(s) de placa/receptivo — abra e anexe manualmente no WhatsApp
+                  </p>
+                  {placasAnexos.map((u, i) => {
+                    const name = u.split("/").pop()?.split("?")[0] || `Anexo ${i + 1}`;
+                    return (
+                      <button
+                        key={u}
+                        type="button"
+                        onClick={() => openAttachment(u)}
+                        className="flex w-full items-center gap-2 rounded border border-amber-200 bg-white px-2 py-1 text-left text-xs text-amber-900 hover:bg-amber-100"
+                      >
+                        <ExternalLink className="h-3 w-3 shrink-0" />
+                        <span className="truncate">{name}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
+
               <Button onClick={handleSend} className="w-full gap-2">
                 <Send className="h-4 w-4" />
                 Enviar via WhatsApp
