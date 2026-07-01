@@ -4,7 +4,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { getMensagens } from "@/data/mensagensData";
 import { AgendaItem } from "@/data/agendaData";
 import { useState, useMemo } from "react";
-import { MessageCircle, Send, FileText, CalendarDays } from "lucide-react";
+import { MessageCircle, Send, FileText, CalendarDays, Paperclip, ExternalLink } from "lucide-react";
+import { toast } from "sonner";
 
 interface WhatsAppDialogProps {
   open: boolean;
@@ -134,37 +135,50 @@ const WhatsAppDialog = ({ open, onOpenChange, item, allItems = [], onSent }: Wha
     setMensagemFinal(buildConsolidatedMessage(allDriverDayItems));
   };
 
+  const collectUrls = (i: any): string[] => [
+    ...(i.placaReceptivoUrl ? [i.placaReceptivoUrl] : []),
+    ...((i.placaReceptivoUrls || []) as string[]),
+  ];
+
+  const placasAnexos = useMemo(() => {
+    if (!item) return [] as string[];
+    const source = modoConsolidado ? allDriverDayItems : [item];
+    return [...new Set(source.flatMap(collectUrls).filter(Boolean))] as string[];
+  }, [item, modoConsolidado, allDriverDayItems]);
+
+  const openAttachment = (url: string) => {
+    // Usa <a> click em vez de window.open — não é bloqueado por popup blockers
+    const a = document.createElement("a");
+    a.href = url;
+    a.target = "_blank";
+    a.rel = "noopener noreferrer";
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+  };
+
   const handleSend = () => {
     const phone = item.telefone.replace(/\D/g, "");
     const phoneWithCountry = phone.startsWith("55") ? phone : `55${phone}`;
 
-    // Anexa link da placa de receptivo (se houver) ao final da mensagem.
-    // No modo consolidado, agrupa todos os links únicos dos serviços do dia.
-    const collectUrls = (i: any): string[] => [
-      ...(i.placaReceptivoUrl ? [i.placaReceptivoUrl] : []),
-      ...((i.placaReceptivoUrls || []) as string[]),
-    ];
-    const placas = modoConsolidado
-      ? [...new Set(allDriverDayItems.flatMap(collectUrls).filter(Boolean))]
-      : ([...new Set(collectUrls(item))] as string[]);
-
     let mensagemFinalComPlaca = mensagemFinal;
-    if (placas.length > 0) {
-      mensagemFinalComPlaca += `\n\n📎 Placa de receptivo:\n${placas.join("\n")}`;
+    if (placasAnexos.length > 0) {
+      mensagemFinalComPlaca += `\n\n📎 Placa de receptivo (anexar manualmente):\n${placasAnexos.join("\n")}`;
     }
 
     const encoded = encodeURIComponent(mensagemFinalComPlaca);
-    // Em desktop, wa.me abre o WhatsApp nativo via protocolo whatsapp:// que corrompe
-    // emojis de plano suplementar (🏢 👥 📍). web.whatsapp.com preserva UTF-8 corretamente.
     const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
     const url = isMobile
       ? `https://wa.me/${phoneWithCountry}?text=${encoded}`
       : `https://web.whatsapp.com/send?phone=${phoneWithCountry}&text=${encoded}`;
     window.open(url, "_blank");
 
-    // Abre cada arquivo de placa em nova aba para que o usuário possa baixar
-    // ou anexar manualmente no WhatsApp (a API web não permite anexar via URL).
-    placas.forEach((u) => window.open(u, "_blank"));
+    // Abre cada anexo via anchor click (evita bloqueio de popup em série)
+    placasAnexos.forEach((u, idx) => setTimeout(() => openAttachment(u), 300 * (idx + 1)));
+
+    if (placasAnexos.length > 0) {
+      toast.info(`${placasAnexos.length} anexo(s) aberto(s) em nova aba — arraste para o WhatsApp para enviar.`);
+    }
 
     if (item) {
       onSent?.(item, modoConsolidado ? allDriverDayItems : undefined);
@@ -253,6 +267,30 @@ const WhatsAppDialog = ({ open, onOpenChange, item, allItems = [], onSent }: Wha
                 rows={6}
                 className="text-sm"
               />
+
+              {placasAnexos.length > 0 && (
+                <div className="rounded-md border border-amber-300 bg-amber-50 p-2 space-y-1.5">
+                  <p className="flex items-center gap-1.5 text-xs font-semibold text-amber-900">
+                    <Paperclip className="h-3.5 w-3.5" />
+                    {placasAnexos.length} anexo(s) de placa/receptivo — abra e anexe manualmente no WhatsApp
+                  </p>
+                  {placasAnexos.map((u, i) => {
+                    const name = u.split("/").pop()?.split("?")[0] || `Anexo ${i + 1}`;
+                    return (
+                      <button
+                        key={u}
+                        type="button"
+                        onClick={() => openAttachment(u)}
+                        className="flex w-full items-center gap-2 rounded border border-amber-200 bg-white px-2 py-1 text-left text-xs text-amber-900 hover:bg-amber-100"
+                      >
+                        <ExternalLink className="h-3 w-3 shrink-0" />
+                        <span className="truncate">{name}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
+
               <Button onClick={handleSend} className="w-full gap-2">
                 <Send className="h-4 w-4" />
                 Enviar via WhatsApp
