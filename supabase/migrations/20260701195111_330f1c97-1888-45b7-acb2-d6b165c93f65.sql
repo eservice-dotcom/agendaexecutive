@@ -1,0 +1,1 @@
+UPDATE public.agenda_items SET cot = TRIM(cot) WHERE cot IS NOT NULL AND cot <> TRIM(cot);

@@ -138,7 +138,7 @@ const Index = () => {
           return false;
         }
         if (filters.cliente && !item.cliente.toLowerCase().includes(filters.cliente.toLowerCase())) return false;
-        if (filters.os && item.cot.toLowerCase() !== filters.os.toLowerCase()) return false;
+        if (filters.os && (item.cot || "").trim().toLowerCase() !== filters.os.trim().toLowerCase()) return false;
         if (filters.placa && !item.placa.toLowerCase().includes(filters.placa.toLowerCase())) return false;
         if (filters.dataInicio && item.data < filters.dataInicio) return false;
         if (filters.dataFim && item.data > filters.dataFim) return false;
