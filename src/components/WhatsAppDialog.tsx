@@ -106,9 +106,10 @@ const WhatsAppDialog = ({ open, onOpenChange, item, allItems = [], onSent }: Wha
   }, [item, allItems]);
 
   const allDriverDayItems = useMemo(() => {
-    if (!item) return [];
+    if (!item || !item.data || !item.data.includes("-")) return [];
     // Próximo dia (para incluir serviços agendados até 01:00 do dia seguinte)
     const [y, m, d] = item.data.split("-").map(Number);
+    if (!y || !m || !d) return [];
     const next = new Date(Date.UTC(y, m - 1, d));
     next.setUTCDate(next.getUTCDate() + 1);
     const nextStr = `${next.getUTCFullYear()}-${String(next.getUTCMonth() + 1).padStart(2, "0")}-${String(next.getUTCDate()).padStart(2, "0")}`;
@@ -120,7 +121,7 @@ const WhatsAppDialog = ({ open, onOpenChange, item, allItems = [], onSent }: Wha
         if (i.data === nextStr && i.hora && i.hora <= "01:00") return true;
         return false;
       })
-      .sort((a, b) => (a.data + a.hora).localeCompare(b.data + b.hora));
+      .sort((a, b) => ((a.data || "") + (a.hora || "")).localeCompare((b.data || "") + (b.hora || "")));
   }, [item, allItems]);
 
   if (!item) return null;
