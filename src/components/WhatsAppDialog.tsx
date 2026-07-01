@@ -45,18 +45,20 @@ const replacePlaceholders = (texto: string, item: AgendaItem) => {
 const buildConsolidatedMessage = (items: AgendaItem[]) => {
   if (items.length === 0) return "";
   const first = items[0];
-  const [y, m, d] = first.data.split("-");
-  const dataFormatada = `${d}/${m}/${y}`;
+  const dataStr = first.data || "";
+  const [y, m, d] = dataStr.includes("-") ? dataStr.split("-") : ["", "", ""];
+  const dataFormatada = y ? `${d}/${m}/${y}` : "—";
   const hasMultipleDates = new Set(items.map((i) => i.data)).size > 1;
 
-  let msg = `Olá ${first.motorista}! Seguem os serviços do dia ${dataFormatada}:\n`;
+  let msg = `Olá ${first.motorista || ""}! Seguem os serviços do dia ${dataFormatada}:\n`;
 
   items
     .slice()
-    .sort((a, b) => (a.data + a.hora).localeCompare(b.data + b.hora))
+    .sort((a, b) => ((a.data || "") + (a.hora || "")).localeCompare((b.data || "") + (b.hora || "")))
     .forEach((item, idx) => {
-      const passageirosDetalhados = item.passageiros.length > 0
-        ? item.passageiros
+      const passageirosArr = item.passageiros || [];
+      const passageirosDetalhados = passageirosArr.length > 0
+        ? passageirosArr
             .map(p => {
               const partes = [p.nome].filter(Boolean);
               if (p.voo) partes.push(`Voo ${p.voo}`);
@@ -66,20 +68,21 @@ const buildConsolidatedMessage = (items: AgendaItem[]) => {
             .filter(Boolean)
             .join("\n   • ")
         : "—";
-      const voos = item.passageiros.length > 0
-        ? [...new Set(item.passageiros.map(p => p.voo).filter(Boolean))].join(", ") || "—"
+      const voos = passageirosArr.length > 0
+        ? [...new Set(passageirosArr.map(p => p.voo).filter(Boolean))].join(", ") || "—"
         : "—";
-      const [iy, im, id] = item.data.split("-");
-      const horaLabel = hasMultipleDates ? `${id}/${im} ${item.hora}` : item.hora;
+      const itemData = item.data || "";
+      const [, im, id] = itemData.includes("-") ? itemData.split("-") : ["", "", ""];
+      const horaLabel = hasMultipleDates && im ? `${id}/${im} ${item.hora || ""}` : (item.hora || "");
 
       msg += `\n*Serviço ${idx + 1}*\n`;
       msg += `⏰ Hora: ${horaLabel}\n`;
-      msg += `🏢 Cliente: ${item.cliente}\n`;
-      msg += `👥 SHT: ${item.pax}\n`;
-      msg += `👤 Passageiros:${item.passageiros.length > 1 ? "\n   • " : " "}${passageirosDetalhados}\n`;
+      msg += `🏢 Cliente: ${item.cliente || "—"}\n`;
+      msg += `👥 SHT: ${item.pax ?? ""}\n`;
+      msg += `👤 Passageiros:${passageirosArr.length > 1 ? "\n   • " : " "}${passageirosDetalhados}\n`;
       msg += `✈️ Voo: ${voos}\n`;
-      msg += `📍 Origem: ${item.origem}\n`;
-      msg += `📍 Destino: ${item.destino}\n`;
+      msg += `📍 Origem: ${item.origem || "—"}\n`;
+      msg += `📍 Destino: ${item.destino || "—"}\n`;
       if (item.observacoes) {
         msg += `📝 Obs: ${item.observacoes}\n`;
       }
