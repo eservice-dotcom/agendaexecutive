@@ -334,6 +334,7 @@ export type Database = {
           data_pagamento: string | null
           data_vencimento: string | null
           descritivo: string
+          fatura_id: string | null
           id: string
           status: string
           subgrupo_receita: string | null
@@ -351,6 +352,7 @@ export type Database = {
           data_pagamento?: string | null
           data_vencimento?: string | null
           descritivo?: string
+          fatura_id?: string | null
           id?: string
           status?: string
           subgrupo_receita?: string | null
@@ -368,6 +370,7 @@ export type Database = {
           data_pagamento?: string | null
           data_vencimento?: string | null
           descritivo?: string
+          fatura_id?: string | null
           id?: string
           status?: string
           subgrupo_receita?: string | null
@@ -378,6 +381,13 @@ export type Database = {
           venda_id?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "contas_receber_fatura_id_fkey"
+            columns: ["fatura_id"]
+            isOneToOne: false
+            referencedRelation: "faturas"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "contas_receber_venda_id_fkey"
             columns: ["venda_id"]
@@ -662,6 +672,93 @@ export type Database = {
           locked_at?: string
           user_email?: string
           user_id?: string
+        }
+        Relationships: []
+      }
+      fatura_vendas: {
+        Row: {
+          created_at: string
+          fatura_id: string
+          id: string
+          venda_id: string
+        }
+        Insert: {
+          created_at?: string
+          fatura_id: string
+          id?: string
+          venda_id: string
+        }
+        Update: {
+          created_at?: string
+          fatura_id?: string
+          id?: string
+          venda_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fatura_vendas_fatura_id_fkey"
+            columns: ["fatura_id"]
+            isOneToOne: false
+            referencedRelation: "faturas"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fatura_vendas_venda_id_fkey"
+            columns: ["venda_id"]
+            isOneToOne: false
+            referencedRelation: "vendas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      faturas: {
+        Row: {
+          cliente: string
+          conta_receber_id: string | null
+          created_at: string
+          data_emissao: string
+          data_vencimento: string | null
+          id: string
+          numero_fatura: number
+          observacoes: string
+          periodo_fim: string
+          periodo_inicio: string
+          status: string
+          updated_at: string
+          user_id: string
+          valor_total: number
+        }
+        Insert: {
+          cliente: string
+          conta_receber_id?: string | null
+          created_at?: string
+          data_emissao?: string
+          data_vencimento?: string | null
+          id?: string
+          numero_fatura?: number
+          observacoes?: string
+          periodo_fim: string
+          periodo_inicio: string
+          status?: string
+          updated_at?: string
+          user_id: string
+          valor_total?: number
+        }
+        Update: {
+          cliente?: string
+          conta_receber_id?: string | null
+          created_at?: string
+          data_emissao?: string
+          data_vencimento?: string | null
+          id?: string
+          numero_fatura?: number
+          observacoes?: string
+          periodo_fim?: string
+          periodo_inicio?: string
+          status?: string
+          updated_at?: string
+          user_id?: string
+          valor_total?: number
         }
         Relationships: []
       }

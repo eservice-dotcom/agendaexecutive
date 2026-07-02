@@ -555,6 +555,11 @@ const Index = () => {
                     <FileText className="h-4 w-4" /> Contratos
                   </Link>
                 </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link to="/faturas" className="flex items-center gap-2 cursor-pointer">
+                    <FileText className="h-4 w-4" /> Faturas
+                  </Link>
+                </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
 
