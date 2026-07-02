@@ -11,6 +11,7 @@ import NotFound from "./pages/NotFound";
 import Vendas from "./pages/Vendas";
 import Cotacoes from "./pages/Cotacoes";
 import Contratos from "./pages/Contratos";
+import Faturas from "./pages/Faturas";
 import MobileContas from "./pages/MobileContas";
 
 const queryClient = new QueryClient();
