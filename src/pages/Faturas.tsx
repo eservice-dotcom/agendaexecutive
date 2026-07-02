@@ -189,6 +189,9 @@ export default function Faturas() {
       vendaIds.map((vid) => ({ fatura_id: inserted.id, venda_id: vid }))
     );
 
+    // Remove any existing CRs linked to these vendas — they get replaced by the consolidated fatura CR
+    await supabase.from("contas_receber").delete().in("venda_id", vendaIds);
+
     // create consolidated CR
     const { data: cr } = await supabase
       .from("contas_receber")
