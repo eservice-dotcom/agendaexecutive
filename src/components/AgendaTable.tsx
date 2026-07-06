@@ -342,8 +342,8 @@ const AgendaTable = ({ items, onEdited, hideFinancials, onClone }: AgendaTablePr
         </colgroup>
         <TableHeader className="sticky top-0 z-30 bg-muted">
           <TableRow className="hover:bg-muted/50">
-            <TableHead className="font-semibold px-0.5 py-0.5 text-[9px] sticky left-0 z-20 bg-muted/95 backdrop-blur-sm">Data</TableHead>
-            <TableHead className="font-semibold px-0.5 py-0.5 text-[9px] sticky left-[58px] z-20 bg-muted/95 backdrop-blur-sm">Hora</TableHead>
+            <TableHead className="font-semibold px-0.5 py-0.5 text-[9px] sticky left-0 z-20 bg-muted">Data</TableHead>
+            <TableHead className="font-semibold px-0.5 py-0.5 text-[9px] sticky left-[58px] z-20 bg-muted">Hora</TableHead>
             <TableHead className="font-semibold px-0.5 py-0.5 text-[9px]">Cliente</TableHead>
             <TableHead className="font-semibold px-0.5 py-0.5 text-[9px] text-center">SHT</TableHead>
             <TableHead className="font-semibold px-0.5 py-0.5 text-[9px]">Passageiro</TableHead>
