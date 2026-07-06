@@ -442,30 +442,38 @@ const NovoServicoDialog = ({ open, onOpenChange, onSaved, initialData }: NovoSer
             </DialogTitle>
           </DialogHeader>
 
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-          <div className="space-y-1.5">
-            <Label>Data *</Label>
-            <Input type="date" value={form.data} onChange={(e) => update("data", e.target.value)} />
+        <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+          <div className="space-y-0.5">
+            <Label className="text-xs">Data *</Label>
+            <Input type="date" value={form.data} onChange={(e) => update("data", e.target.value)} className="h-8 text-sm" />
           </div>
-          <div className="space-y-1.5">
-            <Label>Hora *</Label>
-            <Input type="time" value={form.hora} onChange={(e) => update("hora", e.target.value)} />
+          <div className="space-y-0.5">
+            <Label className="text-xs">Hora *</Label>
+            <Input type="time" value={form.hora} onChange={(e) => update("hora", e.target.value)} className="h-8 text-sm" />
+          </div>
+          <div className="space-y-0.5">
+            <Label className="text-xs">SHT</Label>
+            <Input type="number" min={0} value={form.pax} onChange={(e) => update("pax", e.target.value)} placeholder="0" className="h-8 text-sm" />
+          </div>
+          <div className="space-y-0.5">
+            <Label className="text-xs">O.S.</Label>
+            <Input value={form.cot} onChange={(e) => update("cot", e.target.value)} placeholder="O.S.-000" className="h-8 text-sm" />
           </div>
 
-          <div className="space-y-1.5">
+          <div className="space-y-0.5 col-span-2 sm:col-span-3">
             <div className="flex items-center justify-between">
-              <Label>Cliente *</Label>
-              <Button type="button" variant="ghost" size="sm" className="h-6 gap-1 text-xs px-2" onClick={() => setShowNewCliente(!showNewCliente)}>
+              <Label className="text-xs">Cliente *</Label>
+              <Button type="button" variant="ghost" size="sm" className="h-5 gap-1 text-[10px] px-1.5" onClick={() => setShowNewCliente(!showNewCliente)}>
                 <UserPlus className="h-3 w-3" /> Novo
               </Button>
             </div>
             {showNewCliente ? (
-              <div className="space-y-2 rounded-md border border-border p-2 bg-muted/30">
-                <Input value={newCliente.nome} onChange={(e) => setNewCliente({ ...newCliente, nome: e.target.value })} placeholder="Nome *" />
-                <Input value={newCliente.cnpjCpf} onChange={(e) => setNewCliente({ ...newCliente, cnpjCpf: e.target.value })} placeholder="CNPJ/CPF" />
-                <Input value={newCliente.telefone} onChange={(e) => setNewCliente({ ...newCliente, telefone: e.target.value })} placeholder="Telefone" />
-                <Input value={newCliente.email} onChange={(e) => setNewCliente({ ...newCliente, email: e.target.value })} placeholder="Email" />
-                <Input value={newCliente.endereco} onChange={(e) => setNewCliente({ ...newCliente, endereco: e.target.value })} placeholder="Endereço" />
+              <div className="space-y-1.5 rounded-md border border-border p-2 bg-muted/30">
+                <Input value={newCliente.nome} onChange={(e) => setNewCliente({ ...newCliente, nome: e.target.value })} placeholder="Nome *" className="h-8 text-sm" />
+                <Input value={newCliente.cnpjCpf} onChange={(e) => setNewCliente({ ...newCliente, cnpjCpf: e.target.value })} placeholder="CNPJ/CPF" className="h-8 text-sm" />
+                <Input value={newCliente.telefone} onChange={(e) => setNewCliente({ ...newCliente, telefone: e.target.value })} placeholder="Telefone" className="h-8 text-sm" />
+                <Input value={newCliente.email} onChange={(e) => setNewCliente({ ...newCliente, email: e.target.value })} placeholder="Email" className="h-8 text-sm" />
+                <Input value={newCliente.endereco} onChange={(e) => setNewCliente({ ...newCliente, endereco: e.target.value })} placeholder="Endereço" className="h-8 text-sm" />
                 <div className="flex gap-2">
                   <Button type="button" size="sm" className="h-7 text-xs" onClick={handleSaveNewCliente}>Salvar</Button>
                   <Button type="button" variant="outline" size="sm" className="h-7 text-xs" onClick={() => setShowNewCliente(false)}>Cancelar</Button>
@@ -473,7 +481,7 @@ const NovoServicoDialog = ({ open, onOpenChange, onSaved, initialData }: NovoSer
               </div>
             ) : (
               <Select value={form.clienteId} onValueChange={(v) => update("clienteId", v)}>
-                <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
+                <SelectTrigger className="h-8 text-sm"><SelectValue placeholder="Selecione" /></SelectTrigger>
                 <SelectContent>
                   {clientes.length === 0 && <SelectItem value="_none" disabled>Nenhum cadastrado</SelectItem>}
                   {clientes.map((c) => <SelectItem key={c.id} value={c.id}>{c.nome}</SelectItem>)}
@@ -482,38 +490,24 @@ const NovoServicoDialog = ({ open, onOpenChange, onSaved, initialData }: NovoSer
             )}
           </div>
 
-          <div className="space-y-1.5">
-            <Label>SHT</Label>
-            <Input type="number" min={0} value={form.pax} onChange={(e) => update("pax", e.target.value)} placeholder="0" />
-          </div>
-
-          <div className="space-y-1.5">
-            <Label>O.S.</Label>
-            <Input value={form.cot} onChange={(e) => update("cot", e.target.value)} placeholder="O.S.-000" />
-          </div>
-
-          <div className="space-y-1.5 sm:col-span-2">
-            <PassageirosInput passageiros={passageiros} onChange={setPassageiros} />
-          </div>
-
-          <div className="space-y-1.5">
-            <Label>Tipo *</Label>
+          <div className="space-y-0.5 col-span-2 sm:col-span-1">
+            <Label className="text-xs">Tipo *</Label>
             <Select value={form.tipo} onValueChange={(v) => update("tipo", v)}>
-              <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
+              <SelectTrigger className="h-8 text-sm"><SelectValue placeholder="Selecione" /></SelectTrigger>
               <SelectContent>
                 {tiposServico.map((t) => <SelectItem key={t} value={t}>{t}</SelectItem>)}
               </SelectContent>
             </Select>
           </div>
 
-          <div className="space-y-1.5 sm:col-span-2">
-            <Label>Origem *</Label>
-            <Input value={form.origem} onChange={(e) => update("origem", e.target.value)} placeholder="Local de origem" />
+          <div className="space-y-0.5 col-span-2 sm:col-span-2">
+            <Label className="text-xs">Origem *</Label>
+            <Input value={form.origem} onChange={(e) => update("origem", e.target.value)} placeholder="Local de origem" className="h-8 text-sm" />
           </div>
 
-          <div className="space-y-1.5 sm:col-span-2">
-            <Label>Destino *</Label>
-            <Input value={form.destino} onChange={(e) => update("destino", e.target.value)} placeholder="Local de destino" />
+          <div className="space-y-0.5 col-span-2 sm:col-span-2">
+            <Label className="text-xs">Destino *</Label>
+            <Input value={form.destino} onChange={(e) => update("destino", e.target.value)} placeholder="Local de destino" className="h-8 text-sm" />
           </div>
 
           <div className="space-y-1.5">
