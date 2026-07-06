@@ -7,7 +7,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { AgendaItem, statusFaturamentoOptions, StatusFaturamento, Passageiro, OutraDespesa } from "@/data/agendaData";
 import { updateAgendaItem, getTiposServico, getVeiculos, getMotoristas, getClientes, getFornecedores, saveMotorista, Veiculo, Motorista, Cliente, Fornecedor } from "@/data/cadastroStorage";
 import { toast } from "sonner";
-import { Pencil, Plus, Trash2 } from "lucide-react";
+import { Pencil, Plus, Trash2, ChevronDown } from "lucide-react";
+import { Collapsible, CollapsibleTrigger, CollapsibleContent } from "@/components/ui/collapsible";
 import PassageirosInput from "./PassageirosInput";
 import { TooltipProvider } from "@/components/ui/tooltip";
 
@@ -82,6 +83,7 @@ const EditServicoDialog = ({ open, onOpenChange, item, onSaved }: EditServicoDia
   const [passageiros, setPassageiros] = useState<Passageiro[]>([]);
   const [outrosDespesas, setOutrosDespesas] = useState<OutraDespesa[]>([]);
   const [motoristaDiariaMsg, setMotoristaDiariaMsg] = useState("");
+  const [fechamentosOpen, setFechamentosOpen] = useState(false);
   const [showNewMotorista, setShowNewMotorista] = useState(false);
   const [newMotorista, setNewMotorista] = useState({ nome: "", cnh: "", telefone: "", email: "", categoria: "", tipos: [] as string[] });
 
@@ -734,9 +736,17 @@ const EditServicoDialog = ({ open, onOpenChange, item, onSaved }: EditServicoDia
             </Select>
           </div>
 
-          {/* Fechamento */}
-          <div className="sm:col-span-2 border-t pt-3 mt-2 space-y-4">
-            <p className="text-sm font-semibold text-muted-foreground">Fechamento Cliente</p>
+          <Collapsible open={fechamentosOpen} onOpenChange={setFechamentosOpen} className="sm:col-span-2">
+            <div className="border-t pt-3 mt-2">
+              <CollapsibleTrigger asChild>
+                <button type="button" className="w-full flex items-center justify-center gap-2 text-sm font-bold uppercase tracking-wide text-muted-foreground hover:text-foreground transition-colors py-2">
+                  FECHAMENTOS
+                  <ChevronDown className={`h-4 w-4 transition-transform ${fechamentosOpen ? "rotate-180" : ""}`} />
+                </button>
+              </CollapsibleTrigger>
+            </div>
+            <CollapsibleContent className="space-y-4">
+              <p className="text-sm font-semibold text-muted-foreground">Fechamento Cliente</p>
 
             {/* Quilometragem */}
             <div className="space-y-2">
@@ -1008,7 +1018,8 @@ const EditServicoDialog = ({ open, onOpenChange, item, onSaved }: EditServicoDia
                 </div>
               </div>
             </div>
-          </div>
+          </CollapsibleContent>
+          </Collapsible>
         </div>
 
         <DialogFooter className="mt-4">
