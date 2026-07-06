@@ -333,7 +333,7 @@ const ImportarPDFCSGlobalDialog = ({ open, onOpenChange, onImported }: Props) =>
       setFornecedores(fs);
       setMotoristas(ms);
       setTipos(ts);
-      const cs = cls.find((c: any) => /cs\s*global/i.test(c.nome));
+      const cs = cls.find((c: any) => /cs\s*brasil/i.test(c.nome));
       if (cs) setClienteId(cs.id);
     })();
   }, [open]);
@@ -415,14 +415,14 @@ const ImportarPDFCSGlobalDialog = ({ open, onOpenChange, onImported }: Props) =>
       toast.error("Selecione ao menos um serviço.");
       return;
     }
-    let clienteNome = "CS Global";
+    let clienteNome = "CS Brasil";
     if (clienteId) {
       const c = clientes.find((x) => x.id === clienteId);
       if (c) clienteNome = c.nome;
     } else {
       try {
-        const novo: any = await saveCliente({ nome: "CS Global", contato: "", telefone: "", endereco: "" } as any);
-        clienteNome = novo?.nome || "CS Global";
+        const novo: any = await saveCliente({ nome: "CS Brasil", contato: "", telefone: "", endereco: "" } as any);
+        clienteNome = novo?.nome || "CS Brasil";
       } catch {}
     }
 
@@ -614,7 +614,7 @@ const ImportarPDFCSGlobalDialog = ({ open, onOpenChange, onImported }: Props) =>
                       ))}
                     </SelectContent>
                   </Select>
-                  <p className="text-xs text-muted-foreground mt-1">Padrão: CS Global. Fornecedor, motorista e custo são manuais.</p>
+                  <p className="text-xs text-muted-foreground mt-1">Padrão: CS Brasil. Fornecedor, motorista e custo são manuais.</p>
                 </div>
                 <div className="text-sm text-muted-foreground">
                   <strong>{services.length}</strong> serviço(s) extraído(s). Revise antes de importar.
