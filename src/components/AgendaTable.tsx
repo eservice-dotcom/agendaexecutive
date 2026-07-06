@@ -416,16 +416,11 @@ const AgendaTable = ({ items, onEdited, hideFinancials, onClone }: AgendaTablePr
                 <Tooltip>
                   <TooltipTrigger asChild>
                     <span className="cursor-default inline-flex items-center gap-1 justify-center">
-                      <span>{item.sht || item.cot || "—"}</span>
-                      {item.pax > 0 && (
-                        <span className="inline-flex min-w-[14px] h-3.5 px-1 items-center justify-center rounded-full bg-primary/10 text-[8px] font-bold text-black">
-                          {item.pax}
-                        </span>
-                      )}
+                      {item.sht || item.cot || "—"}
                     </span>
                   </TooltipTrigger>
                   <TooltipContent side="top" className="text-xs">
-                    SHT: {item.sht || item.cot || "—"} · {item.pax} pax
+                    SHT: {item.sht || item.cot || "—"}
                   </TooltipContent>
                 </Tooltip>
               </TableCell>
