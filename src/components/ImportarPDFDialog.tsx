@@ -519,7 +519,7 @@ const ImportarPDFDialog = ({ open, onOpenChange, onImported }: Props) => {
         </DialogHeader>
 
         <div className="space-y-4">
-          {services.length === 0 && (
+          {!advanced && (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               <label className="flex flex-col items-center justify-center gap-3 border-2 border-dashed border-border rounded-lg p-8 cursor-pointer hover:bg-muted/50 transition">
                 {loading ? (
