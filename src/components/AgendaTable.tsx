@@ -91,6 +91,7 @@ const mapAgendaRow = (row: any): AgendaItem => ({
   pax: row.pax,
   passageiros: row.passageiros || [],
   cot: row.cot,
+  sht: row.sht || "",
   tipo: row.tipo,
   origem: row.origem,
   destino: row.destino,
@@ -315,9 +316,9 @@ const AgendaTable = ({ items, onEdited, hideFinancials, onClone }: AgendaTablePr
       <table className="w-full caption-bottom text-[9px]" style={{ tableLayout: 'fixed' }}>
         <colgroup>
           <col style={{ width: '58px' }} />  {/* Data */}
-          <col style={{ width: '34px' }} />  {/* Hora */}
+          <col style={{ width: '44px' }} />  {/* Hora */}
           <col style={{ width: '72px' }} />  {/* Cliente */}
-          <col style={{ width: '36px' }} />  {/* SHT */}
+          <col style={{ width: '56px' }} />  {/* SHT */}
           <col style={{ width: '80px' }} /> {/* Passageiro */}
           <col style={{ width: '38px' }} />  {/* Voo */}
           <col style={{ width: '42px' }} />  {/* O.S. */}
@@ -393,7 +394,7 @@ const AgendaTable = ({ items, onEdited, hideFinancials, onClone }: AgendaTablePr
             return (
             <TableRow key={item.id} className={`transition-colors hover:bg-primary/10 ${!rowInlineBg ? (idx % 2 === 1 ? 'bg-yellow-50/60 dark:bg-yellow-900/10' : tipoRowColor(item.tipo)) : ''}`} style={rowInlineBg ? { backgroundColor: rowInlineBg } : undefined} title={messaged ? `Mensagem enviada para ${item.motorista}` : undefined}>
               <TableCell className={`px-0.5 py-0 font-mono text-[9px] truncate sticky left-0 z-10 bg-background`} style={rowInlineBg ? { backgroundColor: rowInlineBg } : undefined} >{formatDate(item.data)}</TableCell>
-              <TableCell className={`px-0.5 py-0 font-mono text-[9px] font-medium truncate sticky left-[58px] z-10 bg-background`} style={rowInlineBg ? { backgroundColor: rowInlineBg } : undefined}>{item.hora}</TableCell>
+              <TableCell className={`px-0.5 py-0 font-mono text-[9px] font-medium whitespace-nowrap sticky left-[58px] z-10 bg-background`} style={rowInlineBg ? { backgroundColor: rowInlineBg } : undefined}>{item.hora}</TableCell>
               <TableCell className="px-0.5 py-0 font-medium text-[9px] truncate">
                 <Tooltip>
                   <TooltipTrigger asChild>
@@ -401,7 +402,7 @@ const AgendaTable = ({ items, onEdited, hideFinancials, onClone }: AgendaTablePr
                       {hasWarn && (
                         <AlertTriangle className="h-2.5 w-2.5 text-orange-500 shrink-0" />
                       )}
-                      {item.cliente}
+                      {(item.cliente || "").trim().split(/\s+/)[0]}
                     </span>
                   </TooltipTrigger>
                   <TooltipContent side="top" className="text-xs">
@@ -411,10 +412,22 @@ const AgendaTable = ({ items, onEdited, hideFinancials, onClone }: AgendaTablePr
                   </TooltipContent>
                 </Tooltip>
               </TableCell>
-              <TableCell className="px-0.5 py-0 text-center">
-                <span className="inline-flex min-w-[16px] h-4 px-1 items-center justify-center rounded-full bg-primary/10 text-[8px] font-bold text-black">
-                  {item.pax}
-                </span>
+              <TableCell className="px-0.5 py-0 font-mono text-[9px] text-center truncate">
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <span className="truncate cursor-default inline-flex items-center gap-1 justify-center">
+                      <span>{item.sht || item.cot || "—"}</span>
+                      {item.pax > 0 && (
+                        <span className="inline-flex min-w-[14px] h-3.5 px-1 items-center justify-center rounded-full bg-primary/10 text-[8px] font-bold text-black">
+                          {item.pax}
+                        </span>
+                      )}
+                    </span>
+                  </TooltipTrigger>
+                  <TooltipContent side="top" className="text-xs">
+                    SHT: {item.sht || item.cot || "—"} · {item.pax} pax
+                  </TooltipContent>
+                </Tooltip>
               </TableCell>
               <TableCell className="px-0.5 py-0 truncate">
                 {item.passageiros.length > 0 ? (
