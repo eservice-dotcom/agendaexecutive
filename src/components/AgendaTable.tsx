@@ -316,9 +316,9 @@ const AgendaTable = ({ items, onEdited, hideFinancials, onClone }: AgendaTablePr
       <table className="w-full caption-bottom text-[9px]" style={{ tableLayout: 'fixed' }}>
         <colgroup>
           <col style={{ width: '58px' }} />  {/* Data */}
-          <col style={{ width: '34px' }} />  {/* Hora */}
+          <col style={{ width: '44px' }} />  {/* Hora */}
           <col style={{ width: '72px' }} />  {/* Cliente */}
-          <col style={{ width: '36px' }} />  {/* SHT */}
+          <col style={{ width: '56px' }} />  {/* SHT */}
           <col style={{ width: '80px' }} /> {/* Passageiro */}
           <col style={{ width: '38px' }} />  {/* Voo */}
           <col style={{ width: '42px' }} />  {/* O.S. */}
