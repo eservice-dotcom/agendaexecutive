@@ -519,6 +519,7 @@ const ImportarPDFDialog = ({ open, onOpenChange, onImported }: Props) => {
                       <th className="p-2"><Checkbox checked={services.every(s => s.selected)} onCheckedChange={(v) => setServices(prev => prev.map(s => ({ ...s, selected: !!v })))} /></th>
                       <th className="p-2 text-left">Status</th>
                       <th className="p-2 text-left">SHT</th>
+                      <th className="p-2 text-left">O.S.</th>
                       <th className="p-2 text-left">Data</th>
                       <th className="p-2 text-left">Hora</th>
                       <th className="p-2 text-left">Tipo Serviço</th>
@@ -526,7 +527,7 @@ const ImportarPDFDialog = ({ open, onOpenChange, onImported }: Props) => {
                       <th className="p-2 text-left">Origem</th>
                       <th className="p-2 text-left">Destino</th>
                       <th className="p-2 text-left">Valor</th>
-                      <th className="p-2 text-left">PAX</th>
+                      
                       <th className="p-2 text-left">Fornecedor</th>
                       <th className="p-2 text-left">Motorista</th>
                       <th className="p-2 text-left">Custo</th>
@@ -559,6 +560,9 @@ const ImportarPDFDialog = ({ open, onOpenChange, onImported }: Props) => {
                           <Input value={s.sht} onChange={(e) => updateService(idx, { sht: e.target.value })} className="h-8 w-28" />
                         </td>
                         <td className="p-1">
+                          <Input value={s.os} onChange={(e) => updateService(idx, { os: e.target.value })} className="h-8 w-28" placeholder="O.S." />
+                        </td>
+                        <td className="p-1">
                           <Input type="date" value={s.data} onChange={(e) => updateService(idx, { data: e.target.value })} className="h-8 w-36" />
                         </td>
                         <td className="p-1">
@@ -585,7 +589,7 @@ const ImportarPDFDialog = ({ open, onOpenChange, onImported }: Props) => {
                         <td className="p-1">
                           <Input type="number" step="0.01" value={s.valor} onChange={(e) => updateService(idx, { valor: parseFloat(e.target.value) || 0 })} className="h-8 w-24" />
                         </td>
-                        <td className="p-1 text-center">{s.passageiros.length}</td>
+                        
                         <td className="p-1">
                           <Select value={s.fornecedorId} onValueChange={(v) => updateService(idx, { fornecedorId: v })}>
                             <SelectTrigger className="h-8 w-40"><SelectValue placeholder="—" /></SelectTrigger>
