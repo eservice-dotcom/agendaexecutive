@@ -333,6 +333,7 @@ const ImportarPDFDialog = ({ open, onOpenChange, onImported }: Props) => {
       setServices([]);
       setClienteShiftId("");
       setPlacaUrls([]);
+      setAdvanced(false);
     }
   }, [open]);
 
