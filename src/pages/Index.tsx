@@ -47,15 +47,13 @@ interface FiltersState {
 }
 
 const hoje = new Date();
-const sessentaDiasAtras = new Date(hoje);
-sessentaDiasAtras.setDate(hoje.getDate() - 60);
 
 const initialFilters: FiltersState = {
   search: "",
   cliente: "",
   os: "",
   placa: "",
-  dataInicio: sessentaDiasAtras.toISOString().split("T")[0],
+  dataInicio: hoje.toISOString().split("T")[0],
   dataFim: "",
   tipo: "",
   fornecedor: "",
