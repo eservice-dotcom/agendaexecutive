@@ -476,17 +476,27 @@ const EditServicoDialog = ({ open, onOpenChange, item, onSaved }: EditServicoDia
             </DialogTitle>
           </DialogHeader>
 
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-          <div className="space-y-1.5">
-            <Label>Data *</Label>
-            <Input type="date" value={form.data} onChange={(e) => update("data", e.target.value)} />
-          </div>
-          <div className="space-y-1.5">
-            <Label>Hora *</Label>
-            <Input type="time" value={form.hora} onChange={(e) => update("hora", e.target.value)} />
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+          <div className="grid grid-cols-2 gap-3 sm:col-span-2 sm:grid-cols-4">
+            <div className="space-y-1">
+              <Label>Data *</Label>
+              <Input type="date" value={form.data} onChange={(e) => update("data", e.target.value)} />
+            </div>
+            <div className="space-y-1">
+              <Label>Hora *</Label>
+              <Input type="time" value={form.hora} onChange={(e) => update("hora", e.target.value)} />
+            </div>
+            <div className="space-y-1">
+              <Label>SHT</Label>
+              <Input value={form.sht} onChange={(e) => update("sht", e.target.value)} placeholder="SHT-000" />
+            </div>
+            <div className="space-y-1">
+              <Label>O.S.</Label>
+              <Input value={form.cot} onChange={(e) => update("cot", e.target.value)} placeholder="O.S.-000" />
+            </div>
           </div>
 
-          <div className="space-y-1.5">
+          <div className="space-y-1">
             <Label>Cliente *</Label>
             <Select value={currentClienteId || "_manual"} onValueChange={handleClienteChange}>
               <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
@@ -502,21 +512,11 @@ const EditServicoDialog = ({ open, onOpenChange, item, onSaved }: EditServicoDia
             )}
           </div>
 
-          <div className="space-y-1.5">
-            <Label>SHT</Label>
-            <Input value={form.sht} onChange={(e) => update("sht", e.target.value)} placeholder="SHT-000" />
-          </div>
-
-          <div className="space-y-1.5">
-            <Label>O.S.</Label>
-            <Input value={form.cot} onChange={(e) => update("cot", e.target.value)} placeholder="O.S.-000" />
-          </div>
-
-          <div className="space-y-1.5 sm:col-span-2">
+          <div className="space-y-1 sm:col-span-2">
             <PassageirosInput passageiros={passageiros} onChange={setPassageiros} />
           </div>
 
-          <div className="space-y-1.5">
+          <div className="space-y-1">
             <Label>Tipo *</Label>
             <Select value={form.tipo} onValueChange={(v) => update("tipo", v)}>
               <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
@@ -526,17 +526,17 @@ const EditServicoDialog = ({ open, onOpenChange, item, onSaved }: EditServicoDia
             </Select>
           </div>
 
-          <div className="space-y-1.5 sm:col-span-2">
+          <div className="space-y-1 sm:col-span-2">
             <Label>Origem *</Label>
             <Input value={form.origem} onChange={(e) => update("origem", e.target.value)} placeholder="Local de origem" />
           </div>
 
-          <div className="space-y-1.5 sm:col-span-2">
+          <div className="space-y-1 sm:col-span-2">
             <Label>Destino *</Label>
             <Input value={form.destino} onChange={(e) => update("destino", e.target.value)} placeholder="Local de destino" />
           </div>
 
-          <div className="space-y-1.5">
+          <div className="space-y-1">
             <Label>Veículo</Label>
             <Select value={currentVeiculoId || "_manual"} onValueChange={handleVeiculoChange}>
               <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
@@ -555,7 +555,7 @@ const EditServicoDialog = ({ open, onOpenChange, item, onSaved }: EditServicoDia
             )}
           </div>
 
-          <div className="space-y-1.5">
+          <div className="space-y-1">
             <div className="flex items-center justify-between">
               <Label>Motorista</Label>
               <Button type="button" variant="ghost" size="sm" className="h-6 gap-1 text-xs px-2" onClick={() => setShowNewMotorista(!showNewMotorista)}>
@@ -600,12 +600,12 @@ const EditServicoDialog = ({ open, onOpenChange, item, onSaved }: EditServicoDia
             )}
           </div>
 
-          <div className="space-y-1.5">
+          <div className="space-y-1">
             <Label>Valor (R$)</Label>
             <Input type="number" min={0} step="0.01" value={form.valor} onChange={(e) => update("valor", e.target.value)} placeholder="0,00" />
           </div>
 
-          <div className="space-y-1.5">
+          <div className="space-y-1">
             <Label>Fornecedor</Label>
             <Select value={currentFornecedorId || "_manual"} onValueChange={handleFornecedorChange}>
               <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
@@ -621,7 +621,7 @@ const EditServicoDialog = ({ open, onOpenChange, item, onSaved }: EditServicoDia
             )}
           </div>
 
-          <div className="space-y-1.5">
+          <div className="space-y-1">
             <Label>Forma de Contratação</Label>
             {motoristaDiariaMsg ? (
               <div className="rounded-md border border-amber-300 bg-amber-50 px-3 py-2 text-sm text-amber-800 dark:border-amber-600 dark:bg-amber-900/30 dark:text-amber-300">
@@ -639,17 +639,17 @@ const EditServicoDialog = ({ open, onOpenChange, item, onSaved }: EditServicoDia
             )}
           </div>
 
-          <div className="space-y-1.5">
+          <div className="space-y-1">
             <Label>Custo (R$)</Label>
             <Input type="number" min={0} step="0.01" value={form.custo} onChange={(e) => update("custo", e.target.value)} placeholder="0,00" />
           </div>
 
-          <div className="space-y-1.5">
+          <div className="space-y-1">
             <Label>Receptivo</Label>
             <Input value={form.receptivo} onChange={(e) => update("receptivo", e.target.value)} placeholder="Nome do receptivo" />
           </div>
 
-          <div className="space-y-1.5">
+          <div className="space-y-1">
             <Label>Arquivos da Placa de Receptivo</Label>
             <Input
               type="file"
@@ -703,7 +703,7 @@ const EditServicoDialog = ({ open, onOpenChange, item, onSaved }: EditServicoDia
           </div>
 
 
-          <div className="space-y-1.5 sm:col-span-2">
+          <div className="space-y-1 sm:col-span-2">
             <Label>Observações</Label>
             <div className="flex flex-wrap gap-2 mb-1.5">
               {["Motorista Recepciona", "Terá Coordenador"].map((chip) => {
@@ -733,7 +733,7 @@ const EditServicoDialog = ({ open, onOpenChange, item, onSaved }: EditServicoDia
             <Input value={form.observacoes} onChange={(e) => update("observacoes", e.target.value)} placeholder="Observações sobre o serviço" />
           </div>
 
-          <div className="space-y-1.5">
+          <div className="space-y-1">
             <Label>Status Faturamento</Label>
             <Select value={form.statusFaturamento || "_empty"} onValueChange={(v) => update("statusFaturamento", v === "_empty" ? "" : v)}>
               <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
@@ -763,7 +763,7 @@ const EditServicoDialog = ({ open, onOpenChange, item, onSaved }: EditServicoDia
             <div className="space-y-2">
               <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Quilometragem</p>
               <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
-                <div className="space-y-1.5">
+                <div className="space-y-1">
                   <Label>KM Início</Label>
                   <Input type="number" min={0} value={form.kmIn} onChange={(e) => {
                     const kmIn = e.target.value;
@@ -772,7 +772,7 @@ const EditServicoDialog = ({ open, onOpenChange, item, onSaved }: EditServicoDia
                     setForm({ ...form, kmIn, kmExtra: String(extra) });
                   }} placeholder="0" />
                 </div>
-                <div className="space-y-1.5">
+                <div className="space-y-1">
                   <Label>KM Fim</Label>
                   <Input type="number" min={0} value={form.kmFim} onChange={(e) => {
                     const kmFim = e.target.value;
@@ -781,15 +781,15 @@ const EditServicoDialog = ({ open, onOpenChange, item, onSaved }: EditServicoDia
                     setForm({ ...form, kmFim, kmExtra: String(extra) });
                   }} placeholder="0" />
                 </div>
-                <div className="space-y-1.5">
+                <div className="space-y-1">
                   <Label>KM Extra</Label>
                   <Input type="number" min={0} value={form.kmExtra} readOnly className="bg-muted" placeholder="0" />
                 </div>
-                <div className="space-y-1.5">
+                <div className="space-y-1">
                   <Label>R$ Km Extra</Label>
                   <Input type="number" min={0} step="0.01" value={form.valorKmExtra} onChange={(e) => update("valorKmExtra", e.target.value)} placeholder="0,00" />
                 </div>
-                <div className="space-y-1.5">
+                <div className="space-y-1">
                   <Label>R$ Total Km Extra</Label>
                   <Input type="text" readOnly className="bg-muted" value={`R$ ${((parseFloat(form.kmExtra) || 0) * (parseFloat(form.valorKmExtra) || 0)).toFixed(2)}`} />
                 </div>
@@ -800,7 +800,7 @@ const EditServicoDialog = ({ open, onOpenChange, item, onSaved }: EditServicoDia
             <div className="space-y-2">
               <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Horas</p>
               <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
-                <div className="space-y-1.5">
+                <div className="space-y-1">
                   <Label>Hora Início</Label>
                   <Input type="time" value={form.horaIn} onChange={(e) => {
                     const horaIn = e.target.value;
@@ -812,7 +812,7 @@ const EditServicoDialog = ({ open, onOpenChange, item, onSaved }: EditServicoDia
                     setForm({ ...form, horaIn, horaExtra: extra > 0 ? fmt(extra) : "" });
                   }} />
                 </div>
-                <div className="space-y-1.5">
+                <div className="space-y-1">
                   <Label>Hora Fim</Label>
                   <Input type="time" value={form.horaFim} onChange={(e) => {
                     const horaFim = e.target.value;
@@ -824,15 +824,15 @@ const EditServicoDialog = ({ open, onOpenChange, item, onSaved }: EditServicoDia
                     setForm({ ...form, horaFim, horaExtra: extra > 0 ? fmt(extra) : "" });
                   }} />
                 </div>
-                <div className="space-y-1.5">
+                <div className="space-y-1">
                   <Label>Hora Extra</Label>
                   <Input type="time" value={form.horaExtra} onChange={(e) => update("horaExtra", e.target.value)} />
                 </div>
-                <div className="space-y-1.5">
+                <div className="space-y-1">
                   <Label>R$ Hora Extra</Label>
                   <Input type="number" min={0} step="0.01" value={form.valorHoraExtra} onChange={(e) => update("valorHoraExtra", e.target.value)} placeholder="0,00" />
                 </div>
-                <div className="space-y-1.5">
+                <div className="space-y-1">
                   <Label>R$ Total Hora Extra</Label>
                   <Input type="text" readOnly className="bg-muted" value={(() => {
                     const [h,m] = (form.horaExtra||"").split(":").map(Number);
@@ -847,11 +847,11 @@ const EditServicoDialog = ({ open, onOpenChange, item, onSaved }: EditServicoDia
             <div className="space-y-2">
               <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Outros</p>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <div className="space-y-1.5">
+                <div className="space-y-1">
                   <Label>Estacionamento (R$)</Label>
                   <Input type="number" min={0} step="0.01" value={form.estacionamento} onChange={(e) => update("estacionamento", e.target.value)} placeholder="0,00" />
                 </div>
-                <div className="space-y-1.5">
+                <div className="space-y-1">
                   <Label>Comprovantes de Estacionamento</Label>
                   <Input
                     type="file"
@@ -931,7 +931,7 @@ const EditServicoDialog = ({ open, onOpenChange, item, onSaved }: EditServicoDia
             <div className="space-y-2">
               <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Custo Base</p>
               <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
-                <div className="space-y-1.5">
+                <div className="space-y-1">
                   <Label>Custo (R$)</Label>
                   <Input type="number" min={0} step="0.01" value={form.custo} onChange={(e) => update("custo", e.target.value)} placeholder="0,00" />
                 </div>
@@ -941,7 +941,7 @@ const EditServicoDialog = ({ open, onOpenChange, item, onSaved }: EditServicoDia
             <div className="space-y-2">
               <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Quilometragem</p>
               <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
-                <div className="space-y-1.5">
+                <div className="space-y-1">
                   <Label>KM Início</Label>
                   <Input type="number" min={0} value={form.kmInFornecedor} onChange={(e) => {
                     const v = e.target.value;
@@ -950,7 +950,7 @@ const EditServicoDialog = ({ open, onOpenChange, item, onSaved }: EditServicoDia
                     setForm({ ...form, kmInFornecedor: v, kmExtraFornecedor: String(extra) });
                   }} placeholder="0" />
                 </div>
-                <div className="space-y-1.5">
+                <div className="space-y-1">
                   <Label>KM Fim</Label>
                   <Input type="number" min={0} value={form.kmFimFornecedor} onChange={(e) => {
                     const v = e.target.value;
@@ -959,15 +959,15 @@ const EditServicoDialog = ({ open, onOpenChange, item, onSaved }: EditServicoDia
                     setForm({ ...form, kmFimFornecedor: v, kmExtraFornecedor: String(extra) });
                   }} placeholder="0" />
                 </div>
-                <div className="space-y-1.5">
+                <div className="space-y-1">
                   <Label>KM Extra</Label>
                   <Input type="number" min={0} value={form.kmExtraFornecedor} onChange={(e) => update("kmExtraFornecedor", e.target.value)} placeholder="0" />
                 </div>
-                <div className="space-y-1.5">
+                <div className="space-y-1">
                   <Label>R$ Km Extra</Label>
                   <Input type="number" min={0} step="0.01" value={form.valorKmExtraFornecedor} onChange={(e) => update("valorKmExtraFornecedor", e.target.value)} placeholder="0,00" />
                 </div>
-                <div className="space-y-1.5">
+                <div className="space-y-1">
                   <Label>R$ Total Km Extra</Label>
                   <Input type="text" readOnly className="bg-muted" value={`R$ ${((parseFloat(form.kmExtraFornecedor) || 0) * (parseFloat(form.valorKmExtraFornecedor) || 0)).toFixed(2)}`} />
                 </div>
@@ -977,7 +977,7 @@ const EditServicoDialog = ({ open, onOpenChange, item, onSaved }: EditServicoDia
             <div className="space-y-2">
               <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Horas</p>
               <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
-                <div className="space-y-1.5">
+                <div className="space-y-1">
                   <Label>Hora Início</Label>
                   <Input type="time" value={form.horaInFornecedor} onChange={(e) => {
                     const horaIn = e.target.value;
@@ -989,7 +989,7 @@ const EditServicoDialog = ({ open, onOpenChange, item, onSaved }: EditServicoDia
                     setForm({ ...form, horaInFornecedor: horaIn, horaExtraFornecedor: extra > 0 ? fmt(extra) : "" });
                   }} />
                 </div>
-                <div className="space-y-1.5">
+                <div className="space-y-1">
                   <Label>Hora Fim</Label>
                   <Input type="time" value={form.horaFimFornecedor} onChange={(e) => {
                     const horaFim = e.target.value;
@@ -1001,15 +1001,15 @@ const EditServicoDialog = ({ open, onOpenChange, item, onSaved }: EditServicoDia
                     setForm({ ...form, horaFimFornecedor: horaFim, horaExtraFornecedor: extra > 0 ? fmt(extra) : "" });
                   }} />
                 </div>
-                <div className="space-y-1.5">
+                <div className="space-y-1">
                   <Label>Hora Extra</Label>
                   <Input type="time" value={form.horaExtraFornecedor} onChange={(e) => update("horaExtraFornecedor", e.target.value)} />
                 </div>
-                <div className="space-y-1.5">
+                <div className="space-y-1">
                   <Label>R$ Hora Extra</Label>
                   <Input type="number" min={0} step="0.01" value={form.valorHoraExtraFornecedor} onChange={(e) => update("valorHoraExtraFornecedor", e.target.value)} placeholder="0,00" />
                 </div>
-                <div className="space-y-1.5">
+                <div className="space-y-1">
                   <Label>R$ Total Hora Extra</Label>
                   <Input type="text" readOnly className="bg-muted" value={(() => {
                     const [h,m] = (form.horaExtraFornecedor||"").split(":").map(Number);
@@ -1023,7 +1023,7 @@ const EditServicoDialog = ({ open, onOpenChange, item, onSaved }: EditServicoDia
             <div className="space-y-2">
               <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Outros</p>
               <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
-                <div className="space-y-1.5">
+                <div className="space-y-1">
                   <Label>Estacionamento (R$)</Label>
                   <Input type="number" min={0} step="0.01" value={form.estacionamentoFornecedor} onChange={(e) => update("estacionamentoFornecedor", e.target.value)} placeholder="0,00" />
                 </div>
