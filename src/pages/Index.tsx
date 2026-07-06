@@ -22,6 +22,7 @@ import { getAgendaItems } from "@/data/cadastroStorage";
 import AgendaLixeira from "@/components/AgendaLixeira";
 import ContatosMotoristasDialog from "@/components/ContatosMotoristasDialog";
 import ImportarPDFDialog from "@/components/ImportarPDFDialog";
+import ImportarPDFCSGlobalDialog from "@/components/ImportarPDFCSGlobalDialog";
 import { printAgenda } from "@/lib/printUtils";
 import { generateClosingReport } from "@/lib/closingReport";
 import { generateClosingReportExcel } from "@/lib/closingReportExcel";
@@ -79,6 +80,7 @@ const Index = () => {
   const [activeTab, setActiveTab] = useState("agenda");
   const [contatosDialogOpen, setContatosDialogOpen] = useState(false);
   const [importPdfDialogOpen, setImportPdfDialogOpen] = useState(false);
+  const [importPdfCsDialogOpen, setImportPdfCsDialogOpen] = useState(false);
 
   // Fechamento dialog state
   const [fechamentoDialogOpen, setFechamentoDialogOpen] = useState(false);
@@ -722,6 +724,10 @@ const Index = () => {
                   <Upload className="h-4 w-4" />
                   PDF Shift
                 </Button>
+                <Button variant="outline" size="sm" onClick={() => setImportPdfCsDialogOpen(true)} className="gap-2">
+                  <Upload className="h-4 w-4" />
+                  PDF CS Global
+                </Button>
                 <Button onClick={() => setNovoDialogOpen(true)} className="gap-2">
                   <Plus className="h-4 w-4" />
                   Novo Serviço
@@ -732,6 +738,7 @@ const Index = () => {
             <NovoServicoDialog open={novoDialogOpen} onOpenChange={(v) => { setNovoDialogOpen(v); if (!v) setCloneData(null); }} onSaved={reloadData} initialData={cloneData} />
             <ContatosMotoristasDialog open={contatosDialogOpen} onOpenChange={setContatosDialogOpen} items={filteredData} />
             <ImportarPDFDialog open={importPdfDialogOpen} onOpenChange={setImportPdfDialogOpen} onImported={reloadData} />
+            <ImportarPDFCSGlobalDialog open={importPdfCsDialogOpen} onOpenChange={setImportPdfCsDialogOpen} onImported={reloadData} />
           </TabsContent>
 
           <TabsContent value="lixeira" className="space-y-4">
