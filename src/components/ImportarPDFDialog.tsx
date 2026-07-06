@@ -284,6 +284,7 @@ const ImportarPDFDialog = ({ open, onOpenChange, onImported }: Props) => {
   const [clienteShiftId, setClienteShiftId] = useState<string>("");
   const [placaUrls, setPlacaUrls] = useState<string[]>([]);
   const [uploadingPlaca, setUploadingPlaca] = useState(false);
+  const [advanced, setAdvanced] = useState(false);
 
   const handlePlacaFiles = async (files: File[]) => {
     if (!files.length) return;
