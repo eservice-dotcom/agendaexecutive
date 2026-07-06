@@ -242,6 +242,7 @@ const parsePDF = async (file: File): Promise<ParsedService[]> => {
     return {
       selected: true,
       sht: b.sht,
+      os: globalOs,
       data,
       hora,
       tipo: tipo || "Translado",
