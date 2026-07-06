@@ -139,7 +139,7 @@ const parsePDF = async (file: File): Promise<ParsedService[]> => {
 
     const dataAp = text.match(/Data de Apresenta[çc][ãa]o[^\d]*(\d{2}-\d{2}-\d{4})\s+(\d{2}:\d{2})/i);
     const dataSa = text.match(/Data de Sa[íi]da[^\d]*(\d{2}-\d{2}-\d{4})\s+(\d{2}:\d{2})/i);
-    const valorM = text.match(/Valor\s*R\$\s*([\d.]+,\d{2})/i);
+    const valorM = text.match(/Valor\s*R\$\s*([\d.,]+)/i);
 
     // Veículo & tipo serviço — preferentially from the block header captured above; fallback to scanning lines.
     let veiculo = b.veiculo || "";
@@ -234,7 +234,18 @@ const parsePDF = async (file: File): Promise<ParsedService[]> => {
       }
     }
 
-    const valor = valorM ? parseFloat(valorM[1].replace(/\./g, "").replace(",", ".")) : 0;
+    const valor = valorM ? (() => {
+      const raw = valorM[1];
+      // Detect Brazilian (1.234,56) vs US (1,234.56 or 500.00) format by position of last comma/dot.
+      const lastComma = raw.lastIndexOf(",");
+      const lastDot = raw.lastIndexOf(".");
+      if (lastComma > lastDot) {
+        // Brazilian: dots = thousands, comma = decimal
+        return parseFloat(raw.replace(/\./g, "").replace(",", ".")) || 0;
+      }
+      // US / plain: commas = thousands, dot = decimal
+      return parseFloat(raw.replace(/,/g, "")) || 0;
+    })() : 0;
     const baseDate = dataSa || dataAp;
     const data = baseDate ? ddmmyyyyToISO(baseDate[1]) : "";
     const hora = baseDate ? baseDate[2] : "";
