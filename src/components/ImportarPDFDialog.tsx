@@ -307,7 +307,9 @@ const ImportarPDFDialog = ({ open, onOpenChange, onImported }: Props) => {
         const shtSet = new Set(parsed.map((p) => p.sht));
         const byCot = new Map<string, any>();
         for (const it of existing) {
-          if (it.cot && shtSet.has(String(it.cot))) byCot.set(String(it.cot), it);
+          // Match by SHT (preferred) or fallback to cot for legacy items imported before the SHT field existed.
+          const key = (it as any).sht ? String((it as any).sht) : (it.cot ? String(it.cot) : "");
+          if (key && shtSet.has(key)) byCot.set(key, it);
         }
         const norm = (s: any) => String(s ?? "").replace(/\s+/g, " ").trim().toLowerCase();
         const tagged: ParsedService[] = parsed.map((p) => {
