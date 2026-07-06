@@ -518,25 +518,71 @@ const ImportarPDFDialog = ({ open, onOpenChange, onImported }: Props) => {
 
         <div className="space-y-4">
           {services.length === 0 && (
-            <label className="flex flex-col items-center justify-center gap-3 border-2 border-dashed border-border rounded-lg p-10 cursor-pointer hover:bg-muted/50 transition">
-              {loading ? (
-                <Loader2 className="h-10 w-10 animate-spin text-muted-foreground" />
-              ) : (
-                <Upload className="h-10 w-10 text-muted-foreground" />
-              )}
-              <div className="text-center">
-                <p className="text-sm font-medium">{loading ? "Lendo PDF..." : "Selecione ou arraste o PDF do pedido"}</p>
-                <p className="text-xs text-muted-foreground">O sistema extrai automaticamente SHT, datas, horários, veículo, valor e passageiros</p>
-              </div>
-              <input
-                type="file"
-                accept="application/pdf,.pdf"
-                className="hidden"
-                disabled={loading}
-                onChange={(e) => handleFile(e.target.files?.[0] || null)}
-              />
-            </label>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              <label className="flex flex-col items-center justify-center gap-3 border-2 border-dashed border-border rounded-lg p-8 cursor-pointer hover:bg-muted/50 transition">
+                {loading ? (
+                  <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+                ) : (
+                  <Upload className="h-8 w-8 text-muted-foreground" />
+                )}
+                <div className="text-center">
+                  <p className="text-sm font-medium">{loading ? "Lendo PDF..." : "PDF do serviço"}</p>
+                  <p className="text-xs text-muted-foreground">Extrai SHT, datas, horários, veículo, valor e passageiros</p>
+                </div>
+                <input
+                  type="file"
+                  accept="application/pdf,.pdf"
+                  className="hidden"
+                  disabled={loading}
+                  onChange={(e) => handleFile(e.target.files?.[0] || null)}
+                />
+              </label>
+
+              <label className={`flex flex-col items-center justify-center gap-3 border-2 border-dashed rounded-lg p-8 cursor-pointer hover:bg-muted/50 transition ${placaUrls.length ? "border-emerald-500/60 bg-emerald-50/40" : "border-border"}`}>
+                {uploadingPlaca ? (
+                  <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+                ) : (
+                  <FileText className={`h-8 w-8 ${placaUrls.length ? "text-emerald-600" : "text-muted-foreground"}`} />
+                )}
+                <div className="text-center">
+                  <p className="text-sm font-medium">{uploadingPlaca ? "Enviando..." : "PDF da placa do serviço"}</p>
+                  <p className="text-xs text-muted-foreground">
+                    {placaUrls.length ? `${placaUrls.length} arquivo(s) anexado(s) — será replicado em cada serviço` : "Opcional — anexado automaticamente em cada serviço importado"}
+                  </p>
+                </div>
+                <input
+                  type="file"
+                  accept="application/pdf,.pdf,image/*"
+                  multiple
+                  className="hidden"
+                  disabled={uploadingPlaca}
+                  onChange={(e) => handlePlacaFiles(Array.from(e.target.files || []))}
+                />
+              </label>
+            </div>
           )}
+
+          {placaUrls.length > 0 && (
+            <div className="flex flex-wrap gap-2 items-center text-xs">
+              <span className="text-muted-foreground">Placas anexadas:</span>
+              {placaUrls.map((u, i) => (
+                <span key={u} className="inline-flex items-center gap-1 px-2 py-1 rounded bg-emerald-100 text-emerald-800">
+                  <FileText className="h-3 w-3" />
+                  <a href={u} target="_blank" rel="noreferrer" className="underline">Placa {i + 1}</a>
+                  <button
+                    type="button"
+                    className="ml-1 hover:text-destructive"
+                    onClick={() => setPlacaUrls((prev) => prev.filter((x) => x !== u))}
+                    aria-label="Remover"
+                  >
+                    <X className="h-3 w-3" />
+                  </button>
+                </span>
+              ))}
+            </div>
+          )}
+
+
 
           {services.length > 0 && (
             <>
