@@ -415,14 +415,14 @@ const ImportarPDFCSGlobalDialog = ({ open, onOpenChange, onImported }: Props) =>
       toast.error("Selecione ao menos um serviço.");
       return;
     }
-    let clienteNome = "CS Global";
+    let clienteNome = "CS Brasil";
     if (clienteId) {
       const c = clientes.find((x) => x.id === clienteId);
       if (c) clienteNome = c.nome;
     } else {
       try {
-        const novo: any = await saveCliente({ nome: "CS Global", contato: "", telefone: "", endereco: "" } as any);
-        clienteNome = novo?.nome || "CS Global";
+        const novo: any = await saveCliente({ nome: "CS Brasil", contato: "", telefone: "", endereco: "" } as any);
+        clienteNome = novo?.nome || "CS Brasil";
       } catch {}
     }
 
