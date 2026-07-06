@@ -334,8 +334,6 @@ const ImportarPDFDialog = ({ open, onOpenChange, onImported }: Props) => {
       setPlacaUrls([]);
     }
   }, [open]);
-    }
-  }, [open]);
 
   const handleFile = async (file: File | null) => {
     if (!file) return;
