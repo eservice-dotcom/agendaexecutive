@@ -694,7 +694,12 @@ const AgendaTable = ({ items, onEdited, hideFinancials, onClone }: AgendaTablePr
                     variant="ghost"
                     size="sm"
                     className="h-4 w-4 p-0 text-muted-foreground hover:text-accent"
-                    onClick={() => handleClone(item)}
+                    onClick={() => {
+                      const osLabel = item.cot ? `O.S. ${item.cot}` : `serviço de ${item.cliente || 'sem cliente'}`;
+                      if (!window.confirm(`Deseja realmente duplicar o ${osLabel}?`)) return;
+                      if (!window.confirm(`Confirmação final: duplicar ${osLabel}?\n\nUma nova entrada será criada com os mesmos dados.`)) return;
+                      handleClone(item);
+                    }}
                     title="Clonar serviço"
                   >
                     <Copy className="h-2.5 w-2.5" />
