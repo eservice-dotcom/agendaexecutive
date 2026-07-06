@@ -282,6 +282,35 @@ const ImportarPDFDialog = ({ open, onOpenChange, onImported }: Props) => {
   const [motoristas, setMotoristas] = useState<any[]>([]);
   const [tipos, setTipos] = useState<string[]>([]);
   const [clienteShiftId, setClienteShiftId] = useState<string>("");
+  const [placaUrls, setPlacaUrls] = useState<string[]>([]);
+  const [uploadingPlaca, setUploadingPlaca] = useState(false);
+
+  const handlePlacaFiles = async (files: File[]) => {
+    if (!files.length) return;
+    setUploadingPlaca(true);
+    try {
+      const { data: userData, error: userError } = await supabase.auth.getUser();
+      if (userError || !userData?.user) throw new Error("Sessão expirada. Faça login novamente.");
+      const novos: string[] = [];
+      for (const file of files) {
+        const ext = (file.name.split(".").pop() || "pdf").toLowerCase();
+        const path = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
+        const { error: upErr } = await supabase.storage
+          .from("placas-receptivo")
+          .upload(path, file, { upsert: false, contentType: file.type || "application/pdf" });
+        if (upErr) throw upErr;
+        const { data } = supabase.storage.from("placas-receptivo").getPublicUrl(path);
+        novos.push(data.publicUrl);
+      }
+      setPlacaUrls((prev) => [...prev, ...novos]);
+      toast.success(`${novos.length} PDF de placa anexado(s).`);
+    } catch (e: any) {
+      console.error("[ImportPDF placa] falha:", e);
+      toast.error("Erro ao enviar PDF da placa: " + (e?.message || ""));
+    } finally {
+      setUploadingPlaca(false);
+    }
+  };
 
   useEffect(() => {
     if (!open) return;
