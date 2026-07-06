@@ -715,46 +715,6 @@ const AgendaTable = ({ items, onEdited, hideFinancials, onClone }: AgendaTablePr
                   <Button
                     variant="ghost"
                     size="sm"
-                    className="h-4 w-4 p-0 text-muted-foreground hover:text-primary"
-                    onClick={async () => {
-                      await supabase.from("agenda_items").update({ status_faturamento: "enviado" }).eq("id", item.id);
-                      const osLabel = item.cot ? `O.S. ${item.cot}` : "Serviço";
-                      const despesasExtras = ((item.outrosDespesas || []) as any[])
-                        .map((d) => ({
-                          descricao: (d?.descricao || "").trim() || `Outros ${osLabel}`,
-                          valor: Number(d?.valor) || 0,
-                        }))
-                        .filter((d) => d.valor > 0);
-                      const estacValor = Number(item.estacionamento) || 0;
-                      const reportExtras = [
-                        ...(estacValor > 0 ? [{ descricao: `Estacionamento ${osLabel}`, valor: estacValor }] : []),
-                        ...despesasExtras,
-                      ];
-                      generateClosingReport(
-                        [{
-                          cot: item.cot, data: item.data, hora: item.hora, tipo: item.tipo,
-                          origem: item.origem, destino: item.destino, pax: item.pax,
-                          motorista: item.motorista, veiculo: item.veiculo, placa: item.placa,
-                          fornecedor: item.fornecedor, valor: item.valor, custo: item.custo,
-                          km_in: item.kmIn, km_fim: item.kmFim, km_extra: item.kmExtra,
-                          hora_in: item.horaIn, hora_fim: item.horaFim, hora_extra: item.horaExtra,
-                          estacionamento: item.estacionamento,
-                          outros_despesas: item.outrosDespesas, cliente: item.cliente,
-                        }],
-                        `Fechamento - ${item.cot}`,
-                        `O.S. ${item.cot} — ${item.cliente}`,
-                        { cliente: item.cliente, extras: reportExtras }
-                      );
-                      ((item.comprovanteEstacionamentoUrls || []) as string[]).forEach((u) => window.open(u, "_blank"));
-                      onEdited();
-                    }}
-                    title="Relatório de Fechamento"
-                  >
-                    <FileText className="h-2.5 w-2.5" />
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="sm"
                     className="h-4 w-4 p-0 text-muted-foreground hover:text-destructive"
                     onClick={() => setDeleteItemId(item.id)}
                     title="Excluir serviço"
