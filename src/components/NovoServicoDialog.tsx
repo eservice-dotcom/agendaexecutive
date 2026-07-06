@@ -577,6 +577,11 @@ const NovoServicoDialog = ({ open, onOpenChange, onSaved, initialData }: NovoSer
                   {motoristas.map((m) => <SelectItem key={m.id} value={m.id}>{m.nome}</SelectItem>)}
                 </SelectContent>
               </Select>
+              {form.motoristaId && form.motoristaId !== "_empty" && (
+                <p className="text-xs text-muted-foreground">
+                  {motoristas.find((m) => m.id === form.motoristaId)?.telefone || ""}
+                </p>
+              )}
             )}
           </div>
 
