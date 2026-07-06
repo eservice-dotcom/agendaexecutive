@@ -333,7 +333,7 @@ const ImportarPDFCSGlobalDialog = ({ open, onOpenChange, onImported }: Props) =>
       setFornecedores(fs);
       setMotoristas(ms);
       setTipos(ts);
-      const cs = cls.find((c: any) => /cs\s*global/i.test(c.nome));
+      const cs = cls.find((c: any) => /cs\s*brasil/i.test(c.nome));
       if (cs) setClienteId(cs.id);
     })();
   }, [open]);
