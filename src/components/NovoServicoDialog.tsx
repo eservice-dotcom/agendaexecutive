@@ -442,38 +442,30 @@ const NovoServicoDialog = ({ open, onOpenChange, onSaved, initialData }: NovoSer
             </DialogTitle>
           </DialogHeader>
 
-        <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
-          <div className="space-y-0.5">
-            <Label className="text-xs">Data *</Label>
-            <Input type="date" value={form.data} onChange={(e) => update("data", e.target.value)} className="h-8 text-sm" />
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <div className="space-y-1.5">
+            <Label>Data *</Label>
+            <Input type="date" value={form.data} onChange={(e) => update("data", e.target.value)} />
           </div>
-          <div className="space-y-0.5">
-            <Label className="text-xs">Hora *</Label>
-            <Input type="time" value={form.hora} onChange={(e) => update("hora", e.target.value)} className="h-8 text-sm" />
-          </div>
-          <div className="space-y-0.5">
-            <Label className="text-xs">SHT</Label>
-            <Input type="number" min={0} value={form.pax} onChange={(e) => update("pax", e.target.value)} placeholder="0" className="h-8 text-sm" />
-          </div>
-          <div className="space-y-0.5">
-            <Label className="text-xs">O.S.</Label>
-            <Input value={form.cot} onChange={(e) => update("cot", e.target.value)} placeholder="O.S.-000" className="h-8 text-sm" />
+          <div className="space-y-1.5">
+            <Label>Hora *</Label>
+            <Input type="time" value={form.hora} onChange={(e) => update("hora", e.target.value)} />
           </div>
 
-          <div className="space-y-0.5 col-span-2 sm:col-span-3">
+          <div className="space-y-1.5">
             <div className="flex items-center justify-between">
-              <Label className="text-xs">Cliente *</Label>
-              <Button type="button" variant="ghost" size="sm" className="h-5 gap-1 text-[10px] px-1.5" onClick={() => setShowNewCliente(!showNewCliente)}>
+              <Label>Cliente *</Label>
+              <Button type="button" variant="ghost" size="sm" className="h-6 gap-1 text-xs px-2" onClick={() => setShowNewCliente(!showNewCliente)}>
                 <UserPlus className="h-3 w-3" /> Novo
               </Button>
             </div>
             {showNewCliente ? (
-              <div className="space-y-0.5 rounded-md border border-border p-2 bg-muted/30">
-                <Input value={newCliente.nome} onChange={(e) => setNewCliente({ ...newCliente, nome: e.target.value })} placeholder="Nome *" className="h-8 text-sm" />
-                <Input value={newCliente.cnpjCpf} onChange={(e) => setNewCliente({ ...newCliente, cnpjCpf: e.target.value })} placeholder="CNPJ/CPF" className="h-8 text-sm" />
-                <Input value={newCliente.telefone} onChange={(e) => setNewCliente({ ...newCliente, telefone: e.target.value })} placeholder="Telefone" className="h-8 text-sm" />
-                <Input value={newCliente.email} onChange={(e) => setNewCliente({ ...newCliente, email: e.target.value })} placeholder="Email" className="h-8 text-sm" />
-                <Input value={newCliente.endereco} onChange={(e) => setNewCliente({ ...newCliente, endereco: e.target.value })} placeholder="Endereço" className="h-8 text-sm" />
+              <div className="space-y-2 rounded-md border border-border p-2 bg-muted/30">
+                <Input value={newCliente.nome} onChange={(e) => setNewCliente({ ...newCliente, nome: e.target.value })} placeholder="Nome *" />
+                <Input value={newCliente.cnpjCpf} onChange={(e) => setNewCliente({ ...newCliente, cnpjCpf: e.target.value })} placeholder="CNPJ/CPF" />
+                <Input value={newCliente.telefone} onChange={(e) => setNewCliente({ ...newCliente, telefone: e.target.value })} placeholder="Telefone" />
+                <Input value={newCliente.email} onChange={(e) => setNewCliente({ ...newCliente, email: e.target.value })} placeholder="Email" />
+                <Input value={newCliente.endereco} onChange={(e) => setNewCliente({ ...newCliente, endereco: e.target.value })} placeholder="Endereço" />
                 <div className="flex gap-2">
                   <Button type="button" size="sm" className="h-7 text-xs" onClick={handleSaveNewCliente}>Salvar</Button>
                   <Button type="button" variant="outline" size="sm" className="h-7 text-xs" onClick={() => setShowNewCliente(false)}>Cancelar</Button>
@@ -481,7 +473,7 @@ const NovoServicoDialog = ({ open, onOpenChange, onSaved, initialData }: NovoSer
               </div>
             ) : (
               <Select value={form.clienteId} onValueChange={(v) => update("clienteId", v)}>
-                <SelectTrigger className="h-8 text-sm"><SelectValue placeholder="Selecione" /></SelectTrigger>
+                <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
                 <SelectContent>
                   {clientes.length === 0 && <SelectItem value="_none" disabled>Nenhum cadastrado</SelectItem>}
                   {clientes.map((c) => <SelectItem key={c.id} value={c.id}>{c.nome}</SelectItem>)}
@@ -490,27 +482,41 @@ const NovoServicoDialog = ({ open, onOpenChange, onSaved, initialData }: NovoSer
             )}
           </div>
 
-          <div className="space-y-0.5 col-span-2 sm:col-span-1">
-            <Label className="text-xs">Tipo *</Label>
+          <div className="space-y-1.5">
+            <Label>SHT</Label>
+            <Input type="number" min={0} value={form.pax} onChange={(e) => update("pax", e.target.value)} placeholder="0" />
+          </div>
+
+          <div className="space-y-1.5">
+            <Label>O.S.</Label>
+            <Input value={form.cot} onChange={(e) => update("cot", e.target.value)} placeholder="O.S.-000" />
+          </div>
+
+          <div className="space-y-1.5 sm:col-span-2">
+            <PassageirosInput passageiros={passageiros} onChange={setPassageiros} />
+          </div>
+
+          <div className="space-y-1.5">
+            <Label>Tipo *</Label>
             <Select value={form.tipo} onValueChange={(v) => update("tipo", v)}>
-              <SelectTrigger className="h-8 text-sm"><SelectValue placeholder="Selecione" /></SelectTrigger>
+              <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
               <SelectContent>
                 {tiposServico.map((t) => <SelectItem key={t} value={t}>{t}</SelectItem>)}
               </SelectContent>
             </Select>
           </div>
 
-          <div className="space-y-0.5 col-span-2 sm:col-span-2">
-            <Label className="text-xs">Origem *</Label>
-            <Input value={form.origem} onChange={(e) => update("origem", e.target.value)} placeholder="Local de origem" className="h-8 text-sm" />
+          <div className="space-y-1.5 sm:col-span-2">
+            <Label>Origem *</Label>
+            <Input value={form.origem} onChange={(e) => update("origem", e.target.value)} placeholder="Local de origem" />
           </div>
 
-          <div className="space-y-0.5 col-span-2 sm:col-span-2">
-            <Label className="text-xs">Destino *</Label>
-            <Input value={form.destino} onChange={(e) => update("destino", e.target.value)} placeholder="Local de destino" className="h-8 text-sm" />
+          <div className="space-y-1.5 sm:col-span-2">
+            <Label>Destino *</Label>
+            <Input value={form.destino} onChange={(e) => update("destino", e.target.value)} placeholder="Local de destino" />
           </div>
 
-          <div className="space-y-0.5">
+          <div className="space-y-1.5">
             <div className="flex items-center justify-between">
               <Label>Veículo</Label>
               <Button type="button" variant="ghost" size="sm" className="h-6 gap-1 text-xs px-2" onClick={() => setShowNewVeiculo(!showNewVeiculo)}>
@@ -518,7 +524,7 @@ const NovoServicoDialog = ({ open, onOpenChange, onSaved, initialData }: NovoSer
               </Button>
             </div>
             {showNewVeiculo ? (
-              <div className="space-y-1 rounded-md border border-border p-2 bg-muted/30">
+              <div className="space-y-2 rounded-md border border-border p-2 bg-muted/30">
                 <Input value={newVeiculo.placa} onChange={(e) => setNewVeiculo({ ...newVeiculo, placa: e.target.value })} placeholder="Placa *" />
                 <Input value={newVeiculo.modelo} onChange={(e) => setNewVeiculo({ ...newVeiculo, modelo: e.target.value })} placeholder="Modelo *" />
                 <Input value={newVeiculo.tipo} onChange={(e) => setNewVeiculo({ ...newVeiculo, tipo: e.target.value })} placeholder="Tipo (ex: Sedan)" />
@@ -540,7 +546,7 @@ const NovoServicoDialog = ({ open, onOpenChange, onSaved, initialData }: NovoSer
             )}
           </div>
 
-          <div className="space-y-0.5">
+          <div className="space-y-1.5">
             <div className="flex items-center justify-between">
               <Label>Motorista</Label>
               <Button type="button" variant="ghost" size="sm" className="h-6 gap-1 text-xs px-2" onClick={() => setShowNewMotorista(!showNewMotorista)}>
@@ -548,7 +554,7 @@ const NovoServicoDialog = ({ open, onOpenChange, onSaved, initialData }: NovoSer
               </Button>
             </div>
             {showNewMotorista ? (
-              <div className="space-y-1 rounded-md border border-border p-2 bg-muted/30">
+              <div className="space-y-2 rounded-md border border-border p-2 bg-muted/30">
                 <Input value={newMotorista.nome} onChange={(e) => setNewMotorista({ ...newMotorista, nome: e.target.value })} placeholder="Nome *" />
                 <Input value={newMotorista.telefone} onChange={(e) => setNewMotorista({ ...newMotorista, telefone: e.target.value })} placeholder="Telefone" />
                 <Input value={newMotorista.cnh} onChange={(e) => setNewMotorista({ ...newMotorista, cnh: e.target.value })} placeholder="CNH" />
@@ -569,12 +575,12 @@ const NovoServicoDialog = ({ open, onOpenChange, onSaved, initialData }: NovoSer
             )}
           </div>
 
-          <div className="space-y-0.5">
+          <div className="space-y-1.5">
             <Label>Valor (R$)</Label>
             <Input type="number" min={0} step="0.01" value={form.valor} onChange={(e) => update("valor", e.target.value)} placeholder="0,00" />
           </div>
 
-          <div className="space-y-0.5">
+          <div className="space-y-1.5">
             <div className="flex items-center justify-between">
               <Label>Fornecedor</Label>
               <Button type="button" variant="ghost" size="sm" className="h-6 gap-1 text-xs px-2" onClick={() => setShowNewFornecedor(!showNewFornecedor)}>
@@ -582,7 +588,7 @@ const NovoServicoDialog = ({ open, onOpenChange, onSaved, initialData }: NovoSer
               </Button>
             </div>
             {showNewFornecedor ? (
-              <div className="space-y-1 rounded-md border border-border p-2 bg-muted/30">
+              <div className="space-y-2 rounded-md border border-border p-2 bg-muted/30">
                 <Input value={newFornecedor.razaoSocial} onChange={(e) => setNewFornecedor({ ...newFornecedor, razaoSocial: e.target.value })} placeholder="Razão Social *" />
                 <Input value={newFornecedor.cnpj} onChange={(e) => setNewFornecedor({ ...newFornecedor, cnpj: e.target.value })} placeholder="CNPJ" />
                 <Input value={newFornecedor.contato} onChange={(e) => setNewFornecedor({ ...newFornecedor, contato: e.target.value })} placeholder="Contato" />
@@ -604,7 +610,7 @@ const NovoServicoDialog = ({ open, onOpenChange, onSaved, initialData }: NovoSer
             )}
            </div>
 
-          <div className="space-y-0.5">
+          <div className="space-y-1.5">
             <Label>Forma de Contratação</Label>
             {motoristaDiariaMsg ? (
               <div className="rounded-md border border-amber-300 bg-amber-50 px-3 py-2 text-sm text-amber-800 dark:border-amber-600 dark:bg-amber-900/30 dark:text-amber-300">
@@ -622,7 +628,7 @@ const NovoServicoDialog = ({ open, onOpenChange, onSaved, initialData }: NovoSer
             )}
           </div>
 
-          <div className="space-y-0.5">
+          <div className="space-y-1.5">
             <Label>Custo (R$)</Label>
             <Input type="text" readOnly className="bg-muted" value={(() => {
               const f = fornecedores.find((f) => f.id === form.fornecedorId);
@@ -638,12 +644,12 @@ const NovoServicoDialog = ({ open, onOpenChange, onSaved, initialData }: NovoSer
             })()} />
           </div>
 
-          <div className="space-y-0.5">
+          <div className="space-y-1.5">
             <Label>Receptivo</Label>
             <Input value={form.receptivo} onChange={(e) => update("receptivo", e.target.value)} placeholder="Nome do receptivo" />
           </div>
 
-          <div className="space-y-0.5">
+          <div className="space-y-1.5">
             <Label>Arquivos da Placa de Receptivo</Label>
             <Input
               type="file"
@@ -687,7 +693,7 @@ const NovoServicoDialog = ({ open, onOpenChange, onSaved, initialData }: NovoSer
           </div>
 
 
-          <div className="space-y-0.5 sm:col-span-2">
+          <div className="space-y-1.5 sm:col-span-2">
             <Label>Observações</Label>
             <div className="flex flex-wrap gap-2 mb-1.5">
               {["Motorista Recepciona", "Terá Coordenador"].map((chip) => {
@@ -718,14 +724,14 @@ const NovoServicoDialog = ({ open, onOpenChange, onSaved, initialData }: NovoSer
           </div>
 
           {/* Fechamento */}
-          <div className="sm:col-span-2 border-t pt-3 mt-2 space-y-2">
+          <div className="sm:col-span-2 border-t pt-3 mt-2 space-y-4">
             <p className="text-sm font-semibold text-muted-foreground">Fechamento Cliente</p>
 
             {/* Quilometragem */}
-            <div className="space-y-1">
+            <div className="space-y-2">
               <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Quilometragem</p>
               <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
-                <div className="space-y-0.5">
+                <div className="space-y-1.5">
                   <Label>KM Início</Label>
                   <Input type="number" min={0} value={form.kmIn} onChange={(e) => {
                     const kmIn = e.target.value;
@@ -734,7 +740,7 @@ const NovoServicoDialog = ({ open, onOpenChange, onSaved, initialData }: NovoSer
                     setForm({ ...form, kmIn, kmExtra: String(extra) });
                   }} placeholder="0" />
                 </div>
-                <div className="space-y-0.5">
+                <div className="space-y-1.5">
                   <Label>KM Fim</Label>
                   <Input type="number" min={0} value={form.kmFim} onChange={(e) => {
                     const kmFim = e.target.value;
@@ -743,15 +749,15 @@ const NovoServicoDialog = ({ open, onOpenChange, onSaved, initialData }: NovoSer
                     setForm({ ...form, kmFim, kmExtra: String(extra) });
                   }} placeholder="0" />
                 </div>
-                <div className="space-y-0.5">
+                <div className="space-y-1.5">
                   <Label>KM Extra</Label>
                   <Input type="number" min={0} value={form.kmExtra} readOnly className="bg-muted" placeholder="0" />
                 </div>
-                <div className="space-y-0.5">
+                <div className="space-y-1.5">
                   <Label>R$ Km Extra</Label>
                   <Input type="number" min={0} step="0.01" value={form.valorKmExtra} onChange={(e) => update("valorKmExtra", e.target.value)} placeholder="0,00" />
                 </div>
-                <div className="space-y-0.5">
+                <div className="space-y-1.5">
                   <Label>R$ Total Km Extra</Label>
                   <Input type="text" readOnly className="bg-muted" value={`R$ ${((parseFloat(form.kmExtra) || 0) * (parseFloat(form.valorKmExtra) || 0)).toFixed(2)}`} />
                 </div>
@@ -759,10 +765,10 @@ const NovoServicoDialog = ({ open, onOpenChange, onSaved, initialData }: NovoSer
             </div>
 
             {/* Horas */}
-            <div className="space-y-1">
+            <div className="space-y-2">
               <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Horas</p>
               <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
-                <div className="space-y-0.5">
+                <div className="space-y-1.5">
                   <Label>Hora Início</Label>
                   <Input type="time" value={form.horaIn} onChange={(e) => {
                     const horaIn = e.target.value;
@@ -774,7 +780,7 @@ const NovoServicoDialog = ({ open, onOpenChange, onSaved, initialData }: NovoSer
                     setForm({ ...form, horaIn, horaExtra: extra > 0 ? fmt(extra) : "" });
                   }} />
                 </div>
-                <div className="space-y-0.5">
+                <div className="space-y-1.5">
                   <Label>Hora Fim</Label>
                   <Input type="time" value={form.horaFim} onChange={(e) => {
                     const horaFim = e.target.value;
@@ -786,15 +792,15 @@ const NovoServicoDialog = ({ open, onOpenChange, onSaved, initialData }: NovoSer
                     setForm({ ...form, horaFim, horaExtra: extra > 0 ? fmt(extra) : "" });
                   }} />
                 </div>
-                <div className="space-y-0.5">
+                <div className="space-y-1.5">
                   <Label>Hora Extra</Label>
                   <Input type="time" value={form.horaExtra} onChange={(e) => update("horaExtra", e.target.value)} />
                 </div>
-                <div className="space-y-0.5">
+                <div className="space-y-1.5">
                   <Label>R$ Hora Extra</Label>
                   <Input type="number" min={0} step="0.01" value={form.valorHoraExtra} onChange={(e) => update("valorHoraExtra", e.target.value)} placeholder="0,00" />
                 </div>
-                <div className="space-y-0.5">
+                <div className="space-y-1.5">
                   <Label>R$ Total Hora Extra</Label>
                   <Input type="text" readOnly className="bg-muted" value={(() => {
                     const [h,m] = (form.horaExtra||"").split(":").map(Number);
@@ -806,14 +812,14 @@ const NovoServicoDialog = ({ open, onOpenChange, onSaved, initialData }: NovoSer
             </div>
 
             {/* Outros */}
-            <div className="space-y-1">
+            <div className="space-y-2">
               <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Outros</p>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <div className="space-y-0.5">
+                <div className="space-y-1.5">
                   <Label>Estacionamento (R$)</Label>
                   <Input type="number" min={0} step="0.01" value={form.estacionamento} onChange={(e) => update("estacionamento", e.target.value)} placeholder="0,00" />
                 </div>
-                <div className="space-y-0.5">
+                <div className="space-y-1.5">
                   <Label>Comprovantes de Estacionamento</Label>
                   <Input
                     type="file"
@@ -846,7 +852,7 @@ const NovoServicoDialog = ({ open, onOpenChange, onSaved, initialData }: NovoSer
 
             <div className="grid grid-cols-1 gap-3">
               {/* Outras Despesas */}
-              <div className="sm:col-span-4 space-y-1">
+              <div className="sm:col-span-4 space-y-2">
                 <div className="flex items-center justify-between">
                   <Label>Outras Despesas</Label>
                   <Button type="button" variant="outline" size="sm" onClick={() => setOutrosDespesas([...outrosDespesas, { descricao: "", valor: 0 }])} className="gap-1 h-7 text-xs">
@@ -878,14 +884,14 @@ const NovoServicoDialog = ({ open, onOpenChange, onSaved, initialData }: NovoSer
           </div>
 
           {/* Fechamento Fornecedor */}
-          <div className="sm:col-span-2 border-t pt-3 mt-2 space-y-2">
+          <div className="sm:col-span-2 border-t pt-3 mt-2 space-y-4">
             <p className="text-sm font-semibold text-muted-foreground">Fechamento Fornecedor</p>
 
             {/* Custo Base */}
-            <div className="space-y-1">
+            <div className="space-y-2">
               <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Custo Base</p>
               <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
-                <div className="space-y-0.5">
+                <div className="space-y-1.5">
                   <Label>Custo (R$)</Label>
                   <Input type="number" min={0} step="0.01" value={form.custo} onChange={(e) => update("custo", e.target.value)} placeholder="0,00" />
                 </div>
@@ -893,10 +899,10 @@ const NovoServicoDialog = ({ open, onOpenChange, onSaved, initialData }: NovoSer
             </div>
 
             {/* Quilometragem Fornecedor */}
-            <div className="space-y-1">
+            <div className="space-y-2">
               <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Quilometragem</p>
               <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
-                <div className="space-y-0.5">
+                <div className="space-y-1.5">
                   <Label>KM Início</Label>
                   <Input type="number" min={0} value={form.kmInFornecedor} onChange={(e) => {
                     const v = e.target.value;
@@ -905,7 +911,7 @@ const NovoServicoDialog = ({ open, onOpenChange, onSaved, initialData }: NovoSer
                     setForm({ ...form, kmInFornecedor: v, kmExtraFornecedor: String(extra) });
                   }} placeholder="0" />
                 </div>
-                <div className="space-y-0.5">
+                <div className="space-y-1.5">
                   <Label>KM Fim</Label>
                   <Input type="number" min={0} value={form.kmFimFornecedor} onChange={(e) => {
                     const v = e.target.value;
@@ -914,15 +920,15 @@ const NovoServicoDialog = ({ open, onOpenChange, onSaved, initialData }: NovoSer
                     setForm({ ...form, kmFimFornecedor: v, kmExtraFornecedor: String(extra) });
                   }} placeholder="0" />
                 </div>
-                <div className="space-y-0.5">
+                <div className="space-y-1.5">
                   <Label>KM Extra</Label>
                   <Input type="number" min={0} value={form.kmExtraFornecedor} onChange={(e) => update("kmExtraFornecedor", e.target.value)} placeholder="0" />
                 </div>
-                <div className="space-y-0.5">
+                <div className="space-y-1.5">
                   <Label>R$ Km Extra</Label>
                   <Input type="number" min={0} step="0.01" value={form.valorKmExtraFornecedor} onChange={(e) => update("valorKmExtraFornecedor", e.target.value)} placeholder="0,00" />
                 </div>
-                <div className="space-y-0.5">
+                <div className="space-y-1.5">
                   <Label>R$ Total Km Extra</Label>
                   <Input type="text" readOnly className="bg-muted" value={`R$ ${((parseFloat(form.kmExtraFornecedor) || 0) * (parseFloat(form.valorKmExtraFornecedor) || 0)).toFixed(2)}`} />
                 </div>
@@ -930,10 +936,10 @@ const NovoServicoDialog = ({ open, onOpenChange, onSaved, initialData }: NovoSer
             </div>
 
             {/* Horas Fornecedor */}
-            <div className="space-y-1">
+            <div className="space-y-2">
               <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Horas</p>
               <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
-                <div className="space-y-0.5">
+                <div className="space-y-1.5">
                   <Label>Hora Início</Label>
                   <Input type="time" value={form.horaInFornecedor} onChange={(e) => {
                     const horaIn = e.target.value;
@@ -945,7 +951,7 @@ const NovoServicoDialog = ({ open, onOpenChange, onSaved, initialData }: NovoSer
                     setForm({ ...form, horaInFornecedor: horaIn, horaExtraFornecedor: extra > 0 ? fmt(extra) : "" });
                   }} />
                 </div>
-                <div className="space-y-0.5">
+                <div className="space-y-1.5">
                   <Label>Hora Fim</Label>
                   <Input type="time" value={form.horaFimFornecedor} onChange={(e) => {
                     const horaFim = e.target.value;
@@ -957,15 +963,15 @@ const NovoServicoDialog = ({ open, onOpenChange, onSaved, initialData }: NovoSer
                     setForm({ ...form, horaFimFornecedor: horaFim, horaExtraFornecedor: extra > 0 ? fmt(extra) : "" });
                   }} />
                 </div>
-                <div className="space-y-0.5">
+                <div className="space-y-1.5">
                   <Label>Hora Extra</Label>
                   <Input type="time" value={form.horaExtraFornecedor} onChange={(e) => update("horaExtraFornecedor", e.target.value)} />
                 </div>
-                <div className="space-y-0.5">
+                <div className="space-y-1.5">
                   <Label>R$ Hora Extra</Label>
                   <Input type="number" min={0} step="0.01" value={form.valorHoraExtraFornecedor} onChange={(e) => update("valorHoraExtraFornecedor", e.target.value)} placeholder="0,00" />
                 </div>
-                <div className="space-y-0.5">
+                <div className="space-y-1.5">
                   <Label>R$ Total Hora Extra</Label>
                   <Input type="text" readOnly className="bg-muted" value={(() => {
                     const [h,m] = (form.horaExtraFornecedor||"").split(":").map(Number);
@@ -977,10 +983,10 @@ const NovoServicoDialog = ({ open, onOpenChange, onSaved, initialData }: NovoSer
             </div>
 
             {/* Outros Fornecedor */}
-            <div className="space-y-1">
+            <div className="space-y-2">
               <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Outros</p>
               <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
-                <div className="space-y-0.5">
+                <div className="space-y-1.5">
                   <Label>Estacionamento (R$)</Label>
                   <Input type="number" min={0} step="0.01" value={form.estacionamentoFornecedor} onChange={(e) => update("estacionamentoFornecedor", e.target.value)} placeholder="0,00" />
                 </div>

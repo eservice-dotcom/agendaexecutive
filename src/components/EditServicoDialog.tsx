@@ -630,16 +630,17 @@ const EditServicoDialog = ({ open, onOpenChange, item, onSaved }: EditServicoDia
 
           <div className="space-y-1.5">
             <Label>Custo (R$)</Label>
-            <Input
-              type="number"
-              min={0}
-              step="0.01"
-              placeholder="0,00"
-              readOnly={form.fornecedor.toLowerCase().includes("executive")}
-              className={form.fornecedor.toLowerCase().includes("executive") ? "bg-muted" : ""}
-              value={form.fornecedor.toLowerCase().includes("executive") ? "0" : form.custo}
-              onChange={(e) => update("custo", e.target.value)}
-            />
+            <Input type="text" readOnly className="bg-muted" value={(() => {
+              if (form.fornecedor.toLowerCase().includes("executive")) return "R$ 0,00";
+              const base = parseFloat(form.custo) || 0;
+              const kmTot = (parseFloat(form.kmExtraFornecedor) || 0) * (parseFloat(form.valorKmExtraFornecedor) || 0);
+              const [hh, mm] = (form.horaExtraFornecedor || "").split(":").map((v: string) => parseInt(v) || 0);
+              const horas = (hh || 0) + ((mm || 0) / 60);
+              const horaTot = horas * (parseFloat(form.valorHoraExtraFornecedor) || 0);
+              const estac = parseFloat(form.estacionamentoFornecedor) || 0;
+              const total = base + kmTot + horaTot + estac;
+              return `R$ ${total.toFixed(2).replace(".", ",")}`;
+            })()} />
           </div>
 
           <div className="space-y-1.5">
@@ -783,6 +784,7 @@ const EditServicoDialog = ({ open, onOpenChange, item, onSaved }: EditServicoDia
                 </div>
               </div>
             </div>
+
             {/* Horas */}
             <div className="space-y-2">
               <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Horas</p>
@@ -829,6 +831,7 @@ const EditServicoDialog = ({ open, onOpenChange, item, onSaved }: EditServicoDia
                 </div>
               </div>
             </div>
+
             {/* Outros */}
             <div className="space-y-2">
               <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Outros</p>
@@ -876,6 +879,7 @@ const EditServicoDialog = ({ open, onOpenChange, item, onSaved }: EditServicoDia
                 </div>
               </div>
             </div>
+
             <div className="grid grid-cols-1 gap-3">
               {/* Outras Despesas */}
               <div className="sm:col-span-4 space-y-2">
@@ -908,6 +912,20 @@ const EditServicoDialog = ({ open, onOpenChange, item, onSaved }: EditServicoDia
               </div>
             </div>
           </div>
+
+          {/* Fechamento Fornecedor */}
+          <div className="sm:col-span-2 border-t pt-3 mt-2 space-y-4">
+            <p className="text-sm font-semibold text-muted-foreground">Fechamento Fornecedor</p>
+
+            <div className="space-y-2">
+              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Custo Base</p>
+              <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
+                <div className="space-y-1.5">
+                  <Label>Custo (R$)</Label>
+                  <Input type="number" min={0} step="0.01" value={form.custo} onChange={(e) => update("custo", e.target.value)} placeholder="0,00" />
+                </div>
+              </div>
+            </div>
 
             <div className="space-y-2">
               <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Quilometragem</p>
@@ -944,15 +962,7 @@ const EditServicoDialog = ({ open, onOpenChange, item, onSaved }: EditServicoDia
                 </div>
               </div>
             </div>
-            <div className="space-y-2">
-              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Custo Base</p>
-              <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
-                <div className="space-y-1.5">
-                  <Label>Custo (R$)</Label>
-                  <Input type="number" min={0} step="0.01" value={form.custo} onChange={(e) => update("custo", e.target.value)} placeholder="0,00" />
-                </div>
-              </div>
-            </div>
+
             <div className="space-y-2">
               <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Horas</p>
               <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
@@ -998,6 +1008,7 @@ const EditServicoDialog = ({ open, onOpenChange, item, onSaved }: EditServicoDia
                 </div>
               </div>
             </div>
+
             <div className="space-y-2">
               <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Outros</p>
               <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
