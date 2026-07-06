@@ -614,7 +614,7 @@ const ImportarPDFCSGlobalDialog = ({ open, onOpenChange, onImported }: Props) =>
                       ))}
                     </SelectContent>
                   </Select>
-                  <p className="text-xs text-muted-foreground mt-1">Padrão: CS Global. Fornecedor, motorista e custo são manuais.</p>
+                  <p className="text-xs text-muted-foreground mt-1">Padrão: CS Brasil. Fornecedor, motorista e custo são manuais.</p>
                 </div>
                 <div className="text-sm text-muted-foreground">
                   <strong>{services.length}</strong> serviço(s) extraído(s). Revise antes de importar.
