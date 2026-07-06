@@ -19,6 +19,7 @@ import pdfWorker from "pdfjs-dist/build/pdf.worker.min.mjs?url";
 interface ParsedService {
   selected: boolean;
   sht: string;
+  os: string;
   data: string; // yyyy-mm-dd
   hora: string; // HH:MM
   tipo: string;
@@ -79,6 +80,12 @@ const extractPageLines = async (page: any): Promise<string[]> => {
   });
 };
 
+const extractOsFromProposta = (text: string): string => {
+  // "Proposta: COT-268881-W2S5D7" → "268881"
+  const m = text.match(/Proposta[^\n]*?[A-Z]{2,}-(\d+)-[A-Z0-9]+/i);
+  return m ? m[1] : "";
+};
+
 const parsePDF = async (file: File): Promise<ParsedService[]> => {
   const buf = await file.arrayBuffer();
   const pdf = await (pdfjsLib as any).getDocument({ data: buf }).promise;
@@ -88,6 +95,9 @@ const parsePDF = async (file: File): Promise<ParsedService[]> => {
     const lines = await extractPageLines(page);
     allLines.push(...lines, "---PAGE---");
   }
+
+  // Global O.S. extracted from any "Proposta:" line in the document.
+  const globalOs = extractOsFromProposta(allLines.join("\n"));
 
   // Split into service blocks by SHT marker. The "Veículo X" line precedes the SHT line in this layout,
   // so we look back one line when starting a new block.
@@ -232,6 +242,7 @@ const parsePDF = async (file: File): Promise<ParsedService[]> => {
     return {
       selected: true,
       sht: b.sht,
+      os: globalOs,
       data,
       hora,
       tipo: tipo || "Translado",
@@ -296,7 +307,9 @@ const ImportarPDFDialog = ({ open, onOpenChange, onImported }: Props) => {
         const shtSet = new Set(parsed.map((p) => p.sht));
         const byCot = new Map<string, any>();
         for (const it of existing) {
-          if (it.cot && shtSet.has(String(it.cot))) byCot.set(String(it.cot), it);
+          // Match by SHT (preferred) or fallback to cot for legacy items imported before the SHT field existed.
+          const key = (it as any).sht ? String((it as any).sht) : (it.cot ? String(it.cot) : "");
+          if (key && shtSet.has(key)) byCot.set(key, it);
         }
         const norm = (s: any) => String(s ?? "").replace(/\s+/g, " ").trim().toLowerCase();
         const tagged: ParsedService[] = parsed.map((p) => {
@@ -390,7 +403,8 @@ const ImportarPDFDialog = ({ open, onOpenChange, onImported }: Props) => {
             cliente: clienteNome,
             pax: s.passageiros.length,
             passageiros: s.passageiros,
-            cot: s.sht,
+            cot: s.os,
+            sht: s.sht,
             tipo: s.tipo,
             origem: s.origem,
             destino: s.destino,
@@ -412,7 +426,8 @@ const ImportarPDFDialog = ({ open, onOpenChange, onImported }: Props) => {
             cliente: clienteNome,
             pax: s.passageiros.length,
             passageiros: s.passageiros,
-            cot: s.sht,
+            cot: s.os,
+            sht: s.sht,
             tipo: s.tipo,
             origem: s.origem,
             destino: s.destino,
@@ -504,6 +519,7 @@ const ImportarPDFDialog = ({ open, onOpenChange, onImported }: Props) => {
                       <th className="p-2"><Checkbox checked={services.every(s => s.selected)} onCheckedChange={(v) => setServices(prev => prev.map(s => ({ ...s, selected: !!v })))} /></th>
                       <th className="p-2 text-left">Status</th>
                       <th className="p-2 text-left">SHT</th>
+                      <th className="p-2 text-left">O.S.</th>
                       <th className="p-2 text-left">Data</th>
                       <th className="p-2 text-left">Hora</th>
                       <th className="p-2 text-left">Tipo Serviço</th>
@@ -511,7 +527,7 @@ const ImportarPDFDialog = ({ open, onOpenChange, onImported }: Props) => {
                       <th className="p-2 text-left">Origem</th>
                       <th className="p-2 text-left">Destino</th>
                       <th className="p-2 text-left">Valor</th>
-                      <th className="p-2 text-left">PAX</th>
+                      
                       <th className="p-2 text-left">Fornecedor</th>
                       <th className="p-2 text-left">Motorista</th>
                       <th className="p-2 text-left">Custo</th>
@@ -544,6 +560,9 @@ const ImportarPDFDialog = ({ open, onOpenChange, onImported }: Props) => {
                           <Input value={s.sht} onChange={(e) => updateService(idx, { sht: e.target.value })} className="h-8 w-28" />
                         </td>
                         <td className="p-1">
+                          <Input value={s.os} onChange={(e) => updateService(idx, { os: e.target.value })} className="h-8 w-28" placeholder="O.S." />
+                        </td>
+                        <td className="p-1">
                           <Input type="date" value={s.data} onChange={(e) => updateService(idx, { data: e.target.value })} className="h-8 w-36" />
                         </td>
                         <td className="p-1">
@@ -570,7 +589,7 @@ const ImportarPDFDialog = ({ open, onOpenChange, onImported }: Props) => {
                         <td className="p-1">
                           <Input type="number" step="0.01" value={s.valor} onChange={(e) => updateService(idx, { valor: parseFloat(e.target.value) || 0 })} className="h-8 w-24" />
                         </td>
-                        <td className="p-1 text-center">{s.passageiros.length}</td>
+                        
                         <td className="p-1">
                           <Select value={s.fornecedorId} onValueChange={(v) => updateService(idx, { fornecedorId: v })}>
                             <SelectTrigger className="h-8 w-40"><SelectValue placeholder="—" /></SelectTrigger>

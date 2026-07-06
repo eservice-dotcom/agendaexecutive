@@ -19,6 +19,7 @@ export interface AgendaItem {
   pax: number;
   passageiros: Passageiro[];
   cot: string;
+  sht?: string;
   tipo: string;
   origem: string;
   destino: string;

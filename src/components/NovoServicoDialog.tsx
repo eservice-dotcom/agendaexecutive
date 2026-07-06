@@ -41,6 +41,7 @@ const NovoServicoDialog = ({ open, onOpenChange, onSaved, initialData }: NovoSer
     hora: "",
     clienteId: "",
     pax: "",
+    sht: "",
     cot: "",
     tipo: "",
     origem: "",
@@ -208,6 +209,7 @@ const NovoServicoDialog = ({ open, onOpenChange, onSaved, initialData }: NovoSer
             hora: initialData.hora,
             clienteId: clienteMatch?.id || "",
             pax: String(initialData.pax || ""),
+            sht: (initialData as any).sht || "",
             cot: initialData.cot,
             tipo: initialData.tipo,
             origem: initialData.origem,
@@ -362,9 +364,10 @@ const NovoServicoDialog = ({ open, onOpenChange, onSaved, initialData }: NovoSer
         data: form.data,
         hora: form.hora,
         cliente: cliente?.nome || "",
-        pax: parseInt(form.pax) || 0,
+        pax: passageiros.length,
         passageiros: passageiros,
         cot: form.cot,
+        sht: form.sht,
         tipo: form.tipo,
         origem: form.origem,
         destino: form.destino,
@@ -414,7 +417,7 @@ const NovoServicoDialog = ({ open, onOpenChange, onSaved, initialData }: NovoSer
 
       toast.success("Serviço adicionado com sucesso!");
       setForm({
-        data: "", hora: "", clienteId: "", pax: "", cot: "", tipo: "",
+        data: "", hora: "", clienteId: "", pax: "", sht: "", cot: "", tipo: "",
         origem: "", destino: "", veiculoId: "", motoristaId: "", valor: "",
         fornecedorId: "", custo: "", observacoes: "", receptivo: "",
         kmIn: "", kmFim: "", kmExtra: "", valorKmExtra: "", horaIn: "", horaFim: "",
@@ -486,7 +489,7 @@ const NovoServicoDialog = ({ open, onOpenChange, onSaved, initialData }: NovoSer
 
           <div className="space-y-1.5">
             <Label>SHT</Label>
-            <Input type="number" min={0} value={form.pax} onChange={(e) => update("pax", e.target.value)} placeholder="0" />
+            <Input value={form.sht} onChange={(e) => update("sht", e.target.value)} placeholder="SHT-000" />
           </div>
 
           <div className="space-y-1.5">

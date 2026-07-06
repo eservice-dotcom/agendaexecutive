@@ -41,6 +41,7 @@ const EditServicoDialog = ({ open, onOpenChange, item, onSaved }: EditServicoDia
     hora: "",
     cliente: "",
     pax: "",
+    sht: "",
     cot: "",
     tipo: "",
     origem: "",
@@ -152,6 +153,7 @@ const EditServicoDialog = ({ open, onOpenChange, item, onSaved }: EditServicoDia
         hora: item.hora,
         cliente: item.cliente,
         pax: item.pax.toString(),
+        sht: (item as any).sht || "",
         cot: item.cot,
         tipo: item.tipo,
         origem: item.origem,
@@ -397,9 +399,10 @@ const EditServicoDialog = ({ open, onOpenChange, item, onSaved }: EditServicoDia
         data: form.data,
         hora: form.hora,
         cliente: form.cliente,
-        pax: parseInt(form.pax) || 0,
+        pax: passageiros.length,
         passageiros: passageiros,
         cot: form.cot,
+        sht: form.sht,
         tipo: form.tipo,
         origem: form.origem,
         destino: form.destino,
@@ -500,7 +503,7 @@ const EditServicoDialog = ({ open, onOpenChange, item, onSaved }: EditServicoDia
 
           <div className="space-y-1.5">
             <Label>SHT</Label>
-            <Input type="number" min={0} value={form.pax} onChange={(e) => update("pax", e.target.value)} placeholder="0" />
+            <Input value={form.sht} onChange={(e) => update("sht", e.target.value)} placeholder="SHT-000" />
           </div>
 
           <div className="space-y-1.5">
