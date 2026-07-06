@@ -19,6 +19,7 @@ import pdfWorker from "pdfjs-dist/build/pdf.worker.min.mjs?url";
 interface ParsedService {
   selected: boolean;
   sht: string;
+  os: string;
   data: string; // yyyy-mm-dd
   hora: string; // HH:MM
   tipo: string;
