@@ -91,6 +91,7 @@ const mapAgendaRow = (row: any): AgendaItem => ({
   pax: row.pax,
   passageiros: row.passageiros || [],
   cot: row.cot,
+  sht: row.sht || "",
   tipo: row.tipo,
   origem: row.origem,
   destino: row.destino,
