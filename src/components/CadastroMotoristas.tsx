@@ -122,6 +122,14 @@ const CadastroMotoristas = () => {
 
   const handleSave = async () => {
     if (!form.nome.trim()) { toast.error("Nome é obrigatório"); return; }
+    const telDigits = onlyDigits(form.telefone);
+    if (telDigits) {
+      const dup = items.find((m) => m.id !== editingId && onlyDigits(m.telefone) === telDigits);
+      if (dup) {
+        toast.error(`Telefone já cadastrado para: ${dup.nome}`);
+        return;
+      }
+    }
     try {
       if (editingId) {
         await updateMotorista(editingId, form);
