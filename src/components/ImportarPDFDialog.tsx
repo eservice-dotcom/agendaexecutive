@@ -284,6 +284,7 @@ const ImportarPDFDialog = ({ open, onOpenChange, onImported }: Props) => {
   const [clienteShiftId, setClienteShiftId] = useState<string>("");
   const [placaUrls, setPlacaUrls] = useState<string[]>([]);
   const [uploadingPlaca, setUploadingPlaca] = useState(false);
+  const [advanced, setAdvanced] = useState(false);
 
   const handlePlacaFiles = async (files: File[]) => {
     if (!files.length) return;
@@ -332,6 +333,7 @@ const ImportarPDFDialog = ({ open, onOpenChange, onImported }: Props) => {
       setServices([]);
       setClienteShiftId("");
       setPlacaUrls([]);
+      setAdvanced(false);
     }
   }, [open]);
 
@@ -517,7 +519,7 @@ const ImportarPDFDialog = ({ open, onOpenChange, onImported }: Props) => {
         </DialogHeader>
 
         <div className="space-y-4">
-          {services.length === 0 && (
+          {!advanced && (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               <label className="flex flex-col items-center justify-center gap-3 border-2 border-dashed border-border rounded-lg p-8 cursor-pointer hover:bg-muted/50 transition">
                 {loading ? (
@@ -584,7 +586,29 @@ const ImportarPDFDialog = ({ open, onOpenChange, onImported }: Props) => {
 
 
 
-          {services.length > 0 && (
+          {!advanced && (
+            <div className="flex items-center justify-between gap-3 pt-2 border-t">
+              <div className="text-xs text-muted-foreground">
+                {services.length > 0
+                  ? <><strong>{services.length}</strong> serviço(s) lido(s){placaUrls.length ? ` · ${placaUrls.length} placa(s) anexada(s)` : " · sem placa (opcional)"}</>
+                  : "Anexe o PDF do serviço para avançar. A placa é opcional."}
+              </div>
+              <Button
+                onClick={() => {
+                  if (services.length === 0) {
+                    toast.error("Anexe o PDF do serviço antes de avançar.");
+                    return;
+                  }
+                  setAdvanced(true);
+                }}
+                disabled={services.length === 0 || loading || uploadingPlaca}
+              >
+                Avançar
+              </Button>
+            </div>
+          )}
+
+          {advanced && services.length > 0 && (
             <>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 items-end">
                 <div>
