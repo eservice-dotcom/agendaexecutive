@@ -1009,7 +1009,6 @@ const EditServicoDialog = ({ open, onOpenChange, item, onSaved }: EditServicoDia
               </div>
             </div>
           </div>
-          </div>
         </div>
 
         <DialogFooter className="mt-4">
