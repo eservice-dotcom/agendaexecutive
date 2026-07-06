@@ -723,6 +723,10 @@ const Index = () => {
                   <Upload className="h-4 w-4" />
                   PDF Shift
                 </Button>
+                <Button variant="outline" size="sm" onClick={() => setImportPdfCsDialogOpen(true)} className="gap-2">
+                  <Upload className="h-4 w-4" />
+                  PDF CS Global
+                </Button>
                 <Button onClick={() => setNovoDialogOpen(true)} className="gap-2">
                   <Plus className="h-4 w-4" />
                   Novo Serviço
