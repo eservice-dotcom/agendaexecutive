@@ -586,7 +586,7 @@ const ImportarPDFDialog = ({ open, onOpenChange, onImported }: Props) => {
 
 
 
-          {services.length > 0 && (
+          {advanced && services.length > 0 && (
             <>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 items-end">
                 <div>
