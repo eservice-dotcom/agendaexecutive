@@ -342,8 +342,8 @@ const AgendaTable = ({ items, onEdited, hideFinancials, onClone }: AgendaTablePr
         </colgroup>
         <TableHeader className="sticky top-0 z-30 bg-muted">
           <TableRow className="hover:bg-muted/50">
-            <TableHead className="font-semibold px-0.5 py-0.5 text-[9px] sticky left-0 z-20 bg-muted/95 backdrop-blur-sm">Data</TableHead>
-            <TableHead className="font-semibold px-0.5 py-0.5 text-[9px] sticky left-[58px] z-20 bg-muted/95 backdrop-blur-sm">Hora</TableHead>
+            <TableHead className="font-semibold px-0.5 py-0.5 text-[9px] sticky left-0 z-20 bg-muted">Data</TableHead>
+            <TableHead className="font-semibold px-0.5 py-0.5 text-[9px] sticky left-[58px] z-20 bg-muted">Hora</TableHead>
             <TableHead className="font-semibold px-0.5 py-0.5 text-[9px]">Cliente</TableHead>
             <TableHead className="font-semibold px-0.5 py-0.5 text-[9px] text-center">SHT</TableHead>
             <TableHead className="font-semibold px-0.5 py-0.5 text-[9px]">Passageiro</TableHead>
@@ -392,8 +392,8 @@ const AgendaTable = ({ items, onEdited, hideFinancials, onClone }: AgendaTablePr
             const rowInlineBg = item.corManual || (isMillena ? millenaBg : (messaged ? messagedBg : undefined));
             return (
             <TableRow key={item.id} className={`transition-colors hover:bg-primary/10 ${!rowInlineBg ? (idx % 2 === 1 ? 'bg-yellow-50/60 dark:bg-yellow-900/10' : tipoRowColor(item.tipo)) : ''}`} style={rowInlineBg ? { backgroundColor: rowInlineBg } : undefined} title={messaged ? `Mensagem enviada para ${item.motorista}` : undefined}>
-              <TableCell className={`px-0.5 py-0 font-mono text-[9px] truncate sticky left-0 z-10`} style={rowInlineBg ? { backgroundColor: rowInlineBg } : undefined} >{formatDate(item.data)}</TableCell>
-              <TableCell className={`px-0.5 py-0 font-mono text-[9px] font-medium truncate sticky left-[58px] z-10`} style={rowInlineBg ? { backgroundColor: rowInlineBg } : undefined}>{item.hora}</TableCell>
+              <TableCell className={`px-0.5 py-0 font-mono text-[9px] truncate sticky left-0 z-10 bg-background`} style={rowInlineBg ? { backgroundColor: rowInlineBg } : undefined} >{formatDate(item.data)}</TableCell>
+              <TableCell className={`px-0.5 py-0 font-mono text-[9px] font-medium truncate sticky left-[58px] z-10 bg-background`} style={rowInlineBg ? { backgroundColor: rowInlineBg } : undefined}>{item.hora}</TableCell>
               <TableCell className="px-0.5 py-0 font-medium text-[9px] truncate">
                 <Tooltip>
                   <TooltipTrigger asChild>
