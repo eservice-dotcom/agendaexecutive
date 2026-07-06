@@ -288,7 +288,7 @@ const CadastroMotoristas = () => {
               <div><Label>Categoria</Label><Input placeholder="B, D, E..." value={form.categoria} onChange={(e) => setForm({ ...form, categoria: e.target.value })} /></div>
             </div>
             <div className="grid grid-cols-2 gap-3">
-              <div><Label>Telefone</Label><Input value={form.telefone} onChange={(e) => setForm({ ...form, telefone: e.target.value })} /></div>
+              <div><Label>Telefone</Label><Input placeholder="(61) 99999-9999" value={form.telefone} onChange={(e) => setForm({ ...form, telefone: formatTelefone(e.target.value) })} /></div>
               <div><Label>Email</Label><Input type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} /></div>
             </div>
             <div>
