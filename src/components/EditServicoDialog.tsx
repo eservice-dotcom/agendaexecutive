@@ -591,6 +591,11 @@ const EditServicoDialog = ({ open, onOpenChange, item, onSaved }: EditServicoDia
                     <Input value={form.telefone} onChange={(e) => update("telefone", e.target.value)} placeholder="Telefone" />
                   </div>
                 )}
+                {currentMotoristaId && (
+                  <p className="text-xs text-muted-foreground">
+                    {motoristas.find((m) => m.id === currentMotoristaId)?.telefone || ""}
+                  </p>
+                )}
               </>
             )}
           </div>

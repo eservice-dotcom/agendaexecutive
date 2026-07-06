@@ -570,13 +570,20 @@ const NovoServicoDialog = ({ open, onOpenChange, onSaved, initialData }: NovoSer
                 </div>
               </div>
             ) : (
-              <Select value={form.motoristaId || "_empty"} onValueChange={(v) => update("motoristaId", v === "_empty" ? "" : v)}>
-                <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="_empty">-- Sem motorista --</SelectItem>
-                  {motoristas.map((m) => <SelectItem key={m.id} value={m.id}>{m.nome}</SelectItem>)}
-                </SelectContent>
-              </Select>
+              <>
+                <Select value={form.motoristaId || "_empty"} onValueChange={(v) => update("motoristaId", v === "_empty" ? "" : v)}>
+                  <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="_empty">-- Sem motorista --</SelectItem>
+                    {motoristas.map((m) => <SelectItem key={m.id} value={m.id}>{m.nome}</SelectItem>)}
+                  </SelectContent>
+                </Select>
+                {form.motoristaId && form.motoristaId !== "_empty" && (
+                  <p className="text-xs text-muted-foreground">
+                    {motoristas.find((m) => m.id === form.motoristaId)?.telefone || ""}
+                  </p>
+                )}
+              </>
             )}
           </div>
 
