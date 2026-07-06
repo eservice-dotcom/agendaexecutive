@@ -79,6 +79,7 @@ const Index = () => {
   const [activeTab, setActiveTab] = useState("agenda");
   const [contatosDialogOpen, setContatosDialogOpen] = useState(false);
   const [importPdfDialogOpen, setImportPdfDialogOpen] = useState(false);
+  const [importPdfCsDialogOpen, setImportPdfCsDialogOpen] = useState(false);
 
   // Fechamento dialog state
   const [fechamentoDialogOpen, setFechamentoDialogOpen] = useState(false);
