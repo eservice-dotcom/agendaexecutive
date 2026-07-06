@@ -747,43 +747,6 @@ const EditServicoDialog = ({ open, onOpenChange, item, onSaved }: EditServicoDia
           <div className="sm:col-span-2 border-t pt-3 mt-2 space-y-4">
             <p className="text-sm font-semibold text-muted-foreground">Fechamento Cliente</p>
 
-            {/* Quilometragem */}
-            <div className="space-y-2">
-              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Quilometragem</p>
-              <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
-                <div className="space-y-1.5">
-                  <Label>KM Início</Label>
-                  <Input type="number" min={0} value={form.kmIn} onChange={(e) => {
-                    const kmIn = e.target.value;
-                    const diff = (parseFloat(form.kmFim) || 0) - (parseFloat(kmIn) || 0);
-                    const extra = diff > 100 ? diff - 100 : 0;
-                    setForm({ ...form, kmIn, kmExtra: String(extra) });
-                  }} placeholder="0" />
-                </div>
-                <div className="space-y-1.5">
-                  <Label>KM Fim</Label>
-                  <Input type="number" min={0} value={form.kmFim} onChange={(e) => {
-                    const kmFim = e.target.value;
-                    const diff = (parseFloat(kmFim) || 0) - (parseFloat(form.kmIn) || 0);
-                    const extra = diff > 100 ? diff - 100 : 0;
-                    setForm({ ...form, kmFim, kmExtra: String(extra) });
-                  }} placeholder="0" />
-                </div>
-                <div className="space-y-1.5">
-                  <Label>KM Extra</Label>
-                  <Input type="number" min={0} value={form.kmExtra} readOnly className="bg-muted" placeholder="0" />
-                </div>
-                <div className="space-y-1.5">
-                  <Label>R$ Km Extra</Label>
-                  <Input type="number" min={0} step="0.01" value={form.valorKmExtra} onChange={(e) => update("valorKmExtra", e.target.value)} placeholder="0,00" />
-                </div>
-                <div className="space-y-1.5">
-                  <Label>R$ Total Km Extra</Label>
-                  <Input type="text" readOnly className="bg-muted" value={`R$ ${((parseFloat(form.kmExtra) || 0) * (parseFloat(form.valorKmExtra) || 0)).toFixed(2)}`} />
-                </div>
-              </div>
-            </div>
-
             {/* Horas */}
             <div className="space-y-2">
               <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Horas</p>
