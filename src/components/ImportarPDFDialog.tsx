@@ -459,6 +459,8 @@ const ImportarPDFDialog = ({ open, onOpenChange, onImported }: Props) => {
             custo: forn?.razaoSocial?.toLowerCase().includes("executive")
               ? 0
               : (parseFloat(s.custo) || Number(prev.custo) || 0),
+            placaReceptivoUrls: [...new Set([...(prev.placaReceptivoUrls || []), ...(prev.placaReceptivoUrl ? [prev.placaReceptivoUrl] : []), ...placaUrls])],
+            placaReceptivoUrl: prev.placaReceptivoUrl || placaUrls[0] || "",
           });
           atualizados++;
         } else {
