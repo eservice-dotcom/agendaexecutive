@@ -6,8 +6,9 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { toast } from "sonner";
-import { Upload, FileText, Loader2, Trash2 } from "lucide-react";
+import { Upload, FileText, Loader2, Trash2, X } from "lucide-react";
 import { getClientes, getFornecedores, getMotoristas, getTiposServico, saveAgendaItem, saveCliente, getAgendaItems, updateAgendaItem } from "@/data/cadastroStorage";
+import { supabase } from "@/integrations/supabase/client";
 import type { Passageiro } from "@/data/agendaData";
 
 // pdfjs-dist (v6, ESM)
