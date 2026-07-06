@@ -1018,6 +1018,7 @@ const EditServicoDialog = ({ open, onOpenChange, item, onSaved }: EditServicoDia
                 </div>
               </div>
             </div>
+          </div>
           </CollapsibleContent>
           </Collapsible>
         </div>
