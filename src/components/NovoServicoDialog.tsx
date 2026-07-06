@@ -7,8 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { getClientes, getVeiculos, getMotoristas, getFornecedores, saveAgendaItem, getTiposServico, saveMotorista, saveFornecedor, saveVeiculo, saveCliente } from "@/data/cadastroStorage";
 import { Passageiro, OutraDespesa } from "@/data/agendaData";
 import { toast } from "sonner";
-import { Plus, Trash2, UserPlus, ChevronDown } from "lucide-react";
-import { Collapsible, CollapsibleTrigger, CollapsibleContent } from "@/components/ui/collapsible";
+import { Plus, Trash2, UserPlus } from "lucide-react";
 import PassageirosInput from "./PassageirosInput";
 import { TooltipProvider } from "@/components/ui/tooltip";
 
@@ -80,7 +79,6 @@ const NovoServicoDialog = ({ open, onOpenChange, onSaved, initialData }: NovoSer
   const [passageiros, setPassageiros] = useState<Passageiro[]>([]);
   const [outrosDespesas, setOutrosDespesas] = useState<OutraDespesa[]>([]);
   const [motoristaDiariaMsg, setMotoristaDiariaMsg] = useState("");
-  const [fechamentosOpen, setFechamentosOpen] = useState(false);
 
   // Check if selected motorista already has "diaria" on the same date
   useEffect(() => {
@@ -714,17 +712,9 @@ const NovoServicoDialog = ({ open, onOpenChange, onSaved, initialData }: NovoSer
             <Input value={form.observacoes} onChange={(e) => update("observacoes", e.target.value)} placeholder="Observações sobre o serviço" />
           </div>
 
-          <Collapsible open={fechamentosOpen} onOpenChange={setFechamentosOpen} className="sm:col-span-2">
-            <div className="border-t pt-3 mt-2">
-              <CollapsibleTrigger asChild>
-                <button type="button" className="w-full flex items-center justify-center gap-2 text-sm font-bold uppercase tracking-wide text-muted-foreground hover:text-foreground transition-colors py-2">
-                  FECHAMENTOS
-                  <ChevronDown className={`h-4 w-4 transition-transform ${fechamentosOpen ? "rotate-180" : ""}`} />
-                </button>
-              </CollapsibleTrigger>
-            </div>
-            <CollapsibleContent className="space-y-4">
-              <p className="text-sm font-semibold text-muted-foreground">Fechamento Cliente</p>
+          {/* Fechamento */}
+          <div className="sm:col-span-2 border-t pt-3 mt-2 space-y-4">
+            <p className="text-sm font-semibold text-muted-foreground">Fechamento Cliente</p>
 
             {/* Quilometragem */}
             <div className="space-y-2">
@@ -991,8 +981,7 @@ const NovoServicoDialog = ({ open, onOpenChange, onSaved, initialData }: NovoSer
                 </div>
               </div>
             </div>
-          </CollapsibleContent>
-          </Collapsible>
+          </div>
         </div>
 
         <DialogFooter className="mt-4">
