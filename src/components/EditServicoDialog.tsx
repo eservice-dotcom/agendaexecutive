@@ -396,6 +396,7 @@ const EditServicoDialog = ({ open, onOpenChange, item, onSaved }: EditServicoDia
     try {
       await updateAgendaItem({
         id: item.id,
+        corManual: item.corManual,
         data: form.data,
         hora: form.hora,
         cliente: form.cliente,
