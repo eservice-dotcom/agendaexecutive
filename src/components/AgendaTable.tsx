@@ -594,7 +594,7 @@ const AgendaTable = ({ items, onEdited, hideFinancials, onClone }: AgendaTablePr
                   {formatCurrency(item.custo)}
                 </TableCell>
               )}
-              <TableCell className="px-0.5 py-0 text-[9px] truncate">
+              <TableCell className="px-0.5 py-0 text-[9px] truncate text-center">
                 {(() => {
                   const anexos = [
                     ...(item.placaReceptivoUrl ? [item.placaReceptivoUrl] : []),
@@ -604,7 +604,7 @@ const AgendaTable = ({ items, onEdited, hideFinancials, onClone }: AgendaTablePr
                   return (
                     <Tooltip>
                       <TooltipTrigger asChild>
-                        <span className="truncate cursor-default inline-flex items-center gap-0.5">
+                        <span className="truncate cursor-default inline-flex items-center justify-center gap-0.5 w-full">
                           {unicos.length > 0 && (
                             <a href={unicos[0]} target="_blank" rel="noreferrer" className="inline-flex items-center text-primary shrink-0" title={`${unicos.length} anexo(s)`}>
                               <Paperclip className="h-2.5 w-2.5" />
