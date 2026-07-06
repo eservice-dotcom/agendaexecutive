@@ -658,7 +658,7 @@ const AgendaTable = ({ items, onEdited, hideFinancials, onClone }: AgendaTablePr
                 </TooltipProvider>
               </TableCell>
               <TableCell className="px-0.5 py-0 text-center">
-                <span className="flex items-center justify-center gap-0">
+                <span className="flex items-center justify-center gap-1">
                   <Popover>
                     <PopoverTrigger asChild>
                       <Button
