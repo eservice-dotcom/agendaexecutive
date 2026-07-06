@@ -630,17 +630,16 @@ const EditServicoDialog = ({ open, onOpenChange, item, onSaved }: EditServicoDia
 
           <div className="space-y-1.5">
             <Label>Custo (R$)</Label>
-            <Input type="text" readOnly className="bg-muted" value={(() => {
-              if (form.fornecedor.toLowerCase().includes("executive")) return "R$ 0,00";
-              const base = parseFloat(form.custo) || 0;
-              const kmTot = (parseFloat(form.kmExtraFornecedor) || 0) * (parseFloat(form.valorKmExtraFornecedor) || 0);
-              const [hh, mm] = (form.horaExtraFornecedor || "").split(":").map((v: string) => parseInt(v) || 0);
-              const horas = (hh || 0) + ((mm || 0) / 60);
-              const horaTot = horas * (parseFloat(form.valorHoraExtraFornecedor) || 0);
-              const estac = parseFloat(form.estacionamentoFornecedor) || 0;
-              const total = base + kmTot + horaTot + estac;
-              return `R$ ${total.toFixed(2).replace(".", ",")}`;
-            })()} />
+            <Input
+              type="number"
+              min={0}
+              step="0.01"
+              placeholder="0,00"
+              readOnly={form.fornecedor.toLowerCase().includes("executive")}
+              className={form.fornecedor.toLowerCase().includes("executive") ? "bg-muted" : ""}
+              value={form.fornecedor.toLowerCase().includes("executive") ? "0" : form.custo}
+              onChange={(e) => update("custo", e.target.value)}
+            />
           </div>
 
           <div className="space-y-1.5">
