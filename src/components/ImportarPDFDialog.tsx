@@ -80,6 +80,12 @@ const extractPageLines = async (page: any): Promise<string[]> => {
   });
 };
 
+const extractOsFromProposta = (text: string): string => {
+  // "Proposta: COT-268881-W2S5D7" → "268881"
+  const m = text.match(/Proposta[^\n]*?[A-Z]{2,}-(\d+)-[A-Z0-9]+/i);
+  return m ? m[1] : "";
+};
+
 const parsePDF = async (file: File): Promise<ParsedService[]> => {
   const buf = await file.arrayBuffer();
   const pdf = await (pdfjsLib as any).getDocument({ data: buf }).promise;
@@ -89,6 +95,9 @@ const parsePDF = async (file: File): Promise<ParsedService[]> => {
     const lines = await extractPageLines(page);
     allLines.push(...lines, "---PAGE---");
   }
+
+  // Global O.S. extracted from any "Proposta:" line in the document.
+  const globalOs = extractOsFromProposta(allLines.join("\n"));
 
   // Split into service blocks by SHT marker. The "Veículo X" line precedes the SHT line in this layout,
   // so we look back one line when starting a new block.
