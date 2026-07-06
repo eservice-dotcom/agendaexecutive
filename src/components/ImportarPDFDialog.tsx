@@ -486,6 +486,8 @@ const ImportarPDFDialog = ({ open, onOpenChange, onImported }: Props) => {
             receptivo: "",
             statusFaturamento: "",
             outrosDespesas: [],
+            placaReceptivoUrl: placaUrls[0] || "",
+            placaReceptivoUrls: [...placaUrls],
           } as any);
           inseridos++;
         }
