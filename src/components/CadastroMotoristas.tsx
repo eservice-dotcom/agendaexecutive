@@ -15,6 +15,19 @@ const emptyForm = { nome: "", cnh: "", telefone: "", email: "", categoria: "", t
 
 interface TipoMotorista { id: string; nome: string; }
 
+const onlyDigits = (v: string) => (v || "").replace(/\D/g, "");
+const formatTelefone = (v: string) => {
+  const d = onlyDigits(v).slice(0, 11);
+  if (d.length === 0) return "";
+  if (d.length <= 2) return `(${d}`;
+  const ddd = d.slice(0, 2);
+  const rest = d.slice(2);
+  if (rest.length === 0) return `(${ddd}) `;
+  if (rest.length <= 4) return `(${ddd}) ${rest}`;
+  if (rest.length <= 8) return `(${ddd}) ${rest.slice(0, rest.length - 4)}-${rest.slice(-4)}`;
+  return `(${ddd}) ${rest.slice(0, 5)}-${rest.slice(5, 9)}`;
+};
+
 const CadastroMotoristas = () => {
   const [items, setItems] = useState<Motorista[]>([]);
   const [tipos, setTipos] = useState<TipoMotorista[]>([]);
