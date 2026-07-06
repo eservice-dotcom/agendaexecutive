@@ -476,14 +476,24 @@ const EditServicoDialog = ({ open, onOpenChange, item, onSaved }: EditServicoDia
             </DialogTitle>
           </DialogHeader>
 
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-          <div className="space-y-1.5">
-            <Label>Data *</Label>
-            <Input type="date" value={form.data} onChange={(e) => update("data", e.target.value)} />
-          </div>
-          <div className="space-y-1.5">
-            <Label>Hora *</Label>
-            <Input type="time" value={form.hora} onChange={(e) => update("hora", e.target.value)} />
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+          <div className="grid grid-cols-2 gap-3 sm:col-span-2 sm:grid-cols-4">
+            <div className="space-y-1">
+              <Label>Data *</Label>
+              <Input type="date" value={form.data} onChange={(e) => update("data", e.target.value)} />
+            </div>
+            <div className="space-y-1">
+              <Label>Hora *</Label>
+              <Input type="time" value={form.hora} onChange={(e) => update("hora", e.target.value)} />
+            </div>
+            <div className="space-y-1">
+              <Label>SHT</Label>
+              <Input value={form.sht} onChange={(e) => update("sht", e.target.value)} placeholder="SHT-000" />
+            </div>
+            <div className="space-y-1">
+              <Label>O.S.</Label>
+              <Input value={form.cot} onChange={(e) => update("cot", e.target.value)} placeholder="O.S.-000" />
+            </div>
           </div>
 
           <div className="space-y-1.5">
@@ -500,16 +510,6 @@ const EditServicoDialog = ({ open, onOpenChange, item, onSaved }: EditServicoDia
             {(!currentClienteId) && (
               <Input value={form.cliente} onChange={(e) => update("cliente", e.target.value)} placeholder="Nome do cliente" className="mt-1" />
             )}
-          </div>
-
-          <div className="space-y-1.5">
-            <Label>SHT</Label>
-            <Input value={form.sht} onChange={(e) => update("sht", e.target.value)} placeholder="SHT-000" />
-          </div>
-
-          <div className="space-y-1.5">
-            <Label>O.S.</Label>
-            <Input value={form.cot} onChange={(e) => update("cot", e.target.value)} placeholder="O.S.-000" />
           </div>
 
           <div className="space-y-1.5 sm:col-span-2">
