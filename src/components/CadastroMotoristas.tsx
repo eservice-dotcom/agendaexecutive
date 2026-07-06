@@ -15,6 +15,19 @@ const emptyForm = { nome: "", cnh: "", telefone: "", email: "", categoria: "", t
 
 interface TipoMotorista { id: string; nome: string; }
 
+const onlyDigits = (v: string) => (v || "").replace(/\D/g, "");
+const formatTelefone = (v: string) => {
+  const d = onlyDigits(v).slice(0, 11);
+  if (d.length === 0) return "";
+  if (d.length <= 2) return `(${d}`;
+  const ddd = d.slice(0, 2);
+  const rest = d.slice(2);
+  if (rest.length === 0) return `(${ddd}) `;
+  if (rest.length <= 4) return `(${ddd}) ${rest}`;
+  if (rest.length <= 8) return `(${ddd}) ${rest.slice(0, rest.length - 4)}-${rest.slice(-4)}`;
+  return `(${ddd}) ${rest.slice(0, 5)}-${rest.slice(5, 9)}`;
+};
+
 const CadastroMotoristas = () => {
   const [items, setItems] = useState<Motorista[]>([]);
   const [tipos, setTipos] = useState<TipoMotorista[]>([]);
@@ -109,6 +122,14 @@ const CadastroMotoristas = () => {
 
   const handleSave = async () => {
     if (!form.nome.trim()) { toast.error("Nome é obrigatório"); return; }
+    const telDigits = onlyDigits(form.telefone);
+    if (telDigits) {
+      const dup = items.find((m) => m.id !== editingId && onlyDigits(m.telefone) === telDigits);
+      if (dup) {
+        toast.error(`Telefone já cadastrado para: ${dup.nome}`);
+        return;
+      }
+    }
     try {
       if (editingId) {
         await updateMotorista(editingId, form);
@@ -267,7 +288,7 @@ const CadastroMotoristas = () => {
               <div><Label>Categoria</Label><Input placeholder="B, D, E..." value={form.categoria} onChange={(e) => setForm({ ...form, categoria: e.target.value })} /></div>
             </div>
             <div className="grid grid-cols-2 gap-3">
-              <div><Label>Telefone</Label><Input value={form.telefone} onChange={(e) => setForm({ ...form, telefone: e.target.value })} /></div>
+              <div><Label>Telefone</Label><Input placeholder="(61) 99999-9999" value={form.telefone} onChange={(e) => setForm({ ...form, telefone: formatTelefone(e.target.value) })} /></div>
               <div><Label>Email</Label><Input type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} /></div>
             </div>
             <div>
