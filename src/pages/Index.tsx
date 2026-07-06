@@ -22,6 +22,7 @@ import { getAgendaItems } from "@/data/cadastroStorage";
 import AgendaLixeira from "@/components/AgendaLixeira";
 import ContatosMotoristasDialog from "@/components/ContatosMotoristasDialog";
 import ImportarPDFDialog from "@/components/ImportarPDFDialog";
+import ImportarPDFCSGlobalDialog from "@/components/ImportarPDFCSGlobalDialog";
 import { printAgenda } from "@/lib/printUtils";
 import { generateClosingReport } from "@/lib/closingReport";
 import { generateClosingReportExcel } from "@/lib/closingReportExcel";
