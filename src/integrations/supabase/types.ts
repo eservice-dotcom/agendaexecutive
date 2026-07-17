@@ -405,6 +405,7 @@ export type Database = {
           alimentacao_motorista: string
           antecedencia_cancelamento: string
           arquivo_assinado_url: string | null
+          com_motorista: boolean
           condicao_pagamento: string
           contratante_cep: string
           contratante_cidade: string
@@ -459,6 +460,7 @@ export type Database = {
           alimentacao_motorista?: string
           antecedencia_cancelamento?: string
           arquivo_assinado_url?: string | null
+          com_motorista?: boolean
           condicao_pagamento?: string
           contratante_cep?: string
           contratante_cidade?: string
@@ -513,6 +515,7 @@ export type Database = {
           alimentacao_motorista?: string
           antecedencia_cancelamento?: string
           arquivo_assinado_url?: string | null
+          com_motorista?: boolean
           condicao_pagamento?: string
           contratante_cep?: string
           contratante_cidade?: string

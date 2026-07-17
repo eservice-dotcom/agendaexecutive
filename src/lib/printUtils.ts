@@ -800,7 +800,7 @@ body{font-family:'Segoe UI',Arial,sans-serif;color:#1a1a1a;font-size:11px;paddin
   <div class="clause">
     <div class="clause-title">CLÁUSULA 2 — DO OBJETO</div>
     <div class="clause-body">
-      <p>O presente contrato tem por objeto a locação de veículo com motorista para prestação de serviço de transporte, conforme especificações abaixo:</p>
+      <p>O presente contrato tem por objeto a ${c.com_motorista === false ? "<b>locação de veículo sem motorista</b>, na modalidade de autolocação" : "locação de veículo <b>com motorista</b> para prestação de serviço de transporte"}, conforme especificações abaixo:</p>
       ${(() => {
         const veics = Array.isArray(c.contrato_veiculos) && c.contrato_veiculos.length > 0
           ? c.contrato_veiculos
@@ -902,12 +902,19 @@ body{font-family:'Segoe UI',Arial,sans-serif;color:#1a1a1a;font-size:11px;paddin
   <div class="clause">
     <div class="clause-title">CLÁUSULA 5 — DAS OBRIGAÇÕES DA CONTRATADA</div>
     <div class="clause-body">
+      ${c.com_motorista === false ? `
+      <p>a) Disponibilizar o veículo nas condições acordadas, em perfeito estado de conservação, limpeza e com toda a documentação em dia;</p>
+      <p>b) Entregar o veículo com o tanque cheio de combustível ao início da locação;</p>
+      <p>c) Manter o seguro do veículo vigente durante o período de locação, observada a coparticipação prevista neste contrato;</p>
+      <p>d) Prestar suporte ao CONTRATANTE em caso de pane mecânica não decorrente de mau uso.</p>
+      ` : `
       <p>a) Disponibilizar o veículo nas condições acordadas, em perfeito estado de conservação e limpeza;</p>
       <p>b) Fornecer motorista habilitado, uniformizado e com experiência compatível;</p>
       <p>c) Arcar com todas as despesas de manutenção, seguro do veículo e encargos trabalhistas do motorista;</p>
       <p>d) Garantir pontualidade no atendimento conforme horários pactuados;</p>
       <p>e) Manter documentação do veículo e do motorista em dia;</p>
       <p>f) Substituir o veículo em caso de pane mecânica, sem custo adicional ao contratante.</p>
+      `}
     </div>
   </div>
 
@@ -936,24 +943,31 @@ body{font-family:'Segoe UI',Arial,sans-serif;color:#1a1a1a;font-size:11px;paddin
   <div class="clause">
     <div class="clause-title">CLÁUSULA 8 — DAS RESPONSABILIDADES</div>
     <div class="clause-body">
+      ${c.com_motorista === false ? `
+      <p>a) A CONTRATADA responde pelas condições mecânicas do veículo entregue, ressalvados os danos, avarias e desgastes decorrentes do uso pelo CONTRATANTE;</p>
+      <p>b) O CONTRATANTE responde integralmente pela guarda, conservação e utilização adequada do veículo durante todo o período da locação;</p>
+      <p>c) A CONTRATADA não se responsabiliza por objetos deixados no veículo, nem por atrasos, prejuízos ou danos decorrentes de eventos de força maior.</p>
+      ` : `
       <p>a) A CONTRATADA é responsável por danos causados a terceiros durante a prestação do serviço;</p>
       <p>b) A CONTRATADA manterá seguro do veículo com cobertura para passageiros;</p>
       <p>c) A CONTRATADA não se responsabiliza por atrasos causados por condições climáticas, trânsito ou eventos de força maior.</p>
+      `}
     </div>
   </div>
 
+  ${c.com_motorista === false ? `
   <div class="clause">
     <div class="clause-title">CLÁUSULA 9 — DA LOCAÇÃO DE VEÍCULO SEM MOTORISTA</div>
     <div class="clause-body">
-      <p>As disposições desta cláusula aplicam-se exclusivamente às locações de veículo <b>sem motorista</b>:</p>
+      <p>Considerando que a presente contratação se dá na modalidade <b>sem motorista</b>, ficam estabelecidas as seguintes disposições:</p>
       <p>a) O CONTRATANTE é integralmente responsável por multas de trânsito, infrações administrativas e quaisquer atos decorrentes do mau uso do veículo durante o período da locação, comprometendo-se a arcar com todos os valores, taxas e encargos correspondentes;</p>
       <p>b) Em caso de furto, roubo ou colisão, fica estabelecida a <b>coparticipação obrigatória do CONTRATANTE no valor de R$ 15.000,00 (quinze mil reais)</b>, independentemente da cobertura securitária eventualmente acionada;</p>
       <p>c) O veículo será entregue ao CONTRATANTE com o <b>tanque cheio de combustível</b> e deverá ser devolvido, ao término da locação, também com o <b>tanque cheio</b>, sob pena de cobrança do combustível faltante acrescido de taxa de reabastecimento.</p>
     </div>
-  </div>
+  </div>` : ""}
 
   <div class="clause">
-    <div class="clause-title">CLÁUSULA 10 — DA VIGÊNCIA</div>
+    <div class="clause-title">CLÁUSULA ${c.com_motorista === false ? "10" : "9"} — DA VIGÊNCIA</div>
     <div class="clause-body">
       <p>O presente contrato vigorará pelo período estipulado na Cláusula 3, podendo ser renovado mediante acordo entre as partes.</p>
     </div>
@@ -961,7 +975,7 @@ body{font-family:'Segoe UI',Arial,sans-serif;color:#1a1a1a;font-size:11px;paddin
 
   ${c.foro_comarca ? `
   <div class="clause">
-    <div class="clause-title">CLÁUSULA 11 — DO FORO</div>
+    <div class="clause-title">CLÁUSULA ${c.com_motorista === false ? "11" : "10"} — DO FORO</div>
     <div class="clause-body">
       <p>Fica eleito o foro da Comarca de <b>${c.foro_comarca}</b> para dirimir quaisquer dúvidas oriundas do presente contrato, com renúncia expressa a qualquer outro, por mais privilegiado que seja.</p>
     </div>
