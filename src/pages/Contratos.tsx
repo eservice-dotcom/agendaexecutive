@@ -45,6 +45,7 @@ interface ContratoVeiculo {
 interface Contrato {
   id: string;
   numero_contrato: number;
+  com_motorista: boolean;
   data_emissao: string;
   contratante_nome: string;
   contratante_cnpj_cpf: string;
