@@ -922,10 +922,9 @@ body{font-family:'Segoe UI',Arial,sans-serif;color:#1a1a1a;font-size:11px;paddin
     <div class="clause-title">CLÁUSULA 6 — DAS OBRIGAÇÕES DO CONTRATANTE</div>
     <div class="clause-body">
       <p>a) Efetuar o pagamento nas condições e prazos pactuados;</p>
-      <p>b) Informar com antecedência mínima de ${c.antecedencia_cancelamento || "24"} horas eventuais alterações no roteiro ou horário;</p>
-      <p>c) Utilizar o veículo dentro das finalidades previstas neste contrato;</p>
-      <p>d) Respeitar a capacidade máxima de passageiros do veículo;</p>
-      <p>e) Zelar pela conservação do veículo durante o período de utilização.</p>
+      <p>b) Utilizar o veículo dentro das finalidades previstas neste contrato;</p>
+      <p>c) Respeitar a capacidade máxima de passageiros do veículo;</p>
+      <p>d) Zelar pela conservação do veículo durante o período de utilização.</p>
     </div>
   </div>
 
