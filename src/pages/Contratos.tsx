@@ -107,6 +107,7 @@ const emptyItem: ContratoItem = {
 
 const emptyContrato: Omit<Contrato, "id" | "numero_contrato"> = {
   data_emissao: new Date().toISOString().split("T")[0],
+  com_motorista: true,
   contratante_nome: "", contratante_cnpj_cpf: "", contratante_inscricao: "",
   contratante_endereco: "", contratante_cidade: "", contratante_uf: "",
   contratante_cep: "", contratante_telefone: "", contratante_email: "", contratante_contato: "",
