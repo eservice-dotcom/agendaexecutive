@@ -902,12 +902,19 @@ body{font-family:'Segoe UI',Arial,sans-serif;color:#1a1a1a;font-size:11px;paddin
   <div class="clause">
     <div class="clause-title">CLÁUSULA 5 — DAS OBRIGAÇÕES DA CONTRATADA</div>
     <div class="clause-body">
+      ${c.com_motorista === false ? `
+      <p>a) Disponibilizar o veículo nas condições acordadas, em perfeito estado de conservação, limpeza e com toda a documentação em dia;</p>
+      <p>b) Entregar o veículo com o tanque cheio de combustível ao início da locação;</p>
+      <p>c) Manter o seguro do veículo vigente durante o período de locação, observada a coparticipação prevista neste contrato;</p>
+      <p>d) Prestar suporte ao CONTRATANTE em caso de pane mecânica não decorrente de mau uso.</p>
+      ` : `
       <p>a) Disponibilizar o veículo nas condições acordadas, em perfeito estado de conservação e limpeza;</p>
       <p>b) Fornecer motorista habilitado, uniformizado e com experiência compatível;</p>
       <p>c) Arcar com todas as despesas de manutenção, seguro do veículo e encargos trabalhistas do motorista;</p>
       <p>d) Garantir pontualidade no atendimento conforme horários pactuados;</p>
       <p>e) Manter documentação do veículo e do motorista em dia;</p>
       <p>f) Substituir o veículo em caso de pane mecânica, sem custo adicional ao contratante.</p>
+      `}
     </div>
   </div>
 
