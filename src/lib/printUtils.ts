@@ -960,7 +960,7 @@ body{font-family:'Segoe UI',Arial,sans-serif;color:#1a1a1a;font-size:11px;paddin
     <div class="clause-body">
       <p>Considerando que a presente contratação se dá na modalidade <b>sem motorista</b>, ficam estabelecidas as seguintes disposições:</p>
       <p>a) O CONTRATANTE é integralmente responsável por multas de trânsito, infrações administrativas e quaisquer atos decorrentes do mau uso do veículo durante o período da locação, comprometendo-se a arcar com todos os valores, taxas e encargos correspondentes;</p>
-      <p>b) Em caso de furto, roubo ou colisão, fica estabelecida a <b>coparticipação obrigatória do CONTRATANTE no valor de R$ 15.000,00 (quinze mil reais)</b>, independentemente da cobertura securitária eventualmente acionada;</p>
+      <p>b) Em caso de furto, roubo ou colisão, fica estabelecida a <b>coparticipação obrigatória do CONTRATANTE no valor de R$ 15.000,00 (quinze mil reais)</b>;</p>
       <p>c) O veículo será entregue ao CONTRATANTE com o <b>tanque cheio de combustível</b> e deverá ser devolvido, ao término da locação, também com o <b>tanque cheio</b>, sob pena de cobrança do combustível faltante acrescido de taxa de reabastecimento.</p>
     </div>
   </div>` : ""}
