@@ -607,11 +607,26 @@ const Contratos = () => {
 
             {/* Veículos (múltiplos) */}
             <div>
-              <div className="flex items-center justify-between mb-2 border-b pb-1">
+              <div className="flex items-center justify-between mb-2 border-b pb-1 gap-2 flex-wrap">
                 <h3 className="text-sm font-semibold text-primary">Veículos</h3>
-                <Button type="button" variant="outline" size="sm" onClick={addVeiculo}>
-                  <Plus className="h-3 w-3 mr-1" /> Adicionar Veículo
-                </Button>
+                <div className="flex items-center gap-2">
+                  <Label className="text-xs">Modalidade:</Label>
+                  <Select
+                    value={form.com_motorista ? "com" : "sem"}
+                    onValueChange={(v) => setField("com_motorista", v === "com")}
+                  >
+                    <SelectTrigger className="w-[170px] h-8 text-xs">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="com">Com motorista</SelectItem>
+                      <SelectItem value="sem">Sem motorista (locação)</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <Button type="button" variant="outline" size="sm" onClick={addVeiculo}>
+                    <Plus className="h-3 w-3 mr-1" /> Adicionar Veículo
+                  </Button>
+                </div>
               </div>
               {form.contrato_veiculos.map((v, idx) => (
                 <div key={idx} className="mb-3 p-3 border rounded-md relative">
