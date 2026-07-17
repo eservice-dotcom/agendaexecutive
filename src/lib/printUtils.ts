@@ -943,7 +943,17 @@ body{font-family:'Segoe UI',Arial,sans-serif;color:#1a1a1a;font-size:11px;paddin
   </div>
 
   <div class="clause">
-    <div class="clause-title">CLÁUSULA 9 — DA VIGÊNCIA</div>
+    <div class="clause-title">CLÁUSULA 9 — DA LOCAÇÃO DE VEÍCULO SEM MOTORISTA</div>
+    <div class="clause-body">
+      <p>As disposições desta cláusula aplicam-se exclusivamente às locações de veículo <b>sem motorista</b>:</p>
+      <p>a) O CONTRATANTE é integralmente responsável por multas de trânsito, infrações administrativas e quaisquer atos decorrentes do mau uso do veículo durante o período da locação, comprometendo-se a arcar com todos os valores, taxas e encargos correspondentes;</p>
+      <p>b) Em caso de furto, roubo ou colisão, fica estabelecida a <b>coparticipação obrigatória do CONTRATANTE no valor de R$ 15.000,00 (quinze mil reais)</b>, independentemente da cobertura securitária eventualmente acionada;</p>
+      <p>c) O veículo será entregue ao CONTRATANTE com o <b>tanque cheio de combustível</b> e deverá ser devolvido, ao término da locação, também com o <b>tanque cheio</b>, sob pena de cobrança do combustível faltante acrescido de taxa de reabastecimento.</p>
+    </div>
+  </div>
+
+  <div class="clause">
+    <div class="clause-title">CLÁUSULA 10 — DA VIGÊNCIA</div>
     <div class="clause-body">
       <p>O presente contrato vigorará pelo período estipulado na Cláusula 3, podendo ser renovado mediante acordo entre as partes.</p>
     </div>
@@ -951,7 +961,7 @@ body{font-family:'Segoe UI',Arial,sans-serif;color:#1a1a1a;font-size:11px;paddin
 
   ${c.foro_comarca ? `
   <div class="clause">
-    <div class="clause-title">CLÁUSULA 10 — DO FORO</div>
+    <div class="clause-title">CLÁUSULA 11 — DO FORO</div>
     <div class="clause-body">
       <p>Fica eleito o foro da Comarca de <b>${c.foro_comarca}</b> para dirimir quaisquer dúvidas oriundas do presente contrato, com renúncia expressa a qualquer outro, por mais privilegiado que seja.</p>
     </div>
