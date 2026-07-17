@@ -800,7 +800,7 @@ body{font-family:'Segoe UI',Arial,sans-serif;color:#1a1a1a;font-size:11px;paddin
   <div class="clause">
     <div class="clause-title">CLÁUSULA 2 — DO OBJETO</div>
     <div class="clause-body">
-      <p>O presente contrato tem por objeto a locação de veículo com motorista para prestação de serviço de transporte, conforme especificações abaixo:</p>
+      <p>O presente contrato tem por objeto a ${c.com_motorista === false ? "<b>locação de veículo sem motorista</b>, na modalidade de autolocação" : "locação de veículo <b>com motorista</b> para prestação de serviço de transporte"}, conforme especificações abaixo:</p>
       ${(() => {
         const veics = Array.isArray(c.contrato_veiculos) && c.contrato_veiculos.length > 0
           ? c.contrato_veiculos
