@@ -472,6 +472,27 @@ const Cotacoes = () => {
           </DialogHeader>
 
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            <div className="space-y-1.5 sm:col-span-2">
+              <Label>Cliente cadastrado</Label>
+              <Select value={selectedClienteId || "__none"} onValueChange={(v) => handleSelectCliente(v === "__none" ? "" : v)}>
+                <SelectTrigger><SelectValue placeholder="Selecione um cliente cadastrado (opcional)" /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="__none">— Nenhum (digitar manualmente) —</SelectItem>
+                  {clientes.map((cl) => (
+                    <SelectItem key={cl.id} value={cl.id}>{cl.nome}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              {selectedClienteId && (() => {
+                const cli = clientes.find((c) => c.id === selectedClienteId);
+                if (!cli) return null;
+                return (
+                  <p className="text-xs text-muted-foreground mt-1">
+                    {[cli.cnpj_cpf, cli.telefone, cli.email].filter(Boolean).join(" • ")}
+                  </p>
+                );
+              })()}
+            </div>
             <div className="space-y-1.5">
               <Label>Empresa *</Label>
               <Input value={empresa} onChange={(e) => setEmpresa(e.target.value)} placeholder="Nome da empresa" />
@@ -480,6 +501,7 @@ const Cotacoes = () => {
               <Label>Destinatário</Label>
               <Input value={destinatario} onChange={(e) => setDestinatario(e.target.value)} placeholder="Nome do destinatário" />
             </div>
+
 
             <div className="space-y-1.5">
               <Label>Data</Label>
