@@ -70,7 +70,8 @@ const ContatosMotoristasDialog = ({ open, onOpenChange, items }: ContatosMotoris
         .slice()
         .sort((a, b) => (a.hora || "").localeCompare(b.hora || ""))
         .map((i) => {
-          return `🕐 ${i.hora}  |  📋 O.S. ${i.cot || "—"}  |  🔖 SHT ${i.sht || "—"}\n   👤 ${i.motorista}   📞 ${i.telefone}`;
+          const shtPart = i.sht ? `  |  🔖 SHT ${i.sht}` : "";
+          return `🕐 ${i.hora}  |  📋 O.S. ${i.cot || "—"}${shtPart}\n   👤 ${i.motorista}   📞 ${i.telefone}`;
         });
       blocos.push(`📅 *${formatDate(data)}*\n${linhasDia.join("\n\n")}`);
     });
@@ -166,7 +167,7 @@ const ContatosMotoristasDialog = ({ open, onOpenChange, items }: ContatosMotoris
                       <td className="px-2 py-1 font-mono">{formatDate(i.data)}</td>
                       <td className="px-2 py-1 font-mono">{i.hora}</td>
                       <td className="px-2 py-1 font-mono">{i.cot || "—"}</td>
-                      <td className="px-2 py-1 font-mono text-center">{i.pax ?? "—"}</td>
+                      <td className="px-2 py-1 font-mono text-center">{i.sht || "—"}</td>
                       <td className="px-2 py-1 truncate max-w-[140px]">{i.cliente}</td>
                       <td className="px-2 py-1">{i.motorista || "—"}</td>
                       <td className="px-2 py-1 font-mono">{i.telefone || "—"}</td>
