@@ -160,6 +160,7 @@ const Cotacoes = () => {
     setStatus("pendente");
     setItems([{ descritivo: "", valor: 0, hora_extra: "", km_extra: 0 }]);
     setEditingCotacao(null);
+    setSelectedClienteId("");
   };
 
   const openNew = () => {
@@ -178,8 +179,29 @@ const Cotacoes = () => {
     setObservacoes(c.observacoes);
     setStatus(c.status);
     setItems(c.items.length > 0 ? c.items : [{ descritivo: "", valor: 0, hora_extra: "", km_extra: 0 }]);
+    // Try to match a registered client by name
+    const match = clientes.find((cl) => cl.nome.trim().toLowerCase() === (c.empresa || c.nome).trim().toLowerCase());
+    setSelectedClienteId(match?.id || "");
     setDialogOpen(true);
   };
+
+  const handleSelectCliente = (id: string) => {
+    setSelectedClienteId(id);
+    const cli = clientes.find((c) => c.id === id);
+    if (cli) {
+      setEmpresa(cli.nome);
+      if (!destinatario) setDestinatario(cli.nome);
+    }
+  };
+
+  const getClienteForCotacao = (empresaNome: string): Cliente | null => {
+    if (selectedClienteId) {
+      const c = clientes.find((cl) => cl.id === selectedClienteId);
+      if (c) return c;
+    }
+    return clientes.find((cl) => cl.nome.trim().toLowerCase() === (empresaNome || "").trim().toLowerCase()) || null;
+  };
+
 
   const addItem = () => {
     setItems([...items, { descritivo: "", valor: 0, hora_extra: "", km_extra: 0 }]);
