@@ -33,6 +33,7 @@ const formatDate = (d: string) => {
 
 export interface ClosingReportItem {
   cot?: string;
+  sht?: string;
   data?: string;
   hora?: string;
   tipo?: string;
@@ -102,10 +103,11 @@ export const generateClosingReport = (
       ? outrosDespesas.map((d: any) => `${d.descricao || "Outros"}: ${formatCurrency(parseAmount(d.valor))}`).join(" · ")
       : "";
 
+    const shtLabel = ai.sht ? ` · SHT ${ai.sht}` : "";
     return `<div class="card">
       <div class="card-header">
         <span class="card-num">${idx + 1}</span>
-        <span class="card-os">O.S. ${ai.cot || "—"}</span>
+        <span class="card-os">O.S. ${ai.cot || "—"}${shtLabel}</span>
         <span class="card-date">${ai.data ? formatDate(ai.data) : ""} ${ai.hora || ""}</span>
         <span class="card-type">${ai.tipo || ""}</span>
       </div>
@@ -362,10 +364,11 @@ function generateClosingReportSection(
       ? outrosDespesas.map((d: any) => `${d.descricao || "Outros"}: ${formatCurrency(parseAmount(d.valor))}`).join(" · ")
       : "";
 
+    const shtLabel = ai.sht ? ` · SHT ${ai.sht}` : "";
     return `<div class="card">
       <div class="card-header">
         <span class="card-num">${idx + 1}</span>
-        <span class="card-os">O.S. ${ai.cot || "—"}</span>
+        <span class="card-os">O.S. ${ai.cot || "—"}${shtLabel}</span>
         <span class="card-date">${ai.data ? formatDate(ai.data) : ""} ${ai.hora || ""}</span>
         <span class="card-type">${ai.tipo || ""}</span>
       </div>
