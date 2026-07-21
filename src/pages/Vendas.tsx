@@ -610,7 +610,7 @@ const Vendas = () => {
     const load = async () => {
       const { data } = await supabase
         .from("agenda_items")
-        .select("id, cliente, data, hora, tipo, origem, destino, valor, custo, motorista, veiculo, placa, pax, cot, fornecedor, status_faturamento, estacionamento, outros, outros_despesas, km_extra, valor_km_extra, hora_extra, valor_hora_extra, valor_km_extra_fornecedor, valor_hora_extra_fornecedor, estacionamento_fornecedor")
+        .select("id, cliente, data, hora, tipo, origem, destino, valor, custo, motorista, veiculo, placa, pax, sht, cot, fornecedor, status_faturamento, estacionamento, outros, outros_despesas, km_extra, valor_km_extra, hora_extra, valor_hora_extra, valor_km_extra_fornecedor, valor_hora_extra_fornecedor, estacionamento_fornecedor")
         .eq("cliente", cliente)
         .eq("status_faturamento", "enviado")
         .is("deleted_at", null)
