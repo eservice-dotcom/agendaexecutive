@@ -625,7 +625,8 @@ const Cotacoes = () => {
             {editingCotacao && (
               <Button variant="outline" onClick={() => {
                 const logoUrl = new URL(logo, window.location.origin).href;
-                printCotacao(editingCotacao, logoUrl, mostrarValorTotal);
+                const cli = getClienteForCotacao(editingCotacao.empresa || editingCotacao.nome);
+                printCotacao({ ...editingCotacao, cliente: cli }, logoUrl, mostrarValorTotal);
               }} className="gap-2">
                 <Printer className="h-4 w-4" /> Imprimir
               </Button>
