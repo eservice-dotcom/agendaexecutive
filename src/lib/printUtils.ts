@@ -361,6 +361,16 @@ export const printCotacao = (cotacao: {
   valor_total: number;
   status: string;
   items: { descritivo: string; valor: number; hora_extra: string; km_extra: number }[];
+  cliente?: {
+    nome?: string;
+    cnpj_cpf?: string;
+    email?: string;
+    telefone?: string;
+    endereco?: string;
+    cep?: string;
+    cidade?: string;
+    uf?: string;
+  } | null;
 }, logoUrl: string, showTotal: boolean = true) => {
   const fc = (v: number) => new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(v);
   const fd = (d: string) => { if (!d) return ""; const [y, m, day] = d.split("-"); return `${day}/${m}/${y}`; };
