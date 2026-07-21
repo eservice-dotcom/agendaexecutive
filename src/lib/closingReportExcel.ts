@@ -102,6 +102,7 @@ export const generateClosingReportExcel = (
     return {
       "#": idx + 1,
       "O.S.": osCot,
+      "SHT": ai.sht || "",
       "Data": ai.data ? formatDate(ai.data) : "",
       "Hora": ai.hora || "",
       "Tipo": ai.tipo || "",
@@ -133,6 +134,7 @@ export const generateClosingReportExcel = (
     rows.push({
       "#": sortedItems.length + idx + 1,
       "O.S.": "EXTRA",
+      "SHT": "",
       "Data": "",
       "Hora": "",
       "Tipo": desc,
@@ -170,6 +172,7 @@ export const generateClosingReportExcel = (
   rows.push({
     "#": 0,
     "O.S.": "TOTAIS",
+    "SHT": "",
     "Data": "",
     "Hora": "",
     "Tipo": "",
