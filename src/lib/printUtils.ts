@@ -434,8 +434,13 @@ tr:nth-child(even){background:#f8f9fa}
   </div>
 
   <div class="info-grid">
-    <div><span class="label">Empresa:</span> <span class="value">${cotacao.empresa || cotacao.nome}</span></div>
+    <div><span class="label">Empresa:</span> <span class="value">${(cotacao.cliente?.nome) || cotacao.empresa || cotacao.nome}</span></div>
     <div><span class="label">Data:</span> <span class="value">${fd(cotacao.data)}</span></div>
+    ${cotacao.cliente?.cnpj_cpf ? `<div><span class="label">CNPJ/CPF:</span> <span class="value">${cotacao.cliente.cnpj_cpf}</span></div>` : ""}
+    ${cotacao.cliente?.telefone ? `<div><span class="label">Telefone:</span> <span class="value">${cotacao.cliente.telefone}</span></div>` : ""}
+    ${cotacao.cliente?.email ? `<div><span class="label">E-mail:</span> <span class="value">${cotacao.cliente.email}</span></div>` : ""}
+    ${cotacao.cliente?.endereco ? `<div><span class="label">Endereço:</span> <span class="value">${cotacao.cliente.endereco}</span></div>` : ""}
+    ${(cotacao.cliente?.cidade || cotacao.cliente?.uf || cotacao.cliente?.cep) ? `<div><span class="label">Cidade/UF/CEP:</span> <span class="value">${[cotacao.cliente?.cidade, cotacao.cliente?.uf].filter(Boolean).join(" / ")}${cotacao.cliente?.cep ? " — CEP " + cotacao.cliente.cep : ""}</span></div>` : ""}
     ${cotacao.destinatario ? `<div><span class="label">Destinatário:</span> <span class="value">${cotacao.destinatario}</span></div>` : ""}
     <div><span class="label">Forma de Pagamento:</span> <span class="value">${cotacao.forma_pagamento || "—"}</span></div>
     <div><span class="label">Status:</span> <span class="value">${statusLabel}</span></div>
