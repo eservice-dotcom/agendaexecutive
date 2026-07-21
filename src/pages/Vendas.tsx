@@ -49,6 +49,7 @@ interface AgendaItem {
   motorista: string;
   veiculo: string;
   pax: number;
+  sht: string;
   cot: string;
   fornecedor: string;
   status_faturamento: string | null;
