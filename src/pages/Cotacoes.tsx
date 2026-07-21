@@ -443,7 +443,8 @@ const Cotacoes = () => {
                         </Button>
                         <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => {
                           const logoUrl = new URL(logo, window.location.origin).href;
-                          printCotacao(c, logoUrl, true);
+                          const cli = getClienteForCotacao(c.empresa || c.nome);
+                          printCotacao({ ...c, cliente: cli }, logoUrl, true);
                         }}>
                           <Printer className="h-4 w-4" />
                         </Button>
