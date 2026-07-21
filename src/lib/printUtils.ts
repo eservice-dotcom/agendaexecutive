@@ -361,6 +361,16 @@ export const printCotacao = (cotacao: {
   valor_total: number;
   status: string;
   items: { descritivo: string; valor: number; hora_extra: string; km_extra: number }[];
+  cliente?: {
+    nome?: string;
+    cnpj_cpf?: string;
+    email?: string;
+    telefone?: string;
+    endereco?: string;
+    cep?: string;
+    cidade?: string;
+    uf?: string;
+  } | null;
 }, logoUrl: string, showTotal: boolean = true) => {
   const fc = (v: number) => new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(v);
   const fd = (d: string) => { if (!d) return ""; const [y, m, day] = d.split("-"); return `${day}/${m}/${y}`; };
@@ -424,8 +434,13 @@ tr:nth-child(even){background:#f8f9fa}
   </div>
 
   <div class="info-grid">
-    <div><span class="label">Empresa:</span> <span class="value">${cotacao.empresa || cotacao.nome}</span></div>
+    <div><span class="label">Empresa:</span> <span class="value">${(cotacao.cliente?.nome) || cotacao.empresa || cotacao.nome}</span></div>
     <div><span class="label">Data:</span> <span class="value">${fd(cotacao.data)}</span></div>
+    ${cotacao.cliente?.cnpj_cpf ? `<div><span class="label">CNPJ/CPF:</span> <span class="value">${cotacao.cliente.cnpj_cpf}</span></div>` : ""}
+    ${cotacao.cliente?.telefone ? `<div><span class="label">Telefone:</span> <span class="value">${cotacao.cliente.telefone}</span></div>` : ""}
+    ${cotacao.cliente?.email ? `<div><span class="label">E-mail:</span> <span class="value">${cotacao.cliente.email}</span></div>` : ""}
+    ${cotacao.cliente?.endereco ? `<div><span class="label">Endereço:</span> <span class="value">${cotacao.cliente.endereco}</span></div>` : ""}
+    ${(cotacao.cliente?.cidade || cotacao.cliente?.uf || cotacao.cliente?.cep) ? `<div><span class="label">Cidade/UF/CEP:</span> <span class="value">${[cotacao.cliente?.cidade, cotacao.cliente?.uf].filter(Boolean).join(" / ")}${cotacao.cliente?.cep ? " — CEP " + cotacao.cliente.cep : ""}</span></div>` : ""}
     ${cotacao.destinatario ? `<div><span class="label">Destinatário:</span> <span class="value">${cotacao.destinatario}</span></div>` : ""}
     <div><span class="label">Forma de Pagamento:</span> <span class="value">${cotacao.forma_pagamento || "—"}</span></div>
     <div><span class="label">Status:</span> <span class="value">${statusLabel}</span></div>

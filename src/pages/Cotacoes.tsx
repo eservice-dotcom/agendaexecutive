@@ -47,6 +47,18 @@ const statusOptions = [
 
 const formasPagamento = ["", "Dinheiro", "PIX", "Cartão de Crédito", "Cartão de Débito", "Boleto", "Transferência", "Faturado"];
 
+interface Cliente {
+  id: string;
+  nome: string;
+  cnpj_cpf?: string | null;
+  email?: string | null;
+  telefone?: string | null;
+  endereco?: string | null;
+  cep?: string | null;
+  cidade?: string | null;
+  uf?: string | null;
+}
+
 const Cotacoes = () => {
   const { session, signOut } = useAuth();
   const navigate = useNavigate();
@@ -55,6 +67,8 @@ const Cotacoes = () => {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingCotacao, setEditingCotacao] = useState<Cotacao | null>(null);
   const [hasPermission, setHasPermission] = useState(false);
+  const [clientes, setClientes] = useState<Cliente[]>([]);
+  const [selectedClienteId, setSelectedClienteId] = useState<string>("");
 
   // Form state
   const [nome, setNome] = useState("");
@@ -72,8 +86,15 @@ const Cotacoes = () => {
     if (session?.user?.id) {
       checkPermissions();
       loadCotacoes();
+      loadClientes();
     }
   }, [session]);
+
+  const loadClientes = async () => {
+    const { data } = await supabase.from("clientes").select("*").order("nome");
+    setClientes((data || []) as Cliente[]);
+  };
+
 
   const checkPermissions = async () => {
     if (!session?.user?.id) return;
@@ -139,6 +160,7 @@ const Cotacoes = () => {
     setStatus("pendente");
     setItems([{ descritivo: "", valor: 0, hora_extra: "", km_extra: 0 }]);
     setEditingCotacao(null);
+    setSelectedClienteId("");
   };
 
   const openNew = () => {
@@ -157,8 +179,29 @@ const Cotacoes = () => {
     setObservacoes(c.observacoes);
     setStatus(c.status);
     setItems(c.items.length > 0 ? c.items : [{ descritivo: "", valor: 0, hora_extra: "", km_extra: 0 }]);
+    // Try to match a registered client by name
+    const match = clientes.find((cl) => cl.nome.trim().toLowerCase() === (c.empresa || c.nome).trim().toLowerCase());
+    setSelectedClienteId(match?.id || "");
     setDialogOpen(true);
   };
+
+  const handleSelectCliente = (id: string) => {
+    setSelectedClienteId(id);
+    const cli = clientes.find((c) => c.id === id);
+    if (cli) {
+      setEmpresa(cli.nome);
+      if (!destinatario) setDestinatario(cli.nome);
+    }
+  };
+
+  const getClienteForCotacao = (empresaNome: string): Cliente | null => {
+    if (selectedClienteId) {
+      const c = clientes.find((cl) => cl.id === selectedClienteId);
+      if (c) return c;
+    }
+    return clientes.find((cl) => cl.nome.trim().toLowerCase() === (empresaNome || "").trim().toLowerCase()) || null;
+  };
+
 
   const addItem = () => {
     setItems([...items, { descritivo: "", valor: 0, hora_extra: "", km_extra: 0 }]);
@@ -400,7 +443,8 @@ const Cotacoes = () => {
                         </Button>
                         <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => {
                           const logoUrl = new URL(logo, window.location.origin).href;
-                          printCotacao(c, logoUrl, true);
+                          const cli = getClienteForCotacao(c.empresa || c.nome);
+                          printCotacao({ ...c, cliente: cli }, logoUrl, true);
                         }}>
                           <Printer className="h-4 w-4" />
                         </Button>
@@ -428,6 +472,27 @@ const Cotacoes = () => {
           </DialogHeader>
 
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            <div className="space-y-1.5 sm:col-span-2">
+              <Label>Cliente cadastrado</Label>
+              <Select value={selectedClienteId || "__none"} onValueChange={(v) => handleSelectCliente(v === "__none" ? "" : v)}>
+                <SelectTrigger><SelectValue placeholder="Selecione um cliente cadastrado (opcional)" /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="__none">— Nenhum (digitar manualmente) —</SelectItem>
+                  {clientes.map((cl) => (
+                    <SelectItem key={cl.id} value={cl.id}>{cl.nome}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              {selectedClienteId && (() => {
+                const cli = clientes.find((c) => c.id === selectedClienteId);
+                if (!cli) return null;
+                return (
+                  <p className="text-xs text-muted-foreground mt-1">
+                    {[cli.cnpj_cpf, cli.telefone, cli.email].filter(Boolean).join(" • ")}
+                  </p>
+                );
+              })()}
+            </div>
             <div className="space-y-1.5">
               <Label>Empresa *</Label>
               <Input value={empresa} onChange={(e) => setEmpresa(e.target.value)} placeholder="Nome da empresa" />
@@ -436,6 +501,7 @@ const Cotacoes = () => {
               <Label>Destinatário</Label>
               <Input value={destinatario} onChange={(e) => setDestinatario(e.target.value)} placeholder="Nome do destinatário" />
             </div>
+
 
             <div className="space-y-1.5">
               <Label>Data</Label>
@@ -559,7 +625,8 @@ const Cotacoes = () => {
             {editingCotacao && (
               <Button variant="outline" onClick={() => {
                 const logoUrl = new URL(logo, window.location.origin).href;
-                printCotacao(editingCotacao, logoUrl, mostrarValorTotal);
+                const cli = getClienteForCotacao(editingCotacao.empresa || editingCotacao.nome);
+                printCotacao({ ...editingCotacao, cliente: cli }, logoUrl, mostrarValorTotal);
               }} className="gap-2">
                 <Printer className="h-4 w-4" /> Imprimir
               </Button>
