@@ -70,7 +70,7 @@ const ContatosMotoristasDialog = ({ open, onOpenChange, items }: ContatosMotoris
         .slice()
         .sort((a, b) => (a.hora || "").localeCompare(b.hora || ""))
         .map((i) => {
-          return `🕐 ${i.hora}  |  📋 O.S. ${i.cot || "—"}  |  👥 SHT ${i.pax ?? "—"}\n   👤 ${i.motorista}   📞 ${i.telefone}`;
+          return `🕐 ${i.hora}  |  📋 O.S. ${i.cot || "—"}  |  🔖 SHT ${i.sht || "—"}\n   👤 ${i.motorista}   📞 ${i.telefone}`;
         });
       blocos.push(`📅 *${formatDate(data)}*\n${linhasDia.join("\n\n")}`);
     });

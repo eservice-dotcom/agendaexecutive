@@ -43,6 +43,7 @@ const replacePlaceholders = (texto: string, item: AgendaItem) => {
     .replace(/{placa}/g, item.placa || "—")
     .replace(/{motorista}/g, item.motorista || "—")
     .replace(/{pax}/g, String(item.pax ?? ""))
+    .replace(/{sht}/g, item.sht || "—")
     .replace(/{cot}/g, item.cot || "—")
     .replace(/{tipo}/g, item.tipo || "—")
     .replace(/{voos}/g, voos)
@@ -86,7 +87,8 @@ const buildConsolidatedMessage = (items: AgendaItem[]) => {
       msg += `\n*Serviço ${idx + 1}*\n`;
       msg += `⏰ Hora: ${horaLabel}\n`;
       msg += `🏢 Cliente: ${item.cliente || "—"}\n`;
-      msg += `👥 SHT: ${item.pax ?? ""}\n`;
+      msg += `🔖 SHT: ${item.sht || "—"}\n`;
+      msg += `👥 PAX: ${item.pax ?? ""}\n`;
       msg += `👤 Passageiros:${passageirosArr.length > 1 ? "\n   • " : " "}${passageirosDetalhados}\n`;
       msg += `✈️ Voo: ${voos}\n`;
       msg += `📍 Origem: ${item.origem || "—"}\n`;
