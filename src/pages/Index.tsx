@@ -154,7 +154,7 @@ const Index = () => {
           );
           if (!hasMatch) return false;
         }
-        if (filters.sht && !String(item.pax ?? "").includes(filters.sht.trim())) return false;
+        if (filters.sht && !String(item.sht ?? "").includes(filters.sht.trim())) return false;
         if (filters.receptivo && !(item.receptivo || "").toLowerCase().includes(filters.receptivo.toLowerCase())) return false;
         if (filters.statusFaturamento) {
           const sf = item.statusFaturamento || item.status_faturamento || "";
@@ -211,7 +211,7 @@ const Index = () => {
 
   const buildAgendaExtrasFromItems = (items: any[]): { descricao: string; valor: number; auto?: boolean; sourceId?: string }[] => {
     return items.flatMap((item: any) => {
-      const shtLabel = item?.pax ? ` / SHT ${item.pax}` : "";
+      const shtLabel = item?.sht ? ` / SHT ${item.sht}` : "";
       const osLabel = item?.cot ? `O.S. ${item.cot}${shtLabel}` : `Serviço${shtLabel}`;
       const sourceId = item?.id || item?.cot || osLabel;
       const rawDespesas = item?.outros_despesas;
