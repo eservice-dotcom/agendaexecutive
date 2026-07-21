@@ -47,6 +47,18 @@ const statusOptions = [
 
 const formasPagamento = ["", "Dinheiro", "PIX", "Cartão de Crédito", "Cartão de Débito", "Boleto", "Transferência", "Faturado"];
 
+interface Cliente {
+  id: string;
+  nome: string;
+  cnpj_cpf?: string | null;
+  email?: string | null;
+  telefone?: string | null;
+  endereco?: string | null;
+  cep?: string | null;
+  cidade?: string | null;
+  uf?: string | null;
+}
+
 const Cotacoes = () => {
   const { session, signOut } = useAuth();
   const navigate = useNavigate();
@@ -55,6 +67,8 @@ const Cotacoes = () => {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingCotacao, setEditingCotacao] = useState<Cotacao | null>(null);
   const [hasPermission, setHasPermission] = useState(false);
+  const [clientes, setClientes] = useState<Cliente[]>([]);
+  const [selectedClienteId, setSelectedClienteId] = useState<string>("");
 
   // Form state
   const [nome, setNome] = useState("");
@@ -72,8 +86,15 @@ const Cotacoes = () => {
     if (session?.user?.id) {
       checkPermissions();
       loadCotacoes();
+      loadClientes();
     }
   }, [session]);
+
+  const loadClientes = async () => {
+    const { data } = await supabase.from("clientes").select("*").order("nome");
+    setClientes((data || []) as Cliente[]);
+  };
+
 
   const checkPermissions = async () => {
     if (!session?.user?.id) return;
