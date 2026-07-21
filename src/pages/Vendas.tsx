@@ -150,7 +150,7 @@ const horaExtraToHours = (he?: string | null) => {
 
 const buildAgendaExtrasFromItems = (items: any[]) => {
   return items.flatMap((item: any) => {
-    const shtLabel = item?.pax ? ` / SHT ${item.pax}` : "";
+    const shtLabel = item?.sht ? ` / SHT ${item.sht}` : "";
     const osLabel = item?.cot ? `O.S. ${item.cot}${shtLabel}` : `Serviço${shtLabel}`;
     const rawDespesas = item?.outros_despesas;
     let despesas: any[] = [];
@@ -743,7 +743,7 @@ const Vendas = () => {
           existing.total += Number(item.custo);
           existing.items.push(item);
 
-          const osLabel = `${item?.cot ? `O.S. ${item.cot}` : "Serviço"}${item?.pax ? ` / SHT ${item.pax}` : ""}`;
+          const osLabel = `${item?.cot ? `O.S. ${item.cot}` : "Serviço"}${item?.sht ? ` / SHT ${item.sht}` : ""}`;
           const kmExtraQtd = Number(item?.km_extra) || 0;
           const valKmExtFor = Number(item?.valor_km_extra_fornecedor) || 0;
           const kmExtraTotalFor = kmExtraQtd * valKmExtFor;
@@ -992,7 +992,7 @@ const Vendas = () => {
           existing.total += Number(item.custo);
           existing.items.push(item);
 
-          const osLabel = `${item?.cot ? `O.S. ${item.cot}` : "Serviço"}${item?.pax ? ` / SHT ${item.pax}` : ""}`;
+          const osLabel = `${item?.cot ? `O.S. ${item.cot}` : "Serviço"}${item?.sht ? ` / SHT ${item.sht}` : ""}`;
           const kmExtraQtd = Number(item?.km_extra) || 0;
           const valKmExtFor = Number(item?.valor_km_extra_fornecedor) || 0;
           const kmExtraTotalFor = kmExtraQtd * valKmExtFor;
@@ -1113,7 +1113,7 @@ const Vendas = () => {
         <td>${ai?.data ? formatDate(ai.data) : ""}</td>
         <td>${ai?.tipo || ""}</td>
         <td>${ai?.origem || ""} → ${ai?.destino || ""}</td>
-        <td class="c">${ai?.pax || ""}</td>
+        <td class="c">${ai?.sht || ""}</td>
         <td class="r">${formatCurrency(item.valor)}</td>
       </tr>`;
     }).join("");
@@ -1262,7 +1262,7 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
         "Tipo": ai.tipo || "",
         "Origem": ai.origem || "",
         "Destino": ai.destino || "",
-        "SHT": ai.pax || "",
+        "SHT": ai.sht || "",
         "Motorista": ai.motorista || "",
         "Veículo": ai.veiculo || "",
         "Placa": ai.placa || "",
@@ -2732,7 +2732,7 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
                               <TableCell className="font-mono text-xs">{formatDate(item.data)}</TableCell>
                               <TableCell className="text-xs">{item.tipo}</TableCell>
                               <TableCell className="text-xs">{item.origem} → {item.destino}</TableCell>
-                              <TableCell className="text-center">{item.pax}</TableCell>
+                              <TableCell className="text-center">{item.sht}</TableCell>
                               <TableCell className="text-right font-mono text-xs">{formatCurrency(item.valor)}</TableCell>
                               <TableCell>
                                 {item.status_faturamento && (
@@ -3102,7 +3102,7 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
                             <TableCell className="font-mono text-xs">{formatDate(item.data)}</TableCell>
                             <TableCell className="text-xs">{item.tipo}</TableCell>
                             <TableCell className="text-xs">{item.origem} → {item.destino}</TableCell>
-                            <TableCell className="text-center">{item.pax}</TableCell>
+                            <TableCell className="text-center">{item.sht}</TableCell>
                             <TableCell className="text-right font-mono text-xs">{formatCurrency(item.valor)}</TableCell>
                           </TableRow>
                         ))
