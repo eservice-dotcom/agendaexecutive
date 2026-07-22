@@ -415,6 +415,16 @@ const ImportarPDFCSGlobalDialog = ({ open, onOpenChange, onImported }: Props) =>
       toast.error("Selecione ao menos um serviço.");
       return;
     }
+    const semData = toImport.filter((s) => !s.data);
+    if (semData.length > 0) {
+      toast.error(`Preencha a Data dos serviços: O.S. ${semData.map(s => s.os || "?").join(", ")}`);
+      return;
+    }
+    const semHora = toImport.filter((s) => !s.hora);
+    if (semHora.length > 0) {
+      toast.error(`Preencha a Hora dos serviços: O.S. ${semHora.map(s => s.os || "?").join(", ")}`);
+      return;
+    }
     let clienteNome = "CS Brasil";
     if (clienteId) {
       const c = clientes.find((x) => x.id === clienteId);
@@ -490,8 +500,9 @@ const ImportarPDFCSGlobalDialog = ({ open, onOpenChange, onImported }: Props) =>
           } as any);
           inseridos++;
         }
-      } catch (e) {
+      } catch (e: any) {
         console.error("Erro ao importar O.S.", s.os, e);
+        toast.error(`Falha O.S. ${s.os || "?"}: ${e?.message || "erro desconhecido"}`);
         fail++;
       }
     }
