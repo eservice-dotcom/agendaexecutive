@@ -500,8 +500,9 @@ const ImportarPDFCSGlobalDialog = ({ open, onOpenChange, onImported }: Props) =>
           } as any);
           inseridos++;
         }
-      } catch (e) {
+      } catch (e: any) {
         console.error("Erro ao importar O.S.", s.os, e);
+        toast.error(`Falha O.S. ${s.os || "?"}: ${e?.message || "erro desconhecido"}`);
         fail++;
       }
     }
