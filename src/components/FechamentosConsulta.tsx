@@ -248,6 +248,13 @@ const FechamentosConsulta = () => {
 
   const handleDelete = async () => {
     if (!deleteItem) return;
+    // Fetch linked agenda item ids to reset their billing status
+    const { data: linked } = await supabase
+      .from("fechamento_items")
+      .select("agenda_item_id")
+      .eq("fechamento_id", deleteItem.id);
+    const agendaIds = (linked || []).map((r: any) => r.agenda_item_id).filter(Boolean);
+
     // Delete linked items first, then the fechamento
     await supabase.from("fechamento_items").delete().eq("fechamento_id", deleteItem.id);
     const { error } = await supabase.from("fechamentos").delete().eq("id", deleteItem.id);
@@ -255,6 +262,12 @@ const FechamentosConsulta = () => {
     if (error) {
       toast.error("Erro ao excluir: " + error.message);
     } else {
+      if (agendaIds.length > 0) {
+        await supabase
+          .from("agenda_items")
+          .update({ status_faturamento: "" } as any)
+          .in("id", agendaIds);
+      }
       toast.success(`Fechamento Nº ${deleteItem.numero_fechamento} excluído`);
       setDeleteOpen(false);
       await loadFechamentos();
