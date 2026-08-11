@@ -179,28 +179,43 @@ const parsePDF = async (file: File): Promise<ParsedService[]> => {
     }
   }
 
-  // Origem (PU:)
-  let origem = "";
+  // Helper: monta endereço completo a partir de um rótulo (PU:/DO:) + End.: multi-linha
+  const LABEL_RE = /^(PU:|DO:|Obs:|Notas|Cia:|Voo|ETA|Terminal|Instru|Detalhes|Respons|Valor|End\.?:|Data|Hora|Passageiro|Reserva)/i;
+  const buildAddress = (startIdx: number, label: RegExp): string => {
+    if (startIdx < 0) return "";
+    const parts: string[] = [];
+    const first = lines[startIdx].replace(label, "").trim();
+    if (first) parts.push(first);
+    for (let i = startIdx + 1; i < lines.length; i++) {
+      const ln = (lines[i] || "").trim();
+      if (!ln) continue;
+      const em = ln.match(/^End\.?:\s*(.*)$/i);
+      if (em) {
+        let addr = em[1].trim();
+        // captura linhas de continuação do endereço (quebras de linha do PDF)
+        for (let j = i + 1; j < lines.length; j++) {
+          const nxt = (lines[j] || "").trim();
+          if (!nxt) continue;
+          if (LABEL_RE.test(nxt)) break;
+          addr += " " + nxt;
+        }
+        addr = addr.replace(/\|/g, ", ").replace(/\s*,\s*,+/g, ", ").replace(/\s+/g, " ").replace(/[\s,]+$/, "").trim();
+        if (addr) parts.push(addr);
+        break;
+      }
+      if (LABEL_RE.test(ln)) break;
+    }
+    return parts.join(" - ").replace(/\s+/g, " ").trim();
+  };
+
+  // Origem (PU: + End.:)
   const puIdx = lines.findIndex((l) => /^PU:/i.test(l));
-  if (puIdx >= 0) {
-    origem = lines[puIdx].replace(/^PU:\s*/i, "").trim();
-  }
+  const origem = buildAddress(puIdx, /^PU:\s*/i);
 
   // Destino (DO: + End.:)
-  let destino = "";
   const doIdx = lines.findIndex((l) => /^DO:/i.test(l));
-  if (doIdx >= 0) {
-    const parts: string[] = [];
-    const first = lines[doIdx].replace(/^DO:\s*/i, "").trim();
-    if (first) parts.push(first);
-    for (let i = doIdx + 1; i < Math.min(doIdx + 5, lines.length); i++) {
-      const ln = lines[i];
-      const em = ln.match(/^End\.?:\s*(.+)$/i);
-      if (em) { parts.push(em[1].trim()); break; }
-      if (/^Obs:|^Notas|^PU:/i.test(ln)) break;
-    }
-    destino = parts.join(" - ").replace(/\s+/g, " ").trim();
-  }
+  const destino = buildAddress(doIdx, /^DO:\s*/i);
+
 
   // Valor Total
   let valor = 0;
