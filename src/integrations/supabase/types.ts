@@ -576,7 +576,9 @@ export type Database = {
           hora_extra: string | null
           id: string
           km_extra: number | null
+          quantidade: number
           valor: number
+          valor_unitario: number
         }
         Insert: {
           cotacao_id: string
@@ -585,7 +587,9 @@ export type Database = {
           hora_extra?: string | null
           id?: string
           km_extra?: number | null
+          quantidade?: number
           valor?: number
+          valor_unitario?: number
         }
         Update: {
           cotacao_id?: string
@@ -594,7 +598,9 @@ export type Database = {
           hora_extra?: string | null
           id?: string
           km_extra?: number | null
+          quantidade?: number
           valor?: number
+          valor_unitario?: number
         }
         Relationships: [
           {

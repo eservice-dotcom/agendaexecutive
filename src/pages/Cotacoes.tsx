@@ -19,6 +19,8 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 interface CotacaoItem {
   id?: string;
   descritivo: string;
+  valor_unitario: number;
+  quantidade: number;
   valor: number;
   hora_extra: string;
   km_extra: number;
@@ -79,7 +81,7 @@ const Cotacoes = () => {
   const [validadeProposta, setValidadeProposta] = useState("");
   const [observacoes, setObservacoes] = useState("");
   const [status, setStatus] = useState("pendente");
-  const [items, setItems] = useState<CotacaoItem[]>([{ descritivo: "", valor: 0, hora_extra: "", km_extra: 0 }]);
+  const [items, setItems] = useState<CotacaoItem[]>([{ descritivo: "", valor_unitario: 0, quantidade: 1, valor: 0, hora_extra: "", km_extra: 0 }]);
   const [mostrarValorTotal, setMostrarValorTotal] = useState(true);
 
   useEffect(() => {
@@ -138,6 +140,8 @@ const Cotacoes = () => {
         items: (itemsData || []).map((i: any) => ({
           id: i.id,
           descritivo: i.descritivo,
+          valor_unitario: Number(i.valor_unitario ?? i.valor) || 0,
+          quantidade: Number(i.quantidade ?? 1) || 1,
           valor: i.valor,
           hora_extra: i.hora_extra || "",
           km_extra: i.km_extra || 0,
@@ -158,7 +162,7 @@ const Cotacoes = () => {
     setValidadeProposta("");
     setObservacoes("");
     setStatus("pendente");
-    setItems([{ descritivo: "", valor: 0, hora_extra: "", km_extra: 0 }]);
+    setItems([{ descritivo: "", valor_unitario: 0, quantidade: 1, valor: 0, hora_extra: "", km_extra: 0 }]);
     setEditingCotacao(null);
     setSelectedClienteId("");
   };
@@ -178,7 +182,7 @@ const Cotacoes = () => {
     setValidadeProposta(c.validade_proposta);
     setObservacoes(c.observacoes);
     setStatus(c.status);
-    setItems(c.items.length > 0 ? c.items : [{ descritivo: "", valor: 0, hora_extra: "", km_extra: 0 }]);
+    setItems(c.items.length > 0 ? c.items : [{ descritivo: "", valor_unitario: 0, quantidade: 1, valor: 0, hora_extra: "", km_extra: 0 }]);
     // Try to match a registered client by name
     const match = clientes.find((cl) => cl.nome.trim().toLowerCase() === (c.empresa || c.nome).trim().toLowerCase());
     setSelectedClienteId(match?.id || "");
@@ -204,7 +208,7 @@ const Cotacoes = () => {
 
 
   const addItem = () => {
-    setItems([...items, { descritivo: "", valor: 0, hora_extra: "", km_extra: 0 }]);
+    setItems([...items, { descritivo: "", valor_unitario: 0, quantidade: 1, valor: 0, hora_extra: "", km_extra: 0 }]);
   };
 
   const removeItem = (idx: number) => {
@@ -214,7 +218,11 @@ const Cotacoes = () => {
 
   const updateItem = (idx: number, field: keyof CotacaoItem, value: any) => {
     const arr = [...items];
-    arr[idx] = { ...arr[idx], [field]: value };
+    const next = { ...arr[idx], [field]: value } as CotacaoItem;
+    if (field === "valor_unitario" || field === "quantidade") {
+      next.valor = (Number(next.valor_unitario) || 0) * (Number(next.quantidade) || 0);
+    }
+    arr[idx] = next;
     setItems(arr);
   };
 
@@ -257,6 +265,8 @@ const Cotacoes = () => {
           .map((i) => ({
             cotacao_id: editingCotacao.id,
             descritivo: i.descritivo,
+            valor_unitario: i.valor_unitario || 0,
+            quantidade: i.quantidade || 1,
             valor: i.valor || 0,
             hora_extra: i.hora_extra || "",
             km_extra: i.km_extra || 0,
@@ -294,6 +304,8 @@ const Cotacoes = () => {
           .map((i) => ({
             cotacao_id: newCotacao.id,
             descritivo: i.descritivo,
+            valor_unitario: i.valor_unitario || 0,
+            quantidade: i.quantidade || 1,
             valor: i.valor || 0,
             hora_extra: i.hora_extra || "",
             km_extra: i.km_extra || 0,
@@ -566,8 +578,8 @@ const Cotacoes = () => {
                         </Button>
                       )}
                     </div>
-                    <div className="grid grid-cols-1 sm:grid-cols-4 gap-2">
-                      <div className="sm:col-span-4 space-y-1">
+                    <div className="grid grid-cols-1 sm:grid-cols-5 gap-2">
+                      <div className="sm:col-span-5 space-y-1">
                         <Label className="text-xs">Descritivo</Label>
                         <Input
                           value={item.descritivo}
@@ -576,15 +588,30 @@ const Cotacoes = () => {
                         />
                       </div>
                       <div className="space-y-1">
-                        <Label className="text-xs">Valor (R$)</Label>
+                        <Label className="text-xs">Valor Unitário (R$)</Label>
                         <Input
                           type="number"
                           min={0}
                           step="0.01"
-                          value={item.valor || ""}
-                          onChange={(e) => updateItem(idx, "valor", parseFloat(e.target.value) || 0)}
+                          value={item.valor_unitario || ""}
+                          onChange={(e) => updateItem(idx, "valor_unitario", parseFloat(e.target.value) || 0)}
                           placeholder="0,00"
                         />
+                      </div>
+                      <div className="space-y-1">
+                        <Label className="text-xs">Quantidade</Label>
+                        <Input
+                          type="number"
+                          min={0}
+                          step="1"
+                          value={item.quantidade ?? ""}
+                          onChange={(e) => updateItem(idx, "quantidade", parseFloat(e.target.value) || 0)}
+                          placeholder="1"
+                        />
+                      </div>
+                      <div className="space-y-1">
+                        <Label className="text-xs">Valor Total do Item (R$)</Label>
+                        <Input value={formatCurrency(item.valor || 0)} readOnly className="bg-muted font-semibold" />
                       </div>
                       <div className="space-y-1">
                         <Label className="text-xs">Hora Extra (R$)</Label>
