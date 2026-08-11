@@ -375,13 +375,19 @@ export const printCotacao = (cotacao: {
   const fc = (v: number) => new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(v);
   const fd = (d: string) => { if (!d) return ""; const [y, m, day] = d.split("-"); return `${day}/${m}/${y}`; };
 
-  const rows = cotacao.items.map((item, idx) => `<tr>
+  const rows = cotacao.items.map((item, idx) => {
+    const qtd = Number(item.quantidade ?? 1) || 1;
+    const vu = Number(item.valor_unitario ?? item.valor) || 0;
+    return `<tr>
     <td class="c">${idx + 1}</td>
     <td>${item.descritivo}</td>
+    <td class="r">${fc(vu)}</td>
+    <td class="c">${qtd}</td>
     <td class="r">${fc(item.valor)}</td>
     <td class="c">${item.hora_extra || "—"}</td>
     <td class="c">${item.km_extra || "—"}</td>
-  </tr>`).join("");
+  </tr>`;
+  }).join("");
 
   const statusLabel = cotacao.status === "aprovada" ? "APROVADA" : cotacao.status === "recusada" ? "RECUSADA" : "PENDENTE";
 
