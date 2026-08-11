@@ -456,14 +456,16 @@ tr:nth-child(even){background:#f8f9fa}
     <thead><tr>
       <th class="c" style="width:40px">Nº</th>
       <th>Descritivo</th>
-      <th class="r" style="width:110px">Valor</th>
+      <th class="r" style="width:100px">Valor Unit.</th>
+      <th class="c" style="width:50px">Qtd</th>
+      <th class="r" style="width:110px">Valor Total</th>
       <th class="c" style="width:80px">Hora Extra</th>
       <th class="c" style="width:80px">KM Extra</th>
     </tr></thead>
     <tbody>
       ${rows}
       ${showTotal ? `<tr class="total-row">
-        <td colspan="2" class="r">VALOR TOTAL</td>
+        <td colspan="4" class="r">VALOR TOTAL</td>
         <td class="r">${fc(cotacao.valor_total)}</td>
         <td colspan="2"></td>
       </tr>` : ''}
