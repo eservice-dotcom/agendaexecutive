@@ -19,6 +19,8 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 interface CotacaoItem {
   id?: string;
   descritivo: string;
+  valor_unitario: number;
+  quantidade: number;
   valor: number;
   hora_extra: string;
   km_extra: number;
