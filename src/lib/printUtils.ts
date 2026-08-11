@@ -360,7 +360,7 @@ export const printCotacao = (cotacao: {
   observacoes: string;
   valor_total: number;
   status: string;
-  items: { descritivo: string; valor: number; hora_extra: string; km_extra: number }[];
+  items: { descritivo: string; valor: number; hora_extra: string; km_extra: number; valor_unitario?: number; quantidade?: number }[];
   cliente?: {
     nome?: string;
     cnpj_cpf?: string;
