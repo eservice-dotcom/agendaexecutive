@@ -588,15 +588,30 @@ const Cotacoes = () => {
                         />
                       </div>
                       <div className="space-y-1">
-                        <Label className="text-xs">Valor (R$)</Label>
+                        <Label className="text-xs">Valor Unitário (R$)</Label>
                         <Input
                           type="number"
                           min={0}
                           step="0.01"
-                          value={item.valor || ""}
-                          onChange={(e) => updateItem(idx, "valor", parseFloat(e.target.value) || 0)}
+                          value={item.valor_unitario || ""}
+                          onChange={(e) => updateItem(idx, "valor_unitario", parseFloat(e.target.value) || 0)}
                           placeholder="0,00"
                         />
+                      </div>
+                      <div className="space-y-1">
+                        <Label className="text-xs">Quantidade</Label>
+                        <Input
+                          type="number"
+                          min={0}
+                          step="1"
+                          value={item.quantidade ?? ""}
+                          onChange={(e) => updateItem(idx, "quantidade", parseFloat(e.target.value) || 0)}
+                          placeholder="1"
+                        />
+                      </div>
+                      <div className="space-y-1">
+                        <Label className="text-xs">Valor Total do Item (R$)</Label>
+                        <Input value={formatCurrency(item.valor || 0)} readOnly className="bg-muted font-semibold" />
                       </div>
                       <div className="space-y-1">
                         <Label className="text-xs">Hora Extra (R$)</Label>
