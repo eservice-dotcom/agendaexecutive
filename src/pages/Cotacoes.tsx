@@ -578,8 +578,8 @@ const Cotacoes = () => {
                         </Button>
                       )}
                     </div>
-                    <div className="grid grid-cols-1 sm:grid-cols-4 gap-2">
-                      <div className="sm:col-span-4 space-y-1">
+                    <div className="grid grid-cols-1 sm:grid-cols-5 gap-2">
+                      <div className="sm:col-span-5 space-y-1">
                         <Label className="text-xs">Descritivo</Label>
                         <Input
                           value={item.descritivo}
