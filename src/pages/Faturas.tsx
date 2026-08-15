@@ -270,7 +270,7 @@ export default function Faturas() {
       f.numero_fatura,
     ] as const;
     if (format === "excel") generateClosingReportExcel(...args);
-    else generateClosingReport(...args);
+    else generateClosingReport(...args, "FATURA");
   };
 
   const disponiveis = vendas.filter((v) => !vendasJaFaturadas.has(v.id));
