@@ -2289,6 +2289,9 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
                 <Button variant="outline" size="sm" onClick={() => openNovaContaDialog("receber")} className="gap-1">
                   <Plus className="h-4 w-4" /> Nova Conta a Receber
                 </Button>
+                <Button size="sm" onClick={() => setFaturaManualOpen(true)} className="gap-1">
+                  <FileText className="h-4 w-4" /> Nova Fatura Avulsa
+                </Button>
               </div>
             </div>
             <div className="rounded-lg border border-border bg-card shadow-sm">
