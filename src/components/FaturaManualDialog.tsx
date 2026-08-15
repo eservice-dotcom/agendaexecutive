@@ -155,7 +155,8 @@ export default function FaturaManualDialog({ open, onOpenChange, onCreated }: Pr
           data_vencimento: vencimento || null,
           extras,
         },
-        inserted.numero_fatura
+        inserted.numero_fatura,
+        "FATURA"
       );
     }
 
