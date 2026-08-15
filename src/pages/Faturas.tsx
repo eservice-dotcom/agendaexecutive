@@ -285,7 +285,16 @@ export default function Faturas() {
               <FileText className="h-6 w-6 text-primary" /> Faturas
             </h1>
           </div>
+          <Button onClick={() => setFaturaManualOpen(true)} className="gap-1">
+            <FileText className="h-4 w-4" /> Nova Fatura Avulsa
+          </Button>
         </div>
+
+        <FaturaManualDialog
+          open={faturaManualOpen}
+          onOpenChange={setFaturaManualOpen}
+          onCreated={loadFaturas}
+        />
 
         <Card>
           <CardHeader>
