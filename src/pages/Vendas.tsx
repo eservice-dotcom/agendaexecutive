@@ -22,6 +22,7 @@ import { printContasPagar, printContasReceber } from "@/lib/printUtils";
 import DashboardFinanceiro from "@/components/DashboardFinanceiro";
 import RelatorioContasConsolidado from "@/components/RelatorioContasConsolidado";
 import WhatsAppPagamentoDialog from "@/components/WhatsAppPagamentoDialog";
+import FaturaManualDialog from "@/components/FaturaManualDialog";
 
 interface Venda {
   id: string;
@@ -306,6 +307,7 @@ const Vendas = () => {
 
   // New manual conta dialogs
   const [novaContaDialog, setNovaContaDialog] = useState<"pagar" | "receber" | null>(null);
+  const [faturaManualOpen, setFaturaManualOpen] = useState(false);
   const [novaContaForm, setNovaContaForm] = useState({
     descritivo: "",
     valor: "",
@@ -2287,6 +2289,9 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
                 <Button variant="outline" size="sm" onClick={() => openNovaContaDialog("receber")} className="gap-1">
                   <Plus className="h-4 w-4" /> Nova Conta a Receber
                 </Button>
+                <Button size="sm" onClick={() => setFaturaManualOpen(true)} className="gap-1">
+                  <FileText className="h-4 w-4" /> Nova Fatura Avulsa
+                </Button>
               </div>
             </div>
             <div className="rounded-lg border border-border bg-card shadow-sm">
@@ -3637,6 +3642,12 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
           conta={whatsappPagamento?.conta || null}
           contas={whatsappPagamento?.contas}
           vendaInfo={whatsappPagamento?.vendaInfo || null}
+        />
+
+        <FaturaManualDialog
+          open={faturaManualOpen}
+          onOpenChange={setFaturaManualOpen}
+          onCreated={loadContasReceber}
         />
 
         {/* Baixa Parcial Dialog */}

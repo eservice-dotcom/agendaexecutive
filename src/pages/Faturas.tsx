@@ -15,6 +15,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "@/hooks/use-toast";
 import { generateClosingReport } from "@/lib/closingReport";
 import { generateClosingReportExcel } from "@/lib/closingReportExcel";
+import FaturaManualDialog from "@/components/FaturaManualDialog";
 
 interface Venda {
   id: string;
@@ -63,6 +64,7 @@ export default function Faturas() {
   const [obs, setObs] = useState<string>("");
   const [faturas, setFaturas] = useState<Fatura[]>([]);
   const [loading, setLoading] = useState(false);
+  const [faturaManualOpen, setFaturaManualOpen] = useState(false);
 
   const loadClientes = useCallback(async () => {
     const [ag, cl] = await Promise.all([
@@ -285,7 +287,16 @@ export default function Faturas() {
               <FileText className="h-6 w-6 text-primary" /> Faturas
             </h1>
           </div>
+          <Button onClick={() => setFaturaManualOpen(true)} className="gap-1">
+            <FileText className="h-4 w-4" /> Nova Fatura Avulsa
+          </Button>
         </div>
+
+        <FaturaManualDialog
+          open={faturaManualOpen}
+          onOpenChange={setFaturaManualOpen}
+          onCreated={loadFaturas}
+        />
 
         <Card>
           <CardHeader>
