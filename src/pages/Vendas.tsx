@@ -22,6 +22,7 @@ import { printContasPagar, printContasReceber } from "@/lib/printUtils";
 import DashboardFinanceiro from "@/components/DashboardFinanceiro";
 import RelatorioContasConsolidado from "@/components/RelatorioContasConsolidado";
 import WhatsAppPagamentoDialog from "@/components/WhatsAppPagamentoDialog";
+import FaturaManualDialog from "@/components/FaturaManualDialog";
 
 interface Venda {
   id: string;
