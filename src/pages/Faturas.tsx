@@ -15,6 +15,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "@/hooks/use-toast";
 import { generateClosingReport } from "@/lib/closingReport";
 import { generateClosingReportExcel } from "@/lib/closingReportExcel";
+import FaturaManualDialog from "@/components/FaturaManualDialog";
 
 interface Venda {
   id: string;
