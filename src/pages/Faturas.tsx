@@ -64,6 +64,7 @@ export default function Faturas() {
   const [obs, setObs] = useState<string>("");
   const [faturas, setFaturas] = useState<Fatura[]>([]);
   const [loading, setLoading] = useState(false);
+  const [faturaManualOpen, setFaturaManualOpen] = useState(false);
 
   const loadClientes = useCallback(async () => {
     const [ag, cl] = await Promise.all([
