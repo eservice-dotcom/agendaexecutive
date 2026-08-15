@@ -307,6 +307,7 @@ const Vendas = () => {
 
   // New manual conta dialogs
   const [novaContaDialog, setNovaContaDialog] = useState<"pagar" | "receber" | null>(null);
+  const [faturaManualOpen, setFaturaManualOpen] = useState(false);
   const [novaContaForm, setNovaContaForm] = useState({
     descritivo: "",
     valor: "",
