@@ -3644,6 +3644,12 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
           vendaInfo={whatsappPagamento?.vendaInfo || null}
         />
 
+        <FaturaManualDialog
+          open={faturaManualOpen}
+          onOpenChange={setFaturaManualOpen}
+          onCreated={loadContasReceber}
+        />
+
         {/* Baixa Parcial Dialog */}
         <Dialog open={!!baixaDialog} onOpenChange={(v) => { if (!v) setBaixaDialog(null); }}>
           <DialogContent className="max-w-md">
