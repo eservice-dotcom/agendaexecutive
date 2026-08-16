@@ -261,10 +261,23 @@ export default function Faturas() {
           .select("descritivo, valor")
           .eq("fatura_id", f.id)
           .maybeSingle();
-        extrasManuais = cr
-          ? [{ descricao: cr.descritivo, valor: Number(cr.valor) || 0 }]
-          : [{ descricao: f.observacoes || "Fatura avulsa", valor: Number(f.valor_total) || 0 }];
+        const bruto = cr?.descritivo || f.observacoes || "Fatura avulsa";
+        const totalCr = Number(cr?.valor) || Number(f.valor_total) || 0;
+        // Quebra o descritivo consolidado em itens (separados por " | ")
+        const partes = bruto
+          .replace(/^Fatura Avulsa Nº\s*\d+\s*-\s*/i, "")
+          .split("|")
+          .map((p) => p.trim())
+          .filter(Boolean);
+        extrasManuais =
+          partes.length > 1
+            ? partes.map((p, i) => ({
+                descricao: p,
+                valor: i === partes.length - 1 ? totalCr : 0,
+              }))
+            : [{ descricao: bruto, valor: totalCr }];
       }
+
       const argsAvulsa = [
         [] as any[],
         `Fatura Nº ${f.numero_fatura} - ${f.cliente}`,
