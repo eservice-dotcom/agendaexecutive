@@ -104,6 +104,11 @@ export default function FaturaManualDialog({ open, onOpenChange, onCreated }: Pr
         data_vencimento: vencimento || null,
         valor_total: valorTotal,
         observacoes: obs || "",
+        itens_manuais: validos.map((it) => ({
+          descricao: it.descricao.trim(),
+          quantidade: parseFloat(it.quantidade) || 0,
+          valor_unitario: parseFloat(it.valor_unitario) || 0,
+        })),
       } as any)
       .select("id, numero_fatura")
       .single();
