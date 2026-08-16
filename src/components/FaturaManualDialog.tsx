@@ -73,6 +73,8 @@ export default function FaturaManualDialog({ open, onOpenChange, onCreated }: Pr
 
   const reset = () => {
     setCliente("");
+    setClienteLivre(false);
+
     setDataEmissao(new Date().toISOString().slice(0, 10));
     setVencimento("");
     setCentroReceita("");
