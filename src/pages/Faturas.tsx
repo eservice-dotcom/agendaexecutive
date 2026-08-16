@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo, useCallback } from "react";
 import { Link } from "react-router-dom";
-import { ArrowLeft, FileText, Trash2, Download, FileSpreadsheet, Printer, RefreshCw } from "lucide-react";
+import { ArrowLeft, FileText, Trash2, Download, FileSpreadsheet, Printer, RefreshCw, Pencil } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
