@@ -249,7 +249,31 @@ export default function Faturas() {
       .eq("fatura_id", f.id);
     const vendaIds = (fv || []).map((r: any) => r.venda_id);
     if (vendaIds.length === 0) {
-      toast({ title: "Fatura sem vendas vinculadas", variant: "destructive" });
+      // Fatura avulsa (itens manuais)
+      const itens = ((f as any).itens_manuais as any[]) || [];
+      let extrasManuais = itens.map((it: any) => ({
+        descricao: `${it.descricao} — ${Number(it.quantidade) || 0} x ${new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(Number(it.valor_unitario) || 0)}`,
+        valor: (Number(it.quantidade) || 0) * (Number(it.valor_unitario) || 0),
+      }));
+      if (extrasManuais.length === 0) {
+        const { data: cr } = await supabase
+          .from("contas_receber")
+          .select("descritivo, valor")
+          .eq("fatura_id", f.id)
+          .maybeSingle();
+        extrasManuais = cr
+          ? [{ descricao: cr.descritivo, valor: Number(cr.valor) || 0 }]
+          : [{ descricao: f.observacoes || "Fatura avulsa", valor: Number(f.valor_total) || 0 }];
+      }
+      const argsAvulsa = [
+        [] as any[],
+        `Fatura Nº ${f.numero_fatura} - ${f.cliente}`,
+        f.cliente,
+        { cliente: f.cliente, observacoes: f.observacoes, valor_total: Number(f.valor_total), data_vencimento: f.data_vencimento, extras: extrasManuais },
+        f.numero_fatura,
+      ] as const;
+      if (format === "excel") generateClosingReportExcel(...argsAvulsa);
+      else generateClosingReport(...argsAvulsa, "FATURA");
       return;
     }
     const { data: vi } = await supabase

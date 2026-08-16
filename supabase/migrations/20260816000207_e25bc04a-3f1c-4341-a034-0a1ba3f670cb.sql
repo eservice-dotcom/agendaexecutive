@@ -1,0 +1,1 @@
+ALTER TABLE public.faturas ADD COLUMN IF NOT EXISTS itens_manuais jsonb;
