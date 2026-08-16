@@ -39,6 +39,8 @@ export default function FaturaManualDialog({ open, onOpenChange, onCreated }: Pr
   const { session } = useAuth();
   const [clientes, setClientes] = useState<string[]>([]);
   const [cliente, setCliente] = useState("");
+  const [clienteLivre, setClienteLivre] = useState(false);
+
   const [dataEmissao, setDataEmissao] = useState(new Date().toISOString().slice(0, 10));
   const [vencimento, setVencimento] = useState("");
   const [centroReceita, setCentroReceita] = useState("");
