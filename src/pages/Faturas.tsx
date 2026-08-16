@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo, useCallback } from "react";
 import { Link } from "react-router-dom";
-import { ArrowLeft, FileText, Trash2, Download, FileSpreadsheet, Printer, RefreshCw } from "lucide-react";
+import { ArrowLeft, FileText, Trash2, Download, FileSpreadsheet, Printer, RefreshCw, Pencil } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
@@ -232,7 +232,26 @@ export default function Faturas() {
     await Promise.all([buscarVendas(), loadFaturas()]);
   };
 
+  const editarCliente = async (f: Fatura) => {
+    const novo = window.prompt("Editar nome do cliente desta fatura:", f.cliente);
+    if (novo === null) return;
+    const nome = novo.trim();
+    if (!nome) {
+      toast({ title: "Nome não pode ficar vazio", variant: "destructive" });
+      return;
+    }
+    const { error } = await supabase.from("faturas").update({ cliente: nome }).eq("id", f.id);
+    if (error) {
+      toast({ title: "Erro ao atualizar cliente", description: error.message, variant: "destructive" });
+      return;
+    }
+    await supabase.from("contas_receber").update({ cliente: nome }).eq("fatura_id", f.id);
+    toast({ title: "Cliente atualizado" });
+    await loadFaturas();
+  };
+
   const excluirFatura = async (f: Fatura) => {
+
     if (!confirm(`Excluir Fatura Nº ${f.numero_fatura}? A Conta a Receber vinculada também será removida.`)) return;
     if (f.conta_receber_id) {
       await supabase.from("contas_receber").delete().eq("id", f.conta_receber_id);
@@ -484,6 +503,10 @@ export default function Faturas() {
                         <TableCell className="text-right font-mono">{formatCurrency(Number(f.valor_total))}</TableCell>
                         <TableCell className="text-right">
                           <div className="flex justify-end gap-1">
+                            <Button variant="ghost" size="sm" onClick={() => editarCliente(f)} title="Editar nome do cliente">
+                              <Pencil className="h-4 w-4" />
+                            </Button>
+
                             <Button variant="ghost" size="sm" onClick={() => reimprimirFatura(f, "print")} title="Reimprimir PDF">
                               <Printer className="h-4 w-4" />
                             </Button>
