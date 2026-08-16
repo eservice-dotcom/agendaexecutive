@@ -184,14 +184,32 @@ export default function FaturaManualDialog({ open, onOpenChange, onCreated }: Pr
         <div className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
             <div className="md:col-span-2">
-              <Label className="text-xs">Cliente *</Label>
-              <Select value={cliente} onValueChange={setCliente}>
-                <SelectTrigger><SelectValue placeholder="Selecione..." /></SelectTrigger>
-                <SelectContent>
-                  {clientes.map((c) => <SelectItem key={c} value={c}>{c}</SelectItem>)}
-                </SelectContent>
-              </Select>
+              <div className="flex items-center justify-between">
+                <Label className="text-xs">Cliente *</Label>
+                <button
+                  type="button"
+                  className="text-[11px] text-primary underline"
+                  onClick={() => setClienteLivre((v) => !v)}
+                >
+                  {clienteLivre ? "Escolher cadastrado" : "Digitar/editar nome"}
+                </button>
+              </div>
+              {clienteLivre ? (
+                <Input
+                  value={cliente}
+                  onChange={(e) => setCliente(e.target.value)}
+                  placeholder="Nome do cliente"
+                />
+              ) : (
+                <Select value={cliente} onValueChange={setCliente}>
+                  <SelectTrigger><SelectValue placeholder="Selecione..." /></SelectTrigger>
+                  <SelectContent>
+                    {clientes.map((c) => <SelectItem key={c} value={c}>{c}</SelectItem>)}
+                  </SelectContent>
+                </Select>
+              )}
             </div>
+
             <div>
               <Label className="text-xs">Emissão</Label>
               <Input type="date" value={dataEmissao} onChange={(e) => setDataEmissao(e.target.value)} />
