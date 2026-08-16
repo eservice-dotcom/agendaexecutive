@@ -503,6 +503,10 @@ export default function Faturas() {
                         <TableCell className="text-right font-mono">{formatCurrency(Number(f.valor_total))}</TableCell>
                         <TableCell className="text-right">
                           <div className="flex justify-end gap-1">
+                            <Button variant="ghost" size="sm" onClick={() => editarCliente(f)} title="Editar nome do cliente">
+                              <Pencil className="h-4 w-4" />
+                            </Button>
+
                             <Button variant="ghost" size="sm" onClick={() => reimprimirFatura(f, "print")} title="Reimprimir PDF">
                               <Printer className="h-4 w-4" />
                             </Button>
