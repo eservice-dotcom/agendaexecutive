@@ -731,6 +731,7 @@ export type Database = {
           data_emissao: string
           data_vencimento: string | null
           id: string
+          itens_manuais: Json | null
           numero_fatura: number
           observacoes: string
           periodo_fim: string
@@ -747,6 +748,7 @@ export type Database = {
           data_emissao?: string
           data_vencimento?: string | null
           id?: string
+          itens_manuais?: Json | null
           numero_fatura?: number
           observacoes?: string
           periodo_fim: string
@@ -763,6 +765,7 @@ export type Database = {
           data_emissao?: string
           data_vencimento?: string | null
           id?: string
+          itens_manuais?: Json | null
           numero_fatura?: number
           observacoes?: string
           periodo_fim?: string
