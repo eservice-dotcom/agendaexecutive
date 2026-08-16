@@ -232,7 +232,26 @@ export default function Faturas() {
     await Promise.all([buscarVendas(), loadFaturas()]);
   };
 
+  const editarCliente = async (f: Fatura) => {
+    const novo = window.prompt("Editar nome do cliente desta fatura:", f.cliente);
+    if (novo === null) return;
+    const nome = novo.trim();
+    if (!nome) {
+      toast({ title: "Nome não pode ficar vazio", variant: "destructive" });
+      return;
+    }
+    const { error } = await supabase.from("faturas").update({ cliente: nome }).eq("id", f.id);
+    if (error) {
+      toast({ title: "Erro ao atualizar cliente", description: error.message, variant: "destructive" });
+      return;
+    }
+    await supabase.from("contas_receber").update({ cliente: nome }).eq("fatura_id", f.id);
+    toast({ title: "Cliente atualizado" });
+    await loadFaturas();
+  };
+
   const excluirFatura = async (f: Fatura) => {
+
     if (!confirm(`Excluir Fatura Nº ${f.numero_fatura}? A Conta a Receber vinculada também será removida.`)) return;
     if (f.conta_receber_id) {
       await supabase.from("contas_receber").delete().eq("id", f.conta_receber_id);
