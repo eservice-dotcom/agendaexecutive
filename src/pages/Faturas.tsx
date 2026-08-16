@@ -266,7 +266,7 @@ export default function Faturas() {
           : [{ descricao: f.observacoes || "Fatura avulsa", valor: Number(f.valor_total) || 0 }];
       }
       const argsAvulsa = [
-        [],
+        [] as any[],
         `Fatura Nº ${f.numero_fatura} - ${f.cliente}`,
         f.cliente,
         { cliente: f.cliente, observacoes: f.observacoes, valor_total: Number(f.valor_total), data_vencimento: f.data_vencimento, extras: extrasManuais },
