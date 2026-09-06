@@ -28,6 +28,7 @@ import { generateClosingReport } from "@/lib/closingReport";
 import { generateClosingReportExcel } from "@/lib/closingReportExcel";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { calcReceitaServico } from "@/lib/receitaServico";
 
 interface FiltersState {
   search: string;
@@ -499,12 +500,8 @@ const Index = () => {
 
   const totalValor = filteredData.reduce((s, i) => s + i.valor, 0);
   const totalCusto = filteredData.reduce((s, i) => s + i.custo, 0);
-  const totalExtras = filteredData.reduce((s, i) => {
-    const estac = Number(i.estacionamento) || 0;
-    const outros = (i.outrosDespesas || []).reduce((a, o) => a + (Number(o.valor) || 0), 0);
-    return s + estac + outros;
-  }, 0);
-  const totalReceitaGeral = totalValor + totalExtras;
+  const totalReceitaGeral = filteredData.reduce((s, i) => s + calcReceitaServico(i), 0);
+  const totalExtras = totalReceitaGeral - totalValor;
 
   return (
     <div className="min-h-screen bg-background">

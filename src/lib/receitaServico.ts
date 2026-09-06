@@ -21,10 +21,13 @@ export const calcReceitaServico = (item: any): number => {
   const base = Number(item?.valor) || 0;
   const estacionamento = parseMoneyValue(item?.estacionamento);
   const outros = parseMoneyValue(item?.outros);
-  const outrosDespesas = Array.isArray(item?.outros_despesas)
-    ? item.outros_despesas.reduce((s: number, d: any) => s + parseMoneyValue(d?.valor), 0)
+  const despesas = item?.outros_despesas ?? item?.outrosDespesas;
+  const outrosDespesas = Array.isArray(despesas)
+    ? despesas.reduce((s: number, d: any) => s + parseMoneyValue(d?.valor), 0)
     : 0;
-  const kmExtra = (Number(item?.km_extra) || 0) * (Number(item?.valor_km_extra) || 0);
-  const horaExtra = horaExtraToHours(item?.hora_extra) * (Number(item?.valor_hora_extra) || 0);
+  const kmExtra = (Number(item?.km_extra ?? item?.kmExtra) || 0)
+    * (Number(item?.valor_km_extra ?? item?.valorKmExtra) || 0);
+  const horaExtra = horaExtraToHours(item?.hora_extra ?? item?.horaExtra)
+    * (Number(item?.valor_hora_extra ?? item?.valorHoraExtra) || 0);
   return base + estacionamento + outros + outrosDespesas + kmExtra + horaExtra;
 };
