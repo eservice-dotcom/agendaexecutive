@@ -33,7 +33,7 @@ const FaturamentoFornecedor = () => {
       while (true) {
         const { data } = await supabase
           .from("agenda_items")
-          .select("fornecedor, valor, custo, pax, cliente, cot, data, hora, tipo, origem, destino, placa, motorista, status_faturamento")
+          .select("fornecedor, valor, custo, pax, cliente, cot, data, hora, tipo, origem, destino, placa, motorista, status_faturamento, estacionamento, outros, outros_despesas, km_extra, valor_km_extra, hora_extra, valor_hora_extra")
           .is("deleted_at", null)
           .range(from, from + pageSize - 1);
         if (!data || data.length === 0) break;
@@ -86,7 +86,7 @@ const FaturamentoFornecedor = () => {
         cots: [],
       };
       existing.viagens += 1;
-      existing.receita += Number(item.valor) || 0;
+      existing.receita += calcReceitaServico(item);
       existing.custo += Number(item.custo) || 0;
       existing.pax += Number(item.pax) || 0;
       if (item.cliente) existing.clientes.push(item.cliente);
