@@ -5,6 +5,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Truck, Printer, ChevronDown, ChevronRight, CalendarIcon } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { printFatVeiculo } from "@/lib/printUtils";
+import { calcReceitaServico } from "@/lib/receitaServico";
 import { format, startOfMonth, endOfMonth, startOfYear, endOfYear } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { cn } from "@/lib/utils";
@@ -52,7 +53,7 @@ const FaturamentoVeiculo = () => {
       while (true) {
         const { data } = await supabase
           .from("agenda_items")
-          .select("placa, veiculo, valor, custo, cliente, cot, data, origem, destino, motorista, fornecedor, estacionamento, outros_despesas")
+          .select("placa, veiculo, valor, custo, cliente, cot, data, origem, destino, motorista, fornecedor, estacionamento, outros, outros_despesas, km_extra, valor_km_extra, hora_extra, valor_hora_extra")
           .is("deleted_at", null)
           .range(from, from + pageSize - 1);
         if (!data || data.length === 0) break;
@@ -159,8 +160,7 @@ const FaturamentoVeiculo = () => {
       };
 
       existing.viagens += 1;
-      const outrosDespesas = Array.isArray(item.outros_despesas) ? item.outros_despesas : [];
-      const valorTotal = (Number(item.valor) || 0) + (Number(item.estacionamento) || 0) + outrosDespesas.reduce((s: number, d: any) => s + (Number(d.valor) || 0), 0);
+      const valorTotal = calcReceitaServico(item);
       existing.receita += valorTotal;
       existing.custo += Number(item.custo) || 0;
       if (item.cliente) existing.clientes.push(item.cliente);
