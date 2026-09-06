@@ -7,6 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Building2, Printer, X } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { printFatFornecedor, printFatFornecedorDetalhado } from "@/lib/printUtils";
+import { calcReceitaServico } from "@/lib/receitaServico";
 
 const formatCurrency = (value: number) =>
   new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(value);

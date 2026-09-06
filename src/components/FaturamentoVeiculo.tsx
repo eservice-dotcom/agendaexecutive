@@ -5,6 +5,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Truck, Printer, ChevronDown, ChevronRight, CalendarIcon } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { printFatVeiculo } from "@/lib/printUtils";
+import { calcReceitaServico } from "@/lib/receitaServico";
 import { format, startOfMonth, endOfMonth, startOfYear, endOfYear } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { cn } from "@/lib/utils";
