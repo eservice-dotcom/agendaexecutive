@@ -429,8 +429,7 @@ const FaturamentoVeiculo = () => {
                                 </TableHeader>
                                 <TableBody>
                                   {d.servicos.map((s: any, idx: number) => {
-                                    const od = Array.isArray(s.outros_despesas) ? s.outros_despesas : [];
-                                    const sValorTotal = (Number(s.valor) || 0) + (Number(s.estacionamento) || 0) + od.reduce((sum: number, x: any) => sum + (Number(x.valor) || 0), 0);
+                                    const sValorTotal = calcReceitaServico(s);
                                     return (
                                     <TableRow key={idx} className="hover:bg-primary/5">
                                       <TableCell className="font-mono text-xs py-1.5">{s.cot || "—"}</TableCell>

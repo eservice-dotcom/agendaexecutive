@@ -1,4 +1,5 @@
 import { RAFAEL_SIGNATURE_BASE64 } from "./signatureData";
+import { calcReceitaServico } from "./receitaServico";
 
 const formatCurrency = (value: number) =>
   new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(value);
@@ -143,8 +144,7 @@ export const printFatVeiculo = (
     const key = i.placa || `sem-placa-${i.veiculo || "v"}`;
     const e = map.get(key) || { veiculo: i.veiculo, placa: i.placa, viagens: 0, receita: 0, custo: 0, servicos: [] };
     e.viagens += 1;
-    const od = Array.isArray(i.outros_despesas) ? i.outros_despesas : [];
-    const valorTotal = (Number(i.valor) || 0) + (Number(i.estacionamento) || 0) + od.reduce((s: number, x: any) => s + (Number(x.valor) || 0), 0);
+    const valorTotal = calcReceitaServico(i);
     e.receita += valorTotal;
     e.custo += Number(i.custo) || 0;
     e.servicos.push({ ...i, valorTotal });
@@ -502,7 +502,7 @@ export const printFatFornecedor = (items: any[], includeFinancials = true) => {
   const map = new Map<string, { fornecedor: string; viagens: number; receita: number; custo: number; pax: number }>();
   items.forEach(i => {
     const e = map.get(i.fornecedor) || { fornecedor: i.fornecedor, viagens: 0, receita: 0, custo: 0, pax: 0 };
-    e.viagens += 1; e.receita += Number(i.valor); e.custo += Number(i.custo); e.pax += Number(i.pax);
+    e.viagens += 1; e.receita += calcReceitaServico(i); e.custo += Number(i.custo); e.pax += Number(i.pax);
     map.set(i.fornecedor, e);
   });
   const dados = Array.from(map.values()).sort((a, b) => b.custo - a.custo);
