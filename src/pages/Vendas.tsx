@@ -956,76 +956,51 @@ const Vendas = () => {
         pagosPorFornecedor.set(c.fornecedor, prev + Number(c.valor));
       });
 
-      // Group by fornecedor (same logic as original creation)
-      const fornecedorMap = new Map<string, { total: number; items: any[]; extrasLines: string[]; extrasTotal: number }>();
-      agendaItems.forEach((item: any) => {
-        if (item.fornecedor && Number(item.custo) > 0) {
-          const existing = fornecedorMap.get(item.fornecedor) || { total: 0, items: [], extrasLines: [], extrasTotal: 0 };
-          existing.total += Number(item.custo);
-          existing.items.push(item);
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error("Usuário não autenticado");
 
-          const osLabel = `${item?.cot ? `O.S. ${item.cot}` : "Serviço"}${item?.sht ? ` / SHT ${item.sht}` : ""}`;
-          const kmExtraQtd = Number(item?.km_extra) || 0;
-          const valKmExtFor = Number(item?.valor_km_extra_fornecedor) || 0;
-          const kmExtraTotalFor = kmExtraQtd * valKmExtFor;
-          if (kmExtraTotalFor > 0) {
-            existing.extrasLines.push(`Km Extra ${osLabel} (${kmExtraQtd} km x R$ ${valKmExtFor.toFixed(2)}) = R$ ${kmExtraTotalFor.toFixed(2)}`);
-            existing.extrasTotal += kmExtraTotalFor;
-          }
-          const horas = horaExtraToHours(item?.hora_extra);
-          const valHoraExtFor = Number(item?.valor_hora_extra_fornecedor) || 0;
-          const horaExtraTotalFor = horas * valHoraExtFor;
-          if (horaExtraTotalFor > 0) {
-            existing.extrasLines.push(`Hora Extra ${osLabel} (${item?.hora_extra} x R$ ${valHoraExtFor.toFixed(2)}) = R$ ${horaExtraTotalFor.toFixed(2)}`);
-            existing.extrasTotal += horaExtraTotalFor;
-          }
-          const estacFor = Number(item?.estacionamento_fornecedor) || 0;
-          if (estacFor > 0) {
-            existing.extrasLines.push(`Estacionamento ${osLabel} = R$ ${estacFor.toFixed(2)}`);
-            existing.extrasTotal += estacFor;
-          }
+      const itensComCusto = (agendaItems as any[]).filter(
+        (item) => item.fornecedor && Number(item.custo) > 0
+      );
 
-          fornecedorMap.set(item.fornecedor, existing);
-        }
-      });
-
-      if (fornecedorMap.size === 0) {
+      if (itensComCusto.length === 0) {
         toast({ title: "Nenhum serviço com custo > 0 encontrado", description: "Verifique os custos na agenda.", variant: "destructive" });
         return;
       }
 
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error("Usuário não autenticado");
+      // Uma conta a pagar por serviço; abate o que já foi pago por fornecedor
+      const saldoPagoPorFornecedor = new Map(pagosPorFornecedor);
+      const novasContas = itensComCusto
+        .map((item: any) => {
+          const custoItem = Number(item.custo);
+          const jaPago = saldoPagoPorFornecedor.get(item.fornecedor) || 0;
+          const abatido = Math.min(jaPago, custoItem);
+          saldoPagoPorFornecedor.set(item.fornecedor, jaPago - abatido);
+          const valorRestante = Math.round((custoItem - abatido) * 100) / 100;
+          if (valorRestante <= 0) return null; // já pago
 
-      const novasContas = Array.from(fornecedorMap.entries())
-        .map(([fornecedor, info]) => {
-          const jaPago = pagosPorFornecedor.get(fornecedor) || 0;
-          const totalComExtras = info.total;
-          const valorRestante = Math.round((totalComExtras - jaPago) * 100) / 100;
-          if (valorRestante <= 0) return null; // já totalmente pago
-          const descLines = info.items.map((item: any) => formatOsDescricaoFornecedor(item));
-          const allLines = descLines;
-          // Vencimento = data do serviço mais recente + 30 dias
-          const datasServico = info.items.map((i: any) => i.data).filter(Boolean).sort();
-          const dataBase = datasServico[datasServico.length - 1] || venda.data_venda;
+          // Vencimento = data do serviço + 30 dias
+          const dataBase = item.data || venda.data_venda;
           const vencFornecedor = new Date(`${dataBase}T00:00:00`);
           vencFornecedor.setDate(vencFornecedor.getDate() + 30);
           const vencFornecedorStr = vencFornecedor.toISOString().split("T")[0];
-          const isMillena = /millena\s*marques/i.test(fornecedor);
+          const isMillena = /millena\s*marques/i.test(item.fornecedor);
           return {
             venda_id: venda.id,
             user_id: user.id,
-            fornecedor,
-            descritivo: allLines.join("\n"),
+            fornecedor: item.fornecedor,
+            descritivo: formatOsDescricaoFornecedor(item),
             valor: valorRestante,
-            data: venda.data_venda,
+            data: dataBase,
             data_vencimento: vencFornecedorStr,
             status: "pendente",
+            placa: item.placa || "",
             centro_custo: "FORCECEDORES",
             subgrupo_custo: isMillena ? "RH" : "VEÍCULOS",
           };
         })
         .filter(Boolean);
+
 
       if (novasContas.length > 0) {
         const { error } = await supabase.from("contas_pagar").insert(novasContas);
