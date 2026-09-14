@@ -737,63 +737,32 @@ const Vendas = () => {
       });
       if (crError) throw crError;
 
-      // Auto-generate contas a pagar grouped by fornecedor with detailed descritivo
+      // Auto-generate contas a pagar: UMA conta por serviço (sem agrupar por fornecedor)
       const selectedAgendaItems = agendaItems.filter((i) => selectedItems.has(i.id));
-      const fornecedorMap = new Map<string, { total: number; items: typeof selectedAgendaItems; extrasLines: string[]; extrasTotal: number }>();
-      selectedAgendaItems.forEach((item: any) => {
-        if (item.fornecedor && Number(item.custo) > 0) {
-          const existing = fornecedorMap.get(item.fornecedor) || { total: 0, items: [], extrasLines: [], extrasTotal: 0 };
-          existing.total += Number(item.custo);
-          existing.items.push(item);
+      const autoContasPagar = selectedAgendaItems
+        .filter((item: any) => item.fornecedor && Number(item.custo) > 0)
+        .map((item: any) => {
+          // Vencimento = data do serviço + 30 dias
+          const dataBase = item.data || dataVenda;
+          const vencFornecedor = new Date(`${dataBase}T00:00:00`);
+          vencFornecedor.setDate(vencFornecedor.getDate() + 30);
+          const vencFornecedorStr = vencFornecedor.toISOString().split("T")[0];
+          const isMillena = /millena\s*marques/i.test(item.fornecedor);
+          return {
+            venda_id: venda.id,
+            user_id: session!.user.id,
+            fornecedor: item.fornecedor,
+            descritivo: formatOsDescricaoFornecedor(item),
+            valor: Number(item.custo),
+            data: dataBase,
+            data_vencimento: vencFornecedorStr,
+            status: "pendente",
+            placa: item.placa || "",
+            centro_custo: "FORCECEDORES",
+            subgrupo_custo: isMillena ? "RH" : "VEÍCULOS",
+          };
+        });
 
-          const osLabel = `${item?.cot ? `O.S. ${item.cot}` : "Serviço"}${item?.sht ? ` / SHT ${item.sht}` : ""}`;
-          const kmExtraQtd = Number(item?.km_extra) || 0;
-          const valKmExtFor = Number(item?.valor_km_extra_fornecedor) || 0;
-          const kmExtraTotalFor = kmExtraQtd * valKmExtFor;
-          if (kmExtraTotalFor > 0) {
-            existing.extrasLines.push(`Km Extra ${osLabel} (${kmExtraQtd} km x R$ ${valKmExtFor.toFixed(2)}) = R$ ${kmExtraTotalFor.toFixed(2)}`);
-            existing.extrasTotal += kmExtraTotalFor;
-          }
-          const horas = horaExtraToHours(item?.hora_extra);
-          const valHoraExtFor = Number(item?.valor_hora_extra_fornecedor) || 0;
-          const horaExtraTotalFor = horas * valHoraExtFor;
-          if (horaExtraTotalFor > 0) {
-            existing.extrasLines.push(`Hora Extra ${osLabel} (${item?.hora_extra} x R$ ${valHoraExtFor.toFixed(2)}) = R$ ${horaExtraTotalFor.toFixed(2)}`);
-            existing.extrasTotal += horaExtraTotalFor;
-          }
-          const estacFor = Number(item?.estacionamento_fornecedor) || 0;
-          if (estacFor > 0) {
-            existing.extrasLines.push(`Estacionamento ${osLabel} = R$ ${estacFor.toFixed(2)}`);
-            existing.extrasTotal += estacFor;
-          }
-
-          fornecedorMap.set(item.fornecedor, existing);
-        }
-      });
-
-      const autoContasPagar = Array.from(fornecedorMap.entries()).map(([fornecedor, info]) => {
-        const descLines = info.items.map((item) => formatOsDescricaoFornecedor(item));
-        const allLines = descLines;
-        // Vencimento = data do serviço mais recente + 30 dias
-        const datasServico = info.items.map((i) => i.data).filter(Boolean).sort();
-        const dataBase = datasServico[datasServico.length - 1] || dataVenda;
-        const vencFornecedor = new Date(`${dataBase}T00:00:00`);
-        vencFornecedor.setDate(vencFornecedor.getDate() + 30);
-        const vencFornecedorStr = vencFornecedor.toISOString().split("T")[0];
-        const isMillena = /millena\s*marques/i.test(fornecedor);
-        return {
-          venda_id: venda.id,
-          user_id: session!.user.id,
-          fornecedor,
-          descritivo: allLines.join("\n"),
-          valor: info.total,
-          data: dataVenda,
-          data_vencimento: vencFornecedorStr,
-          status: "pendente",
-          centro_custo: "FORCECEDORES",
-          subgrupo_custo: isMillena ? "RH" : "VEÍCULOS",
-        };
-      });
 
       // Also add manually entered contas a pagar
       const manualContas = contasPagar.map((cp) => {
