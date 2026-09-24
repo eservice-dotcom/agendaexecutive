@@ -197,7 +197,13 @@ export const generateClosingReport = (
     obsHTML = `<div style="margin-top:16px;padding:10px;background:#fffbeb;border:1px solid #f0d68a;border-radius:4px"><strong>Observações:</strong> ${vendaInfo.observacoes}</div>`;
   }
 
-  const html = `<!DOCTYPE html><html><head><title>${title}</title>
+  const clienteResumido = (vendaInfo?.cliente || subtitle || "").trim().split(/\s+/)[0] || "";
+  const cotsUnicas = [...new Set(sortedItems.map((ai) => ai.cot).filter(Boolean))];
+  const fileTitle = docTitle === "FATURA" && numeroFechamento
+    ? `Fatura ${numeroFechamento} - ${clienteResumido}${cotsUnicas.length ? ` - COT ${cotsUnicas.join(", ")}` : ""}`
+    : title;
+
+  const html = `<!DOCTYPE html><html><head><title>${fileTitle}</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 body{font-family:Arial,sans-serif;padding:20px;color:#1a1a1a;font-size:11px}
