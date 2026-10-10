@@ -179,6 +179,25 @@ const AgendaTable = ({ items, onEdited, hideFinancials, onClone }: AgendaTablePr
     return !!(item as any).mensagemEnviada && (item as any).mensagemEnviada === (item.motorista || "");
   }, [messagedMap]);
 
+  // Migração: envios registrados apenas no aparelho passam a valer para todos
+  const migratedRef = useRef<Set<string>>(new Set());
+  useEffect(() => {
+    const pending = items.filter((i) => {
+      if (migratedRef.current.has(i.id)) return false;
+      const stored = messagedMap[i.id];
+      if (!stored || stored !== (i.motorista || "")) return false;
+      if ((i as any).mensagemEnviada) return false;
+      return true;
+    });
+    if (pending.length === 0) return;
+    pending.forEach((i) => migratedRef.current.add(i.id));
+    Promise.all(
+      pending.map((i) =>
+        supabase.from("agenda_items").update({ mensagem_enviada: i.motorista || "" } as any).eq("id", i.id)
+      )
+    ).then(() => onEdited?.());
+  }, [items, messagedMap, onEdited]);
+
   const tryEditItem = useCallback(async (item: AgendaItem) => {
     if (!session?.user) return;
     // Clean stale locks (>5min)
