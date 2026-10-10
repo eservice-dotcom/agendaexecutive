@@ -490,7 +490,9 @@ const Index = () => {
       const motorista = (i.motorista || "").trim();
       if (!motorista) return false;
       const stored = messagedMap[i.id];
-      return !(stored && stored === i.motorista);
+      if (stored && stored === i.motorista) return false;
+      const dbMarked = (i.mensagemEnviada || i.mensagem_enviada || "").trim();
+      return dbMarked !== i.motorista;
     });
     const map = new Map<string, number>();
     pendentes.forEach((i: any) => {

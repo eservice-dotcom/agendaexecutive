@@ -157,11 +157,26 @@ const AgendaTable = ({ items, onEdited, hideFinancials, onClone }: AgendaTablePr
       try { localStorage.setItem(MESSAGED_STORAGE_KEY, JSON.stringify(next)); } catch {}
       return next;
     });
+    // Persistir no banco para que TODOS os usuários vejam a linha verde
+    const list = consolidated && consolidated.length > 0 ? consolidated : [item];
+    const ids = list.map((i) => i.id).filter(Boolean);
+    if (ids.length > 0) {
+      const driver = list[0]?.motorista || item.motorista || "";
+      supabase
+        .from("agenda_items")
+        .update({ mensagem_enviada: driver } as any)
+        .in("id", ids)
+        .then(({ error }) => {
+          if (error) console.error("Erro ao marcar mensagem enviada:", error);
+        });
+    }
   }, []);
 
   const isMessagedToCurrentDriver = useCallback((item: AgendaItem) => {
     const stored = messagedMap[item.id];
-    return !!stored && stored === (item.motorista || "");
+    if (stored && stored === (item.motorista || "")) return true;
+    // Também considera a marcação salva no banco (visível para todos)
+    return !!(item as any).mensagemEnviada && (item as any).mensagemEnviada === (item.motorista || "");
   }, [messagedMap]);
 
   const tryEditItem = useCallback(async (item: AgendaItem) => {
