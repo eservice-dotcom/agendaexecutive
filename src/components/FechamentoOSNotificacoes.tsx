@@ -26,24 +26,30 @@ export function FechamentoOSNotificacoes({ items }: { items: any[] }) {
     });
   }, []);
 
+  // Serviços já sinalizados com fechamento enviado (setinha "Enviado" ou "Faturado") não geram notificação.
+  const fechamentoEnviado = (i: any) => String(i.statusFaturamento ?? i.status_faturamento ?? "").trim() !== "";
+
   const pendentes = useMemo(() => {
     const now = new Date();
     const hoje = new Date(now.getTime() - 3 * 3600 * 1000).toISOString().slice(0, 10); // São Paulo
-    const map = new Map<string, { cot: string; cliente: string; ultima: string; qtd: number }>();
+    const map = new Map<string, { cot: string; cliente: string; ultima: string; qtd: number; semFechamento: number }>();
     for (const i of items) {
       if (i.deleted_at || i.deletedAt) continue;
       const cot = String(i.cot ?? "").trim();
       const data = toISO(i.data);
       if (!cot || !data) continue;
+      const enviado = fechamentoEnviado(i);
       const cur = map.get(cot);
-      if (!cur) map.set(cot, { cot, cliente: i.cliente || "", ultima: data, qtd: 1 });
+      if (!cur) map.set(cot, { cot, cliente: i.cliente || "", ultima: data, qtd: 1, semFechamento: enviado ? 0 : 1 });
       else {
         cur.qtd++;
+        if (!enviado) cur.semFechamento++;
         if (data > cur.ultima) cur.ultima = data;
       }
     }
     return [...map.values()]
       .filter((o) => {
+        if (o.semFechamento === 0) return false; // todos os serviços já com fechamento enviado
         if (o.ultima < INICIO_NOTIFICACOES || dismissed.has(o.cot)) return false;
         const d = new Date(o.ultima + "T12:00:00Z");
         d.setUTCDate(d.getUTCDate() + 1);
@@ -51,6 +57,7 @@ export function FechamentoOSNotificacoes({ items }: { items: any[] }) {
       })
       .sort((a, b) => a.ultima.localeCompare(b.ultima));
   }, [items, dismissed]);
+
 
   const dispensar = async (cot: string) => {
     const { data: u } = await supabase.auth.getUser();
