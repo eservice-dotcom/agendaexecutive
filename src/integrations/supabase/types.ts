@@ -43,6 +43,7 @@ export type Database = {
           km_fim_fornecedor: number | null
           km_in: number | null
           km_in_fornecedor: number | null
+          mensagem_enviada: string | null
           motorista: string
           observacoes: string | null
           origem: string
@@ -96,6 +97,7 @@ export type Database = {
           km_fim_fornecedor?: number | null
           km_in?: number | null
           km_in_fornecedor?: number | null
+          mensagem_enviada?: string | null
           motorista: string
           observacoes?: string | null
           origem: string
@@ -149,6 +151,7 @@ export type Database = {
           km_fim_fornecedor?: number | null
           km_in?: number | null
           km_in_fornecedor?: number | null
+          mensagem_enviada?: string | null
           motorista?: string
           observacoes?: string | null
           origem?: string
