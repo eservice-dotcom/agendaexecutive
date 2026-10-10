@@ -696,12 +696,12 @@ const Index = () => {
               )}
             </div>
             <AgendaFilters filters={filters} onFilterChange={setFilters} motoristas={motoristas} tipos={tipos} fornecedores={fornecedoresList} veiculos={veiculosList} />
-            <div className="flex items-center justify-between">
+            <div className="flex flex-wrap items-center justify-between gap-2">
               <div className="flex items-center gap-2 text-sm text-muted-foreground">
                 <ListChecks className="h-4 w-4" />
                 <span>{filteredData.length} de {agendaData.length} registros</span>
               </div>
-              <div className="flex items-center gap-3">
+              <div className="flex flex-wrap items-center justify-end gap-2">
                 <label className="flex items-center gap-1.5 text-xs text-muted-foreground cursor-pointer select-none">
                   <input type="checkbox" checked={printWithFinancials} onChange={e => setPrintWithFinancials(e.target.checked)} className="rounded" />
                   Incluir financeiro
@@ -718,22 +718,33 @@ const Index = () => {
                   <FileText className="h-4 w-4" />
                   Fechamentos
                 </Button>
-                <Button variant="outline" size="sm" onClick={() => setImportPdfDialogOpen(true)} className="gap-2">
-                  <Upload className="h-4 w-4" />
-                  PDF Shift
-                </Button>
-                <Button variant="outline" size="sm" onClick={() => setImportPdfCsDialogOpen(true)} className="gap-2">
-                  <Upload className="h-4 w-4" />
-                  PDF CS Global
-                </Button>
-                <Button variant="outline" size="sm" onClick={() => setBondiDialogOpen(true)} className="gap-2">
-                  <Link2 className="h-4 w-4" />
-                  Link Bondi
-                </Button>
-                <Button onClick={() => setNovoDialogOpen(true)} className="gap-2">
-                  <Plus className="h-4 w-4" />
-                  Novo Serviço
-                </Button>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button className="gap-2">
+                      <Plus className="h-4 w-4" />
+                      Novo Serviço
+                      <ChevronDown className="h-4 w-4" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="w-52">
+                    <DropdownMenuItem onSelect={() => setImportPdfDialogOpen(true)} className="gap-2">
+                      <Upload className="h-4 w-4" />
+                      PDF Shift
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onSelect={() => setImportPdfCsDialogOpen(true)} className="gap-2">
+                      <Upload className="h-4 w-4" />
+                      PDF CS Global
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onSelect={() => setBondiDialogOpen(true)} className="gap-2">
+                      <Link2 className="h-4 w-4" />
+                      Link Bondi
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onSelect={() => { setCloneData(null); setNovoDialogOpen(true); }} className="gap-2">
+                      <Plus className="h-4 w-4" />
+                      Incluir do zero
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
               </div>
             </div>
             <AgendaTable items={filteredData} onEdited={reloadData} hideFinancials={!showFinancials} onClone={(item) => { setCloneData(item); setNovoDialogOpen(true); }} />
