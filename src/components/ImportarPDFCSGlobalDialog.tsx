@@ -41,6 +41,7 @@ interface Props {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onImported: () => void;
+  mode?: "pdf" | "bondi";
 }
 
 const MESES: Record<string, string> = {
@@ -300,7 +301,56 @@ const parsePDF = async (file: File): Promise<ParsedService[]> => {
   }];
 };
 
-const ImportarPDFCSGlobalDialog = ({ open, onOpenChange, onImported }: Props) => {
+const fmtSP = (iso: string) => {
+  if (!iso) return { data: "", hora: "" };
+  const parts = new Intl.DateTimeFormat("en-CA", {
+    timeZone: "America/Sao_Paulo", year: "numeric", month: "2-digit", day: "2-digit",
+    hour: "2-digit", minute: "2-digit", hour12: false,
+  }).formatToParts(new Date(iso));
+  const g = (t: string) => parts.find((x) => x.type === t)?.value || "";
+  return { data: `${g("year")}-${g("month")}-${g("day")}`, hora: `${g("hour") === "24" ? "00" : g("hour")}:${g("minute")}` };
+};
+
+const parseBondi = async (url: string): Promise<ParsedService[]> => {
+  const { data, error } = await supabase.functions.invoke("bondi-reservation", { body: { url } });
+  if (error) throw error;
+  const order = (data as any)?.order;
+  if (!order) throw new Error((data as any)?.error || "Reserva não encontrada");
+  return (order.services || [])
+    .filter((sv: any) => !/cancel/i.test(sv?.status?.slug || ""))
+    .map((sv: any) => {
+      const { data: d, hora } = fmtSP(sv.startDate);
+      const locs: any[] = sv.locations || [];
+      const origem = locs.find((l) => l.type === "origin")?.address || "";
+      const destino = [...locs].reverse().find((l) => l.type === "destiny" || l.type === "destination")?.address || "";
+      const paradas = locs.filter((l) => l.type !== "origin" && l.type !== "destiny" && l.type !== "destination").map((l) => l.address);
+      const flight = String(sv.flightInformation || "");
+      const voo = (flight.match(/voo:?\s*([A-Z0-9]{2}\s?\d{2,5})/i)?.[1] || "").replace(/\s+/g, " ").trim();
+      let passageiros: Passageiro[] = (sv.passengers || []).map((p: any) => ({
+        nome: p.name || p.nome || "", telefone: p.phone || p.telefone || "", voo,
+      })).filter((p: Passageiro) => p.nome);
+      if (!passageiros.length && sv.rawPassengers) {
+        passageiros = String(sv.rawPassengers).split(/[\n;,]+/).map((n) => n.trim()).filter(Boolean)
+          .map((nome) => ({ nome, telefone: "", voo }));
+      }
+      const obs = [
+        paradas.length ? "Paradas: " + paradas.join(" | ") : "",
+        flight.replace(/\s*\n\s*/g, " ").trim(),
+        sv.observation ? String(sv.observation).trim() : "",
+      ].filter(Boolean).join(" | ");
+      return {
+        selected: true, sht: "", os: sv.code || order.code || "", data: d, hora,
+        tipo: sv.type?.name || "Translado", veiculoTipo: sv.vehicleType?.name || "",
+        origem, destino, observacoes: obs, valor: Number(sv.supplierValue) || 0,
+        passageiros, fornecedorId: "", motoristaId: "", custo: "",
+      } as ParsedService;
+    });
+};
+
+const ImportarPDFCSGlobalDialog = ({ open, onOpenChange, onImported, mode = "pdf" }: Props) => {
+  const isBondi = mode === "bondi";
+  const defaultCliente = isBondi ? "Bondi" : "CS Brasil";
+  const [linkUrl, setLinkUrl] = useState("");
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [services, setServices] = useState<ParsedService[]>([]);
@@ -350,7 +400,7 @@ const ImportarPDFCSGlobalDialog = ({ open, onOpenChange, onImported }: Props) =>
       setFornecedores(fs);
       setMotoristas(ms);
       setTipos(ts);
-      const cs = cls.find((c: any) => /cs\s*brasil/i.test(c.nome));
+      const cs = cls.find((c: any) => (isBondi ? /bondi/i : /cs\s*brasil/i).test(c.nome));
       if (cs) setClienteId(cs.id);
     })();
   }, [open]);
@@ -361,14 +411,15 @@ const ImportarPDFCSGlobalDialog = ({ open, onOpenChange, onImported }: Props) =>
       setClienteId("");
       setPlacaUrls([]);
       setAdvanced(false);
+      setLinkUrl("");
     }
   }, [open]);
 
-  const handleFile = async (file: File | null) => {
-    if (!file) return;
+  const handleFile = async (file: File | null, url?: string) => {
+    if (!file && !url) return;
     setLoading(true);
     try {
-      const parsed = await parsePDF(file);
+      const parsed = url ? await parseBondi(url) : await parsePDF(file as File);
       if (parsed.length === 0) {
         toast.error("Nenhum serviço identificado no PDF.");
       } else {
@@ -412,7 +463,7 @@ const ImportarPDFCSGlobalDialog = ({ open, onOpenChange, onImported }: Props) =>
       }
     } catch (e: any) {
       console.error(e);
-      toast.error("Falha ao ler o PDF: " + (e?.message || ""));
+      toast.error((isBondi ? "Falha ao ler o link: " : "Falha ao ler o PDF: ") + (e?.message || ""));
     } finally {
       setLoading(false);
     }
@@ -442,14 +493,14 @@ const ImportarPDFCSGlobalDialog = ({ open, onOpenChange, onImported }: Props) =>
       toast.error(`Preencha a Hora dos serviços: O.S. ${semHora.map(s => s.os || "?").join(", ")}`);
       return;
     }
-    let clienteNome = "CS Brasil";
+    let clienteNome = defaultCliente;
     if (clienteId) {
       const c = clientes.find((x) => x.id === clienteId);
       if (c) clienteNome = c.nome;
     } else {
       try {
-        const novo: any = await saveCliente({ nome: "CS Brasil", contato: "", telefone: "", endereco: "" } as any);
-        clienteNome = novo?.nome || "CS Brasil";
+        const novo: any = await saveCliente({ nome: defaultCliente, contato: "", telefone: "", endereco: "" } as any);
+        clienteNome = novo?.nome || defaultCliente;
       } catch {}
     }
 
@@ -537,13 +588,29 @@ const ImportarPDFCSGlobalDialog = ({ open, onOpenChange, onImported }: Props) =>
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <FileText className="h-5 w-5" />
-            Importar PDF de Pedidos (CS Global)
+            {isBondi ? "Importar Link Bondi" : "Importar PDF de Pedidos (CS Global)"}
           </DialogTitle>
         </DialogHeader>
 
         <div className="space-y-4">
           {!advanced && (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              {isBondi ? (
+                <div className="flex flex-col justify-center gap-3 border-2 border-dashed border-border rounded-lg p-6">
+                  <p className="text-sm font-medium">Link da reserva Bondi</p>
+                  <Input
+                    placeholder="https://dashboard.bondi.com.br/reservation/..."
+                    value={linkUrl}
+                    onChange={(e) => setLinkUrl(e.target.value)}
+                    onKeyDown={(e) => { if (e.key === "Enter" && linkUrl.trim()) handleFile(null, linkUrl.trim()); }}
+                  />
+                  <Button type="button" disabled={loading || !linkUrl.trim()} onClick={() => handleFile(null, linkUrl.trim())} className="gap-2">
+                    {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}
+                    {loading ? "Lendo link..." : "Ler link"}
+                  </Button>
+                  <p className="text-xs text-muted-foreground">Extrai código (O.S.), data, hora, tipo, veículo, origem, destino, paradas, passageiros, voo e valor.</p>
+                </div>
+              ) : (
               <label className="flex flex-col items-center justify-center gap-3 border-2 border-dashed border-border rounded-lg p-8 cursor-pointer hover:bg-muted/50 transition">
                 {loading ? (
                   <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
@@ -562,6 +629,7 @@ const ImportarPDFCSGlobalDialog = ({ open, onOpenChange, onImported }: Props) =>
                   onChange={(e) => handleFile(e.target.files?.[0] || null)}
                 />
               </label>
+              )}
 
               <label className={`flex flex-col items-center justify-center gap-3 border-2 border-dashed rounded-lg p-8 cursor-pointer hover:bg-muted/50 transition ${placaUrls.length ? "border-emerald-500/60 bg-emerald-50/40" : "border-border"}`}>
                 {uploadingPlaca ? (

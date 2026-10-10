@@ -2,3 +2,6 @@ project_id = "mxqudcqjwvricncvqchn"
 
 [functions.create-user]
 verify_jwt = false
+
+[functions.bondi-reservation]
+verify_jwt = false
