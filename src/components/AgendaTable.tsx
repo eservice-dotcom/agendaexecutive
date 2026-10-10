@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback, useEffect, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
@@ -157,12 +157,46 @@ const AgendaTable = ({ items, onEdited, hideFinancials, onClone }: AgendaTablePr
       try { localStorage.setItem(MESSAGED_STORAGE_KEY, JSON.stringify(next)); } catch {}
       return next;
     });
+    // Persistir no banco para que TODOS os usuários vejam a linha verde
+    const list = consolidated && consolidated.length > 0 ? consolidated : [item];
+    const ids = list.map((i) => i.id).filter(Boolean);
+    if (ids.length > 0) {
+      const driver = list[0]?.motorista || item.motorista || "";
+      supabase
+        .from("agenda_items")
+        .update({ mensagem_enviada: driver } as any)
+        .in("id", ids)
+        .then(({ error }) => {
+          if (error) console.error("Erro ao marcar mensagem enviada:", error);
+        });
+    }
   }, []);
 
   const isMessagedToCurrentDriver = useCallback((item: AgendaItem) => {
     const stored = messagedMap[item.id];
-    return !!stored && stored === (item.motorista || "");
+    if (stored && stored === (item.motorista || "")) return true;
+    // Também considera a marcação salva no banco (visível para todos)
+    return !!(item as any).mensagemEnviada && (item as any).mensagemEnviada === (item.motorista || "");
   }, [messagedMap]);
+
+  // Migração: envios registrados apenas no aparelho passam a valer para todos
+  const migratedRef = useRef<Set<string>>(new Set());
+  useEffect(() => {
+    const pending = items.filter((i) => {
+      if (migratedRef.current.has(i.id)) return false;
+      const stored = messagedMap[i.id];
+      if (!stored || stored !== (i.motorista || "")) return false;
+      if ((i as any).mensagemEnviada) return false;
+      return true;
+    });
+    if (pending.length === 0) return;
+    pending.forEach((i) => migratedRef.current.add(i.id));
+    Promise.all(
+      pending.map((i) =>
+        supabase.from("agenda_items").update({ mensagem_enviada: i.motorista || "" } as any).eq("id", i.id)
+      )
+    ).then(() => onEdited?.());
+  }, [items, messagedMap, onEdited]);
 
   const tryEditItem = useCallback(async (item: AgendaItem) => {
     if (!session?.user) return;

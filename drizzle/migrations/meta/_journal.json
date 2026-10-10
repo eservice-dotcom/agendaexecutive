@@ -1,0 +1,13 @@
+{
+  "version": "7",
+  "dialect": "postgresql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "7",
+      "when": 1791646767371,
+      "tag": "0000_add_mensagem_enviada_agenda",
+      "breakpoints": true
+    }
+  ]
+}
