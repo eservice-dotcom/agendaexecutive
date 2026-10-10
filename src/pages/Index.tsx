@@ -725,6 +725,10 @@ const Index = () => {
                   <Upload className="h-4 w-4" />
                   PDF CS Global
                 </Button>
+                <Button variant="outline" size="sm" onClick={() => setBondiDialogOpen(true)} className="gap-2">
+                  <Link2 className="h-4 w-4" />
+                  Link Bondi
+                </Button>
                 <Button onClick={() => setNovoDialogOpen(true)} className="gap-2">
                   <Plus className="h-4 w-4" />
                   Novo Serviço
@@ -736,6 +740,7 @@ const Index = () => {
             <ContatosMotoristasDialog open={contatosDialogOpen} onOpenChange={setContatosDialogOpen} items={filteredData} />
             <ImportarPDFDialog open={importPdfDialogOpen} onOpenChange={setImportPdfDialogOpen} onImported={reloadData} />
             <ImportarPDFCSGlobalDialog open={importPdfCsDialogOpen} onOpenChange={setImportPdfCsDialogOpen} onImported={reloadData} />
+            <ImportarPDFCSGlobalDialog mode="bondi" open={bondiDialogOpen} onOpenChange={setBondiDialogOpen} onImported={reloadData} />
           </TabsContent>
 
           <TabsContent value="lixeira" className="space-y-4">
