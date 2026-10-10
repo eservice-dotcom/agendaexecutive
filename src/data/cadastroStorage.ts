@@ -354,6 +354,7 @@ export const getAgendaItems = async (): Promise<AgendaItem[]> => {
     custo: Number(item.custo),
     observacoes: item.observacoes || "",
     receptivo: item.receptivo || "",
+    mensagemEnviada: (item as any).mensagem_enviada || "",
     statusFaturamento: (item.status_faturamento || "") as any,
     corManual: (item as any).cor_manual || undefined,
     kmIn: Number((item as any).km_in) || 0,

@@ -32,6 +32,7 @@ export interface AgendaItem {
   custo: number;
   observacoes: string;
   receptivo: string;
+  mensagemEnviada?: string;
   statusFaturamento: StatusFaturamento;
   corManual?: string;
   kmIn?: number;
