@@ -89,7 +89,7 @@ export function FechamentoOSNotificacoes({ items }: { items: any[] }) {
             className="inline-flex items-center gap-1.5 text-xs pl-2 pr-1 py-1 rounded-md bg-amber-100 dark:bg-amber-900/40 text-amber-900 dark:text-amber-100 border border-amber-300 dark:border-amber-700"
           >
             <span>
-              O.S. <b>{o.cot}</b> · {o.cliente} · último serviço {fmtBR(o.ultima)} ({o.qtd})
+              O.S. <b>{o.cot}</b> · {o.cliente} · último serviço {fmtBR(o.ultima)} · {o.semFechamento} sem fechamento
             </span>
             <button
               onClick={() => dispensar(o.cot)}
