@@ -82,6 +82,7 @@ const Index = () => {
   const [contatosDialogOpen, setContatosDialogOpen] = useState(false);
   const [importPdfDialogOpen, setImportPdfDialogOpen] = useState(false);
   const [importPdfCsDialogOpen, setImportPdfCsDialogOpen] = useState(false);
+  const [bondiDialogOpen, setBondiDialogOpen] = useState(false);
 
   // Fechamento dialog state
   const [fechamentoDialogOpen, setFechamentoDialogOpen] = useState(false);
