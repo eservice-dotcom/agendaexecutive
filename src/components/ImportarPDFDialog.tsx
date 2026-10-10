@@ -304,10 +304,10 @@ const ImportarPDFDialog = ({ open, onOpenChange, onImported }: Props) => {
         novos.push(data.publicUrl);
       }
       setPlacaUrls((prev) => [...prev, ...novos]);
-      toast.success(`${novos.length} PDF de placa anexado(s).`);
+      toast.success(`${novos.length} arquivo(s) de placa anexado(s).`);
     } catch (e: any) {
       console.error("[ImportPDF placa] falha:", e);
-      toast.error("Erro ao enviar PDF da placa: " + (e?.message || ""));
+      toast.error("Erro ao enviar arquivo da placa: " + (e?.message || ""));
     } finally {
       setUploadingPlaca(false);
     }
@@ -547,7 +547,7 @@ const ImportarPDFDialog = ({ open, onOpenChange, onImported }: Props) => {
                   <FileText className={`h-8 w-8 ${placaUrls.length ? "text-emerald-600" : "text-muted-foreground"}`} />
                 )}
                 <div className="text-center">
-                  <p className="text-sm font-medium">{uploadingPlaca ? "Enviando..." : "PDF da placa do serviço"}</p>
+                  <p className="text-sm font-medium">{uploadingPlaca ? "Enviando..." : "Placa do serviço (PDF ou imagem)"}</p>
                   <p className="text-xs text-muted-foreground">
                     {placaUrls.length ? `${placaUrls.length} arquivo(s) anexado(s) — será replicado em cada serviço` : "Opcional — anexado automaticamente em cada serviço importado"}
                   </p>
