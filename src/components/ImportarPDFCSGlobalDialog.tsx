@@ -10,6 +10,7 @@ import { Upload, FileText, Loader2, Trash2, X } from "lucide-react";
 import { getClientes, getFornecedores, getMotoristas, getTiposServico, saveAgendaItem, saveCliente, getAgendaItems, updateAgendaItem } from "@/data/cadastroStorage";
 import { supabase } from "@/integrations/supabase/client";
 import type { Passageiro } from "@/data/agendaData";
+import { bondiIdentifiers, parseBondiPassengerText } from "@/lib/bondiImport";
 
 import * as pdfjsLib from "pdfjs-dist";
 // @ts-ignore
@@ -330,8 +331,7 @@ const parseBondi = async (url: string): Promise<ParsedService[]> => {
         nome: p.name || p.nome || "", telefone: p.phone || p.telefone || "", voo,
       })).filter((p: Passageiro) => p.nome);
       if (!passageiros.length && sv.rawPassengers) {
-        passageiros = String(sv.rawPassengers).split(/[\n;,]+/).map((n) => n.trim()).filter(Boolean)
-          .map((nome) => ({ nome, telefone: "", voo }));
+        passageiros = parseBondiPassengerText(String(sv.rawPassengers), voo);
       }
       const obs = [
         paradas.length ? "Paradas: " + paradas.join(" | ") : "",
@@ -339,7 +339,7 @@ const parseBondi = async (url: string): Promise<ParsedService[]> => {
         sv.observation ? String(sv.observation).trim() : "",
       ].filter(Boolean).join(" | ");
       return {
-        selected: true, sht: "", os: sv.code || order.code || "", data: d, hora,
+        selected: true, ...bondiIdentifiers(order.code, sv.code), data: d, hora,
         tipo: sv.type?.name || "Translado", veiculoTipo: sv.vehicleType?.name || "",
         origem, destino, observacoes: obs, valor: Number(sv.supplierValue) || 0,
         passageiros, fornecedorId: "", motoristaId: "", custo: "",
@@ -432,9 +432,14 @@ const ImportarPDFCSGlobalDialog = ({ open, onOpenChange, onImported, mode = "pdf
         }
         const norm = (s: any) => String(s ?? "").replace(/\s+/g, " ").trim().toLowerCase();
         const tagged: ParsedService[] = parsed.map((p) => {
-          const ex = p.os ? byOs.get(p.os) : null;
+          const ex = isBondi
+            ? existing.find((it) => p.sht && (String(it.sht || "") === p.sht || String(it.cot || "") === p.sht))
+            : p.os ? byOs.get(p.os) : null;
           if (!ex) return { ...p, status: "novo" as const };
           const changed: string[] = [];
+          if (isBondi && norm(ex.cot) !== norm(p.os)) changed.push("O.S.");
+          if (isBondi && norm(ex.sht) !== norm(p.sht)) changed.push("SHT");
+          if (isBondi && norm(JSON.stringify(ex.passageiros || [])) !== norm(JSON.stringify(p.passageiros))) changed.push("passageiros");
           if (norm(ex.data) !== norm(p.data)) changed.push("data");
           if (norm(ex.hora) !== norm(p.hora)) changed.push("hora");
           if (norm(ex.tipo) !== norm(p.tipo)) changed.push("tipo");
@@ -523,7 +528,7 @@ const ImportarPDFCSGlobalDialog = ({ open, onOpenChange, onImported, mode = "pdf
             pax: s.passageiros.length,
             passageiros: s.passageiros,
             cot: s.os,
-            sht: "",
+            sht: s.sht,
             tipo: s.tipo,
             origem: s.origem,
             destino: s.destino,
@@ -548,7 +553,7 @@ const ImportarPDFCSGlobalDialog = ({ open, onOpenChange, onImported, mode = "pdf
             pax: s.passageiros.length,
             passageiros: s.passageiros,
             cot: s.os,
-            sht: "",
+            sht: s.sht,
             tipo: s.tipo,
             origem: s.origem,
             destino: s.destino,
@@ -710,7 +715,7 @@ const ImportarPDFCSGlobalDialog = ({ open, onOpenChange, onImported, mode = "pdf
                       ))}
                     </SelectContent>
                   </Select>
-                  <p className="text-xs text-muted-foreground mt-1">Padrão: CS Brasil. Fornecedor, motorista e custo são manuais.</p>
+                  <p className="text-xs text-muted-foreground mt-1">Padrão: {defaultCliente}. Fornecedor, motorista e custo são manuais.</p>
                 </div>
                 <div className="text-sm text-muted-foreground">
                   <strong>{services.length}</strong> serviço(s) extraído(s). Revise antes de importar.
@@ -724,6 +729,7 @@ const ImportarPDFCSGlobalDialog = ({ open, onOpenChange, onImported, mode = "pdf
                       <th className="p-2"><Checkbox checked={services.every(s => s.selected)} onCheckedChange={(v) => setServices(prev => prev.map(s => ({ ...s, selected: !!v })))} /></th>
                       <th className="p-2 text-left">Status</th>
                       <th className="p-2 text-left">O.S.</th>
+                      {isBondi && <th className="p-2 text-left">SHT</th>}
                       <th className="p-2 text-left">Data</th>
                       <th className="p-2 text-left">Hora</th>
                       <th className="p-2 text-left">Tipo Serviço</th>
@@ -762,6 +768,11 @@ const ImportarPDFCSGlobalDialog = ({ open, onOpenChange, onImported, mode = "pdf
                         <td className="p-1">
                           <Input value={s.os} onChange={(e) => updateService(idx, { os: e.target.value })} className="h-8 w-28" placeholder="O.S." />
                         </td>
+                        {isBondi && (
+                          <td className="p-1">
+                            <Input value={s.sht} onChange={(e) => updateService(idx, { sht: e.target.value })} className="h-8 w-32" placeholder="SHT" />
+                          </td>
+                        )}
                         <td className="p-1">
                           <Input type="date" value={s.data} onChange={(e) => updateService(idx, { data: e.target.value })} className="h-8 w-36" />
                         </td>
