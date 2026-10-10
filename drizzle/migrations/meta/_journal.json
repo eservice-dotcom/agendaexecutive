@@ -8,6 +8,13 @@
       "when": 1791646767371,
       "tag": "0000_add_mensagem_enviada_agenda",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1791647010636,
+      "tag": "0001_fechamento_notificacoes",
+      "breakpoints": true
     }
   ]
 }

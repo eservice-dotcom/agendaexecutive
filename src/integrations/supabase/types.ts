@@ -816,6 +816,27 @@ export type Database = {
           },
         ]
       }
+      fechamento_notificacoes_dispensadas: {
+        Row: {
+          cot: string
+          created_at: string
+          dismissed_by: string
+          id: string
+        }
+        Insert: {
+          cot: string
+          created_at?: string
+          dismissed_by: string
+          id?: string
+        }
+        Update: {
+          cot?: string
+          created_at?: string
+          dismissed_by?: string
+          id?: string
+        }
+        Relationships: []
+      }
       fechamentos: {
         Row: {
           cliente: string

@@ -29,6 +29,7 @@ import { generateClosingReportExcel } from "@/lib/closingReportExcel";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { calcReceitaServico } from "@/lib/receitaServico";
+import { FechamentoOSNotificacoes } from "@/components/FechamentoOSNotificacoes";
 
 interface FiltersState {
   search: string;
@@ -685,6 +686,7 @@ const Index = () => {
                 </div>
               </div>
             )}
+            <FechamentoOSNotificacoes items={agendaData} />
             <div className={`grid gap-3 ${canViewFinancials ? 'grid-cols-2 sm:grid-cols-3 lg:grid-cols-6' : 'grid-cols-1'}`}>
               <StatCard label="Registros" value={filteredData.length.toString()} />
               {canViewFinancials && (
