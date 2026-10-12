@@ -15,6 +15,13 @@
       "when": 1791647010636,
       "tag": "0001_fechamento_notificacoes",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1791815787958,
+      "tag": "0002_contratos_representante_contratante",
+      "breakpoints": true
     }
   ]
 }

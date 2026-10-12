@@ -808,14 +808,26 @@ body{font-family:'Segoe UI',Arial,sans-serif;color:#1a1a1a;font-size:11px;paddin
         <div class="field"><div class="label">CEP</div><div class="value">${c.contratante_cep || ""}</div></div>
         <div class="field"><div class="label">Telefone</div><div class="value">${c.contratante_telefone || ""}</div></div>
         <div class="field"><div class="label">E-mail</div><div class="value">${c.contratante_email || ""}</div></div>
-        <div class="field"><div class="label">Contato</div><div class="value">${c.contratante_contato || ""}</div></div>
+      </div>
+      <p><b>Representado neste ato por:</b></p>
+      <div class="field-grid">
+        <div class="field"><div class="label">Nome</div><div class="value">${c.contratante_contato || ""}</div></div>
+        <div class="field"><div class="label">Profissão</div><div class="value">${c.contratante_representante_profissao || ""}</div></div>
+        <div class="field"><div class="label">CPF / RG</div><div class="value">${c.contratante_representante_cpf_rg || ""}</div></div>
+        <div class="field"><div class="label">Telefone</div><div class="value">${c.contratante_representante_telefone || ""}</div></div>
       </div>
       <p style="margin-top:10px"><b>CONTRATADA:</b></p>
       <div class="field-grid">
         <div class="field"><div class="label">Razão Social</div><div class="value">Executive Service Transporte e Turismo Ltda</div></div>
         <div class="field"><div class="label">CNPJ</div><div class="value">03.143.672/0001-44</div></div>
         <div class="field"><div class="label">Endereço</div><div class="value">QE 26 Cj. O Casa 33 — CEP 71060-151 — Brasília-DF</div></div>
-        <div class="field"><div class="label">Representante Legal</div><div class="value">Rafael Silva da Cunha — CPF: 899.744.500-63</div></div>
+      </div>
+      <p><b>Representado neste ato por:</b></p>
+      <div class="field-grid">
+        <div class="field"><div class="label">Nome</div><div class="value">Rafael Silva da Cunha</div></div>
+        <div class="field"><div class="label">Profissão</div><div class="value">Empresário</div></div>
+        <div class="field"><div class="label">CPF / RG</div><div class="value">CPF: 899.744.500-63</div></div>
+        <div class="field"><div class="label">Telefone</div><div class="value">(61) 98137-9966</div></div>
       </div>
     </div>
   </div>
