@@ -57,6 +57,9 @@ interface Contrato {
   contratante_telefone: string;
   contratante_email: string;
   contratante_contato: string;
+  contratante_representante_profissao: string;
+  contratante_representante_cpf_rg: string;
+  contratante_representante_telefone: string;
   veiculo_tipo: string;
   veiculo_modelo: string;
   veiculo_placa: string;
@@ -111,6 +114,7 @@ const emptyContrato: Omit<Contrato, "id" | "numero_contrato"> = {
   contratante_nome: "", contratante_cnpj_cpf: "", contratante_inscricao: "",
   contratante_endereco: "", contratante_cidade: "", contratante_uf: "",
   contratante_cep: "", contratante_telefone: "", contratante_email: "", contratante_contato: "",
+  contratante_representante_profissao: "", contratante_representante_cpf_rg: "", contratante_representante_telefone: "",
   veiculo_tipo: "", veiculo_modelo: "", veiculo_placa: "", veiculo_ano: "",
   veiculo_cor: "", veiculo_capacidade: "", veiculo_acessorios: "",
   tipo_servico: "", forma_contratacao: "", origem: "", destino: "", paradas: "",
@@ -165,6 +169,9 @@ const Contratos = () => {
         data_inicio: c.data_inicio || "",
         data_fim: c.data_fim || "",
         data_vencimento: c.data_vencimento || "",
+        contratante_representante_profissao: c.contratante_representante_profissao || "",
+        contratante_representante_cpf_rg: c.contratante_representante_cpf_rg || "",
+        contratante_representante_telefone: c.contratante_representante_telefone || "",
         contrato_items: Array.isArray(c.contrato_items) && c.contrato_items.length > 0
           ? c.contrato_items
           : [],
@@ -329,6 +336,10 @@ const Contratos = () => {
   };
 
   const handleSave = async () => {
+    if (!session?.user) {
+      toast.error("Entre novamente para salvar o contrato");
+      return;
+    }
     if (!form.contratante_nome.trim()) {
       toast.error("Informe o nome do contratante");
       return;
@@ -362,7 +373,7 @@ const Contratos = () => {
         const { error } = await supabase
           .from("contratos")
           .insert({
-            user_id: session!.user.id,
+            user_id: session.user.id,
             ...payload,
           } as any);
         if (error) throw error;
@@ -598,11 +609,38 @@ const Contratos = () => {
                   <Label>E-mail</Label>
                   <Input value={form.contratante_email} onChange={e => setField("contratante_email", e.target.value)} />
                 </div>
+              </div>
+              <h4 className="text-sm font-medium mt-3 mb-2">Representado neste ato por:</h4>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 <div>
-                  <Label>Contato Responsável</Label>
-                  <Input value={form.contratante_contato} onChange={e => setField("contratante_contato", e.target.value)} />
+                  <Label htmlFor="representante-nome">Nome</Label>
+                  <Input id="representante-nome" value={form.contratante_contato} onChange={e => setField("contratante_contato", e.target.value)} />
+                </div>
+                <div>
+                  <Label htmlFor="representante-profissao">Profissão</Label>
+                  <Input id="representante-profissao" value={form.contratante_representante_profissao} onChange={e => setField("contratante_representante_profissao", e.target.value)} />
+                </div>
+                <div>
+                  <Label htmlFor="representante-documento">CPF / RG</Label>
+                  <Input id="representante-documento" value={form.contratante_representante_cpf_rg} onChange={e => setField("contratante_representante_cpf_rg", e.target.value)} />
+                </div>
+                <div>
+                  <Label htmlFor="representante-telefone">Telefone do representante</Label>
+                  <Input id="representante-telefone" type="tel" value={form.contratante_representante_telefone} onChange={e => setField("contratante_representante_telefone", e.target.value)} />
                 </div>
               </div>
+            </div>
+
+            <div>
+              <h3 className="text-sm font-semibold text-primary mb-2 border-b pb-1">Dados da Contratada</h3>
+              <p className="text-sm">Executive Service Transporte e Turismo Ltda</p>
+              <h4 className="text-sm font-medium mt-3 mb-2">Representado neste ato por:</h4>
+              <dl className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
+                <div><dt className="text-muted-foreground">Nome</dt><dd>Rafael Silva da Cunha</dd></div>
+                <div><dt className="text-muted-foreground">Profissão</dt><dd>Empresário</dd></div>
+                <div><dt className="text-muted-foreground">CPF / RG</dt><dd>CPF: 899.744.500-63</dd></div>
+                <div><dt className="text-muted-foreground">Telefone</dt><dd>(61) 98137-9966</dd></div>
+              </dl>
             </div>
 
             {/* Veículos (múltiplos) */}

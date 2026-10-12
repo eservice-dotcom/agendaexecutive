@@ -418,6 +418,9 @@ export type Database = {
           contratante_endereco: string
           contratante_inscricao: string
           contratante_nome: string
+          contratante_representante_cpf_rg: string
+          contratante_representante_profissao: string
+          contratante_representante_telefone: string
           contratante_telefone: string
           contratante_uf: string
           contrato_items: Json | null
@@ -473,6 +476,9 @@ export type Database = {
           contratante_endereco?: string
           contratante_inscricao?: string
           contratante_nome?: string
+          contratante_representante_cpf_rg?: string
+          contratante_representante_profissao?: string
+          contratante_representante_telefone?: string
           contratante_telefone?: string
           contratante_uf?: string
           contrato_items?: Json | null
@@ -528,6 +534,9 @@ export type Database = {
           contratante_endereco?: string
           contratante_inscricao?: string
           contratante_nome?: string
+          contratante_representante_cpf_rg?: string
+          contratante_representante_profissao?: string
+          contratante_representante_telefone?: string
           contratante_telefone?: string
           contratante_uf?: string
           contrato_items?: Json | null
