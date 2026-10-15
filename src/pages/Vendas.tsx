@@ -1272,14 +1272,20 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
   };
 
   const loadFechamentoClientes = useCallback(async () => {
-    const { data } = await supabase
-      .from("agenda_items")
-      .select("cliente")
-      .order("cliente");
-    if (data) {
-      const unique = [...new Set(data.map((d) => d.cliente))].filter(Boolean).sort();
-      setFechamentoAllClientes(unique);
+    const data: { cliente: string }[] = [];
+    for (let from = 0; ; from += 1000) {
+      const { data: page } = await supabase
+        .from("agenda_items")
+        .select("cliente")
+        .is("deleted_at", null)
+        .order("cliente")
+        .range(from, from + 999);
+      if (!page || page.length === 0) break;
+      data.push(...page);
+      if (page.length < 1000) break;
     }
+    const unique = [...new Set(data.map((d) => d.cliente))].filter(Boolean).sort();
+    setFechamentoAllClientes(unique);
   }, []);
 
   const loadFechamentoItemsByCliente = useCallback(async (cli: string) => {
