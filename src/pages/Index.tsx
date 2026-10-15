@@ -273,10 +273,14 @@ const Index = () => {
       setFechamentoDialogOpen(false);
       return;
     }
-    const { data } = await supabase.from("agenda_items").select("cliente").is("deleted_at", null).order("cliente");
-    if (data) {
-      setFechamentoAllClientes([...new Set(data.map((d) => d.cliente))].filter(Boolean).sort());
+    const data: { cliente: string }[] = [];
+    for (let from = 0; ; from += 1000) {
+      const { data: page } = await supabase.from("agenda_items").select("cliente").is("deleted_at", null).order("cliente").range(from, from + 999);
+      if (!page || page.length === 0) break;
+      data.push(...page);
+      if (page.length < 1000) break;
     }
+    setFechamentoAllClientes([...new Set(data.map((d) => (d.cliente || "").trim()))].filter(Boolean).sort());
     setFechamentoCliente("");
     setFechamentoItems([]);
     setFechamentoSelected(new Set());
