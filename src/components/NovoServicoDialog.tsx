@@ -80,6 +80,7 @@ const NovoServicoDialog = ({ open, onOpenChange, onSaved, initialData }: NovoSer
   const [uploadingPlaca, setUploadingPlaca] = useState(false);
   const [passageiros, setPassageiros] = useState<Passageiro[]>([]);
   const [outrosDespesas, setOutrosDespesas] = useState<OutraDespesa[]>([]);
+  const isRentACar = /rent\s*a\s*car/i.test(form.tipo || "");
   const [motoristaDiariaMsg, setMotoristaDiariaMsg] = useState("");
   const [fechamentosOpen, setFechamentosOpen] = useState(false);
 
@@ -341,7 +342,7 @@ const NovoServicoDialog = ({ open, onOpenChange, onSaved, initialData }: NovoSer
 
     const cliente = clientes.find((c) => c.id === form.clienteId);
     const veiculo = veiculos.find((v) => v.id === form.veiculoId);
-    const motorista = motoristas.find((m) => m.id === form.motoristaId);
+    const motorista = isRentACar ? undefined : motoristas.find((m) => m.id === form.motoristaId);
     const fornecedor = fornecedores.find((f) => f.id === form.fornecedorId);
 
     const kmDiff = (parseFloat(form.kmFim) || 0) - (parseFloat(form.kmIn) || 0);
@@ -551,7 +552,7 @@ const NovoServicoDialog = ({ open, onOpenChange, onSaved, initialData }: NovoSer
             )}
           </div>
 
-          <div className="space-y-1">
+          {!isRentACar && (<div className="space-y-1">
             <div className="flex items-center justify-between">
               <Label>Motorista</Label>
               <Button type="button" variant="ghost" size="sm" className="h-6 gap-1 text-xs px-2" onClick={() => setShowNewMotorista(!showNewMotorista)}>
@@ -585,7 +586,7 @@ const NovoServicoDialog = ({ open, onOpenChange, onSaved, initialData }: NovoSer
                 )}
               </>
             )}
-          </div>
+          </div>)}
 
           <div className="space-y-1">
             <Label>Valor (R$)</Label>
