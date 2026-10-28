@@ -375,7 +375,7 @@ const NovoServicoDialog = ({ open, onOpenChange, onSaved, initialData }: NovoSer
         placa: veiculo?.placa || "",
         veiculo: veiculo ? `${veiculo.modelo}` : "",
         motorista: isRentACar ? "Rent a Car" : (motorista?.nome || ""),
-        telefone: motorista?.telefone || "",
+        telefone: isRentACar ? "Rent a Car" : (motorista?.telefone || ""),
         valor: parseFloat(form.valor) || 0,
         fornecedor: fornecedor?.razaoSocial || "",
         custo: (() => {
