@@ -544,12 +544,12 @@ const AgendaTable = ({ items, onEdited, hideFinancials, onClone }: AgendaTablePr
                   <TooltipContent side="top" className="text-xs">{item.veiculo}</TooltipContent>
                 </Tooltip>
               </TableCell>
-              <TableCell className={`px-0.5 py-0 text-[9px] ${!item.motorista ? 'bg-blue-200 dark:bg-blue-900/40' : ''}`}>
+              <TableCell className={`px-0.5 py-0 text-[9px] ${!item.motorista && !/rent\s*a\s*car/i.test(item.tipo || "") ? 'bg-blue-200 dark:bg-blue-900/40' : ''}`}>
                 <Tooltip>
                   <TooltipTrigger asChild>
                     <span className="flex items-center gap-0.5 cursor-default">
                       <User className="h-2 w-2 text-muted-foreground shrink-0" />
-                      <span className="truncate max-w-[80px]">{item.motorista}</span>
+                      <span className="truncate max-w-[80px]">{item.motorista || (/rent\s*a\s*car/i.test(item.tipo || "") ? "Rent a Car" : "")}</span>
                     </span>
                   </TooltipTrigger>
                   {item.motorista && (
