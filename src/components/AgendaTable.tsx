@@ -562,7 +562,7 @@ const AgendaTable = ({ items, onEdited, hideFinancials, onClone }: AgendaTablePr
               <TableCell className="px-0.5 py-0 text-[9px]">
                 <span className="flex items-center gap-0.5">
                   <Phone className="h-2 w-2 text-muted-foreground shrink-0" />
-                  <span className="truncate">{item.telefone}</span>
+                  <span className="truncate">{item.telefone || (/rent\s*a\s*car/i.test(item.tipo || "") ? "Rent a Car" : "")}</span>
                   <Button
                     variant="ghost"
                     size="sm"
