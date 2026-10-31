@@ -1169,18 +1169,18 @@ ${venda.observacoes ? `<div style="margin-top:16px;padding:10px;background:#fffb
   };
 
   const handleSalvarFatura = async (venda: Venda) => {
+    const w = window.open("", "_blank");
+    if (!w) {
+      toast({ title: "Permita pop-ups para salvar a fatura", variant: "destructive" });
+      return;
+    }
     const html = await buildFaturaHTML(venda);
-    const blob = new Blob([html], { type: "text/html" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `Fatura_${venda.numero_venda}_${venda.cliente.replace(/\s+/g, "_")}.html`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
+    w.document.open();
+    w.document.write(html);
+    w.document.close();
+    setTimeout(() => { w.focus(); w.print(); }, 500);
     await markVendaAsFaturado(venda);
-    toast({ title: "Fatura salva", description: "Arquivo HTML baixado com sucesso" });
+    toast({ title: "Salvar fatura", description: "Na janela que abrir, escolha \"Salvar como PDF\"." });
   };
 
   const handleExportarVendaExcel = async (venda: Venda) => {
