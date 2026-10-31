@@ -1075,7 +1075,9 @@ const Vendas = () => {
     const totalCalculado = items.reduce((sum: number, item: any) => sum + Number(item.valor || 0), 0)
       + vendaExtras.reduce((sum: number, ex: any) => sum + Number(ex.valor || 0), 0);
 
-    return `<!DOCTYPE html><html><head><title>Fatura - ${clienteNomeCompleto}</title>
+    const cotsTitulo = [...new Set(items.map((it: any) => String(it.agenda_items?.cot || "").trim()).filter(Boolean))].join(", ");
+    const tituloArquivo = `Fatura nº ${venda.numero_venda} - Executive Service${cotsTitulo ? ` - Nº OS ${cotsTitulo}` : ""}`;
+    return `<!DOCTYPE html><html><head><title>${tituloArquivo}</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 body{font-family:Arial,sans-serif;padding:30px;color:#1a1a1a;font-size:12px}
