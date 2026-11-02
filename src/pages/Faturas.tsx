@@ -218,12 +218,12 @@ export default function Faturas() {
       agendaItems,
       title,
       cliente,
-      { cliente, observacoes: obs, valor_total: valorTotal, extras },
+      { cliente, observacoes: obs, valor_total: valorTotal, data_vencimento: vencimento || null, extras },
       numero,
     ] as const;
 
     if (format === "excel" || format === "ambos") generateClosingReportExcel(...args);
-    if (format === "print" || format === "ambos") generateClosingReport(...args);
+    if (format === "print" || format === "ambos") generateClosingReport(...args, "FATURA");
 
     toast({ title: `Fatura Nº ${numero} gerada com sucesso!` });
     setObs("");
@@ -322,7 +322,7 @@ export default function Faturas() {
       agendaItems,
       `Fatura Nº ${f.numero_fatura} - ${f.cliente}`,
       f.cliente,
-      { cliente: f.cliente, observacoes: f.observacoes, valor_total: Number(f.valor_total), extras },
+      { cliente: f.cliente, observacoes: f.observacoes, valor_total: Number(f.valor_total), data_vencimento: f.data_vencimento, extras },
       f.numero_fatura,
     ] as const;
     if (format === "excel") generateClosingReportExcel(...args);

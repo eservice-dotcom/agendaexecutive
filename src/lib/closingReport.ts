@@ -186,6 +186,7 @@ export const generateClosingReport = (
       <div class="info-box">
         <h3>Detalhes</h3>
         ${vendaInfo.data_venda ? `<p><strong>Data da Venda:</strong> ${formatDate(vendaInfo.data_venda)}</p>` : ""}
+        ${vendaInfo.data_vencimento ? `<p><strong>Vencimento:</strong> ${formatDate(vendaInfo.data_vencimento)}</p>` : ""}
         ${vendaInfo.valor_total != null ? `<p><strong>Valor Total:</strong> ${formatCurrency(vendaInfo.valor_total)}</p>` : ""}
         ${extrasHTML}
       </div>
